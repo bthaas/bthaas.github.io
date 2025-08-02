@@ -369,6 +369,14 @@
         .project-card:nth-child(4) { animation-delay: 0.4s; }
         .project-card:nth-child(5) { animation-delay: 0.5s; }
         .project-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Ripple animation for click effects */
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -608,27 +616,80 @@
             }
         });
 
-        // Project card click handlers
+        // Project card click handlers - more precise
         document.querySelectorAll('.project-card').forEach(card => {
-            card.addEventListener('click', () => {
-                // Add click animation
-                card.style.transform = 'scale(0.98)';
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Add click animation only to this specific card
+                const originalTransform = card.style.transform;
+                card.style.transform = 'scale(0.95)';
+                
                 setTimeout(() => {
-                    card.style.transform = '';
-                }, 150);
+                    card.style.transform = originalTransform || '';
+                }, 200);
+                
+                // Optional: Add a subtle ripple effect
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(0, 122, 255, 0.1)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.left = (e.clientX - card.offsetLeft) + 'px';
+                ripple.style.top = (e.clientY - card.offsetTop) + 'px';
+                ripple.style.width = ripple.style.height = '20px';
+                ripple.style.pointerEvents = 'none';
+                
+                card.style.position = 'relative';
+                card.appendChild(ripple);
+                
+                setTimeout(() => {
+                    if (ripple.parentNode) {
+                        ripple.parentNode.removeChild(ripple);
+                    }
+                }, 600);
             });
         });
 
-        // Experiment item hover effects
+        // Experiment item hover effects - more isolated
         document.querySelectorAll('.experiment-item').forEach(item => {
-            item.addEventListener('mouseenter', () => {
+            let isHovered = false;
+            
+            item.addEventListener('mouseenter', (e) => {
+                e.preventDefault();
+                isHovered = true;
+                
+                // Only change this specific item
                 item.style.borderColor = '#007AFF';
-                item.style.transform = 'translateX(10px)';
+                item.style.transform = 'translateX(8px)';
+                item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
             });
 
-            item.addEventListener('mouseleave', () => {
+            item.addEventListener('mouseleave', (e) => {
+                e.preventDefault();
+                isHovered = false;
+                
+                // Reset only this specific item
                 item.style.borderColor = '#e1e1e1';
                 item.style.transform = 'translateX(0)';
+            });
+            
+            // Prevent click from interfering with hover
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Add a subtle click effect
+                item.style.transform = 'translateX(8px) scale(0.98)';
+                setTimeout(() => {
+                    if (!isHovered) {
+                        item.style.transform = 'translateX(0)';
+                    } else {
+                        item.style.transform = 'translateX(8px)';
+                    }
+                }, 150);
             });
         });
 
