@@ -706,35 +706,74 @@
         // Project card click handlers
         document.querySelectorAll('.project-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+                // Check if this card is a link (has href)
+                const href = card.getAttribute('href');
                 
-                const originalTransform = card.style.transform;
-                card.style.transform = 'scale(0.95)';
-                
-                setTimeout(() => {
-                    card.style.transform = originalTransform || '';
-                }, 200);
-                
-                const ripple = document.createElement('div');
-                ripple.style.position = 'absolute';
-                ripple.style.borderRadius = '50%';
-                ripple.style.background = 'rgba(0, 122, 255, 0.1)';
-                ripple.style.transform = 'scale(0)';
-                ripple.style.animation = 'ripple 0.6s linear';
-                ripple.style.left = (e.clientX - card.offsetLeft) + 'px';
-                ripple.style.top = (e.clientY - card.offsetTop) + 'px';
-                ripple.style.width = ripple.style.height = '20px';
-                ripple.style.pointerEvents = 'none';
-                
-                card.style.position = 'relative';
-                card.appendChild(ripple);
-                
-                setTimeout(() => {
-                    if (ripple.parentNode) {
-                        ripple.parentNode.removeChild(ripple);
-                    }
-                }, 600);
+                if (href) {
+                    // This is a linked card, allow navigation after animation
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const originalTransform = card.style.transform;
+                    card.style.transform = 'scale(0.95)';
+                    
+                    setTimeout(() => {
+                        card.style.transform = originalTransform || '';
+                        // Navigate to the href after animation
+                        window.location.href = href;
+                    }, 200);
+                    
+                    const ripple = document.createElement('div');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(0, 122, 255, 0.1)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = (e.clientX - card.offsetLeft) + 'px';
+                    ripple.style.top = (e.clientY - card.offsetTop) + 'px';
+                    ripple.style.width = ripple.style.height = '20px';
+                    ripple.style.pointerEvents = 'none';
+                    
+                    card.style.position = 'relative';
+                    card.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        if (ripple.parentNode) {
+                            ripple.parentNode.removeChild(ripple);
+                        }
+                    }, 600);
+                } else {
+                    // This is a non-linked card, just do the animation
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const originalTransform = card.style.transform;
+                    card.style.transform = 'scale(0.95)';
+                    
+                    setTimeout(() => {
+                        card.style.transform = originalTransform || '';
+                    }, 200);
+                    
+                    const ripple = document.createElement('div');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(0, 122, 255, 0.1)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = (e.clientX - card.offsetLeft) + 'px';
+                    ripple.style.top = (e.clientY - card.offsetTop) + 'px';
+                    ripple.style.width = ripple.style.height = '20px';
+                    ripple.style.pointerEvents = 'none';
+                    
+                    card.style.position = 'relative';
+                    card.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        if (ripple.parentNode) {
+                            ripple.parentNode.removeChild(ripple);
+                        }
+                    }, 600);
+                }
             });
         });
 
