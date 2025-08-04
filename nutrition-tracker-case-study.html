@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutritionTracker App Case Study | Brett Haas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #666;
+            --accent-color: #007AFF;
+            --hover-color: #f5f5f5;
+            --text-light: #999;
+            --border-color: #e1e1e1;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--primary-color);
+            background: #fafafa;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Left Logo */
+        .left-logo {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+            z-index: 1001;
+            transition: color 0.3s ease;
+        }
+
+        /* Right Logo */
+        .right-logo {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .right-logo a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .right-logo a:hover {
+            color: var(--primary-color);
+        }
+
+        .right-logo a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .right-logo a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            transition: margin-right 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 300;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+        }
+
+        .hero .role {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+
+        /* Case Study Content */
+        .case-study {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 0;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-number {
+            font-size: 2.5rem;
+            font-weight: 100;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+
+        .section-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+        }
+
+        .section-content p {
+            margin-bottom: 20px;
+        }
+
+        .section-content ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-content li {
+            margin-bottom: 10px;
+        }
+
+        /* Image Placeholder */
+        .image-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 40px;
+            left: 120px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 400;
+            transition: color 0.3s ease;
+            z-index: 1001;
+        }
+
+        .back-button:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .left-logo {
+                top: 20px;
+                left: 20px;
+            }
+
+            .right-logo {
+                top: 20px;
+                right: 20px;
+            }
+
+            .back-button {
+                top: 20px;
+                left: 80px;
+            }
+
+            .hero {
+                padding: 100px 0 60px;
+            }
+
+            .case-study {
+                padding: 40px 0;
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Logo -->
+    <a href="index.html" class="left-logo">BH</a>
+
+    <!-- Back Button -->
+    <a href="index.html" class="back-button">Back</a>
+
+    <!-- Right Logo -->
+    <div class="right-logo">
+        <a href="index.html#work">Experience</a>
+        <a href="index.html#work">Projects</a>
+        <a href="index.html#contact">Contact</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>NutritionTracker App</h1>
+                <p class="subtitle">Full-Stack Mobile App Developer</p>
+                <p class="role">Of Interest: Modern nutrition tracking with AI-powered insights and offline-first architecture</p>
+            </div>
+        </section>
+
+        <!-- Case Study Content -->
+        <section class="case-study">
+            <div class="container">
+                <div class="section">
+                    <div class="section-number">1.1</div>
+                    <h2 class="section-title">Overview</h2>
+                    <div class="section-content">
+                        <p>When I started the NutritionTracker project, the goal was to create a comprehensive nutrition and fitness tracking application that would stand out in the crowded health app market. The original vision was to build a modern, user-friendly app with advanced analytics and seamless offline functionality.</p>
+                        <p>Our vision quickly expanded beyond basic nutrition tracking, but let's start here.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">2.1</div>
+                    <h2 class="section-title">Research</h2>
+                    <div class="section-content">
+                        <p>Through user research and market analysis, we discovered that existing nutrition apps had significant limitations. Users struggled with complex food logging interfaces, poor offline experiences, and lack of comprehensive analytics. The mobile health app landscape was fragmented with inconsistent user experiences.</p>
+                        <p>Key findings included:</p>
+                        <ul>
+                            <li>Users needed more intuitive food logging with voice and photo input</li>
+                            <li>Offline functionality was crucial for consistent usage</li>
+                            <li>Comprehensive nutrition data beyond just calories was essential</li>
+                            <li>Integration between nutrition and fitness tracking was lacking</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">3.1</div>
+                    <h2 class="section-title">Strategy</h2>
+                    <div class="section-content">
+                        <p>Based on these findings, we decided to take on the challenge of creating a comprehensive health platform that would serve as the primary nutrition and fitness tracking solution for health-conscious individuals.</p>
+                        <p>Our strategy focused on three core pillars:</p>
+                        <ul>
+                            <li>Offline-first architecture for reliable user experience</li>
+                            <li>AI-powered food recognition and recommendations</li>
+                            <li>Comprehensive analytics with actionable insights</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">4.1</div>
+                    <h2 class="section-title">Technical Architecture</h2>
+                    <div class="section-content">
+                        <p>I designed a modern React Native architecture with TypeScript for type safety and Expo for cross-platform development. The app uses Zustand for lightweight state management and SQLite for offline data persistence.</p>
+                        <p>Key technical decisions:</p>
+                        <ul>
+                            <li>React Native with Expo SDK 50+ for cross-platform development</li>
+                            <li>TypeScript for comprehensive type safety</li>
+                            <li>Zustand for performant state management</li>
+                            <li>SQLite with custom database manager for offline functionality</li>
+                            <li>AsyncStorage for data persistence</li>
+                        </ul>
+                    </div>
+                    <div class="image-placeholder">Technical Architecture Diagram</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">4.2</div>
+                    <h2 class="section-title">Core Features</h2>
+                    <div class="section-content">
+                        <p>The app includes comprehensive nutrition tracking with daily food logging across breakfast, lunch, dinner, and snacks. Users can track calories, macros, fiber, sugar, sodium, and cholesterol with smart food database integration.</p>
+                        <p>Advanced features include:</p>
+                        <ul>
+                            <li>AI-powered food recognition with voice and photo input</li>
+                            <li>Comprehensive workout tracking with MET calculations</li>
+                            <li>Personalized goal setting with automatic calorie recommendations</li>
+                            <li>Interactive analytics with charts and progress tracking</li>
+                        </ul>
+                    </div>
+                    <div class="image-placeholder">Core Features Screenshots</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">5.1</div>
+                    <h2 class="section-title">User Experience Design</h2>
+                    <div class="section-content">
+                        <p>The UX design focuses on simplicity and efficiency. I implemented a tab-based navigation structure with Today, Nutrition, Workouts, Progress, and Profile sections. The interface supports light, dark, and system automatic themes.</p>
+                        <p>Key UX improvements:</p>
+                        <ul>
+                            <li>Intuitive food logging with quick-add functionality</li>
+                            <li>Visual progress indicators and goal tracking</li>
+                            <li>Accessible design with screen reader support</li>
+                            <li>Haptic feedback for better interaction</li>
+                        </ul>
+                    </div>
+                    <div class="image-placeholder">UX Design Screenshots</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">6.1</div>
+                    <h2 class="section-title">Advanced Analytics</h2>
+                    <div class="section-content">
+                        <p>I designed a comprehensive analytics system that provides users with detailed insights into their nutrition and fitness patterns. The system includes interactive charts, progress tracking, and personalized recommendations.</p>
+                        <p>Analytics features include:</p>
+                        <ul>
+                            <li>Real-time macro breakdown with progress bars</li>
+                            <li>Interactive pie charts for nutrition distribution</li>
+                            <li>Weekly and monthly trend analysis</li>
+                            <li>Nutritional gap identification and recommendations</li>
+                        </ul>
+                    </div>
+                    <div class="image-placeholder">Analytics Dashboard</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">7.1</div>
+                    <h2 class="section-title">AI Integration</h2>
+                    <div class="section-content">
+                        <p>The app incorporates AI-powered features for enhanced user experience. This includes voice input for food logging, photo analysis for food identification, and smart recommendations based on nutritional needs.</p>
+                        <p>AI features include:</p>
+                        <ul>
+                            <li>Speech-to-text for hands-free food logging</li>
+                            <li>Image recognition for automatic food identification</li>
+                            <li>Smart nutritional gap analysis</li>
+                            <li>Personalized meal suggestions</li>
+                        </ul>
+                    </div>
+                    <div class="image-placeholder">AI Features Demo</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">8.1</div>
+                    <h2 class="section-title">Performance & Optimization</h2>
+                    <div class="section-content">
+                        <p>Performance was a key focus throughout development. I implemented lazy loading, efficient database queries, and optimized bundle size to ensure fast load times and smooth interactions across all devices.</p>
+                        <p>Performance optimizations include:</p>
+                        <ul>
+                            <li>Offline-first architecture for instant access</li>
+                            <li>Optimized database operations with indexed queries</li>
+                            <li>Memory management and garbage collection</li>
+                            <li>Minimized app size and load times</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-number">9.1</div>
+                    <h2 class="section-title">Outcome & Impact</h2>
+                    <div class="section-content">
+                        <p>The NutritionTracker app successfully addresses the core pain points identified in our research. The offline-first approach ensures reliable user experience, while the comprehensive analytics provide valuable insights for health-conscious individuals.</p>
+                        <p>Key achievements:</p>
+                        <ul>
+                            <li>Modern, intuitive interface that simplifies nutrition tracking</li>
+                            <li>Comprehensive offline functionality for consistent usage</li>
+                            <li>Advanced analytics with actionable health insights</li>
+                            <li>AI-powered features for enhanced user experience</li>
+                            <li>Scalable architecture ready for future enhancements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                
+                if (href === '#top') {
+                    // Scroll to top for logo click
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
