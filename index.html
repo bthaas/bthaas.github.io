@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brett Haas - Portfolio</title>
+    <title>Brett Haas | Home</title>
     <style>
         * {
             margin: 0;
@@ -34,68 +34,57 @@
             padding: 0 20px;
         }
 
-        /* Header */
-        header {
+        /* Side Navigation */
+        .side-nav {
             position: fixed;
             top: 0;
-            left: 0;
             right: 0;
-            background: rgba(250, 250, 250, 0.9);
-            backdrop-filter: blur(10px);
+            height: 100vh;
+            width: 80px;
+            background: transparent;
             z-index: 1000;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
         }
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .side-nav.scrolled {
+            width: 200px;
         }
 
         .logo {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 60px;
+            transition: color 0.3s ease;
+        }
+
+
+
+        /* Left Logo */
+        .left-logo {
+            position: fixed;
+            top: 40px;
+            left: 40px;
             font-size: 18px;
             font-weight: 600;
             color: var(--primary-color);
             text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--secondary-color);
-            text-decoration: none;
-            font-weight: 400;
+            z-index: 1001;
             transition: color 0.3s ease;
-            position: relative;
         }
 
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent-color);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
+                /* Main Content */
+        .main-content {
+            transition: margin-right 0.3s ease;
         }
 
         /* Hero Section */
         .hero {
-            margin-top: 80px;
             padding: 80px 0 60px;
             text-align: center;
         }
@@ -321,8 +310,20 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .nav-links {
-                gap: 20px;
+            .side-nav {
+                width: 60px;
+            }
+            
+            .side-nav.scrolled {
+                width: 160px;
+            }
+            
+            .main-content {
+                margin-right: 60px;
+            }
+            
+            .main-content.scrolled {
+                margin-right: 160px;
             }
 
             .projects-grid {
@@ -380,199 +381,215 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav class="container">
-            <a href="#" class="logo">Brett Haas</a>
-            <ul class="nav-links">
-                <li><a href="#work">Work</a></li>
-                <li><a href="#experiments">Experiments</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+    <!-- Left Logo -->
+    <a href="#" class="left-logo">BH</a>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>I bring ideas to life.</h1>
-            <p class="subtitle">developer & designer</p>
-            <p class="location">New York, NY</p>
-        </div>
-    </section>
+    <!-- Side Navigation -->
+    <nav class="side-nav">
+    </nav>
 
-    <!-- About Section -->
-    <section class="about" id="about">
-        <div class="container">
-            <p>I'm passionate about crafting meaningful digital experiences that bridge the gap between user needs and innovative technology. My work spans across product design, web development, and creative experimentation.</p>
-        </div>
-    </section>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>I bring ideas to life.</h1>
+                <p class="subtitle">developer & designer</p>
+                <p class="location">New York, NY</p>
+            </div>
+        </section>
 
-    <!-- Projects Section -->
-    <section class="projects" id="work">
-        <div class="container">
-            <h2 class="section-title">Selected Work</h2>
-            <div class="projects-grid">
-                <div class="project-card loading">
-                    <div class="project-image">
-                        <div class="project-overlay">
-                            <span class="project-number">01</span>
-                        </div>
-                    </div>
-                    <div class="project-content">
-                        <h3 class="project-title">E-commerce Platform</h3>
-                        <p class="project-description">A modern e-commerce platform with seamless user experience and advanced filtering capabilities.</p>
-                        <div class="project-tags">
-                            <span class="tag">React</span>
-                            <span class="tag">Node.js</span>
-                            <span class="tag">UI/UX</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- About Section -->
+        <section class="about" id="about">
+            <div class="container">
+                <p>I'm passionate about crafting meaningful digital experiences that bridge the gap between user needs and innovative technology. My work spans across product design, web development, and creative experimentation.</p>
+            </div>
+        </section>
 
-                <div class="project-card loading">
-                    <div class="project-image">
-                        <div class="project-overlay">
-                            <span class="project-number">02</span>
+        <!-- Projects Section -->
+        <section class="projects" id="work">
+            <div class="container">
+                <h2 class="section-title">Selected Work</h2>
+                <div class="projects-grid">
+                    <div class="project-card loading">
+                        <div class="project-image">
+                            <div class="project-overlay">
+                                <span class="project-number">01</span>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3 class="project-title">E-commerce Platform</h3>
+                            <p class="project-description">A modern e-commerce platform with seamless user experience and advanced filtering capabilities.</p>
+                            <div class="project-tags">
+                                <span class="tag">React</span>
+                                <span class="tag">Node.js</span>
+                                <span class="tag">UI/UX</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-content">
-                        <h3 class="project-title">Mobile Banking App</h3>
-                        <p class="project-description">Redesigned mobile banking experience focusing on security and usability for financial transactions.</p>
-                        <div class="project-tags">
-                            <span class="tag">Mobile</span>
-                            <span class="tag">Fintech</span>
-                            <span class="tag">Security</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="project-card loading">
-                    <div class="project-image">
-                        <div class="project-overlay">
-                            <span class="project-number">03</span>
+                    <div class="project-card loading">
+                        <div class="project-image">
+                            <div class="project-overlay">
+                                <span class="project-number">02</span>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3 class="project-title">Mobile Banking App</h3>
+                            <p class="project-description">Redesigned mobile banking experience focusing on security and usability for financial transactions.</p>
+                            <div class="project-tags">
+                                <span class="tag">Mobile</span>
+                                <span class="tag">Fintech</span>
+                                <span class="tag">Security</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-content">
-                        <h3 class="project-title">Creative Portfolio</h3>
-                        <p class="project-description">Interactive portfolio website showcasing creative work with immersive animations and storytelling.</p>
-                        <div class="project-tags">
-                            <span class="tag">Creative</span>
-                            <span class="tag">Animation</span>
-                            <span class="tag">WebGL</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="project-card loading">
-                    <div class="project-image">
-                        <div class="project-overlay">
-                            <span class="project-number">04</span>
+                    <div class="project-card loading">
+                        <div class="project-image">
+                            <div class="project-overlay">
+                                <span class="project-number">03</span>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3 class="project-title">Creative Portfolio</h3>
+                            <p class="project-description">Interactive portfolio website showcasing creative work with immersive animations and storytelling.</p>
+                            <div class="project-tags">
+                                <span class="tag">Creative</span>
+                                <span class="tag">Animation</span>
+                                <span class="tag">WebGL</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-content">
-                        <h3 class="project-title">AI Dashboard</h3>
-                        <p class="project-description">Data visualization dashboard for AI model performance monitoring with real-time analytics.</p>
-                        <div class="project-tags">
-                            <span class="tag">AI/ML</span>
-                            <span class="tag">Data Viz</span>
-                            <span class="tag">Dashboard</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="project-card loading">
-                    <div class="project-image">
-                        <div class="project-overlay">
-                            <span class="project-number">05</span>
+                    <div class="project-card loading">
+                        <div class="project-image">
+                            <div class="project-overlay">
+                                <span class="project-number">04</span>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3 class="project-title">AI Dashboard</h3>
+                            <p class="project-description">Data visualization dashboard for AI model performance monitoring with real-time analytics.</p>
+                            <div class="project-tags">
+                                <span class="tag">AI/ML</span>
+                                <span class="tag">Data Viz</span>
+                                <span class="tag">Dashboard</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-content">
-                        <h3 class="project-title">Social Media Tool</h3>
-                        <p class="project-description">Content management platform for social media scheduling and analytics with team collaboration features.</p>
-                        <div class="project-tags">
-                            <span class="tag">SaaS</span>
-                            <span class="tag">Social</span>
-                            <span class="tag">Analytics</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="project-card loading">
-                    <div class="project-image">
-                        <div class="project-overlay">
-                            <span class="project-number">06</span>
+                    <div class="project-card loading">
+                        <div class="project-image">
+                            <div class="project-overlay">
+                                <span class="project-number">05</span>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3 class="project-title">Social Media Tool</h3>
+                            <p class="project-description">Content management platform for social media scheduling and analytics with team collaboration features.</p>
+                            <div class="project-tags">
+                                <span class="tag">SaaS</span>
+                                <span class="tag">Social</span>
+                                <span class="tag">Analytics</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-content">
-                        <h3 class="project-title">Health Tech App</h3>
-                        <p class="project-description">Wellness tracking application with personalized recommendations and community features.</p>
-                        <div class="project-tags">
-                            <span class="tag">Health</span>
-                            <span class="tag">Mobile</span>
-                            <span class="tag">Wellness</span>
+
+                    <div class="project-card loading">
+                        <div class="project-image">
+                            <div class="project-overlay">
+                                <span class="project-number">06</span>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3 class="project-title">Health Tech App</h3>
+                            <p class="project-description">Wellness tracking application with personalized recommendations and community features.</p>
+                            <div class="project-tags">
+                                <span class="tag">Health</span>
+                                <span class="tag">Mobile</span>
+                                <span class="tag">Wellness</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Experiments Section -->
-    <section class="experiments" id="experiments">
-        <div class="container">
-            <h2 class="section-title">Experiments</h2>
-            <div class="experiments-list">
-                <div class="experiment-item">
-                    <div class="experiment-title">AR Filter Collection</div>
-                    <div class="experiment-number">08</div>
-                </div>
-                <div class="experiment-item">
-                    <div class="experiment-title">Voice UI Prototype</div>
-                    <div class="experiment-number">07</div>
-                </div>
-                <div class="experiment-item">
-                    <div class="experiment-title">Generative Art Tool</div>
-                    <div class="experiment-number">06</div>
-                </div>
-                <div class="experiment-item">
-                    <div class="experiment-title">Micro-interaction Library</div>
-                    <div class="experiment-number">05</div>
-                </div>
-                <div class="experiment-item">
-                    <div class="experiment-title">3D Product Configurator</div>
-                    <div class="experiment-number">04</div>
-                </div>
-                <div class="experiment-item">
-                    <div class="experiment-title">Motion Design Studies</div>
-                    <div class="experiment-number">03</div>
-                </div>
-                <div class="experiment-item">
-                    <div class="experiment-title">Color Palette Generator</div>
-                    <div class="experiment-number">02</div>
-                </div>
-                <div class="experiment-item">
-                    <div class="experiment-title">Typography Experiments</div>
-                    <div class="experiment-number">01</div>
+        <!-- Experiments Section -->
+        <section class="experiments" id="experiments">
+            <div class="container">
+                <h2 class="section-title">Experiments</h2>
+                <div class="experiments-list">
+                    <div class="experiment-item">
+                        <div class="experiment-title">AR Filter Collection</div>
+                        <div class="experiment-number">08</div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">Voice UI Prototype</div>
+                        <div class="experiment-number">07</div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">Generative Art Tool</div>
+                        <div class="experiment-number">06</div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">Micro-interaction Library</div>
+                        <div class="experiment-number">05</div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">3D Product Configurator</div>
+                        <div class="experiment-number">04</div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">Motion Design Studies</div>
+                        <div class="experiment-number">03</div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">Color Palette Generator</div>
+                        <div class="experiment-number">02</div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">Typography Experiments</div>
+                        <div class="experiment-number">01</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <div class="container">
-            <h2 class="section-title">Let's create something together</h2>
-            <div class="contact-links">
-                <a href="mailto:dev@bretthaas.com" class="contact-link">Email</a>
-                <a href="https://github.com/bthaas" class="contact-link">GitHub</a>
-                <a href="https://www.linkedin.com/in/brett-haas/" class="contact-link">LinkedIn</a>
+        <!-- Contact Section -->
+        <section class="contact" id="contact">
+            <div class="container">
+                <h2 class="section-title">Let's create something together</h2>
+                <div class="contact-links">
+                    <a href="mailto:dev@bretthaas.com" class="contact-link">Email</a>
+                    <a href="https://github.com/bthaas" class="contact-link">GitHub</a>
+                    <a href="https://www.linkedin.com/in/brett-haas/" class="contact-link">LinkedIn</a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <script>
+        // Side navigation scroll functionality
+        const sideNav = document.querySelector('.side-nav');
+        
+        let lastScrollTop = 0;
+        const scrollThreshold = 100;
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Expand/collapse side nav based on scroll
+            if (scrollTop > scrollThreshold) {
+                sideNav.classList.add('scrolled');
+            } else {
+                sideNav.classList.remove('scrolled');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -606,22 +623,12 @@
             observer.observe(card);
         });
 
-        // Add some interactive cursor effects
-        document.addEventListener('mousemove', (e) => {
-            const cursor = document.querySelector('.cursor');
-            if (cursor) {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-            }
-        });
-
-        // Project card click handlers - more precise
+        // Project card click handlers
         document.querySelectorAll('.project-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Add click animation only to this specific card
                 const originalTransform = card.style.transform;
                 card.style.transform = 'scale(0.95)';
                 
@@ -629,7 +636,6 @@
                     card.style.transform = originalTransform || '';
                 }, 200);
                 
-                // Optional: Add a subtle ripple effect
                 const ripple = document.createElement('div');
                 ripple.style.position = 'absolute';
                 ripple.style.borderRadius = '50%';
@@ -652,7 +658,7 @@
             });
         });
 
-        // Experiment item hover effects - more isolated
+        // Experiment item hover effects
         document.querySelectorAll('.experiment-item').forEach(item => {
             let isHovered = false;
             
@@ -660,7 +666,6 @@
                 e.preventDefault();
                 isHovered = true;
                 
-                // Only change this specific item
                 item.style.borderColor = '#007AFF';
                 item.style.transform = 'translateX(8px)';
                 item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -670,17 +675,14 @@
                 e.preventDefault();
                 isHovered = false;
                 
-                // Reset only this specific item
                 item.style.borderColor = '#e1e1e1';
                 item.style.transform = 'translateX(0)';
             });
             
-            // Prevent click from interfering with hover
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Add a subtle click effect
                 item.style.transform = 'translateX(8px) scale(0.98)';
                 setTimeout(() => {
                     if (!isHovered) {
@@ -690,14 +692,6 @@
                     }
                 }, 150);
             });
-        });
-
-        // Header background opacity on scroll
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('header');
-            const scrolled = window.pageYOffset;
-            const opacity = Math.min(scrolled / 100, 1);
-            header.style.background = `rgba(250, 250, 250, ${0.9 + opacity * 0.1})`;
         });
     </script>
 </body>
