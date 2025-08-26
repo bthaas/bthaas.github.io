@@ -199,9 +199,16 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
+        .project-card, .project-card:hover {
+            text-decoration: none; /* Remove underline from the card link */
+        }
+
+        .project-card:hover .project-title {
+            text-decoration: underline; /* Add underline only to the title on hover */
+        }
+
         .project-image {
             height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             position: relative;
             overflow: hidden;
         }
@@ -432,7 +439,6 @@
         .project-card:nth-child(3) { animation-delay: 0.3s; }
         .project-card:nth-child(4) { animation-delay: 0.4s; }
         .project-card:nth-child(5) { animation-delay: 0.5s; }
-        .project-card:nth-child(6) { animation-delay: 0.6s; }
 
         /* Ripple animation for click effects */
         @keyframes ripple {
@@ -441,16 +447,64 @@
                 opacity: 0;
             }
         }
+
+        /* Top Navigation Container */
+        .top-nav {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            z-index: 1001;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Back Button */
+        .back-button {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--hover-color);
+            border-radius: 50%;
+            text-decoration: none;
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: var(--primary-color);
+            background: var(--accent-color);
+        }
+
+        .back-button svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .diagram-image {
+            width: 60%;
+            display: block;
+            margin: 30px auto 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body>
-    <!-- Left Logo -->
-    <a href="#top" class="left-logo" data-value="BH">BH</a>
-
-    <!-- Right Logo -->
-    <div class="right-logo">
-        <a href="#work">Projects</a>
-        <a href="#contact">Contact</a>
+    <div class="top-nav">
+        <a href="#top" class="left-logo" data-value="BH">BH</a>
+        <div class="right-logo">
+            <a href="#work">Projects</a>
+            <a href="#contact">Contact</a>
+        </div>
     </div>
 
     <!-- Side Navigation -->
@@ -479,7 +533,7 @@
         <!-- Projects Section -->
         <section class="projects" id="work">
             <div class="container">
-                <h2 class="section-title">Selected Work</h2>
+                <h2 class="section-title">Portfolio</h2>
                 <div class="projects-grid">
                     <a href="nutrition-tracker-case-study.html" class="project-card loading">
                         <div class="project-image neutral">
@@ -495,26 +549,53 @@
                         </div>
                     </a>
 
-                    <div class="project-card loading placeholder">
+                    <a href="ai-caption-generator-case-study.html" class="project-card loading">
                         <div class="project-image neutral"></div>
                         <div class="project-content">
-                            <h3 class="project-title">Case Study #2</h3>
-                            <p class="project-description">Coming soon — check back shortly.</p>
+                            <h3 class="project-title">AI Image Caption Generator</h3>
+                            <p class="project-description">End-to-end deep learning model (CNN + LSTM) to generate captions for images.</p>
                             <div class="project-tags">
-                                <span class="tag">TBD</span>
-                                <span class="tag">Design</span>
+                                <span class="tag">TensorFlow</span>
+                                <span class="tag">Python</span>
+                                <span class="tag">Google Cloud</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
+
+                    <a href="photo-curator-case-study.html" class="project-card loading">
+                        <div class="project-image neutral"></div>
+                        <div class="project-content">
+                            <h3 class="project-title">Photo Curator App</h3>
+                            <p class="project-description">Cross-platform mobile app using on-device ML to intelligently curate photo libraries.</p>
+                            <div class="project-tags">
+                                <span class="tag">React Native</span>
+                                <span class="tag">TensorFlow.js</span>
+                                <span class="tag">AWS</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="ai-game-generator-case-study.html" class="project-card loading">
+                        <div class="project-image neutral"></div>
+                        <div class="project-content">
+                            <h3 class="project-title">AI Game Generation</h3>
+                            <p class="project-description">Web app that generates playable 3D browser games from natural language descriptions.</p>
+                            <div class="project-tags">
+                                <span class="tag">OpenAI GPT</span>
+                                <span class="tag">Three.js</span>
+                                <span class="tag">React</span>
+                            </div>
+                        </div>
+                    </a>
 
                     <div class="project-card loading placeholder">
                         <div class="project-image neutral"></div>
                         <div class="project-content">
-                            <h3 class="project-title">Case Study #3</h3>
+                            <h3 class="project-title">Case Study #5</h3>
                             <p class="project-description">Coming soon — check back shortly.</p>
                             <div class="project-tags">
                                 <span class="tag">TBD</span>
-                                <span class="tag">Engineering</span>
+                                <span class="tag">Strategy</span>
                             </div>
                         </div>
                     </div>
