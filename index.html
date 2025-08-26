@@ -76,6 +76,7 @@
             text-decoration: none;
             z-index: 1001;
             transition: color 0.3s ease;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
         }
 
         /* Right Logo */
@@ -444,7 +445,7 @@
 </head>
 <body>
     <!-- Left Logo -->
-    <a href="#top" class="left-logo">BH</a>
+    <a href="#top" class="left-logo" data-value="BH">BH</a>
 
     <!-- Right Logo -->
     <div class="right-logo">
@@ -716,6 +717,27 @@
                     }
                 }, 150);
             });
+        });
+
+        // Interactive Logo Effect
+        const logo = document.querySelector('.left-logo');
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let interval = null;
+
+        logo.addEventListener('mouseover', () => {
+            clearInterval(interval);
+            
+            interval = setInterval(() => {
+                logo.innerText = logo.dataset.value
+                    .split("")
+                    .map(() => letters[Math.floor(Math.random() * 26)])
+                    .join("");
+            }, 10);
+        });
+
+        logo.addEventListener('mouseout', () => {
+            clearInterval(interval);
+            logo.innerText = logo.dataset.value;
         });
     </script>
 </body>
