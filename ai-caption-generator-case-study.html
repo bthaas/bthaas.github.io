@@ -18,7 +18,7 @@
         .right-logo a:hover::after { width: 100%; }
         .back-button { color: var(--secondary-color); text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; position: absolute; left: 80px; }
         .back-button:hover { color: var(--primary-color); transform: translateX(-3px); }
-        .back-button svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.5; }
+        .back-button svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; }
         .hero { padding: 120px 0 80px; text-align: center; }
         .hero h1 { font-size: clamp(3rem, 6vw, 5rem); font-weight: 300; margin-bottom: 20px; letter-spacing: -0.02em; }
         .hero .subtitle { font-size: 1.3rem; color: var(--secondary-color); margin-bottom: 30px; }
@@ -32,6 +32,31 @@
         .section-content ul { margin-left: 20px; }
         .section-content li { margin-bottom: 10px; }
         .image-placeholder { width: 100%; height: 400px; background: #e9e9e9; border-radius: 12px; margin: 30px 0; display: flex; align-items: center; justify-content: center; color: var(--secondary-color); font-size: 1.2rem; font-weight: 300; }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 12px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 60px 0;
+        }
         @media (max-width: 768px) { .left-logo, .right-logo, .back-button { top: 20px; } .left-logo { left: 20px; } .right-logo { right: 20px; } .back-button { left: 80px; } .hero { padding: 100px 0 60px; } .case-study { padding: 40px 0; } }
     </style>
 </head>
@@ -58,6 +83,19 @@
         </section>
         <section class="case-study">
             <div class="container">
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/p8mBXnBdqJA"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+
+                <div class="content-section">
+                    <h2 class="section-title">Project Overview</h2>
+                    <div class="section-content">
+                        <p>The primary goal was to build an end-to-end deep learning model that could automatically generate descriptive captions for images. This involved combining a Convolutional Neural Network (CNN) for image feature extraction with a Recurrent Neural Network (RNN), specifically an LSTM, for sequence generation.</p>
+                    </div>
+                </div>
                 <div class="section">
                     <div class="section-number">1.1</div>
                     <h2 class="section-title">Overview</h2>
