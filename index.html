@@ -14,7 +14,7 @@
         :root {
             --primary-color: #1a1a1a;
             --secondary-color: #666;
-            --accent-color: #007AFF;
+            --accent-color: #2d6a4f;
             --hover-color: #f5f5f5;
             --text-light: #999;
             --border-color: #e1e1e1;
@@ -147,6 +147,9 @@
             color: var(--text-light);
             font-size: 0.9rem;
             margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* About Section */
@@ -380,7 +383,7 @@
 
         /* Experience Section */
         .experience {
-            padding: 60px 0;
+            padding: 0 0 60px;
             max-width: 800px;
             margin: 0 auto;
         }
@@ -565,22 +568,17 @@
         <section class="hero">
             <div class="container">
                 <h1>Brett Haas</h1>
-                <p class="subtitle">developer & designer</p>
-                <p class="location">New York, NY</p>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section class="about" id="about">
-            <div class="container">
-                <p>I build intelligent systems and deliver scalable applications, leveraging my experience in AI, cloud computing, and full-stack development to solve real-world problems. I bring curiosity, creativity, and a drive for continuous learning to every project.</p>
+                <p class="subtitle">AI-focused Full-Stack Developer building scalable and intelligent applications.</p>
+                <p class="location"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 5px;">
+  <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+</svg>New York, NY</p>
             </div>
         </section>
 
         <!-- Experience Section -->
         <section class="experience" id="experience">
             <div class="container">
-                <h2 class="section-title">Experience</h2>
+                <h2 class="section-title"><span style="text-decoration: underline; text-decoration-color: #2d6a4f; text-decoration-thickness: 2px; text-underline-offset: 10px;">Experience</span></h2>
                 <div class="experience-list">
                     <div class="experience-item">
                         <div class="experience-date">
@@ -609,7 +607,7 @@
         <!-- Projects Section -->
         <section class="projects" id="work">
             <div class="container">
-                <h2 class="section-title">Portfolio</h2>
+                <h2 class="section-title"><span style="text-decoration: underline; text-decoration-color: #2d6a4f; text-decoration-thickness: 2px; text-underline-offset: 10px;">Portfolio</span></h2>
                 <div class="projects-grid">
                     <a href="nutrition-tracker-case-study.html" class="project-card loading">
                         <div class="project-image neutral">
