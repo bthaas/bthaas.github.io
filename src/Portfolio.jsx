@@ -287,7 +287,7 @@ const Portfolio = () => {
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <h2 className="text-white text-2xl font-bold mb-2">Brett Haas</h2>
-            <p className="text-sm">Built with React, Tailwind & &lt;3 in Charlottesville.</p>
+            <p className="text-sm">Built with React, Tailwind & ❤️ in Charlottesville.</p>
           </div>
           <div className="flex gap-6">
             <a href="mailto:bthaas15@gmail.com" className="hover:text-white transition-colors">Contact</a>
