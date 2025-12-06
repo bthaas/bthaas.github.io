@@ -18,20 +18,21 @@ import {
   PenTool,
   MousePointer2,
   X,
-  Server
+  Server,
+  ShieldCheck
 } from 'lucide-react';
 
 const projects = [
   {
-    id: 'game-generator',
-    title: "AI Game Generator",
-    description: "Generates playable 3D browser games from natural language using GPT for logic and mechanics.",
-    longDescription: "This project explores the intersection of generative AI and interactive entertainment. By leveraging OpenAI's GPT models, it translates user prompts into game logic, character behaviors, and environmental designs within a Three.js-powered 3D world. The system architecture is built on a Node.js backend that orchestrates AI responses and a React frontend for user interaction and game rendering. It's a testament to the power of LLMs in creative, structured content generation.",
-    icon: <Box className="text-purple-500" />,
-    tags: ["React", "Three.js", "OpenAI", "Node.js"],
-    color: "border-purple-200 bg-purple-50/50",
-    image: "/assets/analytics1.png",
-    url: "https://github.com/bthaas"
+    id: 'go-secure-sandbox',
+    title: "Secure Code Sandbox API",
+    description: "High-performance API for running untrusted code with hardware-level isolation via Firecracker microVMs.",
+    longDescription: "A production-ready API for securely executing user-provided code snippets in isolated MicroVM environments using Firecracker. Designed for AI agents and other applications that need to safely run untrusted code with strict resource limits (CPU, memory, PIDs) and network isolation. The system uses the same technology that powers AWS Lambda for sub-150ms cold starts.",
+    icon: <ShieldCheck className="text-green-500" />,
+    tags: ["Go", "Firecracker", "MicroVMs", "Security"],
+    color: "border-green-200 bg-green-50/50",
+    image: "/assets/analytics3.png",
+    url: "https://github.com/bthaas/go-secure-sandbox"
   },
   {
     id: 'photo-curator',
