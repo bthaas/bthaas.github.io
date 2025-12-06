@@ -21,6 +21,42 @@ import {
   Server
 } from 'lucide-react';
 
+const projects = [
+  {
+    id: 'game-generator',
+    title: "AI Game Generator",
+    description: "Generates playable 3D browser games from natural language using GPT for logic and mechanics.",
+    longDescription: "This project explores the intersection of generative AI and interactive entertainment. By leveraging OpenAI's GPT models, it translates user prompts into game logic, character behaviors, and environmental designs within a Three.js-powered 3D world. The system architecture is built on a Node.js backend that orchestrates AI responses and a React frontend for user interaction and game rendering. It's a testament to the power of LLMs in creative, structured content generation.",
+    icon: <Box className="text-purple-500" />,
+    tags: ["React", "Three.js", "OpenAI", "Node.js"],
+    color: "border-purple-200 bg-purple-50/50",
+    image: "/assets/analytics1.png",
+    url: "https://github.com/bthaas"
+  },
+  {
+    id: 'photo-curator',
+    title: "Photo Curator App",
+    description: "Mobile app using on-device ML for blur detection, facial recognition, and aesthetic scoring.",
+    longDescription: "A React Native application designed to intelligently manage and curate large photo libraries. It uses TensorFlow.js to run on-device machine learning models, ensuring user privacy. Key features include automatic detection of blurry or low-quality images, grouping photos by recognized faces, and an aesthetic scoring model to highlight the best shots. The backend, built with NestJS and AWS, handles user accounts and metadata synchronization.",
+    icon: <Smartphone className="text-blue-500" />,
+    tags: ["React Native", "TensorFlow.js", "NestJS", "AWS"],
+    color: "border-blue-200 bg-blue-50/50",
+    image: "/assets/analytics2.png",
+    url: "https://github.com/bthaas"
+  },
+  {
+    id: 'raft-kv-store',
+    title: "Distributed Key-Value Store",
+    description: "A fault-tolerant, distributed key-value store built in Go using the Raft consensus algorithm.",
+    longDescription: "A fault-tolerant, horizontally scalable Key-Value Store built in Go using the Raft consensus algorithm. Features include strong consistency via Raft (Leader Election, Log Replication), fault tolerance for node failures, and persistence with a Write-Ahead Log (WAL) for crash recovery. The architecture handles leader election with randomized timers, maintains authority with heartbeats, and replicates logs to a majority of followers before committing them to an in-memory store.",
+    icon: <Server className="text-orange-500" />,
+    tags: ["Go", "Raft Consensus", "Distributed Systems"],
+    color: "border-orange-200 bg-orange-50/50",
+    image: "/assets/analytics1.png",
+    url: "https://github.com/bthaas/raft-kv-store"
+  },
+];
+
 /**
  * Brett Haas Portfolio
  * A "Digital Workspace" aesthetic portfolio.
@@ -35,6 +71,7 @@ const Portfolio = () => {
   const [activeSection, setActiveSection] = useState('hero');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -224,27 +261,13 @@ const Portfolio = () => {
           <SectionHeader title="Selected Works" subtitle="Things I've built from scratch" icon={<Code2 />} />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-            <ProjectCard 
-              title="AI Game Generator"
-              description="Generates playable 3D browser games from natural language using GPT for logic and mechanics."
-              icon={<Box className="text-purple-500" />}
-              tags={["React", "Three.js", "OpenAI", "Node.js"]}
-              color="border-purple-200 bg-purple-50/50"
-            />
-            <ProjectCard 
-              title="Photo Curator App"
-              description="Mobile app using on-device ML for blur detection, facial recognition, and aesthetic scoring."
-              icon={<Smartphone className="text-blue-500" />}
-              tags={["React Native", "TensorFlow.js", "NestJS", "AWS"]}
-              color="border-blue-200 bg-blue-50/50"
-            />
-            <ProjectCard 
-              title="Distributed Key-Value Store"
-              description="A fault-tolerant, distributed key-value store built in Go using the Raft consensus algorithm."
-              icon={<Server className="text-orange-500" />}
-              tags={["Go", "Raft Consensus", "Distributed Systems"]}
-              color="border-orange-200 bg-orange-50/50"
-            />
+            {projects.map((project) => (
+              <ProjectCard 
+                key={project.id}
+                onOpen={() => setSelectedProject(project)}
+                {...project}
+              />
+            ))}
           </div>
         </section>
 
@@ -301,6 +324,13 @@ const Portfolio = () => {
           BRETT HAAS
         </div>
       </footer>
+
+      {selectedProject && (
+        <ProjectModal 
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
+      )}
     </div>
   );
 };
@@ -380,16 +410,25 @@ const ExperienceCard = ({ company, role, period, location, logo, color, side, co
   </div>
 );
 
-const ProjectCard = ({ title, description, icon, tags, color }) => (
-  <div className={`group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border transition-all duration-300 hover:-translate-y-2 h-full flex flex-col justify-between relative overflow-hidden ${color}`}>
+const ProjectCard = ({ title, description, icon, tags, color, onOpen, url }) => (
+  <div 
+    onClick={onOpen}
+    className={`group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border transition-all duration-300 hover:-translate-y-2 h-full flex flex-col justify-between relative overflow-hidden cursor-pointer ${color}`}
+  >
     <div className="relative z-10">
       <div className="flex justify-between items-start mb-4">
         <div className="p-3 bg-white rounded-xl shadow-sm">
           {icon}
         </div>
-        <button className="text-slate-400 hover:text-indigo-600 transition-colors">
+        <a 
+          href={url}
+          target="_blank" 
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="text-slate-400 hover:text-indigo-600 transition-colors"
+        >
           <ExternalLink size={20} />
-        </button>
+        </a>
       </div>
       
       <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">{title}</h3>
@@ -429,6 +468,59 @@ const SkillGroup = ({ title, skills, icon }) => (
     </div>
   </div>
 );
+
+const ProjectModal = ({ project, onClose }) => {
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.keyCode === 27) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [onClose]);
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] shadow-2xl flex flex-col relative overflow-hidden border border-slate-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 z-20"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="h-64 w-full overflow-hidden">
+          <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+        </div>
+
+        <div className="p-8 overflow-y-auto">
+          <h2 className="text-3xl font-bold mb-2 text-slate-900">{project.title}</h2>
+          
+          <div className="flex flex-wrap gap-2 mb-6">
+            {project.tags.map((tag, i) => (
+              <span key={i} className="px-2 py-1 bg-slate-100 text-slate-700 text-xs font-semibold rounded-md border border-slate-200">
+                {tag}
+              </span>
+            ))}
+          </div>
+          
+          <p className="text-slate-600 leading-relaxed text-base">
+            {project.longDescription}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // CSS Keyframes for custom animations
 const style = document.createElement('style');
