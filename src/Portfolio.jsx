@@ -224,17 +224,27 @@ const Portfolio = () => {
           <SectionHeader title="Selected Works" subtitle="Things I've built from scratch" icon={<Code2 />} />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-            {projects.map((project) => (
-              <ProjectCard 
-                key={project.id}
-                title={project.title}
-                description={project.description}
-                icon={project.icon}
-                tags={project.tags}
-                color={project.color}
-                url={project.url}
-              />
-            ))}
+            <ProjectCard 
+              title="AI Game Generator"
+              description="Generates playable 3D browser games from natural language using GPT for logic and mechanics."
+              icon={<Box className="text-purple-500" />}
+              tags={["React", "Three.js", "OpenAI", "Node.js"]}
+              color="border-purple-200 bg-purple-50/50"
+            />
+            <ProjectCard 
+              title="Photo Curator App"
+              description="Mobile app using on-device ML for blur detection, facial recognition, and aesthetic scoring."
+              icon={<Smartphone className="text-blue-500" />}
+              tags={["React Native", "TensorFlow.js", "NestJS", "AWS"]}
+              color="border-blue-200 bg-blue-50/50"
+            />
+            <ProjectCard 
+              title="Distributed Key-Value Store"
+              description="A fault-tolerant, distributed key-value store built in Go using the Raft consensus algorithm."
+              icon={<Server className="text-orange-500" />}
+              tags={["Go", "Raft Consensus", "Distributed Systems"]}
+              color="border-orange-200 bg-orange-50/50"
+            />
           </div>
         </section>
 
@@ -370,25 +380,16 @@ const ExperienceCard = ({ company, role, period, location, logo, color, side, co
   </div>
 );
 
-const ProjectCard = ({ title, description, icon, tags, color, onOpen, url }) => (
-  <div
-    onClick={onOpen}
-    className={`group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border transition-all duration-300 hover:-translate-y-2 h-full flex flex-col justify-between relative overflow-hidden cursor-pointer ${color}`}
-  >
+const ProjectCard = ({ title, description, icon, tags, color }) => (
+  <div className={`group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border transition-all duration-300 hover:-translate-y-2 h-full flex flex-col justify-between relative overflow-hidden ${color}`}>
     <div className="relative z-10">
       <div className="flex justify-between items-start mb-4">
         <div className="p-3 bg-white rounded-xl shadow-sm">
           {icon}
         </div>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="text-slate-400 hover:text-indigo-600 transition-colors"
-        >
+        <button className="text-slate-400 hover:text-indigo-600 transition-colors">
           <ExternalLink size={20} />
-        </a>
+        </button>
       </div>
       
       <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">{title}</h3>
