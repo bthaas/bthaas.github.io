@@ -19,7 +19,8 @@ import {
   MousePointer2,
   X,
   Server,
-  ShieldCheck
+  ShieldCheck,
+  Database
 } from 'lucide-react';
 
 const projects = [
@@ -35,15 +36,15 @@ const projects = [
     url: "https://github.com/bthaas/go-secure-sandbox"
   },
   {
-    id: 'photo-curator',
-    title: "Photo Curator App",
-    description: "Mobile app using on-device ML for blur detection, facial recognition, and aesthetic scoring.",
-    longDescription: "A React Native application designed to intelligently manage and curate large photo libraries. It uses TensorFlow.js to run on-device machine learning models, ensuring user privacy. Key features include automatic detection of blurry or low-quality images, grouping photos by recognized faces, and an aesthetic scoring model to highlight the best shots. The backend, built with NestJS and AWS, handles user accounts and metadata synchronization.",
-    icon: <Smartphone className="text-blue-500" />,
-    tags: ["React Native", "TensorFlow.js", "NestJS", "AWS"],
-    color: "border-blue-200 bg-blue-50/50",
+    id: 'apex-vector',
+    title: "ApexVector",
+    description: "A high-performance, distributed vector database built from scratch in Rust with HNSW indexing.",
+    longDescription: "A high-performance, persistent, approximate nearest neighbor (ANN) search vector database written in Rust. It implements the HNSW (Hierarchical Navigable Small World) algorithm with scalar quantization for 4x memory compression and features an ACID-compliant, durable storage engine using Write-Ahead Logging (WAL). The high-performance API is built with Tonic/Protobuf.",
+    icon: <Database className="text-slate-500" />,
+    tags: ["Rust", "Vector Database", "HNSW", "gRPC"],
+    color: "border-slate-200 bg-slate-50/50",
     image: "/assets/analytics2.png",
-    url: "https://github.com/bthaas"
+    url: "https://github.com/bthaas/apex-vector"
   },
   {
     id: 'raft-kv-store',
