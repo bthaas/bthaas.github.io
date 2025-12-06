@@ -17,7 +17,8 @@ import {
   Coffee,
   PenTool,
   MousePointer2,
-  X
+  X,
+  Server
 } from 'lucide-react';
 
 /**
@@ -238,11 +239,11 @@ const Portfolio = () => {
               color="border-blue-200 bg-blue-50/50"
             />
             <ProjectCard 
-              title="Image Caption Generator"
-              description="End-to-end deep learning model (CNN+LSTM) generating natural language captions for images."
-              icon={<Brain className="text-emerald-500" />}
-              tags={["TensorFlow", "Python", "Flask", "GCP"]}
-              color="border-emerald-200 bg-emerald-50/50"
+              title="Distributed Key-Value Store"
+              description="A fault-tolerant, distributed key-value store built in Go using the Raft consensus algorithm."
+              icon={<Server className="text-orange-500" />}
+              tags={["Go", "Raft Consensus", "Distributed Systems"]}
+              color="border-orange-200 bg-orange-50/50"
             />
           </div>
         </section>
