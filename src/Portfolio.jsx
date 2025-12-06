@@ -425,7 +425,7 @@ const ProjectCard = ({ title, description, icon, tags, color, onOpen, url }) => 
           target="_blank" 
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="text-slate-400 hover:text-indigo-600 transition-colors"
+          className="text-slate-400 hover:text-indigo-600 transition-colors relative z-20"
         >
           <ExternalLink size={20} />
         </a>
