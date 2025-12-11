@@ -161,7 +161,7 @@ const Portfolio = () => {
               </h1>
               
               <p className="text-xl md:text-2xl text-slate-600 max-w-lg leading-relaxed">
-                Full-stack engineer & creative technologist building intelligent systems. Currently shaping the future of AI at <span className="font-semibold text-slate-900 border-b-2 border-indigo-200">Scale AI</span>.
+                Full-stack engineer & creative technologist building intelligent systems. 
               </p>
 
               <div className="flex gap-4 pt-4">
@@ -225,7 +225,7 @@ const Portfolio = () => {
             <ExperienceCard 
               company="Scale AI"
               role="GenAI Technical Advisor Intern"
-              period="Jun 2025 - Present"
+              period="Jun 2025 - Dec 2025"
               location="Remote"
               logo="S"
               color="bg-slate-900"
