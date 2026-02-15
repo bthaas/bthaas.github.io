@@ -226,7 +226,7 @@ const Portfolio = () => {
           
           {/* Decorative Top Bar */}
           <div className="absolute top-0 left-0 w-full flex justify-between items-center opacity-50 font-mono text-xs tracking-widest uppercase">
-            <span>Portfolio v2.0 // 2025</span>
+            <span>Portfolio v2.1 // 2026</span>
             <span>UVA_CS_26</span>
           </div>
 
