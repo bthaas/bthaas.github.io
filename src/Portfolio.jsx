@@ -34,7 +34,6 @@ const projects = [
     icon: <ShieldCheck className="text-green-500" />,
     tags: ["Go", "Firecracker", "MicroVMs", "Security"],
     color: "border-green-200 bg-green-50/50",
-    image: "/assets/projects/go-secure-sandbox.svg",
     url: "https://github.com/bthaas/go-secure-sandbox"
   },
   {
@@ -45,7 +44,6 @@ const projects = [
     icon: <Brain className="text-purple-500" />,
     tags: ["Computer Vision", "Python", "Analytics", "Sports Tech"],
     color: "border-purple-200 bg-purple-50/50",
-    image: "/assets/projects/courtvision.svg",
     url: "https://github.com/bthaas/CourtVision"
   },
   {
@@ -56,7 +54,6 @@ const projects = [
     icon: <Smartphone className="text-pink-500" />,
     tags: ["React", "Audio", "Streaming", "UI/UX"],
     color: "border-pink-200 bg-pink-50/50",
-    image: "/assets/projects/beatstream.svg",
     url: "https://github.com/bthaas/BeatStream"
   },
   {
@@ -67,7 +64,6 @@ const projects = [
     icon: <Database className="text-slate-500" />,
     tags: ["Rust", "Vector Database", "HNSW", "gRPC"],
     color: "border-slate-200 bg-slate-50/50",
-    image: "/assets/projects/apex-vector.svg",
     url: "https://github.com/bthaas/apex-vector"
   },
   {
@@ -78,7 +74,6 @@ const projects = [
     icon: <Server className="text-orange-500" />,
     tags: ["Go", "Raft Consensus", "Distributed Systems"],
     color: "border-orange-200 bg-orange-50/50",
-    image: "/assets/projects/raft-kv-store.svg",
     url: "https://github.com/bthaas/raft-kv-store"
   },
 ];
@@ -281,7 +276,7 @@ const Portfolio = () => {
                     <div className="flex gap-2">
                         <img src="https://cdn.simpleicons.org/javascript/f7df1e" alt="JavaScript" className="h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm p-1" />
                         <img src="https://cdn.simpleicons.org/python/3776ab" alt="Python" className="h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm p-1" />
-                        <img src="https://cdn.simpleicons.org/rust/000000" alt="Rust" className="h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm p-1" />
+                        <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" className="h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm p-1" />
                     </div>
                  </div>
               </div>
@@ -646,12 +641,6 @@ const SkillGroup = ({ title, skills, icon }) => (
 );
 
 const ProjectModal = ({ project, onClose }) => {
-  const [imageFailed, setImageFailed] = useState(false);
-
-  useEffect(() => {
-    setImageFailed(false);
-  }, [project.id]);
-
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.keyCode === 27) {
@@ -680,20 +669,19 @@ const ProjectModal = ({ project, onClose }) => {
           <X size={20} />
         </button>
 
-        <div className="h-64 w-full overflow-hidden bg-slate-100">
-          {imageFailed ? (
-            <div className="w-full h-full bg-gradient-to-br from-slate-800 via-indigo-700 to-slate-900 text-white p-8 flex flex-col justify-end">
-              <div className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Project Preview</div>
-              <h3 className="text-3xl font-bold">{project.title}</h3>
-            </div>
-          ) : (
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full h-full object-cover"
-              onError={() => setImageFailed(true)}
-            />
-          )}
+        <div className="h-64 w-full overflow-hidden bg-gradient-to-br from-slate-50 to-white border-b border-slate-200 flex items-center justify-center relative">
+          <div className="absolute inset-0 opacity-40"
+               style={{
+                 backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
+                 backgroundSize: '18px 18px'
+               }}
+          />
+          <div className="relative z-10 w-36 h-36 rounded-3xl bg-white border border-slate-200 shadow-lg flex items-center justify-center text-indigo-600">
+            {React.cloneElement(project.icon, {
+              size: 80,
+              className: `${project.icon.props.className || ''} drop-shadow-sm`
+            })}
+          </div>
         </div>
 
         <div className="p-8 overflow-y-auto">

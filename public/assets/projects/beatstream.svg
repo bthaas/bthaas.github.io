@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="BeatStream icon cover">
-  <rect width="1200" height="675" fill="#f8fafc"/>
-  <circle cx="600" cy="338" r="168" fill="#fdf2f8"/>
-  <circle cx="600" cy="338" r="88" fill="#ffffff" stroke="#ec4899" stroke-width="14"/>
-  <polygon points="575,292 575,384 652,338" fill="#db2777"/>
-  <rect x="500" y="452" width="200" height="16" rx="8" fill="#f9a8d4"/>
-</svg>
