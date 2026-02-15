@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="CourtVision cover">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#7e22ce"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect x="120" y="100" width="960" height="480" rx="26" fill="#ffffff12" stroke="#ddd6fe" stroke-opacity="0.45"/>
+  <circle cx="400" cy="338" r="170" fill="none" stroke="#ede9fe" stroke-width="8" stroke-opacity="0.75"/>
+  <line x1="230" y1="338" x2="570" y2="338" stroke="#ede9fe" stroke-width="8" stroke-opacity="0.75"/>
+  <rect x="760" y="210" width="200" height="260" rx="18" fill="#0b1020" stroke="#ddd6fe" stroke-opacity="0.5"/>
+  <text x="800" y="300" fill="#c4b5fd" font-size="36" font-family="monospace">FPS 30</text>
+  <text x="800" y="350" fill="#c4b5fd" font-size="36" font-family="monospace">shots 42</text>
+  <text x="800" y="400" fill="#c4b5fd" font-size="36" font-family="monospace">pace 98</text>
+  <text x="120" y="82" fill="#ede9fe" font-size="64" font-family="Inter,Arial,sans-serif" font-weight="700">CourtVision</text>
+</svg>

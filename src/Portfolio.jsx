@@ -20,7 +20,9 @@ import {
   X,
   Server,
   ShieldCheck,
-  Database
+  Database,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const projects = [
@@ -32,8 +34,30 @@ const projects = [
     icon: <ShieldCheck className="text-green-500" />,
     tags: ["Go", "Firecracker", "MicroVMs", "Security"],
     color: "border-green-200 bg-green-50/50",
-    image: "/assets/analytics3.png",
+    image: "/assets/projects/go-secure-sandbox.svg",
     url: "https://github.com/bthaas/go-secure-sandbox"
+  },
+  {
+    id: 'courtvision',
+    title: "CourtVision",
+    description: "Computer vision basketball analytics platform for shot tracking and player movement insights.",
+    longDescription: "CourtVision analyzes basketball footage to extract event-level insights like shot attempts, player movement trends, and possession patterns. The project focuses on practical, coach-friendly metrics with a clean visualization layer for fast game review.",
+    icon: <Brain className="text-purple-500" />,
+    tags: ["Computer Vision", "Python", "Analytics", "Sports Tech"],
+    color: "border-purple-200 bg-purple-50/50",
+    image: "/assets/projects/courtvision.svg",
+    url: "https://github.com/bthaas/CourtVision"
+  },
+  {
+    id: 'beatstream',
+    title: "BeatStream",
+    description: "Music streaming and discovery experience focused on smooth playback, curation, and social sharing.",
+    longDescription: "BeatStream is a modern music web app centered on quick playback, rich discovery, and playlist sharing. The interface emphasizes fast interaction loops and clean information hierarchy so users can move from search to listening with minimal friction.",
+    icon: <Smartphone className="text-pink-500" />,
+    tags: ["React", "Audio", "Streaming", "UI/UX"],
+    color: "border-pink-200 bg-pink-50/50",
+    image: "/assets/projects/beatstream.svg",
+    url: "https://github.com/bthaas/BeatStream"
   },
   {
     id: 'apex-vector',
@@ -43,7 +67,7 @@ const projects = [
     icon: <Database className="text-slate-500" />,
     tags: ["Rust", "Vector Database", "HNSW", "gRPC"],
     color: "border-slate-200 bg-slate-50/50",
-    image: "/assets/analytics2.png",
+    image: "/assets/projects/apex-vector.svg",
     url: "https://github.com/bthaas/apex-vector"
   },
   {
@@ -54,7 +78,7 @@ const projects = [
     icon: <Server className="text-orange-500" />,
     tags: ["Go", "Raft Consensus", "Distributed Systems"],
     color: "border-orange-200 bg-orange-50/50",
-    image: "/assets/analytics1.png",
+    image: "/assets/projects/raft-kv-store.svg",
     url: "https://github.com/bthaas/raft-kv-store"
   },
 ];
@@ -74,6 +98,8 @@ const Portfolio = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -85,6 +111,47 @@ const Portfolio = () => {
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setSpotlightIndex((prev) => (prev + 1) % projects.length);
+    }, 4500);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const sectionIds = ['hero', 'experience', 'projects', 'skills'];
+
+    const updateScrollState = () => {
+      const marker = window.innerHeight * 0.35;
+      let closestId = sectionIds[0];
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      sectionIds.forEach((id) => {
+        const section = document.getElementById(id);
+        if (!section) return;
+        const distance = Math.abs(section.getBoundingClientRect().top - marker);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestId = id;
+        }
+      });
+
+      setActiveSection(closestId);
+
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      setScrollProgress(Math.max(0, Math.min(progress, 1)));
+    };
+
+    updateScrollState();
+    window.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      window.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
   }, []);
 
   const scrollTo = (id) => {
@@ -101,9 +168,26 @@ const Portfolio = () => {
       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.4]" 
            style={{ 
              backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', 
-             backgroundSize: '24px 24px' 
+             backgroundSize: '24px 24px',
+             backgroundPosition: `0px ${scrollProgress * 160}px`
            }} 
       />
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div
+          className="absolute -top-40 -left-32 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-25"
+          style={{
+            background: 'radial-gradient(circle, rgba(79,70,229,0.45) 0%, rgba(79,70,229,0) 70%)',
+            transform: `translate3d(${mousePos.x * 28}px, ${scrollProgress * 140}px, 0)`
+          }}
+        />
+        <div
+          className="absolute -bottom-40 -right-28 w-[34rem] h-[34rem] rounded-full blur-3xl opacity-20"
+          style={{
+            background: 'radial-gradient(circle, rgba(14,165,233,0.45) 0%, rgba(14,165,233,0) 72%)',
+            transform: `translate3d(${mousePos.x * -20}px, ${scrollProgress * -120}px, 0)`
+          }}
+        />
+      </div>
       
       {/* Floating Ambient "Physical" Objects */}
       <div className="fixed top-20 right-20 animate-float-slow z-0 opacity-20 rotate-12 hidden lg:block">
@@ -185,7 +269,7 @@ const Portfolio = () => {
                     <Code2 size={120} />
                  </div>
                  <div>
-                    <div className="w-12 h-12 bg-slate-900 rounded-lg mb-4 flex items-center justify-center text-white font-bold text-xl">BH</div>
+                    <img src="https://cdn.simpleicons.org/github/0f172a" alt="GitHub" className="w-12 h-12 bg-white rounded-lg mb-4 p-2 shadow-sm border border-slate-200" />
                     <div className="h-2 w-24 bg-slate-200 rounded mb-2"></div>
                     <div className="h-2 w-16 bg-slate-200 rounded"></div>
                  </div>
@@ -195,9 +279,9 @@ const Portfolio = () => {
                         <div className="h-1 w-full bg-indigo-100 rounded"></div>
                     </div>
                     <div className="flex gap-2">
-                        <div className="h-8 w-8 rounded-full bg-yellow-400 border-2 border-white shadow-sm flex items-center justify-center text-[10px]">JS</div>
-                        <div className="h-8 w-8 rounded-full bg-blue-500 border-2 border-white shadow-sm flex items-center justify-center text-[10px] text-white">PY</div>
-                        <div className="h-8 w-8 rounded-full bg-cyan-400 border-2 border-white shadow-sm flex items-center justify-center text-[10px]">R</div>
+                        <img src="https://cdn.simpleicons.org/javascript/f7df1e" alt="JavaScript" className="h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm p-1" />
+                        <img src="https://cdn.simpleicons.org/python/3776ab" alt="Python" className="h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm p-1" />
+                        <img src="https://cdn.simpleicons.org/rust/000000" alt="Rust" className="h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm p-1" />
                     </div>
                  </div>
               </div>
@@ -261,6 +345,13 @@ const Portfolio = () => {
         {/* PROJECTS SECTION */}
         <section id="projects">
           <SectionHeader title="Selected Works" subtitle="Things I've built from scratch" icon={<Code2 />} />
+
+          <ProjectSpotlight
+            projects={projects}
+            activeIndex={spotlightIndex}
+            onSelect={setSpotlightIndex}
+            onOpen={(project) => setSelectedProject(project)}
+          />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {projects.map((project) => (
@@ -412,7 +503,7 @@ const ExperienceCard = ({ company, role, period, location, logo, color, side, co
   </div>
 );
 
-const ProjectCard = ({ title, description, icon, tags, color, onOpen, url }) => (
+const ProjectCard = ({ title, description, icon, tags, color, onOpen, url, image }) => (
   <div 
     onClick={onOpen}
     className={`group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border transition-all duration-300 hover:-translate-y-2 h-full flex flex-col justify-between relative overflow-hidden cursor-pointer ${color}`}
@@ -434,9 +525,13 @@ const ProjectCard = ({ title, description, icon, tags, color, onOpen, url }) => 
       </div>
       
       <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">{title}</h3>
-      <p className="text-slate-600 text-sm leading-relaxed mb-6">
+      <p className="text-slate-600 text-sm leading-relaxed mb-5">
         {description}
       </p>
+
+      <div className="h-28 rounded-xl overflow-hidden border border-white/70 bg-white/70 mb-5">
+        <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      </div>
     </div>
 
     <div className="flex flex-wrap gap-2 relative z-10">
@@ -451,6 +546,78 @@ const ProjectCard = ({ title, description, icon, tags, color, onOpen, url }) => 
     <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-current opacity-[0.05] rounded-full" />
   </div>
 );
+
+const ProjectSpotlight = ({ projects, activeIndex, onSelect, onOpen }) => {
+  const project = projects[activeIndex];
+
+  return (
+    <div className="mt-8 rounded-3xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        <button
+          onClick={() => onOpen(project)}
+          className="relative h-72 lg:h-full min-h-72 overflow-hidden group"
+        >
+          <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <div className="absolute bottom-4 left-4 text-white text-sm font-semibold tracking-wide">
+            Tap to open project
+          </div>
+        </button>
+
+        <div className="p-8 flex flex-col">
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+              Project Spotlight
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onSelect((activeIndex - 1 + projects.length) % projects.length)}
+                className="p-2 rounded-full border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => onSelect((activeIndex + 1) % projects.length)}
+                className="p-2 rounded-full border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          <h3 className="text-3xl font-bold text-slate-900 mb-3">{project.title}</h3>
+          <p className="text-slate-600 leading-relaxed mb-6">{project.description}</p>
+
+          <div className="flex flex-wrap gap-2 mb-8">
+            {project.tags.map((tag, i) => (
+              <span key={i} className="px-2 py-1 bg-slate-100 text-slate-700 text-xs font-semibold rounded-md border border-slate-200">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          <button
+            onClick={() => onOpen(project)}
+            className="self-start px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors"
+          >
+            View Details
+          </button>
+
+          <div className="mt-6 flex gap-2">
+            {projects.map((item, i) => (
+              <button
+                key={item.id}
+                onClick={() => onSelect(i)}
+                aria-label={`Show ${item.title}`}
+                className={`h-2.5 rounded-full transition-all ${i === activeIndex ? 'w-8 bg-indigo-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const SkillGroup = ({ title, skills, icon }) => (
   <div>
@@ -472,6 +639,12 @@ const SkillGroup = ({ title, skills, icon }) => (
 );
 
 const ProjectModal = ({ project, onClose }) => {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [project.id]);
+
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.keyCode === 27) {
@@ -500,8 +673,20 @@ const ProjectModal = ({ project, onClose }) => {
           <X size={20} />
         </button>
 
-        <div className="h-64 w-full overflow-hidden">
-          <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+        <div className="h-64 w-full overflow-hidden bg-slate-100">
+          {imageFailed ? (
+            <div className="w-full h-full bg-gradient-to-br from-slate-800 via-indigo-700 to-slate-900 text-white p-8 flex flex-col justify-end">
+              <div className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Project Preview</div>
+              <h3 className="text-3xl font-bold">{project.title}</h3>
+            </div>
+          ) : (
+            <img
+              src={project.image}
+              alt={project.title}
+              className="w-full h-full object-cover"
+              onError={() => setImageFailed(true)}
+            />
+          )}
         </div>
 
         <div className="p-8 overflow-y-auto">
@@ -518,6 +703,16 @@ const ProjectModal = ({ project, onClose }) => {
           <p className="text-slate-600 leading-relaxed text-base">
             {project.longDescription}
           </p>
+
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-7 px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-indigo-600 transition-colors"
+          >
+            View on GitHub
+            <ExternalLink size={15} />
+          </a>
         </div>
       </div>
     </div>
