@@ -1,32 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Secure Code Sandbox API cover">
-  <defs>
-    <radialGradient id="mintGlow" cx="38%" cy="58%" r="48%">
-      <stop offset="0%" stop-color="#bbf7d0" stop-opacity="0.48"/>
-      <stop offset="55%" stop-color="#d1fae5" stop-opacity="0.20"/>
-      <stop offset="100%" stop-color="#d1fae5" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.84"/>
-      <stop offset="100%" stop-color="#f8fafc" stop-opacity="0.72"/>
-    </linearGradient>
-    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="180%">
-      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.12"/>
-    </filter>
-  </defs>
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Secure Code Sandbox API icon cover">
   <rect width="1200" height="675" fill="#f8fafc"/>
-
-  <g transform="translate(405 140)" filter="url(#softShadow)">
-    <path d="M195 0L390 72V220c0 116-78 206-195 255C78 426 0 336 0 220V72L195 0z"
-      fill="url(#glass)" stroke="#e2e8f0" stroke-width="2"/>
-
-    <path d="M195 30L348 86v129c0 92-61 163-153 205C103 378 42 307 42 215V86L195 30z"
-      fill="url(#glass)" fill-opacity="0.9" stroke="#e5e7eb" stroke-width="2"/>
-
-    <path d="M195 58L326 106v112c0 78-52 139-131 176C116 357 64 296 64 218V106L195 58z"
-      fill="url(#mintGlow)" stroke="#d1fae5" stroke-width="2"/>
-
-    <path d="M195 88L304 128v98c0 63-44 113-109 145c-65-32-109-82-109-145v-98L195 88z"
-      fill="url(#glass)" stroke="#ecfeff" stroke-width="2"/>
-  </g>
+  <circle cx="600" cy="338" r="168" fill="#ecfdf5"/>
+  <path d="M600 198l120 46v92c0 97-62 172-120 201-58-29-120-104-120-201v-92l120-46z" fill="#ffffff" stroke="#22c55e" stroke-width="16"/>
+  <path d="M600 252l70 27v54c0 61-39 108-70 124-31-16-70-63-70-124v-54l70-27z" fill="#dcfce7"/>
 </svg>

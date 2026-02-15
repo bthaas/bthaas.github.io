@@ -503,7 +503,7 @@ const ExperienceCard = ({ company, role, period, location, logo, color, side, co
   </div>
 );
 
-const ProjectCard = ({ title, description, icon, tags, color, onOpen, url, image }) => (
+const ProjectCard = ({ title, description, icon, tags, color, onOpen, url }) => (
   <div 
     onClick={onOpen}
     className={`group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border transition-all duration-300 hover:-translate-y-2 h-full flex flex-col justify-between relative overflow-hidden cursor-pointer ${color}`}
@@ -529,9 +529,6 @@ const ProjectCard = ({ title, description, icon, tags, color, onOpen, url, image
         {description}
       </p>
 
-      <div className="h-28 rounded-xl overflow-hidden border border-white/70 bg-white/70 mb-5">
-        <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-      </div>
     </div>
 
     <div className="flex flex-wrap gap-2 relative z-10">
@@ -555,11 +552,21 @@ const ProjectSpotlight = ({ projects, activeIndex, onSelect, onOpen }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2">
         <button
           onClick={() => onOpen(project)}
-          className="relative h-72 lg:h-full min-h-72 overflow-hidden group"
+          className="relative h-72 lg:h-full min-h-72 overflow-hidden group bg-gradient-to-br from-slate-50 to-white border-r border-slate-100 flex items-center justify-center"
         >
-          <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-          <div className="absolute bottom-4 left-4 text-white text-sm font-semibold tracking-wide">
+          <div className="absolute inset-0 opacity-40"
+               style={{
+                 backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
+                 backgroundSize: '18px 18px'
+               }}
+          />
+          <div className="relative z-10 w-40 h-40 rounded-3xl bg-white border border-slate-200 shadow-lg flex items-center justify-center text-indigo-600 group-hover:scale-105 transition-transform duration-300">
+            {React.cloneElement(project.icon, {
+              size: 88,
+              className: `${project.icon.props.className || ''} drop-shadow-sm`
+            })}
+          </div>
+          <div className="absolute bottom-4 left-4 text-slate-500 text-sm font-semibold tracking-wide">
             Tap to open project
           </div>
         </button>
