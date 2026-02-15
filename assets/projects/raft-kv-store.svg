@@ -1,14 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Distributed Key Value Store cover">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Distributed Key Value Store icon cover">
   <rect width="1200" height="675" fill="#f8fafc"/>
-  <rect x="90" y="90" width="1020" height="495" rx="24" fill="#ffffff" stroke="#cbd5e1"/>
-  <rect x="180" y="220" width="130" height="84" rx="14" fill="#fff7ed" stroke="#fdba74"/>
-  <rect x="360" y="170" width="130" height="84" rx="14" fill="#fff7ed" stroke="#fdba74"/>
-  <rect x="360" y="360" width="130" height="84" rx="14" fill="#fff7ed" stroke="#fdba74"/>
-  <rect x="540" y="220" width="130" height="84" rx="14" fill="#fff7ed" stroke="#fdba74"/>
-  <line x1="310" y1="262" x2="360" y2="212" stroke="#fb923c" stroke-width="4"/>
-  <line x1="310" y1="262" x2="360" y2="402" stroke="#fb923c" stroke-width="4"/>
-  <line x1="490" y1="212" x2="540" y2="262" stroke="#fb923c" stroke-width="4"/>
-  <line x1="490" y1="402" x2="540" y2="262" stroke="#fb923c" stroke-width="4"/>
-  <text x="730" y="280" fill="#0f172a" font-size="56" font-family="Inter,Arial,sans-serif" font-weight="700">Distributed KV Store</text>
-  <text x="730" y="340" fill="#475569" font-size="30" font-family="Inter,Arial,sans-serif">Consensus-backed replication</text>
+  <circle cx="600" cy="338" r="168" fill="#fff7ed"/>
+  <rect x="510" y="240" width="180" height="70" rx="14" fill="#ffffff" stroke="#f97316" stroke-width="10"/>
+  <rect x="510" y="322" width="180" height="70" rx="14" fill="#ffffff" stroke="#f97316" stroke-width="10"/>
+  <rect x="510" y="404" width="180" height="70" rx="14" fill="#ffffff" stroke="#f97316" stroke-width="10"/>
+  <circle cx="542" cy="275" r="8" fill="#fb923c"/>
+  <circle cx="542" cy="357" r="8" fill="#fb923c"/>
+  <circle cx="542" cy="439" r="8" fill="#fb923c"/>
 </svg>
