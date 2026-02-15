@@ -1,19 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="BeatStream cover">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3b0764"/>
-      <stop offset="100%" stop-color="#be185d"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="675" fill="url(#bg)"/>
-  <g fill="#fdf2f8" fill-opacity="0.88">
-    <rect x="190" y="145" width="42" height="300" rx="21"/>
-    <rect x="300" y="205" width="42" height="240" rx="21"/>
-    <rect x="410" y="120" width="42" height="325" rx="21"/>
-    <rect x="520" y="180" width="42" height="265" rx="21"/>
-    <rect x="630" y="240" width="42" height="205" rx="21"/>
+  <rect width="1200" height="675" fill="#f8fafc"/>
+  <rect x="90" y="90" width="1020" height="495" rx="24" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect x="150" y="165" width="480" height="350" rx="18" fill="#fdf2f8" stroke="#fbcfe8"/>
+  <g fill="#ec4899" fill-opacity="0.85">
+    <rect x="220" y="250" width="24" height="170" rx="12"/>
+    <rect x="275" y="220" width="24" height="200" rx="12"/>
+    <rect x="330" y="275" width="24" height="145" rx="12"/>
+    <rect x="385" y="200" width="24" height="220" rx="12"/>
+    <rect x="440" y="245" width="24" height="175" rx="12"/>
+    <rect x="495" y="290" width="24" height="130" rx="12"/>
   </g>
-  <circle cx="910" cy="330" r="150" fill="#ffffff10" stroke="#fbcfe8" stroke-opacity="0.6"/>
-  <polygon points="870,265 870,395 980,330" fill="#fdf2f8"/>
-  <text x="120" y="590" fill="#fdf2f8" font-size="68" font-family="Inter,Arial,sans-serif" font-weight="700">BeatStream</text>
+  <circle cx="870" cy="300" r="110" fill="#fdf2f8" stroke="#f9a8d4"/>
+  <polygon points="845,245 845,355 940,300" fill="#db2777"/>
+  <text x="690" y="500" fill="#0f172a" font-size="62" font-family="Inter,Arial,sans-serif" font-weight="700">BeatStream</text>
 </svg>
