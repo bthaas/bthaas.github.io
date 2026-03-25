@@ -294,45 +294,61 @@ const Portfolio = () => {
 
         {/* EXPERIENCE SECTION */}
         <section id="experience" className="relative">
-          <SectionHeader title="Experience" subtitle="Where I've made an impact" icon={<Briefcase />} />
+          <SectionHeader title="Experience" subtitle="Internships, research, and applied ML work" icon={<Briefcase />} />
           
           <div className="mt-12 space-y-12 relative">
             {/* Connecting Line */}
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-200 via-indigo-400 to-transparent transform -translate-x-1/2 hidden md:block" />
 
             {/* Experience Items */}
-            <ExperienceCard 
+            <ExperienceCard
               company="Scale AI"
               role="GenAI Technical Advisor Intern"
               period="Jun 2025 - Dec 2025"
-              location="Remote"
-              logo="S"
+              location="Remote, USA"
+              logoImage="/assets/scale.webp"
+              logoAlt="Scale AI"
               color="bg-slate-900"
               side="left"
               content={[
-                "Fine-tuned LLMs on competitive programming & algorithmic tasks.",
-                "Designed benchmarks for reasoning, accuracy, and agentic behavior.",
-                "Conducted red-teaming to identify jailbreak vulnerabilities.",
-                "Collaborated with ML engineers to debug failure modes."
+                "Red-teamed production LLMs to find security vulnerabilities and jailbreak vectors.",
+                "Evaluated 500+ code generation outputs to build RLHF training data.",
+                "Worked with ML engineers across 10+ model eval projects to improve alignment."
               ]}
               tech={["LLMs", "Python", "RLHF", "Evaluation"]}
             />
 
-            <ExperienceCard 
+            <ExperienceCard
+              company="University of Virginia"
+              role="Undergraduate Researcher"
+              period="Nov 2025 - Present"
+              location="Charlottesville, VA"
+              logoImage="/assets/uva-symbol.png"
+              logoAlt="University of Virginia"
+              color="bg-indigo-600"
+              side="right"
+              content={[
+                "Using activation steering to control GPT-2's behavior via targeted interventions on internal representations.",
+                "Built fine-tuning pipelines to extract control vectors via Weighted Mean Difference."
+              ]}
+              tech={["PyTorch", "Interpretability", "Activation Steering", "AI Safety"]}
+            />
+
+            <ExperienceCard
               company="Refraction Innovation Hub"
               role="Software Engineer Intern"
               period="Jun 2025 - Aug 2025"
-              location="Tysons Corner, VA"
-              logo="R"
+              location="McLean, VA"
+              logoImage="/assets/refraction.webp"
+              logoAlt="Refraction Innovation Hub"
               color="bg-blue-600"
-              side="right"
+              side="left"
               content={[
-                "Built multimodal food recognition app with React Native.",
-                "Integrated OpenAI APIs for 1.2s inference speed.",
-                "Optimized load time by 55% and achieved 99.5% crash-free sessions.",
-                "Implemented AWS Cognito auth and Azure SQL storage."
+                "Built a cross-platform food recognition app in React Native with OpenAI vision APIs.",
+                "Cut load time by 55% and maintained 99.5% crash-free sessions through memory optimizations.",
+                "Set up CI/CD with Docker and AWS Lambda for zero-downtime deployments."
               ]}
-              tech={["React Native", "OpenAI", "AWS", "Azure"]}
+              tech={["React Native", "OpenAI", "AWS", "Docker"]}
             />
           </div>
         </section>
@@ -372,21 +388,26 @@ const Portfolio = () => {
                  }} 
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
-              <SkillGroup 
-                title="Languages" 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+              <SkillGroup
+                title="Languages"
                 icon={<Terminal size={18} />}
-                skills={["Python", "Java", "TypeScript", "C/C++", "Go", "Rust", "SQL"]} 
+                skills={["Python", "Java", "JavaScript", "TypeScript", "C/C++", "Go", "Rust", "SQL"]}
               />
-              <SkillGroup 
-                title="Frameworks" 
+              <SkillGroup
+                title="Frameworks"
                 icon={<Layers size={18} />}
-                skills={["React", "React Native", "Node.js", "Next.js", "Flask", "PyTorch"]} 
+                skills={["React", "React Native", "Node.js", "Next.js", "Flask", "PyTorch", "TensorFlow Lite", "WebSockets"]}
               />
-              <SkillGroup 
-                title="Infrastructure" 
+              <SkillGroup
+                title="Infrastructure"
                 icon={<Box size={18} />}
-                skills={["AWS", "Docker", "Kubernetes", "GCP", "PostgreSQL", "MongoDB"]} 
+                skills={["AWS", "Docker", "Kubernetes", "GCP", "Firebase", "PostgreSQL", "MongoDB"]}
+              />
+              <SkillGroup
+                title="AI / ML"
+                icon={<Brain size={18} />}
+                skills={["OpenAI API", "Fine-tuning", "RLHF", "LLM Evaluation", "Activation Steering"]}
               />
             </div>
           </div>
@@ -449,7 +470,7 @@ const SocialButton = ({ href, icon, label }) => (
   </a>
 );
 
-const ExperienceCard = ({ company, role, period, location, logo, color, side, content, tech }) => (
+const ExperienceCard = ({ company, role, period, location, logo, logoImage, logoAlt, logoNode, color, side, content, tech }) => (
   <div className={`flex flex-col md:flex-row items-center gap-8 ${side === 'left' ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
     
     {/* Timeline Node */}
@@ -463,10 +484,26 @@ const ExperienceCard = ({ company, role, period, location, logo, color, side, co
         
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 ${color} text-white rounded-lg flex items-center justify-center font-bold text-lg shadow-md`}>
-              {logo}
-            </div>
-            <div>
+            {logoImage ? (
+              <div className="w-12 h-12 rounded-xl border border-slate-100 shadow-md flex items-center justify-center shrink-0 overflow-hidden bg-white">
+                <div className="w-full h-full flex items-center justify-center">
+                  <img
+                    src={logoImage}
+                    alt={logoAlt || company}
+                    className="w-8 h-8 object-contain block"
+                  />
+                </div>
+              </div>
+            ) : logoNode ? (
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 shadow-md flex items-center justify-center shrink-0">
+                {logoNode}
+              </div>
+            ) : (
+              <div className={`w-12 h-12 ${color} text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md shrink-0`}>
+                {logo}
+              </div>
+            )}
+            <div className="min-w-0">
               <h3 className="font-bold text-lg leading-tight">{company}</h3>
               <p className="text-sm text-slate-500 font-medium">{role}</p>
             </div>
