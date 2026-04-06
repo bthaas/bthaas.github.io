@@ -328,8 +328,9 @@ const Portfolio = () => {
               color="bg-indigo-600"
               side="right"
               content={[
-                "Using activation steering to control GPT-2's behavior via targeted interventions on internal representations.",
-                "Built fine-tuning pipelines to extract control vectors via Weighted Mean Difference."
+                "Built a reproducible PyTorch and NNSight pipeline for activation steering across Qwen 1.8B-14B models on A100 GPUs.",
+                "Designed evaluation tooling for controllability vs. quality trade-offs, including bias metrics, layer diagnostics, lambda sweeps, and coherence analysis.",
+                "Ran large-scale multi-model studies achieving up to 93.0% bias reduction and analyzing how instruction tuning affects steerability."
               ]}
               tech={["PyTorch", "Interpretability", "Activation Steering", "AI Safety"]}
             />
