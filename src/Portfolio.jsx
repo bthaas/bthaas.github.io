@@ -18,27 +18,14 @@ import {
   PenTool,
   MousePointer2,
   X,
-  Server,
-  ShieldCheck,
-  Database,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
 
 const projects = [
   {
-    id: 'go-secure-sandbox',
-    title: "Secure Code Sandbox API",
-    description: "High-performance API for running untrusted code with hardware-level isolation via Firecracker microVMs.",
-    longDescription: "A production-ready API for securely executing user-provided code snippets in isolated MicroVM environments using Firecracker. Designed for AI agents and other applications that need to safely run untrusted code with strict resource limits (CPU, memory, PIDs) and network isolation. The system uses the same technology that powers AWS Lambda for sub-150ms cold starts.",
-    icon: <ShieldCheck className="text-green-500" />,
-    tags: ["Go", "Firecracker", "MicroVMs", "Security"],
-    color: "border-green-200 bg-green-50/50",
-    url: "https://github.com/bthaas/go-secure-sandbox"
-  },
-  {
     id: 'courtvision',
-    title: "CourtVision",
+    title: "Court Vision",
     description: "Computer vision basketball analytics platform for shot tracking and player movement insights.",
     longDescription: "CourtVision analyzes basketball footage to extract event-level insights like shot attempts, player movement trends, and possession patterns. The project focuses on practical, coach-friendly metrics with a clean visualization layer for fast game review.",
     icon: <Brain className="text-purple-500" />,
@@ -48,33 +35,13 @@ const projects = [
   },
   {
     id: 'beatstream',
-    title: "BeatStream",
+    title: "Beat Stream",
     description: "Music streaming and discovery experience focused on smooth playback, curation, and social sharing.",
     longDescription: "BeatStream is a modern music web app centered on quick playback, rich discovery, and playlist sharing. The interface emphasizes fast interaction loops and clean information hierarchy so users can move from search to listening with minimal friction.",
     icon: <Smartphone className="text-pink-500" />,
     tags: ["React", "Audio", "Streaming", "UI/UX"],
     color: "border-pink-200 bg-pink-50/50",
     url: "https://github.com/bthaas/BeatStream"
-  },
-  {
-    id: 'apex-vector',
-    title: "ApexVector",
-    description: "A high-performance, distributed vector database built from scratch in Rust with HNSW indexing.",
-    longDescription: "A high-performance, persistent, approximate nearest neighbor (ANN) search vector database written in Rust. It implements the HNSW (Hierarchical Navigable Small World) algorithm with scalar quantization for 4x memory compression and features an ACID-compliant, durable storage engine using Write-Ahead Logging (WAL). The high-performance API is built with Tonic/Protobuf.",
-    icon: <Database className="text-slate-500" />,
-    tags: ["Rust", "Vector Database", "HNSW", "gRPC"],
-    color: "border-slate-200 bg-slate-50/50",
-    url: "https://github.com/bthaas/apex-vector"
-  },
-  {
-    id: 'raft-kv-store',
-    title: "Distributed Key-Value Store",
-    description: "A fault-tolerant, distributed key-value store built in Go using the Raft consensus algorithm.",
-    longDescription: "A fault-tolerant, horizontally scalable Key-Value Store built in Go using the Raft consensus algorithm. Features include strong consistency via Raft (Leader Election, Log Replication), fault tolerance for node failures, and persistence with a Write-Ahead Log (WAL) for crash recovery. The architecture handles leader election with randomized timers, maintains authority with heartbeats, and replicates logs to a majority of followers before committing them to an in-memory store.",
-    icon: <Server className="text-orange-500" />,
-    tags: ["Go", "Raft Consensus", "Distributed Systems"],
-    color: "border-orange-200 bg-orange-50/50",
-    url: "https://github.com/bthaas/raft-kv-store"
   },
 ];
 
