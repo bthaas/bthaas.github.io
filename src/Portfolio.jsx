@@ -38,10 +38,20 @@ const projects = [
     title: "Beat Stream",
     description: "Music streaming and discovery experience focused on smooth playback, curation, and social sharing.",
     longDescription: "BeatStream is a modern music web app centered on quick playback, rich discovery, and playlist sharing. The interface emphasizes fast interaction loops and clean information hierarchy so users can move from search to listening with minimal friction.",
-    icon: <Smartphone className="text-pink-500" />,
+    icon: <Smartphone className="text-indigo-500" />,
     tags: ["React", "Audio", "Streaming", "UI/UX"],
-    color: "border-pink-200 bg-pink-50/50",
+    color: "border-indigo-200 bg-indigo-50/50",
     url: "https://github.com/bthaas/BeatStream"
+  },
+  {
+    id: 'vision-bias-steering',
+    title: "Vision Bias Steering",
+    description: "LLM steering experiments for shifting model outputs between spatial and descriptive language.",
+    longDescription: "Vision Bias Steering is a research codebase for training, validating, and evaluating steering vectors that shift language-model outputs between spatial and descriptive captioning behavior. It includes local and multi-model sweep runners, evaluation utilities, and plotting workflows built around PyTorch, Transformers, and NNSight.",
+    icon: <Zap className="text-pink-500" />,
+    tags: ["Python", "PyTorch", "NNSight", "LLM Evaluation"],
+    color: "border-pink-200 bg-pink-50/50",
+    url: "https://github.com/bthaas/vision-bias-steering"
   },
 ];
 
@@ -207,7 +217,7 @@ const Portfolio = () => {
               </h1>
               
               <p className="text-xl md:text-2xl text-slate-600 max-w-lg leading-relaxed">
-                Full-stack engineer & creative technologist building intelligent systems. 
+                Full-stack software engineer building reliable, intelligent products across web, mobile, and AI systems.
               </p>
 
               <div className="flex gap-4 pt-4">
@@ -261,13 +271,46 @@ const Portfolio = () => {
 
         {/* EXPERIENCE SECTION */}
         <section id="experience" className="relative">
-          <SectionHeader title="Experience" subtitle="Internships, research, and applied ML work" icon={<Briefcase />} />
+          <SectionHeader title="Experience & Education" subtitle="Internships, research, and academic foundation" icon={<Briefcase />} />
           
           <div className="mt-12 space-y-12 relative">
             {/* Connecting Line */}
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-200 via-indigo-400 to-transparent transform -translate-x-1/2 hidden md:block" />
 
             {/* Experience Items */}
+            <ExperienceCard
+              company="University of Virginia"
+              role="B.S. in Computer Science"
+              period="May 2026"
+              location="Charlottesville, VA"
+              logoImage="/assets/uva-symbol.png"
+              logoAlt="University of Virginia"
+              color="bg-indigo-600"
+              side="left"
+              content={[
+                "GPA: 3.7",
+                "Relevant coursework: Data Structures and Algorithms, Software Development, Software Testing, Computer Systems and Organization, Cybersecurity, Machine Learning Research."
+              ]}
+              tech={["Computer Science", "Cybersecurity", "Machine Learning", "Software Engineering"]}
+            />
+
+            <ExperienceCard
+              company="University of Virginia"
+              role="ML Research Assistant"
+              period="Nov 2025 - May 2026"
+              location="Charlottesville, VA"
+              logoImage="/assets/uva-symbol.png"
+              logoAlt="University of Virginia"
+              color="bg-indigo-600"
+              side="right"
+              content={[
+                "Built an inference-time activation steering pipeline for LLMs in PyTorch and NNSight, intervening on residual-stream activations across Qwen models with frozen weights.",
+                "Engineered a filtering pipeline over 616K+ COCO captions using lexical scoring, next-token probability disparities, and RMSE-based layer selection.",
+                "Reduced RMS next-token bias 28.9% while preserving output quality across 1,000 samples."
+              ]}
+              tech={["PyTorch", "NNSight", "Activation Steering", "Interpretability"]}
+            />
+
             <ExperienceCard
               company="Scale AI"
               role="GenAI Technical Advisor Intern"
@@ -278,28 +321,11 @@ const Portfolio = () => {
               color="bg-slate-900"
               side="left"
               content={[
-                "Red-teamed production LLMs to find security vulnerabilities and jailbreak vectors.",
-                "Evaluated 500+ code generation outputs to build RLHF training data.",
-                "Worked with ML engineers across 10+ model eval projects to improve alignment."
+                "Red-teamed frontier LLMs in Scale AI SEAL, identifying jailbreaks, unsafe behaviors, prompt-injection risks, and agent security failure modes.",
+                "Produced RLHF-style code evaluation data for complex software-engineering and competitive-programming tasks.",
+                "Improved system prompts and tool use in agentic workflows to increase model safety, consistency, and multi-step reliability."
               ]}
-              tech={["LLMs", "Python", "RLHF", "Evaluation"]}
-            />
-
-            <ExperienceCard
-              company="University of Virginia"
-              role="Undergraduate Researcher"
-              period="Nov 2025 - Present"
-              location="Charlottesville, VA"
-              logoImage="/assets/uva-symbol.png"
-              logoAlt="University of Virginia"
-              color="bg-indigo-600"
-              side="right"
-              content={[
-                "Built a reproducible PyTorch and NNSight pipeline for activation steering across Qwen 1.8B-14B models on A100 GPUs.",
-                "Designed evaluation tooling for controllability vs. quality trade-offs, including bias metrics, layer diagnostics, lambda sweeps, and coherence analysis.",
-                "Ran large-scale multi-model studies achieving up to 93.0% bias reduction and analyzing how instruction tuning affects steerability."
-              ]}
-              tech={["PyTorch", "Interpretability", "Activation Steering", "AI Safety"]}
+              tech={["LLMs", "RLHF", "Model Safety", "Evaluation"]}
             />
 
             <ExperienceCard
@@ -310,13 +336,13 @@ const Portfolio = () => {
               logoImage="/assets/refraction.webp"
               logoAlt="Refraction Innovation Hub"
               color="bg-blue-600"
-              side="left"
+              side="right"
               content={[
-                "Built a cross-platform food recognition app in React Native with OpenAI vision APIs.",
-                "Cut load time by 55% and maintained 99.5% crash-free sessions through memory optimizations.",
-                "Set up CI/CD with Docker and AWS Lambda for zero-downtime deployments."
+                "Architected a cross-platform food recognition app in TypeScript and React Native with OpenAI multimodal APIs.",
+                "Deployed authentication through AWS Cognito with storage on AWS RDS and Azure SQL across iOS and Android.",
+                "Improved load time 55% and reached 99.5% crash-free sessions through memory optimizations and lazy-loading monitored with AWS CloudWatch."
               ]}
-              tech={["React Native", "OpenAI", "AWS", "Docker"]}
+              tech={["TypeScript", "React Native", "OpenAI", "AWS"]}
             />
           </div>
         </section>
@@ -565,9 +591,6 @@ const ProjectSpotlight = ({ projects, activeIndex, onSelect, onOpen }) => {
               size: 88,
               className: `${project.icon.props.className || ''} drop-shadow-sm`
             })}
-          </div>
-          <div className="absolute bottom-4 left-4 text-slate-500 text-sm font-semibold tracking-wide">
-            Tap to open project
           </div>
         </button>
 
