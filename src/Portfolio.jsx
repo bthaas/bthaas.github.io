@@ -213,7 +213,7 @@ const Portfolio = () => {
 
               <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[0.9]">
                 Brett <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Haas</span>.
+                <span className="hero-name-gradient">Haas</span>.
               </h1>
               
               <p className="text-xl md:text-2xl text-slate-600 max-w-lg leading-relaxed">
