@@ -44,4 +44,15 @@ describe('Portfolio', () => {
       'mailto:bthaas15@gmail.com',
     )
   })
+
+  it('renders an inert, hidden cloud descent around the pinned hero', () => {
+    const { container } = render(<Portfolio />)
+
+    const cloudDescent = container.querySelector('[data-cloud-descent]')
+    expect(cloudDescent).toHaveAttribute('aria-hidden', 'true')
+    expect(cloudDescent).toHaveClass('cloud-descent')
+    expect(cloudDescent?.querySelectorAll('.cloud-layer')).toHaveLength(3)
+    expect(cloudDescent?.querySelector('.cloud-whiteout')).toBeInTheDocument()
+    expect(container.querySelector('#about [data-about-arrival]')).toBeInTheDocument()
+  })
 })

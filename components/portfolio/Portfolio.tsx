@@ -73,10 +73,18 @@ const constellationEdges = [
 
 function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>) {
   useEffect(() => {
+    const root = document.documentElement
     const reducedMotion =
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
       new URLSearchParams(window.location.search).get('motion') === 'reduce'
-    if (reducedMotion) return
+    if (reducedMotion) {
+      root.dataset.motion = 'reduce'
+      fractureProgressRef.current = 0
+      return () => {
+        delete root.dataset.motion
+      }
+    }
+    delete root.dataset.motion
 
     let disposed = false
     let cleanupExperience = () => undefined
@@ -104,37 +112,98 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
       lenis.on('scroll', ScrollTrigger.update)
 
       const context = gsap.context(() => {
-        ScrollTrigger.create({
-          trigger: '#hero',
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 0.8,
-          onUpdate: ({ progress }) => {
-            fractureProgressRef.current = progress
-            document.documentElement.style.setProperty('--hero-progress', progress.toFixed(3))
-          },
-        })
+        const heroShell = document.querySelector<HTMLElement>('#hero')
+        const heroStage = heroShell?.querySelector<HTMLElement>('.hero-stage')
 
-        gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((element) => {
-          gsap.fromTo(
-            element,
-            { autoAlpha: 0, y: 40 },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 1.1,
-              ease: 'back.out(1.25)',
-              scrollTrigger: { trigger: element, start: 'top 86%', once: true },
+        if (heroShell && heroStage) {
+          const descentTimeline = gsap.timeline({
+            defaults: { ease: 'power2.inOut' },
+            scrollTrigger: {
+              trigger: heroShell,
+              start: 'top top',
+              end: () => `+=${heroShell.offsetHeight}`,
+              pin: heroStage,
+              pinSpacing: false,
+              scrub: 0.75,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+              onUpdate: ({ progress }) => {
+                fractureProgressRef.current = progress
+                root.style.setProperty('--hero-progress', progress.toFixed(3))
+              },
             },
-          )
-        })
+          })
+
+          descentTimeline
+            .to(
+              '.hero-content',
+              { autoAlpha: 0, yPercent: -8, scale: 1.055, duration: 0.7 },
+              0,
+            )
+            .fromTo(
+              '.cloud-layer-far',
+              { xPercent: -4, yPercent: 84, scale: 0.9 },
+              { xPercent: 3, yPercent: -128, scale: 1.08, duration: 0.78 },
+              0.02,
+            )
+            .fromTo(
+              '.cloud-layer-mid',
+              { xPercent: 5, yPercent: 105, scale: 0.94 },
+              { xPercent: -3, yPercent: -155, scale: 1.13, duration: 0.75 },
+              0.08,
+            )
+            .fromTo(
+              '.cloud-layer-near',
+              { xPercent: -2, yPercent: 126, scale: 0.98 },
+              { xPercent: 4, yPercent: -188, scale: 1.19, duration: 0.72 },
+              0.14,
+            )
+            .fromTo(
+              '.cloud-whiteout',
+              { autoAlpha: 0 },
+              { autoAlpha: 0.88, duration: 0.17, ease: 'power2.in' },
+              0.34,
+            )
+            .to(
+              '.cloud-whiteout',
+              { autoAlpha: 0, duration: 0.23, ease: 'power2.out' },
+              0.51,
+            )
+            .to(
+              '.cloud-descent',
+              { autoAlpha: 0, duration: 0.18, ease: 'power2.out' },
+              0.72,
+            )
+            .fromTo(
+              '[data-about-arrival]',
+              { autoAlpha: 0, y: 64 },
+              { autoAlpha: 1, y: 0, duration: 0.2, ease: 'power2.out' },
+              0.8,
+            )
+        }
+
+        gsap.utils
+          .toArray<HTMLElement>('[data-reveal]:not([data-about-arrival])')
+          .forEach((element) => {
+            gsap.fromTo(
+              element,
+              { autoAlpha: 0, y: 40 },
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 1.1,
+                ease: 'back.out(1.25)',
+                scrollTrigger: { trigger: element, start: 'top 86%', once: true },
+              },
+            )
+          })
       })
       ScrollTrigger.refresh()
       cleanupExperience = () => {
         cancelAnimationFrame(frame)
         context.revert()
         lenis.destroy()
-        document.documentElement.style.removeProperty('--hero-progress')
+        root.style.removeProperty('--hero-progress')
       }
     }
 
@@ -185,32 +254,46 @@ function SiteNav() {
   )
 }
 
+function CloudDescent() {
+  return (
+    <div className="cloud-descent" data-cloud-descent aria-hidden="true">
+      <div className="cloud-layer cloud-layer-far" />
+      <div className="cloud-layer cloud-layer-mid" />
+      <div className="cloud-layer cloud-layer-near" />
+      <div className="cloud-whiteout" />
+    </div>
+  )
+}
+
 function Hero({ fractureProgressRef }: { fractureProgressRef: React.MutableRefObject<number> }) {
   const letters = useMemo(() => siteContent.identity.name.split(''), [])
 
   return (
     <section id="hero" className="hero-shell" aria-label="Introduction">
       <div className="hero-stage">
-        <HeroExperience fractureProgressRef={fractureProgressRef} />
-        <div className="hero-wash" />
-        <div className="hero-copy">
-          <h1 aria-label="Brett Haas">
-            {letters.map((letter, index) => (
-              <span
-                key={`${letter}-${index}`}
-                aria-hidden="true"
-                style={{ '--letter-index': index } as React.CSSProperties}
-              >
-                {letter === ' ' ? '\u00A0' : letter}
-              </span>
-            ))}
-          </h1>
-          <p>{siteContent.identity.title}</p>
+        <div className="hero-content">
+          <HeroExperience fractureProgressRef={fractureProgressRef} />
+          <div className="hero-wash" />
+          <div className="hero-copy">
+            <h1 aria-label="Brett Haas">
+              {letters.map((letter, index) => (
+                <span
+                  key={`${letter}-${index}`}
+                  aria-hidden="true"
+                  style={{ '--letter-index': index } as React.CSSProperties}
+                >
+                  {letter === ' ' ? '\u00A0' : letter}
+                </span>
+              ))}
+            </h1>
+            <p>{siteContent.identity.title}</p>
+          </div>
+          <a className="scroll-cue" href="#about">
+            <span>Descend</span>
+            <ChevronDown size={14} />
+          </a>
         </div>
-        <a className="scroll-cue" href="#about">
-          <span>Descend</span>
-          <ChevronDown size={14} />
-        </a>
+        <CloudDescent />
       </div>
     </section>
   )
@@ -219,7 +302,7 @@ function Hero({ fractureProgressRef }: { fractureProgressRef: React.MutableRefOb
 function AboutSection() {
   return (
     <section id="about" className="section about-section">
-      <div className="section-heading" data-reveal>
+      <div className="section-heading" data-reveal data-about-arrival>
         <p className="eyebrow">01 · In pursuit</p>
         <h2>Ambition, with<br />an engineering plan.</h2>
         <p className="section-intro">{siteContent.identity.descriptor}</p>
