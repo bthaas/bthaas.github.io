@@ -25,12 +25,13 @@ jobs:
         run: |
           npm ci
           npm run build
+          mkdir -p out/static-v1
+          cp -R out/_next out/static-v1/_next
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: main # The branch the action should deploy to.
           folder: out # Next.js static export output.
-
 
 
