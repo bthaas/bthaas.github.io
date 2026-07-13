@@ -136,6 +136,9 @@ dist/
 coverage/
 # dist/
 
+# Local audit output and temporary generated assets
+artifacts/
+tmp/
 
 
 

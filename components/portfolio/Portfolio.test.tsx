@@ -45,14 +45,25 @@ describe('Portfolio', () => {
     )
   })
 
-  it('renders an inert, hidden cloud descent around the pinned hero', () => {
+  it('renders an inert cloud descent made from distinct puffy silhouettes', () => {
     const { container } = render(<Portfolio />)
 
     const cloudDescent = container.querySelector('[data-cloud-descent]')
     expect(cloudDescent).toHaveAttribute('aria-hidden', 'true')
     expect(cloudDescent).toHaveClass('cloud-descent')
     expect(cloudDescent?.querySelectorAll('.cloud-layer')).toHaveLength(3)
-    expect(cloudDescent?.querySelector('.cloud-whiteout')).toBeInTheDocument()
+    expect(cloudDescent?.querySelectorAll('.cloud-puff')).toHaveLength(47)
+    expect(cloudDescent?.querySelectorAll('.cloud-wipe-puff')).toHaveLength(35)
+    cloudDescent?.querySelectorAll('.cloud-layer').forEach((layer) => {
+      expect(layer.querySelectorAll('.cloud-puff')).toHaveLength(4)
+    })
+    expect(cloudDescent?.querySelector('.cloud-whiteout')).not.toBeInTheDocument()
+
+    cloudDescent?.querySelectorAll('.cloud-puff').forEach((cloud) => {
+      expect(cloud.querySelector('svg')).toBeInTheDocument()
+      expect(cloud.querySelectorAll('circle').length).toBeGreaterThanOrEqual(4)
+      expect(cloud.querySelector('.cloud-underside')).toBeInTheDocument()
+    })
     expect(container.querySelector('#about [data-about-arrival]')).toBeInTheDocument()
   })
 })

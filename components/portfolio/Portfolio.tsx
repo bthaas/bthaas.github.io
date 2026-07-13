@@ -116,6 +116,7 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
         const heroStage = heroShell?.querySelector<HTMLElement>('.hero-stage')
 
         if (heroShell && heroStage) {
+          const wipeClouds = gsap.utils.toArray<HTMLElement>('.cloud-wipe-slot')
           const descentTimeline = gsap.timeline({
             defaults: { ease: 'power2.inOut' },
             scrollTrigger: {
@@ -154,31 +155,44 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
             )
             .fromTo(
               '.cloud-layer-near',
-              { xPercent: -2, yPercent: 126, scale: 0.98 },
+              { xPercent: -2, yPercent: 112, scale: 0.98 },
               { xPercent: 4, yPercent: -188, scale: 1.19, duration: 0.72 },
               0.14,
             )
             .fromTo(
-              '.cloud-whiteout',
-              { autoAlpha: 0 },
-              { autoAlpha: 0.88, duration: 0.17, ease: 'power2.in' },
-              0.34,
+              wipeClouds,
+              {
+                xPercent: (_, cloud) => Number(cloud.dataset.entryX),
+                yPercent: (_, cloud) => Number(cloud.dataset.entryY),
+                scale: 0.78,
+              },
+              {
+                xPercent: 0,
+                yPercent: 0,
+                scale: 1,
+                duration: 0.25,
+                ease: 'power2.in',
+                stagger: 0.001,
+              },
+              0.25,
             )
             .to(
-              '.cloud-whiteout',
-              { autoAlpha: 0, duration: 0.23, ease: 'power2.out' },
-              0.51,
-            )
-            .to(
-              '.cloud-descent',
-              { autoAlpha: 0, duration: 0.18, ease: 'power2.out' },
-              0.72,
+              wipeClouds,
+              {
+                xPercent: (_, cloud) => Number(cloud.dataset.exitX),
+                yPercent: (_, cloud) => Number(cloud.dataset.exitY),
+                scale: 1.12,
+                duration: 0.28,
+                ease: 'power2.in',
+                stagger: 0.0005,
+              },
+              0.55,
             )
             .fromTo(
               '[data-about-arrival]',
               { autoAlpha: 0, y: 64 },
-              { autoAlpha: 1, y: 0, duration: 0.2, ease: 'power2.out' },
-              0.8,
+              { autoAlpha: 1, y: 0, duration: 0.22, ease: 'power2.out' },
+              0.78,
             )
         }
 
@@ -254,13 +268,130 @@ function SiteNav() {
   )
 }
 
+type CloudProfile = 'round' | 'tower' | 'wide'
+
+const cloudProfiles: Record<CloudProfile, ReadonlyArray<readonly [number, number, number]>> = {
+  round: [
+    [50, 72, 38],
+    [86, 52, 48],
+    [128, 43, 55],
+    [170, 56, 47],
+    [202, 74, 34],
+  ],
+  tower: [
+    [48, 76, 36],
+    [82, 58, 45],
+    [118, 35, 60],
+    [158, 55, 48],
+    [198, 75, 36],
+  ],
+  wide: [
+    [42, 76, 34],
+    [78, 61, 42],
+    [116, 54, 48],
+    [158, 58, 44],
+    [202, 76, 35],
+  ],
+}
+
+const ambientClouds: Record<
+  'far' | 'mid' | 'near',
+  ReadonlyArray<{ className: string; profile: CloudProfile }>
+> = {
+  far: [
+    { className: 'cloud-far-one', profile: 'wide' },
+    { className: 'cloud-far-two', profile: 'round' },
+    { className: 'cloud-far-three', profile: 'tower' },
+    { className: 'cloud-far-four', profile: 'wide' },
+  ],
+  mid: [
+    { className: 'cloud-mid-one', profile: 'tower' },
+    { className: 'cloud-mid-two', profile: 'wide' },
+    { className: 'cloud-mid-three', profile: 'round' },
+    { className: 'cloud-mid-four', profile: 'tower' },
+  ],
+  near: [
+    { className: 'cloud-near-one', profile: 'round' },
+    { className: 'cloud-near-two', profile: 'tower' },
+    { className: 'cloud-near-three', profile: 'wide' },
+    { className: 'cloud-near-four', profile: 'round' },
+  ],
+}
+
+const profileCycle: ReadonlyArray<CloudProfile> = ['round', 'wide', 'tower']
+
+const wipeClouds = Array.from({ length: 35 }, (_, index) => {
+  const desktopColumn = index % 7
+  const desktopRow = Math.floor(index / 7)
+  const mobileColumn = index % 5
+  const mobileRow = Math.floor(index / 5)
+  const entrySide = index % 4
+
+  return {
+    entryX: entrySide === 0 ? -220 : entrySide === 1 ? 220 : (index % 5 - 2) * 18,
+    entryY: entrySide === 2 ? -900 : entrySide === 3 ? 900 : (index % 3 - 1) * 30,
+    exitX: (index % 7 - 3) * 12,
+    exitY: -900 - (index % 4) * 55,
+    profile: profileCycle[index % profileCycle.length],
+    style: {
+      '--cloud-left': `${-8 + desktopColumn * 16}vw`,
+      '--cloud-top': `${-10 + desktopRow * 21}vh`,
+      '--cloud-size': `${23 + (index % 4)}vw`,
+      '--cloud-mobile-left': `${-28 + mobileColumn * 28}vw`,
+      '--cloud-mobile-top': `${-7 + mobileRow * 15}vh`,
+      '--cloud-mobile-size': `${60 + (index % 3) * 2}vw`,
+    } as React.CSSProperties,
+  }
+})
+
+function CloudPuff({ className, profile }: { className: string; profile: CloudProfile }) {
+  return (
+    <div className={`cloud-puff ${className}`}>
+      <svg viewBox="0 0 240 124" focusable="false" preserveAspectRatio="xMidYMid meet">
+        <ellipse className="cloud-underside" cx="120" cy="91" rx="108" ry="28" />
+        <ellipse className="cloud-body" cx="120" cy="80" rx="110" ry="30" />
+        {cloudProfiles[profile].map(([cx, cy, radius]) => (
+          <circle className="cloud-body" cx={cx} cy={cy} r={radius} key={`${cx}-${cy}`} />
+        ))}
+        <ellipse className="cloud-highlight" cx="104" cy="62" rx="57" ry="25" />
+      </svg>
+    </div>
+  )
+}
+
 function CloudDescent() {
   return (
     <div className="cloud-descent" data-cloud-descent aria-hidden="true">
-      <div className="cloud-layer cloud-layer-far" />
-      <div className="cloud-layer cloud-layer-mid" />
-      <div className="cloud-layer cloud-layer-near" />
-      <div className="cloud-whiteout" />
+      <div className="cloud-layer cloud-layer-far">
+        {ambientClouds.far.map((cloud) => (
+          <CloudPuff {...cloud} key={cloud.className} />
+        ))}
+      </div>
+      <div className="cloud-layer cloud-layer-mid">
+        {ambientClouds.mid.map((cloud) => (
+          <CloudPuff {...cloud} key={cloud.className} />
+        ))}
+      </div>
+      <div className="cloud-layer cloud-layer-near">
+        {ambientClouds.near.map((cloud) => (
+          <CloudPuff {...cloud} key={cloud.className} />
+        ))}
+      </div>
+      <div className="cloud-wipe">
+        {wipeClouds.map((cloud, index) => (
+          <div
+            className="cloud-wipe-slot"
+            data-entry-x={cloud.entryX}
+            data-entry-y={cloud.entryY}
+            data-exit-x={cloud.exitX}
+            data-exit-y={cloud.exitY}
+            key={index}
+            style={cloud.style}
+          >
+            <CloudPuff className="cloud-wipe-puff" profile={cloud.profile} />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

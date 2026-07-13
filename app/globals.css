@@ -250,11 +250,9 @@ button:focus-visible,
 
 .cloud-layer {
   position: absolute;
-  top: 0;
-  left: -20vw;
-  width: 140vw;
-  height: 76vh;
-  min-height: 34rem;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   transform: translate3d(0, 0, 0);
   transform-origin: center;
@@ -263,54 +261,106 @@ button:focus-visible,
 }
 
 .cloud-layer-far {
-  background:
-    radial-gradient(ellipse at 8% 58%, rgba(247, 247, 246, 0.76) 0 13%, rgba(231, 234, 236, 0.46) 32%, transparent 62%),
-    radial-gradient(ellipse at 31% 46%, rgba(255, 255, 255, 0.82) 0 16%, rgba(232, 235, 237, 0.48) 36%, transparent 65%),
-    radial-gradient(ellipse at 56% 57%, rgba(250, 250, 249, 0.78) 0 17%, rgba(227, 231, 233, 0.45) 38%, transparent 66%),
-    radial-gradient(ellipse at 82% 43%, rgba(255, 255, 255, 0.8) 0 14%, rgba(231, 234, 236, 0.46) 34%, transparent 64%);
-  filter: blur(28px);
-  opacity: 0.52;
+  z-index: 1;
 }
 
 .cloud-layer-mid {
-  height: 82vh;
-  background:
-    radial-gradient(ellipse at 5% 48%, rgba(255, 255, 255, 0.94) 0 15%, rgba(237, 239, 240, 0.68) 36%, transparent 63%),
-    radial-gradient(ellipse at 25% 61%, rgba(248, 249, 249, 0.94) 0 18%, rgba(225, 229, 232, 0.62) 40%, transparent 67%),
-    radial-gradient(ellipse at 49% 43%, rgba(255, 255, 255, 0.96) 0 19%, rgba(235, 237, 239, 0.7) 40%, transparent 68%),
-    radial-gradient(ellipse at 72% 60%, rgba(248, 249, 249, 0.92) 0 18%, rgba(224, 228, 231, 0.61) 39%, transparent 66%),
-    radial-gradient(ellipse at 96% 45%, rgba(255, 255, 255, 0.93) 0 16%, rgba(235, 237, 238, 0.64) 37%, transparent 64%);
-  filter: blur(22px);
-  opacity: 0.7;
+  z-index: 2;
 }
 
 .cloud-layer-near {
-  height: 88vh;
-  background:
-    radial-gradient(ellipse at 0% 55%, rgba(255, 255, 255, 0.98) 0 18%, rgba(237, 239, 240, 0.82) 39%, transparent 66%),
-    radial-gradient(ellipse at 22% 42%, rgba(252, 252, 251, 0.98) 0 20%, rgba(226, 230, 232, 0.78) 42%, transparent 69%),
-    radial-gradient(ellipse at 48% 62%, rgba(255, 255, 255, 0.99) 0 21%, rgba(235, 237, 238, 0.82) 43%, transparent 70%),
-    radial-gradient(ellipse at 75% 40%, rgba(250, 251, 250, 0.98) 0 20%, rgba(225, 229, 232, 0.76) 42%, transparent 68%),
-    radial-gradient(ellipse at 100% 58%, rgba(255, 255, 255, 0.98) 0 19%, rgba(237, 239, 240, 0.8) 40%, transparent 67%);
-  filter: blur(18px);
-  opacity: 0.86;
+  z-index: 3;
 }
 
-.cloud-whiteout {
+.cloud-puff {
   position: absolute;
-  inset: -12%;
-  background: radial-gradient(
-    ellipse at 50% 52%,
-    rgba(252, 252, 251, 0.99) 0 44%,
-    rgba(238, 240, 241, 0.92) 62%,
-    rgba(250, 250, 249, 0.58) 74%,
-    transparent 88%
-  );
-  filter: blur(26px);
-  opacity: 0;
+  width: 30vw;
+  aspect-ratio: 240 / 124;
+  filter: blur(2px) drop-shadow(0 9px 8px rgba(94, 104, 111, 0.11));
   pointer-events: none;
-  transform: translateZ(0) scale(1.08);
-  will-change: opacity;
+  transform: translateZ(0);
+  transform-origin: center;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.cloud-puff svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.cloud-body {
+  fill: #fff;
+  stroke: rgba(198, 206, 211, 0.34);
+  stroke-width: 1.1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.cloud-underside {
+  fill: #d9dee1;
+  stroke: rgba(172, 183, 190, 0.26);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.cloud-highlight {
+  fill: rgba(255, 255, 255, 0.72);
+  stroke: rgba(215, 220, 223, 0.22);
+  stroke-width: 0.8px;
+  vector-effect: non-scaling-stroke;
+}
+
+.cloud-layer-far .cloud-puff {
+  opacity: 0.66;
+}
+
+.cloud-layer-mid .cloud-puff {
+  opacity: 0.84;
+}
+
+.cloud-layer-near .cloud-puff {
+  opacity: 0.97;
+}
+
+.cloud-far-one { top: 8vh; left: 6vw; width: 12vw; }
+.cloud-far-two { top: 32vh; right: 13vw; width: 9vw; }
+.cloud-far-three { top: 56vh; left: 34vw; width: 14vw; }
+.cloud-far-four { top: 73vh; right: 35vw; width: 10vw; }
+.cloud-mid-one { top: 6vh; left: -4vw; width: 18vw; }
+.cloud-mid-two { top: 29vh; right: 4vw; width: 15vw; }
+.cloud-mid-three { top: 52vh; left: 23vw; width: 20vw; }
+.cloud-mid-four { top: 71vh; right: 28vw; width: 16vw; }
+.cloud-near-one { top: 4vh; left: -10vw; width: 32vw; }
+.cloud-near-two { top: 27vh; right: -7vw; width: 27vw; }
+.cloud-near-three { top: 51vh; left: 13vw; width: 30vw; }
+.cloud-near-four { top: 70vh; right: 17vw; width: 24vw; }
+
+.cloud-wipe {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cloud-wipe-slot {
+  position: absolute;
+  top: var(--cloud-top);
+  left: var(--cloud-left);
+  width: var(--cloud-size);
+  aspect-ratio: 240 / 124;
+  transform: translateZ(0);
+  transform-origin: center;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.cloud-wipe-puff {
+  inset: 0;
+  width: 100%;
+  filter: blur(2px) drop-shadow(0 7px 8px rgba(89, 99, 106, 0.12));
+  opacity: 1;
 }
 
 .section {
@@ -1208,11 +1258,24 @@ button:focus-visible,
   .hero-copy h1 { font-size: clamp(4.2rem, 21vw, 7.5rem); line-height: 0.86; }
   .hero-copy p { margin-top: 1.5rem; font-size: 0.62rem; }
   .scroll-cue { bottom: 1.2rem; }
-  .cloud-layer { width: 156vw; left: -28vw; filter: blur(18px); }
   .cloud-layer-far { display: none; }
-  .cloud-layer-mid { opacity: 0.55; }
-  .cloud-layer-near { opacity: 0.68; }
-  .cloud-whiteout { filter: blur(20px); }
+  .cloud-puff { filter: blur(1.5px) drop-shadow(0 6px 6px rgba(94, 104, 111, 0.1)); }
+  .cloud-layer-mid .cloud-puff { opacity: 0.72; }
+  .cloud-layer-near .cloud-puff { opacity: 0.9; }
+  .cloud-mid-one { left: -10vw; width: 38vw; }
+  .cloud-mid-two { right: -8vw; width: 34vw; }
+  .cloud-mid-three { left: 18vw; width: 43vw; }
+  .cloud-mid-four { right: 20vw; width: 36vw; }
+  .cloud-near-one { left: -22vw; width: 68vw; }
+  .cloud-near-two { right: -19vw; width: 61vw; }
+  .cloud-near-three { left: 3vw; width: 66vw; }
+  .cloud-near-four { right: 5vw; width: 56vw; }
+  .cloud-wipe-slot {
+    top: var(--cloud-mobile-top);
+    left: var(--cloud-mobile-left);
+    width: var(--cloud-mobile-size);
+  }
+  .cloud-wipe-puff { filter: blur(1.5px) drop-shadow(0 5px 6px rgba(89, 99, 106, 0.1)); }
   .section { width: min(100% - 2rem, 42rem); padding: 7rem 0; }
   .about-section { min-height: auto; }
   .ruins { display: grid; height: auto; margin-top: 4rem; gap: 1rem; }
