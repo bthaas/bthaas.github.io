@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'],
   },
   icons: {
-    icon: [{ url: '/favicon.svg?v=4', type: 'image/svg+xml' }],
-    shortcut: '/favicon.svg?v=4',
+    icon: [{ url: '/filled-wing-favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/filled-wing-favicon.svg',
     apple: '/assets/wing-mark.png',
   },
 }
