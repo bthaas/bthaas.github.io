@@ -4,7 +4,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bthaas.github.io'),
-  title: 'Brett Haas — Software Engineer',
+  title: 'Brett Haas',
   description:
     'Brett Haas is a software engineer building ambitious products across AI, web, mobile, and intelligent systems.',
   keywords: ['Brett Haas', 'Software Engineer', 'AI', 'React', 'Python', 'Portfolio'],
