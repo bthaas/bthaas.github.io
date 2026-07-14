@@ -9,7 +9,7 @@ export function shouldRenderWebGL({
   reducedMotion,
   webGLAvailable,
 }: ClientCapabilities): boolean {
-  return width >= 768 && !reducedMotion && webGLAvailable
+  return width >= 320 && !reducedMotion && webGLAvailable
 }
 
 export function detectWebGL(): boolean {

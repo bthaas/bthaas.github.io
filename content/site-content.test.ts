@@ -38,4 +38,20 @@ describe('siteContent', () => {
     expect(siteContent.assets.every(({ path }) => path.startsWith('/assets/'))).toBe(true)
     expect(siteContent.assets).toHaveLength(8)
   })
+
+  it('maps the about fragments to content that actually exists', () => {
+    expect(siteContent.about.map(({ label }) => label)).toEqual([
+      'AI Research',
+      'Scale AI',
+      'Refraction',
+      'Selected Work',
+      'UVA · CS',
+    ])
+    expect(siteContent.about.some(({ label }) => String(label) === 'Amazon')).toBe(false)
+    expect(siteContent.about.every(({ detail }) => detail.length > 30)).toBe(true)
+  })
+
+  it('keeps the ending copy to the requested closing line only', () => {
+    expect(siteContent.editorial).toEqual({ closingLine: 'Keep Building.' })
+  })
 })
