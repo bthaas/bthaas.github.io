@@ -6,6 +6,15 @@ export interface ContentAsset {
   readonly context: string
 }
 
+export interface AboutItem {
+  readonly id: string
+  readonly label: string
+  readonly caption: string
+  readonly detail: string
+  readonly kind: 'experience' | 'projects' | 'education'
+  readonly targetId: string | null
+}
+
 export interface Project {
   readonly id: string
   readonly name: string
@@ -59,13 +68,13 @@ export interface SiteContent {
     readonly linkedin: string
     readonly resume: string | null
   }
+  readonly about: readonly AboutItem[]
   readonly projects: readonly Project[]
   readonly experience: readonly ExperienceEntry[]
   readonly education: readonly EducationEntry[]
   readonly skills: Readonly<Record<string, readonly string[]>>
   readonly assets: readonly ContentAsset[]
   readonly editorial: {
-    readonly endingQuote: string
     readonly closingLine: string
   }
 }
@@ -93,6 +102,53 @@ export const siteContent = {
     linkedin: 'https://linkedin.com/in/brett-haas',
     resume: null,
   },
+  about: [
+    {
+      id: 'about-research',
+      label: 'AI Research',
+      caption: 'Steering model behavior at inference time without changing the weights.',
+      detail:
+        'At UVA, Brett researches inference-time activation steering for language models, building evaluation pipelines that reduce visual-language bias while preserving output quality.',
+      kind: 'experience',
+      targetId: 'uva-ml-research',
+    },
+    {
+      id: 'about-scale',
+      label: 'Scale AI',
+      caption: 'Pressure-testing frontier models, agents, and the systems around them.',
+      detail:
+        'On Scale AI’s SEAL team, Brett red-teamed frontier models, produced high-signal code evaluation data, and improved prompts and tool use for safer multi-step agents.',
+      kind: 'experience',
+      targetId: 'scale-ai',
+    },
+    {
+      id: 'about-refraction',
+      label: 'Refraction',
+      caption: 'Shipping a cross-platform AI nutrition product from architecture to telemetry.',
+      detail:
+        'At Refraction Innovation Hub, Brett shipped a React Native food-recognition product spanning multimodal AI, cloud authentication, data storage, and production performance work.',
+      kind: 'experience',
+      targetId: 'refraction-innovation-hub',
+    },
+    {
+      id: 'about-projects',
+      label: 'Selected Work',
+      caption: 'Products built where intelligent systems meet real human workflows.',
+      detail:
+        'The selected project set covers computer-vision sports analytics, music discovery, and research tooling for controlling and evaluating language-model behavior.',
+      kind: 'projects',
+      targetId: null,
+    },
+    {
+      id: 'about-education',
+      label: 'UVA · CS',
+      caption: 'Computer Science, systems, security, and machine learning research.',
+      detail:
+        'Brett earned a B.S. in Computer Science at the University of Virginia with a 3.7 GPA and a focus on software engineering, systems, cybersecurity, and machine learning.',
+      kind: 'education',
+      targetId: null,
+    },
+  ],
   projects: [
     {
       id: 'courtvision',
@@ -299,7 +355,6 @@ export const siteContent = {
     },
   ],
   editorial: {
-    endingQuote: 'I laughed as I fell, for I had soared.',
     closingLine: 'Keep Building.',
   },
 } as const satisfies SiteContent

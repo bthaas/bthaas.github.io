@@ -12,37 +12,18 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { HeroExperience } from '@/components/scenes/HeroExperience'
-import { siteContent, type Project } from '@/content/site-content'
+import { SectionSceneExperience } from '@/components/scenes/SectionSceneExperience'
+import { siteContent, type AboutItem, type Project } from '@/content/site-content'
 
 const ProjectDialog = dynamic(() => import('./ProjectDialog'), { ssr: false })
 
-const aboutFragments = [
-  {
-    label: 'AI Research',
-    caption: 'Steering model behavior at inference time without changing the weights.',
-    className: 'fragment-one',
-  },
-  {
-    label: 'Scale AI',
-    caption: 'Pressure-testing frontier models, agents, and the systems around them.',
-    className: 'fragment-two',
-  },
-  {
-    label: 'Refraction',
-    caption: 'Shipping a cross-platform AI nutrition product from architecture to telemetry.',
-    className: 'fragment-three',
-  },
-  {
-    label: 'Selected Work',
-    caption: 'Products built where intelligent systems meet real human workflows.',
-    className: 'fragment-four',
-  },
-  {
-    label: 'UVA · CS',
-    caption: 'Computer Science, systems, security, and machine learning research.',
-    className: 'fragment-five',
-  },
-]
+const fragmentClasses = [
+  'fragment-one',
+  'fragment-two',
+  'fragment-three',
+  'fragment-four',
+  'fragment-five',
+] as const
 
 const constellationNodes = [
   { label: 'Python', x: 14, y: 28 },
@@ -71,7 +52,15 @@ const constellationEdges = [
   [6, 7],
 ] as const
 
-function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>) {
+interface ExperienceProgressRefs {
+  readonly fracture: React.MutableRefObject<number>
+  readonly about: React.MutableRefObject<number>
+  readonly experience: React.MutableRefObject<number>
+  readonly projects: React.MutableRefObject<number>
+  readonly ending: React.MutableRefObject<number>
+}
+
+function useScrollExperience(progressRefs: ExperienceProgressRefs) {
   useEffect(() => {
     const root = document.documentElement
     const reducedMotion =
@@ -79,7 +68,9 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
       new URLSearchParams(window.location.search).get('motion') === 'reduce'
     if (reducedMotion) {
       root.dataset.motion = 'reduce'
-      fractureProgressRef.current = 0
+      Object.values(progressRefs).forEach((progressRef) => {
+        progressRef.current = 0
+      })
       return () => {
         delete root.dataset.motion
       }
@@ -116,7 +107,6 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
         const heroStage = heroShell?.querySelector<HTMLElement>('.hero-stage')
 
         if (heroShell && heroStage) {
-          const wipeClouds = gsap.utils.toArray<HTMLElement>('.cloud-wipe-slot')
           const descentTimeline = gsap.timeline({
             defaults: { ease: 'power2.inOut' },
             scrollTrigger: {
@@ -129,7 +119,7 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
               anticipatePin: 1,
               invalidateOnRefresh: true,
               onUpdate: ({ progress }) => {
-                fractureProgressRef.current = progress
+                progressRefs.fracture.current = progress
                 root.style.setProperty('--hero-progress', progress.toFixed(3))
               },
             },
@@ -137,56 +127,47 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
 
           descentTimeline
             .to(
-              '.hero-content',
-              { autoAlpha: 0, yPercent: -8, scale: 1.055, duration: 0.7 },
+              '.scroll-cue',
+              { autoAlpha: 0, duration: 0.12 },
               0,
             )
-            .fromTo(
-              '.cloud-layer-far',
-              { xPercent: -4, yPercent: 84, scale: 0.9 },
-              { xPercent: 3, yPercent: -128, scale: 1.08, duration: 0.78 },
-              0.02,
+            .to(
+              '.hero-copy',
+              { autoAlpha: 0, yPercent: -12, duration: 0.46 },
+              0.18,
             )
             .fromTo(
-              '.cloud-layer-mid',
-              { xPercent: 5, yPercent: 105, scale: 0.94 },
-              { xPercent: -3, yPercent: -155, scale: 1.13, duration: 0.75 },
+              '.cloud-reference-a',
+              { autoAlpha: 0, yPercent: 18, scale: 1.08 },
+              { autoAlpha: 1, yPercent: -5, scale: 1.02, duration: 0.32 },
               0.08,
             )
             .fromTo(
-              '.cloud-layer-near',
-              { xPercent: -2, yPercent: 112, scale: 0.98 },
-              { xPercent: 4, yPercent: -188, scale: 1.19, duration: 0.72 },
-              0.14,
+              '.cloud-reference-b',
+              { autoAlpha: 0, yPercent: 12, scale: 1.1 },
+              { autoAlpha: 1, yPercent: -3, scale: 1.03, duration: 0.3 },
+              0.28,
             )
+            .to('.cloud-reference-a', { autoAlpha: 0, duration: 0.2 }, 0.38)
             .fromTo(
-              wipeClouds,
-              {
-                xPercent: (_, cloud) => Number(cloud.dataset.entryX),
-                yPercent: (_, cloud) => Number(cloud.dataset.entryY),
-                scale: 0.78,
-              },
-              {
-                xPercent: 0,
-                yPercent: 0,
-                scale: 1,
-                duration: 0.25,
-                ease: 'power2.in',
-                stagger: 0.001,
-              },
-              0.25,
+              '.cloud-whiteout',
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: 0.22 },
+              0.39,
             )
+            .to('.cloud-whiteout', { autoAlpha: 0, duration: 0.22 }, 0.61)
+            .fromTo(
+              '.cloud-reference-c',
+              { autoAlpha: 0, yPercent: 8, scale: 1.08 },
+              { autoAlpha: 1, yPercent: -6, scale: 1.02, duration: 0.32 },
+              0.58,
+            )
+            .to('.cloud-reference-b', { autoAlpha: 0, duration: 0.2 }, 0.68)
+            .to('.cloud-reference-c', { autoAlpha: 0, duration: 0.18 }, 0.88)
             .to(
-              wipeClouds,
-              {
-                xPercent: (_, cloud) => Number(cloud.dataset.exitX),
-                yPercent: (_, cloud) => Number(cloud.dataset.exitY),
-                scale: 1.12,
-                duration: 0.28,
-                ease: 'power2.in',
-                stagger: 0.0005,
-              },
-              0.55,
+              '.hero-content',
+              { autoAlpha: 0, scale: 1.025, duration: 0.12 },
+              0.88,
             )
             .fromTo(
               '[data-about-arrival]',
@@ -195,6 +176,66 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
               0.78,
             )
         }
+
+        const sectionTimelines = [
+          { selector: '#about', progressRef: progressRefs.about, cssName: '--about-progress' },
+          {
+            selector: '#experience',
+            progressRef: progressRefs.experience,
+            cssName: '--experience-progress',
+          },
+          {
+            selector: '#projects',
+            progressRef: progressRefs.projects,
+            cssName: '--projects-progress',
+          },
+          {
+            selector: '.ending-section',
+            progressRef: progressRefs.ending,
+            cssName: '--ending-progress',
+          },
+        ]
+
+        sectionTimelines.forEach(({ selector, progressRef, cssName }) => {
+          const section = document.querySelector<HTMLElement>(selector)
+          if (!section) return
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 0.65,
+              onUpdate: ({ progress }) => {
+                progressRef.current = progress
+                root.style.setProperty(cssName, progress.toFixed(3))
+              },
+            },
+          }).fromTo(
+            section.querySelectorAll('[data-scene-overlay]'),
+            { autoAlpha: 0.28, yPercent: 5 },
+            { autoAlpha: 1, yPercent: -3, duration: 1 },
+          )
+        })
+
+        gsap.utils.toArray<HTMLElement>('[data-cloud-transition]').forEach((transition) => {
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: transition,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 0.55,
+              onUpdate: ({ progress }) => {
+                transition.style.setProperty('--transition-progress', progress.toFixed(3))
+              },
+            },
+          })
+            .fromTo(
+              transition.querySelector('.cloud-transition-veil'),
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: 0.5 },
+            )
+            .to(transition.querySelector('.cloud-transition-veil'), { autoAlpha: 0, duration: 0.5 })
+        })
 
         gsap.utils
           .toArray<HTMLElement>('[data-reveal]:not([data-about-arrival])')
@@ -218,6 +259,10 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
         context.revert()
         lenis.destroy()
         root.style.removeProperty('--hero-progress')
+        root.style.removeProperty('--about-progress')
+        root.style.removeProperty('--experience-progress')
+        root.style.removeProperty('--projects-progress')
+        root.style.removeProperty('--ending-progress')
       }
     }
 
@@ -239,7 +284,7 @@ function useScrollExperience(fractureProgressRef: React.MutableRefObject<number>
       removeStartListeners()
       cleanupExperience()
     }
-  }, [fractureProgressRef])
+  }, [progressRefs])
 }
 
 function SiteNav() {
@@ -268,130 +313,13 @@ function SiteNav() {
   )
 }
 
-type CloudProfile = 'round' | 'tower' | 'wide'
-
-const cloudProfiles: Record<CloudProfile, ReadonlyArray<readonly [number, number, number]>> = {
-  round: [
-    [50, 72, 38],
-    [86, 52, 48],
-    [128, 43, 55],
-    [170, 56, 47],
-    [202, 74, 34],
-  ],
-  tower: [
-    [48, 76, 36],
-    [82, 58, 45],
-    [118, 35, 60],
-    [158, 55, 48],
-    [198, 75, 36],
-  ],
-  wide: [
-    [42, 76, 34],
-    [78, 61, 42],
-    [116, 54, 48],
-    [158, 58, 44],
-    [202, 76, 35],
-  ],
-}
-
-const ambientClouds: Record<
-  'far' | 'mid' | 'near',
-  ReadonlyArray<{ className: string; profile: CloudProfile }>
-> = {
-  far: [
-    { className: 'cloud-far-one', profile: 'wide' },
-    { className: 'cloud-far-two', profile: 'round' },
-    { className: 'cloud-far-three', profile: 'tower' },
-    { className: 'cloud-far-four', profile: 'wide' },
-  ],
-  mid: [
-    { className: 'cloud-mid-one', profile: 'tower' },
-    { className: 'cloud-mid-two', profile: 'wide' },
-    { className: 'cloud-mid-three', profile: 'round' },
-    { className: 'cloud-mid-four', profile: 'tower' },
-  ],
-  near: [
-    { className: 'cloud-near-one', profile: 'round' },
-    { className: 'cloud-near-two', profile: 'tower' },
-    { className: 'cloud-near-three', profile: 'wide' },
-    { className: 'cloud-near-four', profile: 'round' },
-  ],
-}
-
-const profileCycle: ReadonlyArray<CloudProfile> = ['round', 'wide', 'tower']
-
-const wipeClouds = Array.from({ length: 35 }, (_, index) => {
-  const desktopColumn = index % 7
-  const desktopRow = Math.floor(index / 7)
-  const mobileColumn = index % 5
-  const mobileRow = Math.floor(index / 5)
-  const entrySide = index % 4
-
-  return {
-    entryX: entrySide === 0 ? -220 : entrySide === 1 ? 220 : (index % 5 - 2) * 18,
-    entryY: entrySide === 2 ? -900 : entrySide === 3 ? 900 : (index % 3 - 1) * 30,
-    exitX: (index % 7 - 3) * 12,
-    exitY: -900 - (index % 4) * 55,
-    profile: profileCycle[index % profileCycle.length],
-    style: {
-      '--cloud-left': `${-8 + desktopColumn * 16}vw`,
-      '--cloud-top': `${-10 + desktopRow * 21}vh`,
-      '--cloud-size': `${23 + (index % 4)}vw`,
-      '--cloud-mobile-left': `${-28 + mobileColumn * 28}vw`,
-      '--cloud-mobile-top': `${-7 + mobileRow * 15}vh`,
-      '--cloud-mobile-size': `${60 + (index % 3) * 2}vw`,
-    } as React.CSSProperties,
-  }
-})
-
-function CloudPuff({ className, profile }: { className: string; profile: CloudProfile }) {
-  return (
-    <div className={`cloud-puff ${className}`}>
-      <svg viewBox="0 0 240 124" focusable="false" preserveAspectRatio="xMidYMid meet">
-        <ellipse className="cloud-underside" cx="120" cy="91" rx="108" ry="28" />
-        <ellipse className="cloud-body" cx="120" cy="80" rx="110" ry="30" />
-        {cloudProfiles[profile].map(([cx, cy, radius]) => (
-          <circle className="cloud-body" cx={cx} cy={cy} r={radius} key={`${cx}-${cy}`} />
-        ))}
-        <ellipse className="cloud-highlight" cx="104" cy="62" rx="57" ry="25" />
-      </svg>
-    </div>
-  )
-}
-
 function CloudDescent() {
   return (
     <div className="cloud-descent" data-cloud-descent aria-hidden="true">
-      <div className="cloud-layer cloud-layer-far">
-        {ambientClouds.far.map((cloud) => (
-          <CloudPuff {...cloud} key={cloud.className} />
-        ))}
-      </div>
-      <div className="cloud-layer cloud-layer-mid">
-        {ambientClouds.mid.map((cloud) => (
-          <CloudPuff {...cloud} key={cloud.className} />
-        ))}
-      </div>
-      <div className="cloud-layer cloud-layer-near">
-        {ambientClouds.near.map((cloud) => (
-          <CloudPuff {...cloud} key={cloud.className} />
-        ))}
-      </div>
-      <div className="cloud-wipe">
-        {wipeClouds.map((cloud, index) => (
-          <div
-            className="cloud-wipe-slot"
-            data-entry-x={cloud.entryX}
-            data-entry-y={cloud.entryY}
-            data-exit-x={cloud.exitX}
-            data-exit-y={cloud.exitY}
-            key={index}
-            style={cloud.style}
-          >
-            <CloudPuff className="cloud-wipe-puff" profile={cloud.profile} />
-          </div>
-        ))}
-      </div>
+      <div className="cloud-reference-frame cloud-reference-a" />
+      <div className="cloud-reference-frame cloud-reference-b" />
+      <div className="cloud-whiteout" />
+      <div className="cloud-reference-frame cloud-reference-c" />
     </div>
   )
 }
@@ -411,7 +339,7 @@ function Hero({ fractureProgressRef }: { fractureProgressRef: React.MutableRefOb
                 <span
                   key={`${letter}-${index}`}
                   aria-hidden="true"
-                  style={{ '--letter-index': index } as React.CSSProperties}
+                  style={{ '--letter-delay': `${index * 55}ms` } as React.CSSProperties}
                 >
                   {letter === ' ' ? '\u00A0' : letter}
                 </span>
@@ -430,71 +358,13 @@ function Hero({ fractureProgressRef }: { fractureProgressRef: React.MutableRefOb
   )
 }
 
-function AboutSection() {
-  return (
-    <section id="about" className="section about-section">
-      <div className="section-heading" data-reveal data-about-arrival>
-        <p className="eyebrow">01 · In pursuit</p>
-        <h2>Ambition, with<br />an engineering plan.</h2>
-        <p className="section-intro">{siteContent.identity.descriptor}</p>
-      </div>
-      <div className="ruins" data-reveal>
-        {aboutFragments.map((fragment) => (
-          <div
-            className={`ruin-fragment ${fragment.className}`}
-            key={fragment.label}
-            tabIndex={0}
-          >
-            <span>{fragment.label}</span>
-            <p>{fragment.caption}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-function ProjectsSection({ onSelect }: { onSelect: (project: Project) => void }) {
-  return (
-    <section id="projects" className="section projects-section">
-      <div className="section-heading split-heading" data-reveal>
-        <div>
-          <p className="eyebrow">02 · Made tangible</p>
-          <h2>Selected Work</h2>
-        </div>
-        <p className="section-intro">
-          Systems shaped around real-time collaboration, computer vision, and model behavior.
-        </p>
-      </div>
-      <div className="monolith-grid">
-        {siteContent.projects.map((project, index) => (
-          <button
-            aria-label={`Explore ${project.name}`}
-            className="project-monolith physical-button"
-            data-reveal
-            key={project.id}
-            onClick={() => onSelect(project)}
-            style={{ '--monolith-index': index } as React.CSSProperties}
-          >
-            <span className="monolith-number">0{index + 1}</span>
-            <span className="monolith-name">{project.name}</span>
-            <span className="gold-vein" />
-            <span className="monolith-stack">{project.technologies.slice(0, 3).join(' · ')}</span>
-            <ArrowUpRight className="monolith-arrow" size={18} />
-          </button>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 function SkillsSection() {
   const [activeNode, setActiveNode] = useState<number | null>(null)
 
   return (
-    <section id="skills" className="section skills-section">
+    <div id="skills" className="section skills-section">
       <div className="section-heading" data-reveal>
-        <p className="eyebrow">03 · Connected systems</p>
+        <p className="eyebrow">01B · Connected systems</p>
         <h2>Constellation</h2>
         <p className="section-intro">Tools are most useful in relation to one another.</p>
       </div>
@@ -532,20 +402,132 @@ function SkillsSection() {
           </button>
         ))}
       </div>
+    </div>
+  )
+}
+
+function AboutSection({
+  progressRef,
+  onSelect,
+}: {
+  progressRef: React.MutableRefObject<number>
+  onSelect: (item: AboutItem) => void
+}) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
+  return (
+    <section id="about" className="section about-section immersive-section" data-scene-section>
+      <div className="immersive-scene-stage">
+        <SectionSceneExperience
+          activeIndex={activeIndex}
+          progressRef={progressRef}
+          variant="ruins"
+        />
+      </div>
+      <div className="section-heading immersive-heading" data-reveal data-about-arrival data-scene-overlay>
+        <p className="eyebrow">01 · In pursuit</p>
+        <h2>Ambition, with<br />an engineering plan.</h2>
+        <p className="section-intro">{siteContent.identity.descriptor}</p>
+      </div>
+      <div className="ruins ruins-controls" data-reveal data-scene-overlay>
+        {siteContent.about.map((item, index) => (
+          <button
+            aria-label={`Explore ${item.label}`}
+            className={`ruin-fragment ${fragmentClasses[index]}`}
+            key={item.id}
+            onBlur={() => setActiveIndex(null)}
+            onClick={() => onSelect(item)}
+            onFocus={() => setActiveIndex(index)}
+            onMouseEnter={() => setActiveIndex(index)}
+            onMouseLeave={() => setActiveIndex(null)}
+          >
+            <span>{item.label}</span>
+            <p>{item.caption}</p>
+          </button>
+        ))}
+      </div>
+      <SkillsSection />
     </section>
   )
 }
 
-function ExperienceSection() {
+function CloudTransition({ label }: { label: string }) {
   return (
-    <section id="experience" className="section experience-section">
-      <div className="section-heading" data-reveal>
-        <p className="eyebrow">04 · The ascent</p>
+    <div className="cloud-transition" data-cloud-transition data-testid="cloud-transition" aria-hidden="true">
+      <div className="cloud-transition-outgoing" />
+      <div className="cloud-transition-veil" />
+      <div className="cloud-transition-incoming" />
+      <span>{label}</span>
+    </div>
+  )
+}
+
+function ProjectsSection({
+  onSelect,
+  progressRef,
+}: {
+  onSelect: (project: Project) => void
+  progressRef: React.MutableRefObject<number>
+}) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
+  return (
+    <section id="projects" className="section projects-section immersive-section" data-scene-section>
+      <div className="immersive-scene-stage">
+        <SectionSceneExperience
+          activeIndex={activeIndex}
+          progressRef={progressRef}
+          variant="monolith"
+        />
+      </div>
+      <div className="section-heading split-heading immersive-heading" data-reveal data-scene-overlay>
+        <div>
+          <p className="eyebrow">03 · Made tangible</p>
+          <h2>Selected Work</h2>
+        </div>
+        <p className="section-intro">
+          Systems shaped around real-time collaboration, computer vision, and model behavior.
+        </p>
+      </div>
+      <div className="monolith-grid monolith-controls" data-scene-overlay>
+        {siteContent.projects.map((project, index) => (
+          <button
+            aria-label={`Explore ${project.name}`}
+            className="project-monolith physical-button"
+            data-reveal
+            key={project.id}
+            onBlur={() => setActiveIndex(null)}
+            onClick={() => onSelect(project)}
+            onFocus={() => setActiveIndex(index)}
+            onMouseEnter={() => setActiveIndex(index)}
+            onMouseLeave={() => setActiveIndex(null)}
+            style={{ '--monolith-index': index } as React.CSSProperties}
+          >
+            <span className="monolith-number">0{index + 1}</span>
+            <span className="monolith-name">{project.name}</span>
+            <span className="gold-vein" />
+            <span className="monolith-stack">{project.technologies.slice(0, 3).join(' · ')}</span>
+            <ArrowUpRight className="monolith-arrow" size={18} />
+          </button>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ExperienceSection({ progressRef }: { progressRef: React.MutableRefObject<number> }) {
+  return (
+    <section id="experience" className="section experience-section immersive-section" data-scene-section>
+      <div className="immersive-scene-stage">
+        <SectionSceneExperience progressRef={progressRef} variant="stairs" />
+      </div>
+      <div className="section-heading immersive-heading" data-reveal data-scene-overlay>
+        <p className="eyebrow">02 · The descent</p>
         <h2>Experience</h2>
       </div>
-      <div className="timeline">
-        {siteContent.experience.map((entry) => (
-          <article className="timeline-entry" data-reveal key={entry.id}>
+      <div className="timeline stair-timeline" data-scene-overlay>
+        {siteContent.experience.map((entry, index) => (
+          <article className="timeline-entry" data-landing={index + 1} data-reveal key={entry.id}>
             <div className="timeline-date">{entry.period}</div>
             <div className="timeline-inscription">
               <div className="timeline-meta">
@@ -568,7 +550,7 @@ function ExperienceSection() {
           </article>
         ))}
         {siteContent.education.map((entry) => (
-          <article className="timeline-entry education-entry" data-reveal key={entry.degree}>
+          <article className="timeline-entry education-entry" data-landing="4" data-reveal key={entry.degree}>
             <div className="timeline-date">{entry.graduation}</div>
             <div className="timeline-inscription">
               <div className="timeline-meta">
@@ -587,14 +569,35 @@ function ExperienceSection() {
 
 function EndingSection() {
   return (
-    <section className="ending-section" aria-label="Closing thought">
-      <div className="ending-sky" />
-      <div className="ending-sun" />
-      <div className="ending-copy" data-reveal>
-        <p>{siteContent.editorial.endingQuote}</p>
+    <section className="ending-section" aria-label="Closing thought" data-scene-section>
+      <div className="ending-ascent ending-ascent-distant" />
+      <div className="ending-ascent ending-ascent-whiteout" />
+      <div className="ending-copy" data-reveal data-scene-overlay>
         <span>{siteContent.editorial.closingLine}</span>
       </div>
     </section>
+  )
+}
+
+function AboutDialog({ item, onClose }: { item: AboutItem; onClose: () => void }) {
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [onClose])
+
+  return (
+    <div className="dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <div className="project-dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-dialog-title">
+        <button className="dialog-close" onClick={onClose} aria-label="Close details">Close</button>
+        <p className="eyebrow">Ruins inscription</p>
+        <h2 id="about-dialog-title">{item.label}</h2>
+        <p>{item.detail}</p>
+        {item.targetId && <a href={`#${item.kind === 'projects' ? 'projects' : 'experience'}`} onClick={onClose}>Continue to the full entry</a>}
+      </div>
+    </div>
   )
 }
 
@@ -617,19 +620,39 @@ function Footer() {
 
 export function Portfolio() {
   const fractureProgressRef = useRef(0)
+  const aboutProgressRef = useRef(0)
+  const experienceProgressRef = useRef(0)
+  const projectsProgressRef = useRef(0)
+  const endingProgressRef = useRef(0)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  useScrollExperience(fractureProgressRef)
+  const [selectedAbout, setSelectedAbout] = useState<AboutItem | null>(null)
+  const progressRefs = useMemo(
+    () => ({
+      fracture: fractureProgressRef,
+      about: aboutProgressRef,
+      experience: experienceProgressRef,
+      projects: projectsProgressRef,
+      ending: endingProgressRef,
+    }),
+    [],
+  )
+  useScrollExperience(progressRefs)
 
   return (
     <main>
       <SiteNav />
       <Hero fractureProgressRef={fractureProgressRef} />
-      <AboutSection />
-      <ProjectsSection onSelect={setSelectedProject} />
-      <SkillsSection />
-      <ExperienceSection />
+      <AboutSection progressRef={aboutProgressRef} onSelect={setSelectedAbout} />
+      <CloudTransition label="Through the cloud deck" />
+      <ExperienceSection progressRef={experienceProgressRef} />
+      <CloudTransition label="Below the stair" />
+      <ProjectsSection onSelect={setSelectedProject} progressRef={projectsProgressRef} />
+      <CloudTransition label="Return to the light" />
       <EndingSection />
       <Footer />
+      {selectedAbout && (
+        <AboutDialog item={selectedAbout} onClose={() => setSelectedAbout(null)} />
+      )}
       {selectedProject && (
         <ProjectDialog project={selectedProject} onClose={() => setSelectedProject(null)} />
       )}

@@ -5,22 +5,26 @@ import { Component, useEffect, useRef, useState } from 'react'
 
 import { detectWebGL, shouldRenderWebGL } from '@/lib/client-capabilities'
 
-const HeroScene = dynamic(() => import('./HeroScene').then((module) => module.HeroScene), {
+export type SectionSceneVariant = 'ruins' | 'stairs' | 'monolith'
+
+const SectionScene = dynamic(() => import('./SectionScene').then((module) => module.SectionScene), {
   ssr: false,
 })
 
-interface HeroExperienceProps {
-  readonly fractureProgressRef: React.MutableRefObject<number>
+interface SectionSceneExperienceProps {
+  readonly variant: SectionSceneVariant
+  readonly progressRef: React.MutableRefObject<number>
+  readonly activeIndex?: number | null
 }
 
-interface BoundaryState {
+interface SceneBoundaryState {
   readonly failed: boolean
 }
 
-class SceneBoundary extends Component<React.PropsWithChildren, BoundaryState> {
-  state: BoundaryState = { failed: false }
+class SceneBoundary extends Component<React.PropsWithChildren, SceneBoundaryState> {
+  state: SceneBoundaryState = { failed: false }
 
-  static getDerivedStateFromError(): BoundaryState {
+  static getDerivedStateFromError(): SceneBoundaryState {
     return { failed: true }
   }
 
@@ -29,7 +33,17 @@ class SceneBoundary extends Component<React.PropsWithChildren, BoundaryState> {
   }
 }
 
-export function HeroExperience({ fractureProgressRef }: HeroExperienceProps) {
+const fallbackByVariant: Record<SectionSceneVariant, string> = {
+  ruins: '/assets/ruins-ring-fallback.webp',
+  stairs: '/assets/stair-timeline-fallback.webp',
+  monolith: '/assets/monolith-field-fallback.webp',
+}
+
+export function SectionSceneExperience({
+  variant,
+  progressRef,
+  activeIndex = null,
+}: SectionSceneExperienceProps) {
   const [canRenderWebGL, setCanRenderWebGL] = useState(false)
   const [isCanvasReady, setIsCanvasReady] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -66,60 +80,34 @@ export function HeroExperience({ fractureProgressRef }: HeroExperienceProps) {
       setIsCanvasReady(false)
       return
     }
-
     const element = visualRef.current
     if (!element) return
-    let idleRequest = 0
-    let timeout: ReturnType<typeof setTimeout> | undefined
 
-    const mountCanvas = () => {
-      if ('requestIdleCallback' in window) {
-        idleRequest = window.requestIdleCallback(() => setIsCanvasReady(true), { timeout: 900 })
-      } else {
-        timeout = globalThis.setTimeout(() => setIsCanvasReady(true), 320)
-      }
-    }
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          mountCanvas()
-          return
-        }
-        if (idleRequest) window.cancelIdleCallback(idleRequest)
-        if (timeout) globalThis.clearTimeout(timeout)
-        setIsCanvasReady(false)
-      },
+      ([entry]) => setIsCanvasReady(entry.isIntersecting),
       { rootMargin: '35% 0px' },
     )
     observer.observe(element)
-
-    return () => {
-      observer.disconnect()
-      if (idleRequest) window.cancelIdleCallback(idleRequest)
-      if (timeout) globalThis.clearTimeout(timeout)
-    }
+    return () => observer.disconnect()
   }, [canRenderWebGL])
 
   return (
     <div
       ref={visualRef}
-      className={isCanvasReady ? 'hero-visual hero-visual-canvas' : 'hero-visual'}
+      className={isCanvasReady ? 'section-scene section-scene-canvas' : 'section-scene'}
       aria-hidden="true"
+      data-scene-variant={variant}
     >
-      <img
-        className="hero-fallback"
-        src="/assets/icarus-wings-fallback.webp"
-        alt=""
-        decoding="async"
-        fetchPriority="high"
-      />
+      <img className="section-scene-fallback" src={fallbackByVariant[variant]} alt="" />
       {canRenderWebGL && isCanvasReady && (
-        <div className="hero-canvas">
+        <div className="section-scene-canvas-shell">
           <SceneBoundary>
-            <HeroScene
-              fractureProgressRef={fractureProgressRef}
+            <SectionScene
+              activeIndex={activeIndex}
               isMobile={isMobile}
+              progressRef={progressRef}
               showStats={showStats}
+              variant={variant}
             />
           </SceneBoundary>
         </div>
