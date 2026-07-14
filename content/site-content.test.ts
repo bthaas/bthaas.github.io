@@ -14,7 +14,26 @@ describe('siteContent', () => {
       expect(project.links.repository).toMatch(/^https:\/\/github\.com\/bthaas\//)
       expect(project.description.length).toBeGreaterThan(20)
       expect(project.technologies.length).toBeGreaterThan(0)
+      expect(project.visualKey).toBe(project.id)
+      expect(project.caseStudy.brief.length).toBeGreaterThan(20)
+      expect(project.caseStudy.approach.length).toBeGreaterThan(20)
+      expect(project.caseStudy.focus.length).toBeGreaterThan(20)
     }
+  })
+
+  it('keeps every featured metric verified and traceable to an experience entry', () => {
+    expect(siteContent.featuredMetrics.map(({ value }) => value)).toEqual([
+      '616K+',
+      '28.9%',
+      '55%',
+      '99.5%',
+    ])
+
+    const experienceIds = new Set(siteContent.experience.map(({ id }) => id))
+    expect(siteContent.featuredMetrics).toHaveLength(4)
+    expect(
+      siteContent.featuredMetrics.every(({ sourceId }) => experienceIds.has(sourceId)),
+    ).toBe(true)
   })
 
   it('preserves the current experience and education details', () => {

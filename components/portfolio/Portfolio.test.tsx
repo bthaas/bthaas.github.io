@@ -1,136 +1,122 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { render, screen, within } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import { Portfolio } from './Portfolio'
 
-vi.mock('../scenes/HeroExperience', () => ({
-  HeroExperience: () => <div data-testid="hero-experience" />,
-}))
-
-vi.mock('../scenes/SectionSceneExperience', () => ({
-  SectionSceneExperience: ({ variant }: { variant: string }) => (
-    <div data-testid={`${variant}-experience`} />
-  ),
-}))
-
 describe('Portfolio', () => {
-  it('renders every editorial section from the real content source', () => {
-    render(<Portfolio />)
-
-    expect(screen.getByRole('heading', { name: 'Brett Haas' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Selected Work' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Experience' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Constellation' })).toBeInTheDocument()
-    expect(screen.getByText('Keep Building.')).toBeInTheDocument()
-    expect(screen.getAllByTestId(/-experience$/)).toHaveLength(4)
-    expect(screen.getAllByTestId('cloud-transition')).toHaveLength(3)
-    expect(screen.queryByText('Amazon')).not.toBeInTheDocument()
-  })
-
-  it('opens accessible details from the ruins ring', async () => {
-    render(<Portfolio />)
-
-    const researchButton = screen.getByRole('button', { name: 'Explore AI Research' })
-    fireEvent.focus(researchButton)
-    fireEvent.blur(researchButton)
-    fireEvent.mouseEnter(researchButton)
-    fireEvent.mouseLeave(researchButton)
-    fireEvent.click(researchButton)
-
-    const dialog = await screen.findByRole('dialog', { name: 'AI Research' })
-    expect(within(dialog).getByText(/inference-time activation steering/i)).toBeInTheDocument()
-    fireEvent.keyDown(window, { key: 'Escape' })
-    expect(screen.queryByRole('dialog', { name: 'AI Research' })).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Explore Scale AI' }))
-    const scaleDialog = screen.getByRole('dialog', { name: 'Scale AI' })
-    fireEvent.mouseDown(scaleDialog)
-    expect(scaleDialog).toBeInTheDocument()
-    fireEvent.mouseDown(scaleDialog.parentElement as HTMLElement)
-    expect(screen.queryByRole('dialog', { name: 'Scale AI' })).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Explore Selected Work' }))
-    expect(screen.queryByRole('link', { name: 'Continue to the full entry' })).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Close details' }))
-  })
-
-  it('opens a project detail dialog and exposes its repository link', async () => {
-    render(<Portfolio />)
-
-    const projectButton = screen.getByRole('button', { name: 'Explore Court Vision' })
-    fireEvent.focus(projectButton)
-    fireEvent.blur(projectButton)
-    fireEvent.mouseEnter(projectButton)
-    fireEvent.mouseLeave(projectButton)
-    fireEvent.click(projectButton)
-
-    expect(await screen.findByRole('dialog', { name: 'Court Vision' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'View repository' })).toHaveAttribute(
-      'href',
-      'https://github.com/bthaas/CourtVision',
-    )
-    fireEvent.keyDown(window, { key: 'ArrowDown' })
-    expect(screen.getByRole('dialog', { name: 'Court Vision' })).toBeInTheDocument()
-    fireEvent.keyDown(window, { key: 'Escape' })
-    expect(screen.queryByRole('dialog', { name: 'Court Vision' })).not.toBeInTheDocument()
-
-    fireEvent.click(projectButton)
-    fireEvent.mouseDown(screen.getByRole('dialog', { name: 'Court Vision' }))
-    expect(screen.getByRole('dialog', { name: 'Court Vision' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Close project' }))
-    expect(screen.queryByRole('dialog', { name: 'Court Vision' })).not.toBeInTheDocument()
-
-    fireEvent.click(projectButton)
-    const reopenedDialog = screen.getByRole('dialog', { name: 'Court Vision' })
-    fireEvent.mouseDown(reopenedDialog.parentElement as HTMLElement)
-    expect(screen.queryByRole('dialog', { name: 'Court Vision' })).not.toBeInTheDocument()
-  })
-
-  it('exercises keyboard and pointer states for the skill constellation', () => {
-    render(<Portfolio />)
-    const python = screen.getByRole('button', { name: 'Python' })
-
-    fireEvent.focus(python)
-    expect(python).toHaveClass('active')
-    fireEvent.blur(python)
-    fireEvent.mouseEnter(python)
-    expect(python).toHaveClass('active')
-    fireEvent.mouseLeave(python)
-    expect(python).not.toHaveClass('active')
-  })
-
-  it('provides working in-page navigation and contact links', () => {
-    render(<Portfolio />)
-
-    expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('href', '#projects')
-    expect(screen.getByRole('link', { name: 'Experience' })).toHaveAttribute(
-      'href',
-      '#experience',
-    )
-    expect(screen.getByRole('link', { name: 'Email' })).toHaveAttribute(
-      'href',
-      'mailto:bthaas15@gmail.com',
-    )
-  })
-
-  it('renders an inert reference-driven cloud descent with a real whiteout', () => {
+  it('renders the complete editorial atlas as a semantic static journey', () => {
     const { container } = render(<Portfolio />)
 
-    const cloudDescent = container.querySelector('[data-cloud-descent]')
-    expect(cloudDescent).toHaveAttribute('aria-hidden', 'true')
-    expect(cloudDescent).toHaveClass('cloud-descent')
-    expect(cloudDescent?.querySelectorAll('.cloud-reference-frame')).toHaveLength(3)
-    expect(cloudDescent?.querySelector('.cloud-whiteout')).toBeInTheDocument()
-    expect(cloudDescent?.querySelector('.cloud-puff')).not.toBeInTheDocument()
-    expect(container.querySelector('#about [data-about-arrival]')).toBeInTheDocument()
-  })
+    expect(screen.getByRole('heading', { level: 1, name: 'Brett Haas' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', {
+        name: 'I build intelligent systems that hold up in the real world.',
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'The craft behind the flight.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Trajectory' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Selected work' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Keep building.' })).toBeInTheDocument()
 
-  it('keeps the narrative section order continuous', () => {
-    const { container } = render(<Portfolio />)
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
     )
+    expect(ids).toEqual(['hero', 'craft', 'experience', 'projects', 'contact'])
+  })
 
-    expect(ids).toEqual(['hero', 'about', 'experience', 'projects'])
+  it('keeps navigation visible, concise, and anchored to the editorial sections', () => {
+    render(<Portfolio />)
+
+    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+    expect(within(navigation).getByRole('link', { name: 'Brett Haas' })).toHaveAttribute(
+      'href',
+      '#hero',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Craft' })).toHaveAttribute(
+      'href',
+      '#craft',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Trajectory' })).toHaveAttribute(
+      'href',
+      '#experience',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Work' })).toHaveAttribute(
+      'href',
+      '#projects',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Contact' })).toHaveAttribute(
+      'href',
+      '#contact',
+    )
+  })
+
+  it('surfaces the four verified field metrics with their source labels', () => {
+    render(<Portfolio />)
+
+    const metrics = screen.getAllByTestId('featured-metric')
+    expect(metrics).toHaveLength(4)
+    expect(metrics.map((metric) => within(metric).getByTestId('metric-value').textContent)).toEqual([
+      '616K+',
+      '28.9%',
+      '55%',
+      '99.5%',
+    ])
+    expect(screen.getByText('COCO captions filtered')).toBeInTheDocument()
+    expect(screen.getByText('RMS next-token bias reduction')).toBeInTheDocument()
+    expect(screen.getByText('load-time improvement')).toBeInTheDocument()
+    expect(screen.getByText('crash-free sessions')).toBeInTheDocument()
+  })
+
+  it('presents every project as an inline case study with a repository link', () => {
+    render(<Portfolio />)
+
+    const studies = screen.getAllByTestId('project-case-study')
+    expect(studies).toHaveLength(3)
+    expect(within(studies[0]).getByRole('heading', { name: 'Court Vision' })).toBeInTheDocument()
+    expect(within(studies[1]).getByRole('heading', { name: 'Beat Stream' })).toBeInTheDocument()
+    expect(
+      within(studies[2]).getByRole('heading', { name: 'Vision Bias Steering' }),
+    ).toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: 'View Court Vision repository' })).toHaveAttribute(
+      'href',
+      'https://github.com/bthaas/CourtVision',
+    )
+    expect(screen.getByRole('link', { name: 'View Beat Stream repository' })).toHaveAttribute(
+      'href',
+      'https://github.com/bthaas/BeatStream',
+    )
+    expect(
+      screen.getByRole('link', { name: 'View Vision Bias Steering repository' }),
+    ).toHaveAttribute('href', 'https://github.com/bthaas/vision-bias-steering')
+  })
+
+  it('contains no legacy cinematic or modal presentation surfaces', () => {
+    const { container } = render(<Portfolio />)
+
+    expect(container.querySelector('canvas')).not.toBeInTheDocument()
+    expect(container.querySelector('video')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-webgl]')).not.toBeInTheDocument()
+    expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-testid="cloud-transition"]')).not.toBeInTheDocument()
+    expect(container.querySelector('.descent-rail')).not.toBeInTheDocument()
+    expect(container.querySelector('.project-track')).not.toBeInTheDocument()
+  })
+
+  it('keeps the contact destinations explicit and keyboard reachable', () => {
+    render(<Portfolio />)
+
+    expect(screen.getByRole('link', { name: 'Email Brett' })).toHaveAttribute(
+      'href',
+      'mailto:bthaas15@gmail.com',
+    )
+    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/bthaas',
+    )
+    expect(screen.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute(
+      'href',
+      'https://linkedin.com/in/brett-haas',
+    )
   })
 })

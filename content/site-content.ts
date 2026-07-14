@@ -15,12 +15,28 @@ export interface AboutItem {
   readonly targetId: string | null
 }
 
+export interface FeaturedMetric {
+  readonly value: string
+  readonly label: string
+  readonly sourceId: string
+}
+
+export interface ProjectCaseStudy {
+  readonly brief: string
+  readonly approach: string
+  readonly focus: string
+}
+
+export type ProjectVisualKey = 'courtvision' | 'beatstream' | 'vision-bias-steering'
+
 export interface Project {
   readonly id: string
+  readonly visualKey: ProjectVisualKey
   readonly name: string
   readonly description: string
   readonly longDescription: string
   readonly technologies: readonly string[]
+  readonly caseStudy: ProjectCaseStudy
   readonly links: {
     readonly repository: string
     readonly live: string | null
@@ -69,6 +85,7 @@ export interface SiteContent {
     readonly resume: string | null
   }
   readonly about: readonly AboutItem[]
+  readonly featuredMetrics: readonly FeaturedMetric[]
   readonly projects: readonly Project[]
   readonly experience: readonly ExperienceEntry[]
   readonly education: readonly EducationEntry[]
@@ -149,15 +166,46 @@ export const siteContent = {
       targetId: null,
     },
   ],
+  featuredMetrics: [
+    {
+      value: '616K+',
+      label: 'COCO captions filtered',
+      sourceId: 'uva-ml-research',
+    },
+    {
+      value: '28.9%',
+      label: 'RMS next-token bias reduction',
+      sourceId: 'uva-ml-research',
+    },
+    {
+      value: '55%',
+      label: 'load-time improvement',
+      sourceId: 'refraction-innovation-hub',
+    },
+    {
+      value: '99.5%',
+      label: 'crash-free sessions',
+      sourceId: 'refraction-innovation-hub',
+    },
+  ],
   projects: [
     {
       id: 'courtvision',
+      visualKey: 'courtvision',
       name: 'Court Vision',
       description:
         'Computer vision basketball analytics platform for shot tracking and player movement insights.',
       longDescription:
         'CourtVision analyzes basketball footage to extract event-level insights like shot attempts, player movement trends, and possession patterns. The project focuses on practical, coach-friendly metrics with a clean visualization layer for fast game review.',
       technologies: ['Computer Vision', 'Python', 'Analytics', 'Sports Tech'],
+      caseStudy: {
+        brief:
+          'Turn basketball footage into practical, coach-friendly signals for reviewing shots, movement, and possession.',
+        approach:
+          'Extract event-level patterns from video, then organize the results in a focused visualization layer for fast game review.',
+        focus:
+          'Computer-vision analysis, event pipelines, movement trends, and readable sports analytics.',
+      },
       links: {
         repository: 'https://github.com/bthaas/CourtVision',
         live: null,
@@ -166,12 +214,21 @@ export const siteContent = {
     },
     {
       id: 'beatstream',
+      visualKey: 'beatstream',
       name: 'Beat Stream',
       description:
         'Music streaming and discovery experience focused on smooth playback, curation, and social sharing.',
       longDescription:
         'BeatStream is a modern music web app centered on quick playback, rich discovery, and playlist sharing. The interface emphasizes fast interaction loops and clean information hierarchy so users can move from search to listening with minimal friction.',
       technologies: ['React', 'Audio', 'Streaming', 'UI/UX'],
+      caseStudy: {
+        brief:
+          'Make music discovery, playback, curation, and playlist sharing feel immediate in a modern web experience.',
+        approach:
+          'Reduce the distance between search and listening with quick interaction loops and a clear information hierarchy.',
+        focus:
+          'React interface architecture, audio playback, discovery flows, and responsive product design.',
+      },
       links: {
         repository: 'https://github.com/bthaas/BeatStream',
         live: null,
@@ -180,12 +237,21 @@ export const siteContent = {
     },
     {
       id: 'vision-bias-steering',
+      visualKey: 'vision-bias-steering',
       name: 'Vision Bias Steering',
       description:
         'LLM steering experiments for shifting model outputs between spatial and descriptive language.',
       longDescription:
         'Vision Bias Steering is a research codebase for training, validating, and evaluating steering vectors that shift language-model outputs between spatial and descriptive captioning behavior. It includes local and multi-model sweep runners, evaluation utilities, and plotting workflows built around PyTorch, Transformers, and NNSight.',
       technologies: ['Python', 'PyTorch', 'NNSight', 'LLM Evaluation'],
+      caseStudy: {
+        brief:
+          'Study whether inference-time steering can shift captions between spatial and descriptive language without retraining model weights.',
+        approach:
+          'Train and validate steering vectors, run local and multi-model sweeps, then compare language behavior through evaluation and plotting utilities.',
+        focus:
+          'PyTorch experimentation, NNSight interventions, reproducible sweeps, and language-model evaluation.',
+      },
       links: {
         repository: 'https://github.com/bthaas/vision-bias-steering',
         live: null,
