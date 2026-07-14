@@ -77,7 +77,7 @@ export function Portfolio() {
           <div className="hero-art">
             <AtlasPicture
               visual={atlasVisuals.hero}
-              alt="Icarus flying over a geometric Aegean city"
+              alt="A geometric Aegean city aligned with a rising sun"
               className="atlas-picture atlas-picture--hero"
               sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
               priority
@@ -274,7 +274,7 @@ export function Portfolio() {
           <div className="atlas-shell contact-board">
             <AtlasPicture
               visual={atlasVisuals.ending}
-              alt="Distant wings crossing a calm sunrise horizon"
+              alt="A calm sunrise horizon between distant mountain ridges"
               className="atlas-picture contact-art frame-reveal"
               sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
             />

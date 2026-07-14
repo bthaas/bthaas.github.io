@@ -8,7 +8,9 @@ import { Portfolio } from './Portfolio'
 describe('Portfolio responsive media contract', () => {
   it('eagerly loads only the hero and exposes an AVIF/WebP picture pair', () => {
     const { container } = render(<Portfolio />)
-    const hero = screen.getByRole('img', { name: 'Icarus flying over a geometric Aegean city' })
+    const hero = screen.getByRole('img', {
+      name: 'A geometric Aegean city aligned with a rising sun',
+    })
     const picture = hero.closest('picture')
 
     expect(hero).toHaveAttribute('src', atlasVisuals.hero.fallback)
@@ -29,7 +31,9 @@ describe('Portfolio responsive media contract', () => {
       screen.getByRole('img', { name: 'A geometric arena with analytical trajectory arcs' }),
       screen.getByRole('img', { name: 'Coastal architecture crossed by rhythmic signal ribbons' }),
       screen.getByRole('img', { name: 'A labyrinth observatory with two controlled light paths' }),
-      screen.getByRole('img', { name: 'Distant wings crossing a calm sunrise horizon' }),
+      screen.getByRole('img', {
+        name: 'A calm sunrise horizon between distant mountain ridges',
+      }),
     ]
 
     for (const image of offscreen) expect(image).toHaveAttribute('loading', 'lazy')
