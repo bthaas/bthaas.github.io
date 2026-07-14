@@ -76,6 +76,9 @@ class TurntableConfig:
     camera_target: tuple[float, float, float] = (0.0, 0.0, 0.42)
     light_target: tuple[float, float, float] = (0.0, 0.0, 0.45)
     orbit_angles: tuple[float, ...] = DEFAULT_ORBIT_ANGLES
+    orbit_target_radius: float = 0.0
+    camera_height_offsets: tuple[float, ...] = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    target_height_offsets: tuple[float, ...] = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
 
 def reset_scene() -> None:
@@ -292,6 +295,81 @@ def append_box(
     accumulator.append(vertices, faces)
 
 
+def append_chamfered_box(
+    accumulator: MeshAccumulator,
+    center: Vector,
+    size: Vector,
+    chamfer: float,
+) -> None:
+    """Append a closed box with chamfered corners in its front-facing X/Z profile."""
+
+    half = size * 0.5
+    inset = min(chamfer, half.x * 0.45, half.z * 0.45)
+    if inset <= 0.0:
+        append_box(accumulator, center, size)
+        return
+
+    profile = (
+        (-half.x + inset, -half.z),
+        (half.x - inset, -half.z),
+        (half.x, -half.z + inset),
+        (half.x, half.z - inset),
+        (half.x - inset, half.z),
+        (-half.x + inset, half.z),
+        (-half.x, half.z - inset),
+        (-half.x, -half.z + inset),
+    )
+    vertices = tuple(
+        center + Vector((x, y, z))
+        for y in (-half.y, half.y)
+        for x, z in profile
+    )
+    faces: list[tuple[int, ...]] = [
+        tuple(reversed(range(8))),
+        tuple(range(8, 16)),
+    ]
+    for index in range(8):
+        following = (index + 1) % 8
+        faces.append((index, following, following + 8, index + 8))
+    accumulator.append(vertices, faces)
+
+
+def append_fractured_box(
+    accumulator: MeshAccumulator,
+    center: Vector,
+    size: Vector,
+    negative_end_offsets: Sequence[float] = (0.0, 0.0, 0.0, 0.0),
+    positive_end_offsets: Sequence[float] = (0.0, 0.0, 0.0, 0.0),
+) -> None:
+    """Append a closed beam whose X-facing ends have irregular fracture planes."""
+
+    if len(negative_end_offsets) != 4 or len(positive_end_offsets) != 4:
+        raise ValueError("Fracture end offsets must each contain four values")
+    half = size * 0.5
+    yz_corners = (
+        (-half.y, -half.z),
+        (half.y, -half.z),
+        (half.y, half.z),
+        (-half.y, half.z),
+    )
+    vertices = tuple(
+        center + Vector((-half.x + negative_end_offsets[index], y, z))
+        for index, (y, z) in enumerate(yz_corners)
+    ) + tuple(
+        center + Vector((half.x + positive_end_offsets[index], y, z))
+        for index, (y, z) in enumerate(yz_corners)
+    )
+    faces = (
+        (0, 3, 2, 1),
+        (4, 5, 6, 7),
+        (0, 1, 5, 4),
+        (1, 2, 6, 5),
+        (2, 3, 7, 6),
+        (3, 0, 4, 7),
+    )
+    accumulator.append(vertices, faces)
+
+
 def append_cylinder(
     accumulator: MeshAccumulator,
     center: Vector,
@@ -369,6 +447,68 @@ def append_arch_segment(
     vertices: list[Vector] = []
     for index in range(segments + 1):
         angle = math.pi - math.pi * index / segments
+        cosine = math.cos(angle)
+        sine = math.sin(angle)
+        for y, radius in (
+            (-half_depth, outer_radius),
+            (-half_depth, inner_radius),
+            (half_depth, outer_radius),
+            (half_depth, inner_radius),
+        ):
+            vertices.append(
+                Vector(
+                    (
+                        center.x + cosine * radius,
+                        center.y + y,
+                        arch_center_z + sine * radius,
+                    )
+                )
+            )
+
+    faces: list[tuple[int, ...]] = []
+    for index in range(segments):
+        current = index * 4
+        following = (index + 1) * 4
+        faces.extend(
+            (
+                (current, following, following + 1, current + 1),
+                (current + 2, current + 3, following + 3, following + 2),
+                (current, current + 2, following + 2, following),
+                (current + 1, following + 1, following + 3, current + 3),
+            )
+        )
+    final = segments * 4
+    faces.extend(((0, 1, 3, 2), (final, final + 2, final + 3, final + 1)))
+    accumulator.append(vertices, faces)
+
+
+def append_arch_arc(
+    accumulator: MeshAccumulator,
+    center: Vector,
+    width: float,
+    height: float,
+    depth: float,
+    start_angle: float,
+    end_angle: float,
+    segments: int = 10,
+    opening_ratio: float = 0.56,
+) -> None:
+    """Append a partial arch crown for broken, open architectural silhouettes."""
+
+    if segments < 2:
+        raise ValueError("An arch arc needs at least two segments")
+    if not 0.35 <= opening_ratio <= 0.78:
+        raise ValueError("Arch opening ratio must preserve visible crown thickness")
+    if end_angle <= start_angle:
+        raise ValueError("Arch arc end angle must be greater than start angle")
+
+    outer_radius = width * 0.5
+    inner_radius = width * opening_ratio * 0.5
+    arch_center_z = center.z + height * 0.5 - outer_radius
+    half_depth = depth * 0.5
+    vertices: list[Vector] = []
+    for index in range(segments + 1):
+        angle = start_angle + (end_angle - start_angle) * index / segments
         cosine = math.cos(angle)
         sine = math.sin(angle)
         for y, radius in (
@@ -712,13 +852,33 @@ def orbit_camera_positions(
 ) -> tuple[tuple[float, float, float], ...]:
     """Return the six deterministic camera positions for comparison renders."""
 
+    if len(config.camera_height_offsets) != len(config.orbit_angles):
+        raise ValueError("Camera height offsets must match orbit angle count")
     return tuple(
         (
             math.sin(math.radians(degrees)) * config.radius,
             -math.cos(math.radians(degrees)) * config.radius,
-            config.camera_height,
+            config.camera_height + config.camera_height_offsets[index],
         )
-        for degrees in config.orbit_angles
+        for index, degrees in enumerate(config.orbit_angles)
+    )
+
+
+def orbit_camera_targets(
+    config: TurntableConfig = TurntableConfig(),
+) -> tuple[tuple[float, float, float], ...]:
+    """Return per-view targets, optionally looking across an interior orbit."""
+
+    base = Vector(config.camera_target)
+    if len(config.target_height_offsets) != len(config.orbit_angles):
+        raise ValueError("Target height offsets must match orbit angle count")
+    return tuple(
+        (
+            base.x - math.sin(math.radians(degrees)) * config.orbit_target_radius,
+            base.y + math.cos(math.radians(degrees)) * config.orbit_target_radius,
+            base.z + config.target_height_offsets[index],
+        )
+        for index, degrees in enumerate(config.orbit_angles)
     )
 
 
@@ -730,10 +890,13 @@ def render_turntable_orbit(
     """Render the configured six-view orbit to numbered PNG files."""
 
     output_directory.mkdir(parents=True, exist_ok=True)
-    target = Vector(config.camera_target)
-    for index, position in enumerate(orbit_camera_positions(config), start=1):
+    targets = orbit_camera_targets(config)
+    for index, (position, target) in enumerate(
+        zip(orbit_camera_positions(config), targets),
+        start=1,
+    ):
         camera.location = Vector(position)
-        look_at(camera, target)
+        look_at(camera, Vector(target))
         filename = f"turntable-{index:02d}.png"
         bpy.context.scene.render.filepath = str(output_directory / filename)
         bpy.ops.render.render(write_still=True)

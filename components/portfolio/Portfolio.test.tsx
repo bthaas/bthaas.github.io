@@ -69,7 +69,20 @@ describe('Portfolio', () => {
       'href',
       'https://github.com/bthaas/CourtVision',
     )
+    fireEvent.keyDown(window, { key: 'ArrowDown' })
+    expect(screen.getByRole('dialog', { name: 'Court Vision' })).toBeInTheDocument()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Court Vision' })).not.toBeInTheDocument()
+
+    fireEvent.click(projectButton)
+    fireEvent.mouseDown(screen.getByRole('dialog', { name: 'Court Vision' }))
+    expect(screen.getByRole('dialog', { name: 'Court Vision' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Close project' }))
+    expect(screen.queryByRole('dialog', { name: 'Court Vision' })).not.toBeInTheDocument()
+
+    fireEvent.click(projectButton)
+    const reopenedDialog = screen.getByRole('dialog', { name: 'Court Vision' })
+    fireEvent.mouseDown(reopenedDialog.parentElement as HTMLElement)
     expect(screen.queryByRole('dialog', { name: 'Court Vision' })).not.toBeInTheDocument()
   })
 

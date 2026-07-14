@@ -1,11 +1,11 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { gsap } from 'gsap'
 import Image from 'next/image'
 import {
   ArrowUpRight,
   BriefcaseBusiness,
-  ChevronDown,
   Code2,
   Mail,
 } from 'lucide-react'
@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { HeroExperience } from '@/components/scenes/HeroExperience'
 import { SectionSceneExperience } from '@/components/scenes/SectionSceneExperience'
 import { siteContent, type AboutItem, type Project } from '@/content/site-content'
+import { DialogFrame } from './DialogFrame'
 
 const ProjectDialog = dynamic(() => import('./ProjectDialog'), { ssr: false })
 
@@ -58,6 +59,64 @@ interface ExperienceProgressRefs {
   readonly experience: React.MutableRefObject<number>
   readonly projects: React.MutableRefObject<number>
   readonly ending: React.MutableRefObject<number>
+}
+
+function HeadingFlourish() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="heading-flourish"
+      data-heading-flourish
+      preserveAspectRatio="none"
+      viewBox="0 0 160 8"
+    >
+      <path d="M1 4C38 3.4 68 4.7 101 3.6C124 2.9 141 3.4 159 4" pathLength="160" />
+    </svg>
+  )
+}
+
+function ScrollIndicator() {
+  const cueRef = useRef<HTMLAnchorElement>(null)
+
+  useEffect(() => {
+    const cue = cueRef.current
+    if (!cue) return
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) return
+
+    const context = gsap.context(() => {
+      gsap
+        .timeline({ repeat: -1, repeatDelay: 1.25 })
+        .fromTo(
+          '.scroll-cue-dot',
+          { y: 0, autoAlpha: 0.35 },
+          { y: 35, autoAlpha: 1, duration: 1.5, ease: 'power1.inOut' },
+        )
+        .to('.scroll-cue-dot', { autoAlpha: 0, duration: 0.42 })
+      gsap
+        .timeline({ repeat: -1, yoyo: true })
+        .fromTo(
+          '.scroll-cue-feather',
+          { x: -1, y: -2, rotation: -5 },
+          { x: 3, y: 5, rotation: 6, duration: 3.4, ease: 'sine.inOut' },
+        )
+    }, cue)
+    return () => context.revert()
+  }, [])
+
+  return (
+    <a ref={cueRef} className="scroll-cue" href="#about" aria-label="Descend to About">
+      <svg aria-hidden="true" viewBox="0 0 42 82">
+        <path className="scroll-cue-line" d="M21 8V58" />
+        <circle className="scroll-cue-dot" cx="21" cy="10" r="2" />
+        <path
+          className="scroll-cue-feather"
+          d="M21 74C14 70 12 62 17 55C24 59 28 65 21 74ZM18 69L26 58"
+        />
+      </svg>
+      <span>Descend</span>
+    </a>
+  )
 }
 
 function useScrollExperience(progressRefs: ExperienceProgressRefs) {
@@ -199,7 +258,7 @@ function useScrollExperience(progressRefs: ExperienceProgressRefs) {
         sectionTimelines.forEach(({ selector, progressRef, cssName }) => {
           const section = document.querySelector<HTMLElement>(selector)
           if (!section) return
-          gsap.timeline({
+          const timeline = gsap.timeline({
             scrollTrigger: {
               trigger: section,
               start: 'top bottom',
@@ -208,16 +267,32 @@ function useScrollExperience(progressRefs: ExperienceProgressRefs) {
               onUpdate: ({ progress }) => {
                 progressRef.current = progress
                 root.style.setProperty(cssName, progress.toFixed(3))
+                if (cssName === '--ending-progress') {
+                  root.style.setProperty(
+                    '--ending-whiteout-opacity',
+                    Math.max(0, Math.min(1, (progress - 0.52) * 6.67)).toFixed(3),
+                  )
+                  root.style.setProperty(
+                    '--ending-copy-opacity',
+                    Math.max(0, Math.min(1, (progress - 0.68) * 25)).toFixed(3),
+                  )
+                }
               },
             },
-          }).fromTo(
-            section.querySelectorAll('[data-scene-overlay]'),
-            { autoAlpha: 0.28, yPercent: 5 },
-            { autoAlpha: 1, yPercent: -3, duration: 1 },
-          )
+          })
+          const overlays = section.querySelectorAll('[data-scene-overlay]')
+          if (overlays.length > 0) {
+            timeline.fromTo(
+              overlays,
+              { autoAlpha: 0.28, yPercent: 5 },
+              { autoAlpha: 1, yPercent: -3, duration: 1 },
+            )
+          }
         })
 
         gsap.utils.toArray<HTMLElement>('[data-cloud-transition]').forEach((transition) => {
+          const veil = transition.querySelector('.cloud-transition-veil')
+          if (!veil) return
           gsap.timeline({
             scrollTrigger: {
               trigger: transition,
@@ -230,11 +305,11 @@ function useScrollExperience(progressRefs: ExperienceProgressRefs) {
             },
           })
             .fromTo(
-              transition.querySelector('.cloud-transition-veil'),
+              veil,
               { autoAlpha: 0 },
               { autoAlpha: 1, duration: 0.5 },
             )
-            .to(transition.querySelector('.cloud-transition-veil'), { autoAlpha: 0, duration: 0.5 })
+            .to(veil, { autoAlpha: 0, duration: 0.5 })
         })
 
         gsap.utils
@@ -252,6 +327,21 @@ function useScrollExperience(progressRefs: ExperienceProgressRefs) {
               },
             )
           })
+
+        gsap.utils.toArray<SVGPathElement>('[data-heading-flourish] path').forEach((path) => {
+          const flourish = path.closest('[data-heading-flourish]')
+          if (!flourish) return
+          gsap.fromTo(
+            path,
+            { strokeDashoffset: 160 },
+            {
+              strokeDashoffset: 0,
+              duration: 1.05,
+              ease: 'power2.inOut',
+              scrollTrigger: { trigger: flourish, start: 'top 88%', once: true },
+            },
+          )
+        })
       })
       ScrollTrigger.refresh()
       cleanupExperience = () => {
@@ -263,6 +353,8 @@ function useScrollExperience(progressRefs: ExperienceProgressRefs) {
         root.style.removeProperty('--experience-progress')
         root.style.removeProperty('--projects-progress')
         root.style.removeProperty('--ending-progress')
+        root.style.removeProperty('--ending-whiteout-opacity')
+        root.style.removeProperty('--ending-copy-opacity')
       }
     }
 
@@ -270,14 +362,20 @@ function useScrollExperience(progressRefs: ExperienceProgressRefs) {
     const handleKey = (event: KeyboardEvent) => {
       if (['ArrowDown', 'PageDown', 'End', ' '].includes(event.key)) start()
     }
+    const handleAnchorClick = (event: MouseEvent) => {
+      const target = event.target
+      if (target instanceof Element && target.closest('a[href^="#"]')) start()
+    }
     const removeStartListeners = () => {
       window.removeEventListener('wheel', start)
       window.removeEventListener('touchstart', start)
       window.removeEventListener('keydown', handleKey)
+      document.removeEventListener('click', handleAnchorClick, true)
     }
     window.addEventListener('wheel', start, { once: true, passive: true })
     window.addEventListener('touchstart', start, { once: true, passive: true })
     window.addEventListener('keydown', handleKey)
+    document.addEventListener('click', handleAnchorClick, true)
 
     return () => {
       disposed = true
@@ -347,10 +445,7 @@ function Hero({ fractureProgressRef }: { fractureProgressRef: React.MutableRefOb
             </h1>
             <p>{siteContent.identity.title}</p>
           </div>
-          <a className="scroll-cue" href="#about">
-            <span>Descend</span>
-            <ChevronDown size={14} />
-          </a>
+          <ScrollIndicator />
         </div>
         <CloudDescent />
       </div>
@@ -366,6 +461,7 @@ function SkillsSection() {
       <div className="section-heading" data-reveal>
         <p className="eyebrow">01B · Connected systems</p>
         <h2>Constellation</h2>
+        <HeadingFlourish />
         <p className="section-intro">Tools are most useful in relation to one another.</p>
       </div>
       <div className="constellation" data-reveal>
@@ -414,6 +510,7 @@ function AboutSection({
   onSelect: (item: AboutItem) => void
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [visitedIndices, setVisitedIndices] = useState<ReadonlySet<number>>(() => new Set())
 
   return (
     <section id="about" className="section about-section immersive-section" data-scene-section>
@@ -421,12 +518,14 @@ function AboutSection({
         <SectionSceneExperience
           activeIndex={activeIndex}
           progressRef={progressRef}
+          visitedIndices={[...visitedIndices]}
           variant="ruins"
         />
       </div>
       <div className="section-heading immersive-heading" data-reveal data-about-arrival data-scene-overlay>
         <p className="eyebrow">01 · In pursuit</p>
         <h2>Ambition, with<br />an engineering plan.</h2>
+        <HeadingFlourish />
         <p className="section-intro">{siteContent.identity.descriptor}</p>
       </div>
       <div className="ruins ruins-controls" data-reveal data-scene-overlay>
@@ -436,7 +535,10 @@ function AboutSection({
             className={`ruin-fragment ${fragmentClasses[index]}`}
             key={item.id}
             onBlur={() => setActiveIndex(null)}
-            onClick={() => onSelect(item)}
+            onClick={() => {
+              setVisitedIndices((current) => new Set(current).add(index))
+              onSelect(item)
+            }}
             onFocus={() => setActiveIndex(index)}
             onMouseEnter={() => setActiveIndex(index)}
             onMouseLeave={() => setActiveIndex(null)}
@@ -470,6 +572,7 @@ function ProjectsSection({
   progressRef: React.MutableRefObject<number>
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [visitedIndices, setVisitedIndices] = useState<ReadonlySet<number>>(() => new Set())
 
   return (
     <section id="projects" className="section projects-section immersive-section" data-scene-section>
@@ -477,6 +580,7 @@ function ProjectsSection({
         <SectionSceneExperience
           activeIndex={activeIndex}
           progressRef={progressRef}
+          visitedIndices={[...visitedIndices]}
           variant="monolith"
         />
       </div>
@@ -484,6 +588,7 @@ function ProjectsSection({
         <div>
           <p className="eyebrow">03 · Made tangible</p>
           <h2>Selected Work</h2>
+          <HeadingFlourish />
         </div>
         <p className="section-intro">
           Systems shaped around real-time collaboration, computer vision, and model behavior.
@@ -497,7 +602,10 @@ function ProjectsSection({
             data-reveal
             key={project.id}
             onBlur={() => setActiveIndex(null)}
-            onClick={() => onSelect(project)}
+            onClick={() => {
+              setVisitedIndices((current) => new Set(current).add(index))
+              onSelect(project)
+            }}
             onFocus={() => setActiveIndex(index)}
             onMouseEnter={() => setActiveIndex(index)}
             onMouseLeave={() => setActiveIndex(null)}
@@ -524,6 +632,7 @@ function ExperienceSection({ progressRef }: { progressRef: React.MutableRefObjec
       <div className="section-heading immersive-heading" data-reveal data-scene-overlay>
         <p className="eyebrow">02 · The descent</p>
         <h2>Experience</h2>
+        <HeadingFlourish />
       </div>
       <div className="timeline stair-timeline" data-scene-overlay>
         {siteContent.experience.map((entry, index) => (
@@ -570,10 +679,15 @@ function ExperienceSection({ progressRef }: { progressRef: React.MutableRefObjec
 function EndingSection() {
   return (
     <section className="ending-section" aria-label="Closing thought" data-scene-section>
-      <div className="ending-ascent ending-ascent-distant" />
-      <div className="ending-ascent ending-ascent-whiteout" />
-      <div className="ending-copy" data-reveal data-scene-overlay>
-        <span>{siteContent.editorial.closingLine}</span>
+      <div className="ending-stage" aria-hidden="true">
+        <div className="ending-ascent ending-ascent-distant" />
+        <div className="ending-ruin-haze ending-ruin-haze-far" />
+        <div className="ending-ruin-haze ending-ruin-haze-near" />
+        <div className="ending-sun" />
+        <div className="ending-ascent ending-ascent-whiteout" />
+        <div className="ending-copy">
+          <span>{siteContent.editorial.closingLine}</span>
+        </div>
       </div>
     </section>
   )
@@ -591,6 +705,7 @@ function AboutDialog({ item, onClose }: { item: AboutItem; onClose: () => void }
   return (
     <div className="dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <div className="project-dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-dialog-title">
+        <DialogFrame />
         <button className="dialog-close" onClick={onClose} aria-label="Close details">Close</button>
         <p className="eyebrow">Ruins inscription</p>
         <h2 id="about-dialog-title">{item.label}</h2>

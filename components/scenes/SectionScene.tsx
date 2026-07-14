@@ -6,15 +6,18 @@ import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
-import type { SectionSceneVariant } from './SectionSceneExperience'
+import type { SceneAffordancePosition, SectionSceneVariant } from './SectionSceneExperience'
 import { getDescentLighting, getLandingProgress } from '@/lib/descent-choreography'
 
 interface SectionSceneProps {
   readonly variant: SectionSceneVariant
   readonly progressRef: React.MutableRefObject<number>
   readonly activeIndex: number | null
+  readonly affordanceIndex: number | null
   readonly isMobile: boolean
+  readonly onAffordancePosition: (position: SceneAffordancePosition | null) => void
   readonly showStats?: boolean
+  readonly visitedIndices: readonly number[]
 }
 
 interface VeinMaterial extends THREE.MeshPhysicalMaterial {
@@ -26,25 +29,67 @@ interface VeinMaterial extends THREE.MeshPhysicalMaterial {
 const sceneConfig = {
   ruins: {
     model: '/models/ruins-ring.glb',
-    scale: 0.72,
-    position: [0, -0.25, 0] as const,
-    camera: [0, 2.1, 14.5] as const,
+    scale: 0.82,
+    position: [0, -0.22, 0] as const,
+    camera: [0, 1.55, 5.8] as const,
+    target: [0, 0.1, -5.4] as const,
+    fov: 47,
+    background: '#E5E8E8',
+    warmBackground: '#F1ECE3',
+    fogNear: 5.5,
+    fogFar: 27,
+    exposure: 0.86,
+    ambientIntensity: 0.34,
+    keyIntensity: 1.55,
+    keyPosition: [7, 8, 3] as const,
+    fillIntensity: 0.36,
+    progressTravel: [0, -0.15, -0.65] as const,
   },
   stairs: {
     model: '/models/stair-timeline.glb',
-    scale: 0.6,
-    position: [0, -4.6, 0] as const,
-    camera: [0, 0.4, 16] as const,
+    scale: 0.68,
+    position: [-1.4, -3.5, 0] as const,
+    camera: [4.4, 5.7, 12.8] as const,
+    target: [-1.2, -2.1, -1.4] as const,
+    fov: 43,
+    background: '#D6DADC',
+    warmBackground: '#E8E3DA',
+    fogNear: 7,
+    fogFar: 31,
+    exposure: 0.78,
+    ambientIntensity: 0.26,
+    keyIntensity: 1.42,
+    keyPosition: [6, 9, 4] as const,
+    fillIntensity: 0.28,
+    progressTravel: [-0.9, -6.4, -1.5] as const,
   },
   monolith: {
     model: '/models/monolith-field.glb',
-    scale: 0.78,
-    position: [0, -0.45, 1.3] as const,
-    camera: [0, 1.1, 15.5] as const,
+    scale: 0.82,
+    position: [0, -0.65, 0] as const,
+    camera: [0, 1.15, 10.5] as const,
+    target: [0, -0.15, -9] as const,
+    fov: 45,
+    background: '#BFC5C3',
+    warmBackground: '#D8D4CC',
+    fogNear: 6.5,
+    fogFar: 25,
+    exposure: 0.7,
+    ambientIntensity: 0.2,
+    keyIntensity: 1.15,
+    keyPosition: [7, 8, 2] as const,
+    fillIntensity: 0.23,
+    progressTravel: [0.4, -0.35, -3.2] as const,
   },
 } as const
 
 const dracoPath = '/draco/'
+
+const interactionTargets: Record<SectionSceneVariant, readonly string[]> = {
+  ruins: ['ruin_arch_03', 'ruin_column_01', 'ruin_fragment_01', 'ruin_arch_02', 'ruin_column_03'],
+  stairs: ['stair_landing_01', 'stair_landing_02', 'stair_landing_03', 'stair_landing_04'],
+  monolith: ['monolith_01', 'monolith_02', 'monolith_03'],
+}
 
 export function createVeinedMarbleMaterial(): VeinMaterial {
   const material = new THREE.MeshPhysicalMaterial({
@@ -117,12 +162,26 @@ function createCloudTexture(seed: number): THREE.CanvasTexture {
   return texture
 }
 
-function SceneModel({ variant, progressRef, activeIndex }: Pick<SectionSceneProps, 'variant' | 'progressRef' | 'activeIndex'>) {
+function SceneModel({
+  variant,
+  progressRef,
+  activeIndex,
+  affordanceIndex,
+  onAffordancePosition,
+  visitedIndices,
+}: Pick<
+  SectionSceneProps,
+  'variant' | 'progressRef' | 'activeIndex' | 'affordanceIndex' | 'onAffordancePosition' | 'visitedIndices'
+>) {
   const config = sceneConfig[variant]
   const groupRef = useRef<THREE.Group>(null)
+  const projectionFrameRef = useRef(0)
+  const projectedPositionRef = useRef(new THREE.Vector3())
+  const lastAffordanceRef = useRef<SceneAffordancePosition | null>(null)
   const { scene } = useGLTF(config.model, dracoPath, true)
   const model = useMemo(() => scene.clone(true), [scene])
   const materials = useMemo(() => new Map<string, VeinMaterial>(), [])
+  const visitedSet = useMemo(() => new Set(visitedIndices), [visitedIndices])
 
   useLayoutEffect(() => {
     model.traverse((object) => {
@@ -139,7 +198,12 @@ function SceneModel({ variant, progressRef, activeIndex }: Pick<SectionSceneProp
     }
   }, [materials, model])
 
-  useFrame(({ clock, pointer }, delta) => {
+  useEffect(
+    () => () => onAffordancePosition(null),
+    [onAffordancePosition],
+  )
+
+  useFrame(({ camera, clock, pointer, size }, delta) => {
     const group = groupRef.current
     if (group) {
       const progress = progressRef.current
@@ -153,19 +217,53 @@ function SceneModel({ variant, progressRef, activeIndex }: Pick<SectionSceneProp
       group.rotation.x = THREE.MathUtils.damp(group.rotation.x, pointer.y * -0.025, 2.1, delta)
     }
 
-    const primaryPrefix = variant === 'ruins' ? 'ruin_arch_' : variant === 'stairs' ? 'stair_landing_' : 'monolith_'
-    let primaryIndex = 0
+    const targets = interactionTargets[variant]
     materials.forEach((material, name) => {
-      if (!name.startsWith(primaryPrefix) || name.startsWith('monolith_decor_')) return
+      const primaryIndex = targets.indexOf(name)
+      if (primaryIndex < 0) return
       const response = material.userData.goldResponse
       if (response) {
+        const shimmer = !visitedSet.has(primaryIndex)
+          ? 0.08 + Math.max(0, Math.sin(clock.elapsedTime * 0.72 + primaryIndex * 1.7)) ** 12 * 0.24
+          : 0
         const target = activeIndex === primaryIndex
           ? 1
-          : variant === 'stairs' ? getLandingProgress(progressRef.current, primaryIndex) * 0.32 : 0
+          : variant === 'stairs' ? getLandingProgress(progressRef.current, primaryIndex) * 0.32 : shimmer
         response.value = THREE.MathUtils.damp(response.value, target, 5, delta)
       }
-      primaryIndex += 1
     })
+
+    projectionFrameRef.current += 1
+    if (projectionFrameRef.current % 8 !== 0 || affordanceIndex === null || !group) return
+    const targetObject = model.getObjectByName(targets[affordanceIndex])
+    if (!targetObject) {
+      onAffordancePosition(null)
+      return
+    }
+    group.updateWorldMatrix(true, true)
+    const projected = projectedPositionRef.current
+    targetObject.getWorldPosition(projected)
+    projected.project(camera)
+    if (projected.z < -1 || projected.z > 1 || Math.abs(projected.x) > 1.12 || Math.abs(projected.y) > 1.12) {
+      if (lastAffordanceRef.current) {
+        lastAffordanceRef.current = null
+        onAffordancePosition(null)
+      }
+      return
+    }
+    const nextPosition = {
+      x: (projected.x * 0.5 + 0.5) * size.width,
+      y: (-projected.y * 0.5 + 0.5) * size.height,
+    }
+    const lastPosition = lastAffordanceRef.current
+    if (
+      !lastPosition ||
+      Math.abs(lastPosition.x - nextPosition.x) > 3 ||
+      Math.abs(lastPosition.y - nextPosition.y) > 3
+    ) {
+      lastAffordanceRef.current = nextPosition
+      onAffordancePosition(nextPosition)
+    }
   })
 
   return (
@@ -182,7 +280,7 @@ function CloudPlanes({ variant }: Pick<SectionSceneProps, 'variant'>) {
   useFrame(({ clock }) => {
     if (groupRef.current) groupRef.current.position.x = Math.sin(clock.elapsedTime * 0.05) * 0.25
   })
-  const baseY = variant === 'stairs' ? -3.9 : -3.25
+  const baseY = variant === 'stairs' ? -3.9 : variant === 'monolith' ? -2.35 : -3.25
   return (
     <group ref={groupRef}>
       {textures.map((texture, index) => (
@@ -236,23 +334,43 @@ function Dust() {
 
 function CameraRig({ variant, progressRef }: Pick<SectionSceneProps, 'variant' | 'progressRef'>) {
   const target = useMemo(() => new THREE.Vector3(), [])
-  const warm = useMemo(() => new THREE.Color('#FAF8F4'), [])
-  const cool = useMemo(() => new THREE.Color('#E4E7E7'), [])
+  const atmosphere = useMemo(() => new THREE.Color(), [])
+  const warm = useMemo(() => new THREE.Color(sceneConfig[variant].warmBackground), [variant])
+  const cool = useMemo(() => new THREE.Color(sceneConfig[variant].background), [variant])
   useFrame(({ camera, pointer, scene }, delta) => {
     const config = sceneConfig[variant]
     const progress = progressRef.current
     const lighting = getDescentLighting(progress)
-    const stairDescent = variant === 'stairs' ? progress * 4.4 : 0
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, config.camera[0] + pointer.x * 0.42, 2.4, delta)
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, config.camera[1] - stairDescent + pointer.y * 0.18, 2.4, delta)
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, config.camera[2] - progress * 1.1, 2.5, delta)
-    target.set(0, variant === 'stairs' ? -2.2 - stairDescent : 0, -0.5)
+    camera.position.x = THREE.MathUtils.damp(
+      camera.position.x,
+      config.camera[0] + config.progressTravel[0] * progress + pointer.x * 0.36,
+      2.4,
+      delta,
+    )
+    camera.position.y = THREE.MathUtils.damp(
+      camera.position.y,
+      config.camera[1] + config.progressTravel[1] * progress + pointer.y * 0.16,
+      2.4,
+      delta,
+    )
+    camera.position.z = THREE.MathUtils.damp(
+      camera.position.z,
+      config.camera[2] + config.progressTravel[2] * progress,
+      2.5,
+      delta,
+    )
+    target.set(
+      config.target[0],
+      config.target[1] + (variant === 'stairs' ? config.progressTravel[1] * progress * 0.72 : 0),
+      config.target[2] + (variant === 'monolith' ? config.progressTravel[2] * progress * 0.55 : 0),
+    )
     camera.lookAt(target)
-    const atmosphere = cool.clone().lerp(warm, lighting.warmth)
+    atmosphere.copy(cool).lerp(warm, lighting.warmth * 0.45)
     if (scene.background instanceof THREE.Color) scene.background.copy(atmosphere)
     if (scene.fog instanceof THREE.Fog) {
       scene.fog.color.copy(atmosphere)
-      scene.fog.near = lighting.fogNear
+      scene.fog.near = config.fogNear + (lighting.fogNear - 7.5) * 0.2
+      scene.fog.far = config.fogFar
     }
   })
   return null
@@ -286,13 +404,14 @@ function MobileFrameLoop() {
 }
 
 function World(props: Omit<SectionSceneProps, 'showStats'>) {
+  const config = sceneConfig[props.variant]
   return (
     <>
-      <color attach="background" args={['#FAF8F4']} />
-      <fog attach="fog" args={['#FAF8F4', 8, 28]} />
-      <ambientLight intensity={0.5} />
-      <directionalLight color="#FFE8B5" intensity={1.7} position={[6, 7, 5]} />
-      <directionalLight color="#D7E3EA" intensity={0.42} position={[-5, 2, 4]} />
+      <color attach="background" args={[config.background]} />
+      <fog attach="fog" args={[config.background, config.fogNear, config.fogFar]} />
+      <ambientLight intensity={config.ambientIntensity} />
+      <directionalLight color="#FFE8B5" intensity={config.keyIntensity} position={config.keyPosition} />
+      <directionalLight color="#C8D7DF" intensity={config.fillIntensity} position={[-5, 2, 4]} />
       <SoftEnvironment />
       <SceneModel {...props} />
       <CloudPlanes variant={props.variant} />
@@ -308,15 +427,16 @@ function World(props: Omit<SectionSceneProps, 'showStats'>) {
 }
 
 export function SectionScene({ showStats = false, ...props }: SectionSceneProps) {
+  const config = sceneConfig[props.variant]
   return (
     <Canvas
       dpr={props.isMobile ? [1, 1.05] : [1, 1.2]}
-      camera={{ position: sceneConfig[props.variant].camera, fov: 40, near: 0.1, far: 70 }}
+      camera={{ position: config.camera, fov: config.fov, near: 0.1, far: 70 }}
       frameloop={props.isMobile ? 'never' : 'always'}
       gl={{ antialias: !props.isMobile, alpha: false, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping
-        gl.toneMappingExposure = 0.72
+        gl.toneMappingExposure = config.exposure
       }}
     >
       <Suspense fallback={null}>

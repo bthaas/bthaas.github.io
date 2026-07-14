@@ -21,9 +21,13 @@ if str(SCRIPT_DIRECTORY) not in sys.path:
 from asset_lib import (  # noqa: E402
     CompressionBudget,
     MeshAccumulator,
+    TurntableConfig,
+    append_arch_arc,
     append_arch_segment,
     append_box,
+    append_chamfered_box,
     append_cylinder,
+    append_fractured_box,
     append_rounded_monolith,
     append_stair_run,
     append_tetrahedral_fragment,
@@ -32,6 +36,7 @@ from asset_lib import (  # noqa: E402
     create_marble_material,
     make_feather_template,
     orbit_camera_positions,
+    orbit_camera_targets,
     reset_scene,
     validate_asset_budget,
 )
@@ -92,6 +97,28 @@ class ArchitecturalPrimitiveTests(unittest.TestCase):
         self.assertEqual(len(cylinder.vertices), 24)
         self.assertEqual(len(cylinder.faces), 14)
 
+    def test_chamfered_and_fractured_boxes_keep_closed_silhouettes(self) -> None:
+        chamfered = MeshAccumulator()
+        append_chamfered_box(
+            chamfered,
+            center=Vector((0.0, 0.0, 0.0)),
+            size=Vector((3.0, 1.0, 2.0)),
+            chamfer=0.2,
+        )
+        self.assertEqual(len(chamfered.vertices), 16)
+        self.assertEqual(len(chamfered.faces), 10)
+
+        fractured = MeshAccumulator()
+        append_fractured_box(
+            fractured,
+            center=Vector((0.0, 0.0, 0.0)),
+            size=Vector((4.0, 1.0, 1.0)),
+            positive_end_offsets=(-0.3, 0.12, -0.08, 0.24),
+        )
+        self.assertEqual(len(fractured.vertices), 8)
+        self.assertEqual(len(fractured.faces), 6)
+        self.assertGreater(len({round(vertex[0], 2) for vertex in fractured.vertices[4:]}), 2)
+
     def test_arch_preserves_a_tall_open_center(self) -> None:
         arch = MeshAccumulator()
         append_arch_segment(
@@ -109,6 +136,24 @@ class ArchitecturalPrimitiveTests(unittest.TestCase):
         self.assertGreaterEqual(max(xs), 1.99)
         self.assertGreater(max(zs) - min(zs), 5.4)
         self.assertLess(sum(len(face) - 2 for face in arch.faces), 180)
+
+    def test_arch_arc_supports_a_broken_partial_crown(self) -> None:
+        arc = MeshAccumulator()
+        append_arch_arc(
+            arc,
+            center=Vector((0.0, 0.0, 0.0)),
+            width=4.0,
+            height=5.5,
+            depth=0.65,
+            start_angle=0.28,
+            end_angle=2.2,
+            segments=7,
+        )
+
+        self.assertEqual(len(arc.vertices), 32)
+        self.assertEqual(len(arc.faces), 30)
+        self.assertLess(min(vertex[0] for vertex in arc.vertices), 0.0)
+        self.assertGreater(max(vertex[0] for vertex in arc.vertices), 0.0)
 
     def test_stair_run_has_one_named_step_volume_per_riser(self) -> None:
         stairs = MeshAccumulator()
@@ -190,11 +235,20 @@ class TurntableRigTests(unittest.TestCase):
             camera = configure_turntable_rig(Path(directory))
 
         positions = orbit_camera_positions()
+        interior_targets = orbit_camera_targets(
+            config=TurntableConfig(orbit_target_radius=6.0)
+        )
+        descending_positions = orbit_camera_positions(
+            config=TurntableConfig(camera_height_offsets=(3.0, 2.0, 1.0, 0.0, -1.0, -2.0))
+        )
         lights = [obj for obj in bpy.context.scene.objects if obj.type == "LIGHT"]
         self.assertEqual(camera.name, "Turntable_Camera")
         self.assertEqual(len(positions), 6)
         self.assertEqual(len(lights), 3)
         self.assertTrue(all(abs(Vector(position).length - 15.02) < 0.1 for position in positions))
+        self.assertEqual(len(interior_targets), 6)
+        self.assertTrue(all(abs(Vector(target).xy.length - 6.0) < 0.01 for target in interior_targets))
+        self.assertGreater(descending_positions[0][2], descending_positions[-1][2])
 
 
 if __name__ == "__main__":

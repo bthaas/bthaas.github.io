@@ -28,6 +28,7 @@ import {
 interface HeroSceneProps {
   readonly fractureProgressRef: React.MutableRefObject<number>
   readonly isMobile: boolean
+  readonly onReady: () => void
   readonly showStats?: boolean
 }
 
@@ -151,7 +152,7 @@ function createHorizonTexture(): THREE.CanvasTexture {
   return texture
 }
 
-function Wings({ fractureProgressRef }: Pick<HeroSceneProps, 'fractureProgressRef'>) {
+function Wings({ fractureProgressRef, onReady }: Pick<HeroSceneProps, 'fractureProgressRef' | 'onReady'>) {
   const groupRef = useRef<THREE.Group>(null)
   const { scene } = useGLTF(modelPath, dracoPath, true)
   const model = useMemo(() => scene.clone(true), [scene])
@@ -178,6 +179,8 @@ function Wings({ fractureProgressRef }: Pick<HeroSceneProps, 'fractureProgressRe
     })
     return () => marbleMaterial.dispose()
   }, [marbleMaterial, model])
+
+  useEffect(() => onReady(), [model, onReady])
 
   useFrame(({ clock, pointer }, delta) => {
     const time = clock.elapsedTime
@@ -435,7 +438,7 @@ function MobileFrameLoop() {
   return null
 }
 
-function HeroWorld({ fractureProgressRef, isMobile }: Omit<HeroSceneProps, 'showStats'>) {
+function HeroWorld({ fractureProgressRef, isMobile, onReady }: Omit<HeroSceneProps, 'showStats'>) {
   return (
     <>
       <color attach="background" args={['#FAF8F4']} />
@@ -444,7 +447,7 @@ function HeroWorld({ fractureProgressRef, isMobile }: Omit<HeroSceneProps, 'show
       <directionalLight color="#FFE8B2" intensity={1.85} position={[6.5, 6.8, 6.2]} />
       <directionalLight color="#DCE5EB" intensity={0.45} position={[-5, 2, 4]} />
       <SoftEnvironment />
-      <Wings fractureProgressRef={fractureProgressRef} />
+      <Wings fractureProgressRef={fractureProgressRef} onReady={onReady} />
       <CloudLayers />
       <Dust />
       <CameraRig fractureProgressRef={fractureProgressRef} />
@@ -457,6 +460,7 @@ function HeroWorld({ fractureProgressRef, isMobile }: Omit<HeroSceneProps, 'show
 export function HeroScene({
   fractureProgressRef,
   isMobile,
+  onReady,
   showStats = false,
 }: HeroSceneProps) {
   return (
@@ -471,7 +475,7 @@ export function HeroScene({
       }}
     >
       <Suspense fallback={null}>
-        <HeroWorld fractureProgressRef={fractureProgressRef} isMobile={isMobile} />
+        <HeroWorld fractureProgressRef={fractureProgressRef} isMobile={isMobile} onReady={onReady} />
       </Suspense>
       {showStats && <Stats className="fps-stats" showPanel={0} />}
     </Canvas>

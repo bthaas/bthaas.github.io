@@ -113,13 +113,14 @@ describe('Portfolio scroll experience', () => {
     expect(animation.timelineFromTo).toHaveBeenCalled()
     expect(animation.fromTo).toHaveBeenCalled()
 
-    const scrollTrigger = animation.timelineOptions[0].scrollTrigger as {
+    const scrollTimelines = animation.timelineOptions.filter((options) => options.scrollTrigger)
+    const scrollTrigger = scrollTimelines[0].scrollTrigger as {
       onUpdate: (state: { progress: number }) => void
     }
     act(() => scrollTrigger.onUpdate({ progress: 0.625 }))
     expect(document.documentElement.style.getPropertyValue('--hero-progress')).toBe('0.625')
 
-    animation.timelineOptions.slice(1).forEach((options, index) => {
+    scrollTimelines.slice(1).forEach((options, index) => {
       const sectionTrigger = options.scrollTrigger as {
         onUpdate: (state: { progress: number }) => void
       }
@@ -128,6 +129,13 @@ describe('Portfolio scroll experience', () => {
     expect(document.documentElement.style.getPropertyValue('--about-progress')).toBe('0.375')
     expect(document.documentElement.style.getPropertyValue('--ending-progress')).toBe('0.405')
     expect(document.querySelector<HTMLElement>('[data-cloud-transition]')?.style.getPropertyValue('--transition-progress')).toBe('0.415')
+
+    const endingTrigger = scrollTimelines[4].scrollTrigger as {
+      onUpdate: (state: { progress: number }) => void
+    }
+    act(() => endingTrigger.onUpdate({ progress: 0.74 }))
+    expect(document.documentElement.style.getPropertyValue('--ending-whiteout-opacity')).toBe('1.000')
+    expect(document.documentElement.style.getPropertyValue('--ending-copy-opacity')).toBe('1.000')
 
     const rafCallback = vi.mocked(window.requestAnimationFrame).mock.calls[0]?.[0]
     act(() => rafCallback?.(120))

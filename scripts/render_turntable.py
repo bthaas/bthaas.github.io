@@ -61,6 +61,38 @@ def infer_turntable_config(model_path: Path) -> TurntableConfig:
     )
     center = (minimum + maximum) * 0.5
     extent = maximum - minimum
+    if "ruins-ring" in model_path.stem:
+        return TurntableConfig(
+            lens_millimeters=40.0,
+            radius=1.25,
+            camera_height=center.z + 2.05,
+            camera_target=(0.0, 0.0, center.z + 0.62),
+            light_target=(0.0, 0.0, center.z + 0.25),
+            orbit_angles=(-18.0, 42.0, 102.0, 162.0, 222.0, 282.0),
+            orbit_target_radius=6.2,
+        )
+    if "stair-timeline" in model_path.stem:
+        camera_offsets = (8.4, 5.0, 1.7, -1.7, -5.0, -8.4)
+        target_offsets = tuple(value - 2.9 for value in camera_offsets)
+        return TurntableConfig(
+            lens_millimeters=43.0,
+            radius=11.8,
+            camera_height=center.z,
+            camera_target=(center.x, center.y, center.z),
+            light_target=(center.x, center.y, center.z),
+            orbit_angles=(-22.0, -14.0, -6.0, 6.0, 14.0, 22.0),
+            camera_height_offsets=camera_offsets,
+            target_height_offsets=target_offsets,
+        )
+    if "monolith-field" in model_path.stem:
+        return TurntableConfig(
+            lens_millimeters=44.0,
+            radius=10.8,
+            camera_height=center.z + 0.65,
+            camera_target=(0.0, 6.4, center.z + 0.35),
+            light_target=(0.0, 6.4, center.z + 0.2),
+            orbit_angles=(-17.0, -10.0, -3.0, 4.0, 11.0, 18.0),
+        )
     vertical_fit = 2.65 if "stair-timeline" in model_path.stem else 2.15
     radius = max(13.0, extent.x * 1.55, extent.y * 1.55, extent.z * vertical_fit)
     target = (center.x, center.y, center.z)
