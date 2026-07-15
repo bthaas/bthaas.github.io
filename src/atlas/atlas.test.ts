@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { countUp } from './count-up'
+import { setupCraftChapter } from './craft'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
@@ -154,6 +155,60 @@ describe('atlas DOM capabilities', () => {
     cleanup()
   })
 
+  it('provides an IO wipe and scroll-scrubbed Craft fallback', () => {
+    document.body.innerHTML = `
+      <section class="craft-section">
+        <span data-craft-ghost></span>
+        <picture class="craft-art"><img /></picture>
+      </section>
+    `
+    const section = document.querySelector<HTMLElement>('.craft-section')!
+    const plate = document.querySelector<HTMLElement>('.craft-art')!
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
+    vi.spyOn(plate, 'getBoundingClientRect').mockReturnValue({
+      bottom: 2900,
+      height: 900,
+      left: 0,
+      right: 1200,
+      top: 2000,
+      width: 1200,
+      x: 0,
+      y: 2000,
+      toJSON: () => undefined,
+    })
+    let update: IntersectionObserverCallback | undefined
+    const observer = {
+      disconnect: vi.fn(),
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+    } as unknown as IntersectionObserver
+    const cleanup = setupCraftChapter(
+      document,
+      window,
+      false,
+      (callback) => {
+        update = callback
+        return observer
+      },
+    )
+
+    expect(document.documentElement).toHaveClass('atlas-craft-fallback')
+    expect(observer.observe).toHaveBeenCalledWith(section)
+    update?.([
+      { isIntersecting: true, target: section },
+    ] as unknown as IntersectionObserverEntry[], observer)
+    expect(section).toHaveClass('is-craft-visible')
+
+    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 1702.5 } }))
+    expect(plate.style.getPropertyValue('--atlas-craft-clip-bottom')).toBe('50%')
+    expect(plate.style.getPropertyValue('--atlas-craft-image-y')).toBe('0%')
+    expect(section.style.getPropertyValue('--atlas-craft-ghost-y')).toBe('0px')
+
+    cleanup()
+    expect(document.documentElement).not.toHaveClass('atlas-craft-fallback')
+    expect(section).not.toHaveClass('is-craft-visible')
+  })
+
   it('sets one active nav link from the four observed narrative sections', () => {
     document.body.innerHTML = `
       <nav>
@@ -216,6 +271,7 @@ describe('atlas DOM capabilities', () => {
     const createBus = vi.fn()
     const prepareEntrance = vi.fn()
     const prepareHero = vi.fn()
+    const prepareCraft = vi.fn()
     const prepareMetrics = vi.fn()
     const prepareReveals = vi.fn()
     const cleanupWayfinding = vi.fn()
@@ -229,6 +285,7 @@ describe('atlas DOM capabilities', () => {
       matchMedia,
       prepareEntrance,
       prepareHero,
+      prepareCraft,
       prepareMetrics,
       prepareReveals,
       prepareSun,
@@ -241,6 +298,7 @@ describe('atlas DOM capabilities', () => {
     expect(createBus).not.toHaveBeenCalled()
     expect(prepareEntrance).not.toHaveBeenCalled()
     expect(prepareHero).not.toHaveBeenCalled()
+    expect(prepareCraft).not.toHaveBeenCalled()
     expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
     expect(prepareSun).not.toHaveBeenCalled()
@@ -256,6 +314,7 @@ describe('atlas DOM capabilities', () => {
     const cleanupReveals = vi.fn()
     const cleanupEntrance = vi.fn()
     const cleanupHero = vi.fn()
+    const cleanupCraft = vi.fn()
     const cleanupMetrics = vi.fn()
     const cleanupSun = vi.fn()
     const cleanupWayfinding = vi.fn()
@@ -274,6 +333,7 @@ describe('atlas DOM capabilities', () => {
       matchMedia: () => ({ matches: false }),
       prepareEntrance: () => cleanupEntrance,
       prepareHero: () => cleanupHero,
+      prepareCraft: () => cleanupCraft,
       prepareMetrics: () => cleanupMetrics,
       prepareReveals: () => cleanupReveals,
       prepareSun: () => cleanupSun,
@@ -290,6 +350,7 @@ describe('atlas DOM capabilities', () => {
     expect(unsubscribe).toHaveBeenCalledOnce()
     expect(cleanupEntrance).toHaveBeenCalledOnce()
     expect(cleanupHero).toHaveBeenCalledOnce()
+    expect(cleanupCraft).toHaveBeenCalledOnce()
     expect(cleanupMetrics).toHaveBeenCalledOnce()
     expect(cleanupSun).toHaveBeenCalledOnce()
     expect(cleanupWayfinding).toHaveBeenCalledOnce()

@@ -86,6 +86,86 @@
   html.atlas-hero-fallback .art-caption {
     transform: translate3d(0, var(--atlas-hero-caption-y, 0), 0);
   }
+
+  html.atlas-js .craft-narrative {
+    min-height: clamp(36rem, 78vh, 46rem);
+  }
+
+  html.atlas-js .craft-heading {
+    position: sticky;
+    z-index: 2;
+    top: clamp(5.5rem, 12vh, 8rem);
+    align-self: start;
+  }
+
+  html.atlas-js .craft-heading .eyebrow {
+    position: relative;
+    z-index: 1;
+  }
+
+  html.atlas-js .craft-ghost {
+    position: absolute;
+    z-index: 0;
+    top: -0.46em;
+    left: -0.08em;
+    display: block;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: clamp(9rem, 20vw, 20rem);
+    font-weight: 500;
+    letter-spacing: -0.08em;
+    line-height: 0.8;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+
+  html.atlas-js .craft-art img {
+    position: absolute;
+    top: -4%;
+    left: 0;
+    width: 100%;
+    height: 108%;
+    max-width: none;
+  }
+
+  html.atlas-js .craft-notes {
+    visibility: hidden;
+  }
+
+  html.atlas-js .craft-marquee {
+    display: block;
+    overflow: hidden;
+    margin-top: clamp(3rem, 6vw, 6rem);
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    outline-offset: -5px;
+  }
+
+  html.atlas-js .craft-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: atlas-craft-marquee 28s linear infinite;
+    will-change: transform;
+  }
+
+  html.atlas-js .craft-marquee__sequence {
+    display: flex;
+    min-width: 100vw;
+    padding: 0.9rem clamp(1.5rem, 4vw, 4rem);
+    align-items: center;
+    justify-content: space-around;
+    gap: clamp(2rem, 5vw, 6rem);
+    font-size: clamp(0.68rem, 0.85vw, 0.8rem);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  html.atlas-js .craft-marquee:hover .craft-marquee__track,
+  html.atlas-js .craft-marquee:focus-within .craft-marquee__track {
+    animation-play-state: paused;
+  }
 }
 
 @media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
@@ -155,8 +235,56 @@
   }
 }
 
+@keyframes atlas-craft-marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js .craft-section {
+      background: var(--cream);
+    }
+
+    html.atlas-js .craft-section::before {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      background: var(--citron);
+      clip-path: inset(0 100% 0 0);
+      content: "";
+      animation: atlas-craft-wipe both linear;
+      animation-range: entry 0% cover 28%;
+      animation-timeline: view();
+      pointer-events: none;
+    }
+
+    html.atlas-js .craft-narrative {
+      view-timeline-axis: block;
+      view-timeline-name: --atlas-craft-narrative;
+    }
+
+    html.atlas-js .craft-ghost {
+      animation: atlas-craft-counter-parallax both linear;
+      animation-range: entry 0% exit 100%;
+      animation-timeline: --atlas-craft-narrative;
+    }
+
+    html.atlas-js .craft-art {
+      view-timeline-axis: block;
+      view-timeline-name: --atlas-craft-plate;
+      animation: atlas-craft-plate-reveal both linear;
+      animation-range: entry 0% cover 45%;
+      animation-timeline: --atlas-craft-plate;
+    }
+
+    html.atlas-js .craft-art img {
+      animation: atlas-craft-plate-parallax both linear;
+      animation-range: entry 0% cover 45%;
+      animation-timeline: --atlas-craft-plate;
+    }
+
     html.atlas-js .hero-art {
       view-timeline-axis: block;
       view-timeline-name: --atlas-hero;
@@ -227,11 +355,78 @@
         transform: translate3d(0, -2.5vh, 0);
       }
     }
+
+    @keyframes atlas-craft-wipe {
+      to {
+        clip-path: inset(0);
+      }
+    }
+
+    @keyframes atlas-craft-counter-parallax {
+      from {
+        transform: translate3d(0, 28px, 0);
+      }
+
+      to {
+        transform: translate3d(0, -28px, 0);
+      }
+    }
+
+    @keyframes atlas-craft-plate-reveal {
+      from {
+        clip-path: inset(0 0 100%);
+      }
+
+      to {
+        clip-path: inset(0);
+      }
+    }
+
+    @keyframes atlas-craft-plate-parallax {
+      from {
+        transform: translate3d(0, -4%, 0);
+      }
+
+      to {
+        transform: translate3d(0, 4%, 0);
+      }
+    }
   }
 }
 
 @supports not (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js.atlas-craft-fallback .craft-section {
+      background: var(--cream);
+    }
+
+    html.atlas-js.atlas-craft-fallback .craft-section::before {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      background: var(--citron);
+      clip-path: inset(0 100% 0 0);
+      content: "";
+      pointer-events: none;
+      transition: clip-path 900ms var(--ease-out);
+    }
+
+    html.atlas-js.atlas-craft-fallback .craft-section.is-craft-visible::before {
+      clip-path: inset(0);
+    }
+
+    html.atlas-js.atlas-craft-fallback .craft-ghost {
+      transform: translate3d(0, var(--atlas-craft-ghost-y, 28px), 0);
+    }
+
+    html.atlas-js.atlas-craft-fallback .craft-art {
+      clip-path: inset(0 0 var(--atlas-craft-clip-bottom, 100%));
+    }
+
+    html.atlas-js.atlas-craft-fallback .craft-art img {
+      transform: translate3d(0, var(--atlas-craft-image-y, -4%), 0);
+    }
+
     html.atlas-js.atlas-reveal-ready [data-reveal],
     html.atlas-js.atlas-reveal-ready [data-reveal-stagger] > * {
       opacity: 0.4;
@@ -505,6 +700,18 @@
   .site-footer > a {
     grid-column: 1 / -1;
     justify-self: start;
+  }
+}
+
+@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
+  html.atlas-js .craft-narrative {
+    min-height: auto;
+    padding-bottom: 4rem;
+  }
+
+  html.atlas-js .craft-heading {
+    position: relative;
+    top: auto;
   }
 }
 

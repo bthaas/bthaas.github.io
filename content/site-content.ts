@@ -85,6 +85,7 @@ export interface SiteContent {
     readonly resume: string | null
   }
   readonly about: readonly AboutItem[]
+  readonly craftCapabilities: readonly string[]
   readonly featuredMetrics: readonly FeaturedMetric[]
   readonly projects: readonly Project[]
   readonly experience: readonly ExperienceEntry[]
@@ -165,6 +166,11 @@ export const siteContent = {
       kind: 'education',
       targetId: null,
     },
+  ],
+  craftCapabilities: [
+    'Research systems',
+    'Production engineering',
+    'Human-centered interfaces',
   ],
   featuredMetrics: [
     {

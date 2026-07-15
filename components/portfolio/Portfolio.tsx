@@ -51,8 +51,27 @@ function AtlasPicture({
   )
 }
 
+function CraftCapabilitySequence({
+  capabilities,
+  duplicate = false,
+}: {
+  readonly capabilities: readonly string[]
+  readonly duplicate?: boolean
+}) {
+  return (
+    <div className="craft-marquee__sequence" aria-hidden={duplicate || undefined}>
+      {capabilities.map((capability) => (
+        <span key={capability}>
+          {capability} <span aria-hidden="true">·</span>
+        </span>
+      ))}
+    </div>
+  )
+}
+
 export function Portfolio() {
-  const { identity, contact, featuredMetrics, experience, education, projects } = siteContent
+  const { identity, contact, featuredMetrics, experience, education, projects, craftCapabilities } =
+    siteContent
 
   return (
     <>
@@ -134,33 +153,50 @@ export function Portfolio() {
         </section>
 
         <section className="craft-section" id="craft" aria-labelledby="craft-title">
-          <div className="atlas-shell editorial-grid craft-layout">
-            <div className="section-heading craft-heading">
-              <p className="eyebrow">01 / Craft</p>
-              <h2 id="craft-title">The craft behind the flight.</h2>
+          <div className="atlas-shell craft-layout">
+            <div className="craft-narrative editorial-grid">
+              <div className="section-heading craft-heading">
+                <span className="craft-ghost" data-craft-ghost aria-hidden="true">
+                  01
+                </span>
+                <p className="eyebrow">01 / Craft</p>
+                <h2 id="craft-title">The craft behind the flight.</h2>
+              </div>
+              <div className="craft-copy">
+                <p className="lede">
+                  My work sits where software engineering, machine learning, and product judgment
+                  meet.
+                </p>
+                <p>
+                  I like difficult systems with visible stakes: steering model behavior, testing
+                  frontier agents, and shipping cross-platform products whose performance can be
+                  measured—not merely described.
+                </p>
+              </div>
             </div>
-            <div className="craft-copy">
-              <p className="lede">
-                My work sits where software engineering, machine learning, and product judgment
-                meet.
-              </p>
-              <p>
-                I like difficult systems with visible stakes: steering model behavior, testing
-                frontier agents, and shipping cross-platform products whose performance can be
-                measured—not merely described.
-              </p>
+            <div className="craft-plate-row editorial-grid">
+              <AtlasPicture
+                visual={atlasVisuals.craft}
+                alt="A cliffside workshop with sculptural wings"
+                className="atlas-picture craft-art"
+                sizes="(max-width: 720px) 100vw, 66vw"
+              />
+              <div className="craft-notes" aria-label="Core capabilities">
+                {craftCapabilities.map((capability) => (
+                  <p key={capability}>{capability}</p>
+                ))}
+              </div>
             </div>
-            <AtlasPicture
-              visual={atlasVisuals.craft}
-              alt="A cliffside workshop with sculptural wings"
-              className="atlas-picture craft-art frame-reveal"
-              reveal
-              sizes="(max-width: 720px) 100vw, 66vw"
-            />
-            <div className="craft-notes" aria-label="Core capabilities">
-              <p>Research systems</p>
-              <p>Production engineering</p>
-              <p>Human-centered interfaces</p>
+          </div>
+          <div
+            className="craft-marquee"
+            data-craft-marquee
+            aria-label="Core capabilities ticker; focus to pause"
+            tabIndex={0}
+          >
+            <div className="craft-marquee__track">
+              <CraftCapabilitySequence capabilities={craftCapabilities} />
+              <CraftCapabilitySequence capabilities={craftCapabilities} duplicate />
             </div>
           </div>
         </section>

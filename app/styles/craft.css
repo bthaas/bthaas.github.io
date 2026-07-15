@@ -1,9 +1,18 @@
 .craft-section {
+  position: relative;
+  isolation: isolate;
   padding: clamp(5rem, 10vw, 10rem) 0;
   background: var(--citron);
 }
 
-.craft-layout {
+.craft-layout,
+.craft-marquee {
+  position: relative;
+  z-index: 1;
+}
+
+.craft-narrative,
+.craft-plate-row {
   align-items: start;
 }
 
@@ -17,11 +26,18 @@
 }
 
 .craft-heading {
+  position: relative;
   grid-column: 1 / span 6;
 }
 
 .craft-heading h2 {
+  position: relative;
+  z-index: 1;
   max-width: 8ch;
+}
+
+.craft-ghost {
+  display: none;
 }
 
 .craft-copy {
@@ -65,3 +81,6 @@
   border-bottom: 1px solid var(--ink);
 }
 
+.craft-marquee {
+  display: none;
+}

@@ -1,3 +1,4 @@
+import { setupCraftChapter } from './craft'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
@@ -8,6 +9,7 @@ interface AtlasRuntimeOptions {
   readonly document?: Document
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
   readonly prepareEntrance?: (document: Document) => () => void
+  readonly prepareCraft?: (document: Document, window: Window) => () => void
   readonly prepareHero?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareReveals?: () => () => void
@@ -21,6 +23,7 @@ export function initializeAtlas({
   document: runtimeDocument = document,
   matchMedia = (query) => window.matchMedia(query),
   prepareEntrance = setupEntrance,
+  prepareCraft = setupCraftChapter,
   prepareHero = setupHeroParallax,
   prepareMetrics = setupMetricCountUps,
   prepareReveals = setupReveals,
@@ -36,6 +39,7 @@ export function initializeAtlas({
   html.dataset.atlas = 'ready'
 
   const cleanupEntrance = prepareEntrance(runtimeDocument)
+  const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
   const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupSun = prepareSun(runtimeDocument, runtimeWindow)
@@ -51,6 +55,7 @@ export function initializeAtlas({
     isActive = false
     unsubscribe()
     cleanupEntrance()
+    cleanupCraft()
     cleanupHero()
     cleanupMetrics()
     cleanupSun()
