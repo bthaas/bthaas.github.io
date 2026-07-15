@@ -1,0 +1,169 @@
+.eyebrow,
+.board-meta,
+.art-caption,
+.flight-index,
+.project-meta,
+.craft-notes,
+.signal-metric small {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  margin-bottom: 1.25rem;
+}
+
+.atlas-picture {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #d9d4c6;
+}
+
+.atlas-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-section {
+  padding: clamp(1rem, 2vw, 1.8rem) 0 clamp(4rem, 8vw, 8rem);
+}
+
+.board-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 0 0 0.85rem;
+  color: var(--muted);
+}
+
+.board-meta p {
+  margin-bottom: 0;
+}
+
+.board-meta p:nth-child(2) {
+  text-align: center;
+}
+
+.board-meta p:last-child {
+  text-align: right;
+}
+
+.hero-art {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.atlas-picture--hero {
+  aspect-ratio: 16 / 8.7;
+  border-radius: 0;
+}
+
+.atlas-picture--hero img {
+  object-position: center 52%;
+}
+
+.art-caption {
+  position: absolute;
+  z-index: 2;
+  bottom: 1rem;
+  left: 1.15rem;
+  margin: 0;
+}
+
+.art-caption--light {
+  color: var(--paper);
+  text-shadow: 0 1px 8px rgb(0 0 0 / 38%);
+}
+
+.hero-copy {
+  align-items: end;
+  padding: clamp(1.5rem, 3vw, 3rem) 0 clamp(2.5rem, 5vw, 4.5rem);
+  border-bottom: 1px solid var(--ink);
+}
+
+.hero-identity {
+  grid-column: 1 / span 5;
+}
+
+.hero-identity h1 {
+  max-width: 8ch;
+  margin-bottom: 0;
+  font-family: var(--serif);
+  font-size: clamp(4rem, 9vw, 9.4rem);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+  line-height: 0.73;
+}
+
+.hero-statement {
+  grid-column: 7 / -1;
+}
+
+.hero-statement h2 {
+  max-width: 13ch;
+  margin-bottom: 1.5rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.4vw, 4.5rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+}
+
+.hero-statement > p {
+  max-width: 40rem;
+  margin-bottom: 1.75rem;
+  color: var(--muted);
+  font-size: clamp(0.9rem, 1.25vw, 1.06rem);
+  line-height: 1.65;
+}
+
+.signal-strip {
+  display: grid;
+  overflow: hidden;
+  margin-top: 1.25rem;
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--paper);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.signal-metric {
+  display: flex;
+  min-height: 166px;
+  padding: 1.25rem;
+  flex-direction: column;
+  border-right: 1px solid rgb(255 253 245 / 24%);
+}
+
+.signal-metric:last-child {
+  border-right: 0;
+}
+
+.signal-metric strong {
+  margin-bottom: auto;
+  color: var(--citron);
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 5vw, 5.2rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.86;
+}
+
+.signal-metric span {
+  margin-top: 1.75rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.signal-metric small {
+  margin-top: 0.45rem;
+  color: rgb(255 253 245 / 56%);
+  letter-spacing: 0.09em;
+}
+

@@ -1,0 +1,296 @@
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .frame-reveal {
+      animation: atlas-reveal both linear;
+      animation-range: entry 8% cover 34%;
+      animation-timeline: view();
+    }
+
+    @keyframes atlas-reveal {
+      from {
+        opacity: 0.4;
+        transform: translateY(26px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+@media (max-width: 980px) {
+  :root {
+    --shell: min(100vw - 40px, 1440px);
+  }
+
+  .hero-identity {
+    grid-column: 1 / span 6;
+  }
+
+  .hero-statement {
+    grid-column: 7 / -1;
+  }
+
+  .craft-heading,
+  .experience-intro .section-heading,
+  .projects-intro .section-heading {
+    grid-column: 1 / span 7;
+  }
+
+  .craft-copy,
+  .experience-kicker,
+  .projects-intro > p {
+    grid-column: 8 / -1;
+  }
+
+  .project-meta {
+    grid-column: 1 / span 4;
+  }
+
+  .project-title {
+    grid-column: 5 / -1;
+  }
+
+  .project-art {
+    grid-column: 1 / span 7;
+  }
+
+  .case-study-copy,
+  .repository-link {
+    grid-column: 8 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --shell: calc(100vw - 28px);
+    --radius: 12px;
+  }
+
+  html {
+    scroll-padding-top: 7rem;
+  }
+
+  .site-nav {
+    min-height: 54px;
+  }
+
+  .nav-links {
+    max-width: 74vw;
+    gap: 0.8rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    scrollbar-width: none;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links a {
+    flex: 0 0 auto;
+    font-size: 0.58rem;
+  }
+
+  .nav-name {
+    display: none;
+  }
+
+  .editorial-grid,
+  .project-grid {
+    display: block;
+  }
+
+  .hero-section {
+    padding-top: 0.8rem;
+  }
+
+  .board-meta {
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    font-size: 0.54rem;
+  }
+
+  .board-meta p:nth-child(2) {
+    display: none;
+  }
+
+  .atlas-picture--hero {
+    aspect-ratio: 4 / 4.5;
+  }
+
+  .atlas-picture--hero img {
+    object-position: 55% center;
+  }
+
+  .art-caption {
+    right: 0.8rem;
+    bottom: 0.8rem;
+    left: 0.8rem;
+    font-size: 0.53rem;
+  }
+
+  .hero-copy {
+    padding: 1.8rem 0 2.5rem;
+  }
+
+  .hero-identity {
+    margin-bottom: 2.4rem;
+  }
+
+  .hero-identity h1 {
+    font-size: clamp(4.7rem, 24vw, 7rem);
+    line-height: 0.78;
+  }
+
+  .hero-statement h2 {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+  }
+
+  .signal-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .signal-metric {
+    min-height: 150px;
+    border-bottom: 1px solid rgb(255 253 245 / 24%);
+  }
+
+  .signal-metric:nth-child(2) {
+    border-right: 0;
+  }
+
+  .signal-metric:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .signal-metric strong {
+    font-size: clamp(2.7rem, 15vw, 4.2rem);
+  }
+
+  .craft-heading,
+  .craft-copy,
+  .experience-kicker,
+  .projects-intro > p,
+  .contact-copy > div:last-child {
+    margin-top: 2rem;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(3.5rem, 17vw, 6rem);
+  }
+
+  .craft-art,
+  .experience-art,
+  .project-art,
+  .contact-art {
+    aspect-ratio: 4 / 3;
+  }
+
+  .craft-notes {
+    margin-top: 1rem;
+  }
+
+  .experience-intro,
+  .projects-intro {
+    margin-bottom: 0;
+  }
+
+  .flight-entry {
+    display: grid;
+    min-height: auto;
+    padding: 1.2rem 0 1.5rem;
+    grid-template-columns: 2.5rem 1fr;
+  }
+
+  .flight-index {
+    grid-row: 1 / span 3;
+    grid-column: 1;
+  }
+
+  .flight-entry > div,
+  .flight-summary,
+  .flight-period {
+    grid-column: 2;
+  }
+
+  .flight-entry > div {
+    margin-bottom: 1rem;
+  }
+
+  .flight-summary {
+    margin-bottom: 1rem;
+  }
+
+  .flight-period {
+    text-align: left;
+  }
+
+  .flight-period span {
+    display: inline;
+    margin: 0 0 0 0.6rem;
+  }
+
+  .project-title h3 {
+    font-size: clamp(4rem, 19vw, 6rem);
+  }
+
+  .project-art {
+    margin-top: 2.5rem;
+  }
+
+  .case-study-copy {
+    padding: 2rem 0 0;
+  }
+
+  .repository-link,
+  .project-chapter--2 .repository-link {
+    display: inline-block;
+    margin: 0.5rem 0 0;
+  }
+
+  .contact-copy h2 {
+    font-size: clamp(4.5rem, 23vw, 7rem);
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr auto;
+    row-gap: 1.5rem;
+  }
+
+  .site-footer > div {
+    justify-self: end;
+  }
+
+  .site-footer > a {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 420px) {
+  .signal-metric {
+    padding: 1rem;
+  }
+
+  .signal-metric span {
+    font-size: 0.69rem;
+  }
+
+  .site-footer > div {
+    gap: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

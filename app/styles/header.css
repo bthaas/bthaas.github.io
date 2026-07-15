@@ -1,0 +1,68 @@
+.site-header {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  border-bottom: 1px solid var(--rule);
+  background: rgb(243 239 227 / 90%);
+  backdrop-filter: blur(16px);
+}
+
+.site-nav {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-name {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+}
+
+.nav-links a,
+.text-link,
+.repository-link,
+.site-footer a {
+  position: relative;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.nav-links a::after,
+.text-link::after,
+.repository-link::after,
+.site-footer a::after {
+  position: absolute;
+  right: 0;
+  bottom: -0.35rem;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 300ms var(--ease-out);
+}
+
+.nav-links a:hover::after,
+.text-link:hover::after,
+.repository-link:hover::after,
+.site-footer a:hover::after,
+.nav-links a:focus-visible::after,
+.text-link:focus-visible::after,
+.repository-link:focus-visible::after,
+.site-footer a:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+

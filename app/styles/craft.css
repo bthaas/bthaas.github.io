@@ -1,0 +1,67 @@
+.craft-section {
+  padding: clamp(5rem, 10vw, 10rem) 0;
+  background: var(--citron);
+}
+
+.craft-layout {
+  align-items: start;
+}
+
+.section-heading h2 {
+  margin-bottom: 0;
+  font-family: var(--serif);
+  font-size: clamp(3.1rem, 7.5vw, 7.8rem);
+  font-weight: 500;
+  letter-spacing: -0.07em;
+  line-height: 0.88;
+}
+
+.craft-heading {
+  grid-column: 1 / span 6;
+}
+
+.craft-heading h2 {
+  max-width: 8ch;
+}
+
+.craft-copy {
+  grid-column: 8 / -1;
+  padding-top: 2.1rem;
+}
+
+.craft-copy p,
+.experience-kicker,
+.projects-intro > p,
+.contact-copy p {
+  font-size: clamp(0.94rem, 1.35vw, 1.14rem);
+  line-height: 1.6;
+}
+
+.craft-copy .lede {
+  margin-bottom: 1.25rem;
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.7vw, 2.8rem);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.craft-art {
+  grid-column: 1 / span 9;
+  aspect-ratio: 16 / 9;
+  margin-top: clamp(3rem, 6vw, 6rem);
+}
+
+.craft-notes {
+  display: grid;
+  align-self: end;
+  grid-column: 10 / -1;
+  margin-top: clamp(3rem, 6vw, 6rem);
+  border-top: 1px solid var(--ink);
+}
+
+.craft-notes p {
+  margin: 0;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--ink);
+}
+
