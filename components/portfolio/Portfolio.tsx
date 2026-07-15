@@ -4,12 +4,14 @@ import {
   type ExperienceEntry,
   type ProjectVisualKey,
 } from '@/content/site-content'
+import { getProjectDirection } from '@/lib/atlas-motion/project-choreography'
 
 interface AtlasPictureProps {
   readonly visual: AtlasVisual
   readonly alt: string
   readonly className?: string
   readonly priority?: boolean
+  readonly projectPan?: boolean
   readonly reveal?: boolean
   readonly sizes: string
 }
@@ -25,11 +27,16 @@ function AtlasPicture({
   alt,
   className,
   priority = false,
+  projectPan = false,
   reveal = false,
   sizes,
 }: AtlasPictureProps) {
   return (
-    <picture className={className} data-reveal={reveal ? '' : undefined}>
+    <picture
+      className={className}
+      data-project-pan={projectPan ? '' : undefined}
+      data-reveal={reveal ? '' : undefined}
+    >
       <source
         type="image/avif"
         srcSet={`${visual.smallSrc} ${visual.smallWidth}w, ${visual.src} ${visual.width}w`}
@@ -194,7 +201,13 @@ export function Portfolio() {
           </div>
         </section>
 
-        <section className="craft-section" id="craft" aria-labelledby="craft-title">
+        <section
+          className="craft-section chapter-wipe chapter-wipe--ltr"
+          id="craft"
+          aria-labelledby="craft-title"
+          data-chapter-wipe
+          data-wipe-direction="ltr"
+        >
           <div className="atlas-shell craft-layout">
             <div className="craft-narrative editorial-grid">
               <div className="section-heading craft-heading">
@@ -333,15 +346,19 @@ export function Portfolio() {
           <div className="project-chapters">
             {projects.map((project, index) => (
               <article
-                className={`project-chapter project-chapter--${index + 1}`}
+                className={`project-chapter project-chapter--${index + 1} chapter-wipe chapter-wipe--${getProjectDirection(index)}`}
                 data-testid="project-case-study"
+                data-chapter-wipe
+                data-wipe-direction={getProjectDirection(index)}
                 id={`project-${project.id}`}
                 key={project.id}
               >
                 <div className="atlas-shell project-grid">
-                  <div className="project-meta">
-                    <p className="eyebrow">Case {String(index + 1).padStart(2, '0')}</p>
-                    <p>{project.technologies.join(' · ')}</p>
+                  <div className="project-meta" data-reveal-stagger>
+                    <p className="eyebrow project-case-label">
+                      Case {String(index + 1).padStart(2, '0')}
+                    </p>
+                    <p className="project-tech-list">{project.technologies.join(' · ')}</p>
                   </div>
 
                   <div className="project-title">
@@ -353,11 +370,12 @@ export function Portfolio() {
                     visual={atlasVisuals.projects[project.visualKey]}
                     alt={projectAlts[project.visualKey]}
                     className="atlas-picture project-art frame-reveal"
+                    projectPan
                     reveal
                     sizes="(max-width: 720px) 100vw, 58vw"
                   />
 
-                  <div className="case-study-copy">
+                  <div className="case-study-copy" data-reveal-stagger>
                     <div>
                       <h4>Brief</h4>
                       <p>{project.caseStudy.brief}</p>
@@ -378,6 +396,7 @@ export function Portfolio() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={`View ${project.name} repository`}
+                    data-magnetic
                   >
                     Repository <span aria-hidden="true">↗</span>
                   </a>
