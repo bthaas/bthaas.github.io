@@ -327,6 +327,15 @@
     display: none;
   }
 
+  .sun-arc {
+    top: 27px;
+    right: 0;
+    left: auto;
+    width: 7rem;
+    height: 24px;
+    transform: none;
+  }
+
   .editorial-grid,
   .project-grid {
     display: block;

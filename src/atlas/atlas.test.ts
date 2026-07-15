@@ -6,6 +6,7 @@ import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
 import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
 import { splitText } from './split-text'
+import { setupSectionWayfinding, setupSunArc, SUN_PROGRESS_EVENT } from './sun-arc'
 
 describe('atlas DOM capabilities', () => {
   beforeEach(() => {
@@ -133,6 +134,62 @@ describe('atlas DOM capabilities', () => {
     cleanup()
   })
 
+  it('moves the header sun from shared progress and publishes the Step 7 handshake', () => {
+    document.body.innerHTML = `
+      <svg><g data-atlas-sun></g></svg>
+      <section id="experience"></section>
+    `
+    const dispatchEvent = vi.spyOn(window, 'dispatchEvent')
+    const cleanup = setupSunArc(document, window, () => 0.4)
+
+    window.dispatchEvent(new CustomEvent('atlas:scroll', {
+      detail: { documentProgress: 0.4, scrollY: 1000 },
+    }))
+
+    expect(document.querySelector('[data-atlas-sun]')).toHaveAttribute(
+      'transform',
+      'translate(112 -14)',
+    )
+    expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: SUN_PROGRESS_EVENT }))
+    cleanup()
+  })
+
+  it('sets one active nav link from the four observed narrative sections', () => {
+    document.body.innerHTML = `
+      <nav>
+        <div class="nav-links">
+          <a href="#craft">Craft</a><a href="#experience">Trajectory</a>
+          <a href="#projects">Work</a><a href="#contact">Contact</a>
+        </div>
+      </nav>
+      <section id="craft"></section><section id="experience"></section>
+      <section id="projects"></section><section id="contact"></section>
+    `
+    const observed: Element[] = []
+    let update: IntersectionObserverCallback | undefined
+    const cleanup = setupSectionWayfinding(document, (callback) => {
+      update = callback
+      return {
+        disconnect: vi.fn(),
+        observe: (target: Element) => observed.push(target),
+        unobserve: vi.fn(),
+      } as unknown as IntersectionObserver
+    })
+
+    update?.([
+      { boundingClientRect: { top: 100 }, isIntersecting: true, target: observed[0] },
+    ] as IntersectionObserverEntry[], {} as IntersectionObserver)
+    expect(document.querySelector('a[href="#craft"]')).toHaveAttribute('aria-current', 'true')
+
+    update?.([
+      { boundingClientRect: { top: -100 }, isIntersecting: false, target: observed[0] },
+      { boundingClientRect: { top: 120 }, isIntersecting: true, target: observed[1] },
+    ] as IntersectionObserverEntry[], {} as IntersectionObserver)
+    expect(document.querySelector('a[href="#craft"]')).not.toHaveAttribute('aria-current')
+    expect(document.querySelector('a[href="#experience"]')).toHaveAttribute('aria-current', 'true')
+    cleanup()
+  })
+
   it('animates and cancels a count-up through requestAnimationFrame', () => {
     const callbacks: FrameRequestCallback[] = []
     const requestFrame = vi.fn((callback: FrameRequestCallback) => {
@@ -161,9 +218,12 @@ describe('atlas DOM capabilities', () => {
     const prepareHero = vi.fn()
     const prepareMetrics = vi.fn()
     const prepareReveals = vi.fn()
+    const cleanupWayfinding = vi.fn()
+    const prepareSun = vi.fn()
+    const prepareWayfinding = vi.fn(() => cleanupWayfinding)
     const matchMedia = vi.fn(() => ({ matches: true }))
 
-    initializeAtlas({
+    const cleanup = initializeAtlas({
       createBus,
       document,
       matchMedia,
@@ -171,6 +231,8 @@ describe('atlas DOM capabilities', () => {
       prepareHero,
       prepareMetrics,
       prepareReveals,
+      prepareSun,
+      prepareWayfinding,
       window,
     })
 
@@ -181,6 +243,10 @@ describe('atlas DOM capabilities', () => {
     expect(prepareHero).not.toHaveBeenCalled()
     expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
+    expect(prepareSun).not.toHaveBeenCalled()
+    expect(prepareWayfinding).toHaveBeenCalledOnce()
+    cleanup()
+    expect(cleanupWayfinding).toHaveBeenCalledOnce()
   })
 
   it('marks, publishes, and cleans up the enhanced runtime', () => {
@@ -191,6 +257,8 @@ describe('atlas DOM capabilities', () => {
     const cleanupEntrance = vi.fn()
     const cleanupHero = vi.fn()
     const cleanupMetrics = vi.fn()
+    const cleanupSun = vi.fn()
+    const cleanupWayfinding = vi.fn()
     const createBus = vi.fn(() => ({
       destroy: destroyBus,
       subscribe: (next: (snapshot: ScrollSnapshot) => void) => {
@@ -208,6 +276,8 @@ describe('atlas DOM capabilities', () => {
       prepareHero: () => cleanupHero,
       prepareMetrics: () => cleanupMetrics,
       prepareReveals: () => cleanupReveals,
+      prepareSun: () => cleanupSun,
+      prepareWayfinding: () => cleanupWayfinding,
       window,
     })
     subscriber?.({ documentProgress: 0.5, scrollY: 500 })
@@ -221,6 +291,8 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupEntrance).toHaveBeenCalledOnce()
     expect(cleanupHero).toHaveBeenCalledOnce()
     expect(cleanupMetrics).toHaveBeenCalledOnce()
+    expect(cleanupSun).toHaveBeenCalledOnce()
+    expect(cleanupWayfinding).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()
     expect(destroyBus).toHaveBeenCalledOnce()
   })
