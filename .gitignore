@@ -87,6 +87,7 @@ __pycache__/
 # Next.js build output
 .next
 out
+public/atlas.js
 
 # Nuxt.js build output
 .nuxt
@@ -143,5 +144,4 @@ coverage/
 # Local audit output and temporary generated assets
 artifacts/
 tmp/
-
 

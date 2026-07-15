@@ -1,0 +1,139 @@
+.projects-section {
+  padding-top: clamp(5rem, 10vw, 10rem);
+  background: var(--cream);
+}
+
+.projects-intro {
+  align-items: end;
+  padding-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+.projects-intro .section-heading {
+  grid-column: 1 / span 8;
+}
+
+.projects-intro > p {
+  grid-column: 9 / -1;
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.project-chapter {
+  padding: clamp(4rem, 8vw, 8rem) 0;
+}
+
+.project-chapter--1 {
+  background: var(--cobalt);
+  color: var(--paper);
+}
+
+.project-chapter--2 {
+  background: var(--citron);
+  color: var(--ink);
+}
+
+.project-chapter--3 {
+  background: var(--dusk);
+  color: var(--paper);
+}
+
+.project-grid {
+  align-items: start;
+}
+
+.project-meta {
+  grid-column: 1 / span 3;
+  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.project-meta p {
+  margin-bottom: 0.55rem;
+}
+
+.project-meta p:last-child {
+  max-width: 18rem;
+  color: currentColor;
+  font-size: 0.6rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.project-title {
+  grid-column: 5 / -1;
+  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.project-title h3 {
+  margin-bottom: 1rem;
+  font-family: var(--serif);
+  font-size: clamp(3.5rem, 8.7vw, 9rem);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+  line-height: 0.82;
+}
+
+.project-title p {
+  max-width: 42rem;
+  margin-bottom: 0;
+  font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+  line-height: 1.55;
+  opacity: 0.76;
+}
+
+.project-art {
+  grid-column: 1 / span 8;
+  aspect-ratio: 3 / 2;
+}
+
+.project-art img {
+  object-position: center;
+}
+
+.case-study-copy {
+  grid-column: 9 / -1;
+  padding-left: clamp(1rem, 2vw, 2rem);
+}
+
+.case-study-copy > div {
+  padding: 0 0 1.4rem;
+  border-bottom: 1px solid currentColor;
+  margin-bottom: 1.4rem;
+}
+
+.case-study-copy h4 {
+  margin-bottom: 0.55rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.case-study-copy p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  opacity: 0.78;
+}
+
+.repository-link {
+  grid-column: 9 / -1;
+  justify-self: start;
+  margin: 1.5rem 0 0 clamp(1rem, 2vw, 2rem);
+}
+
+.project-chapter--2 .project-art {
+  grid-column: 5 / -1;
+}
+
+.project-chapter--2 .case-study-copy {
+  grid-row: 3;
+  grid-column: 1 / span 4;
+  padding-right: clamp(1rem, 2vw, 2rem);
+  padding-left: 0;
+}
+
+.project-chapter--2 .repository-link {
+  grid-row: 4;
+  grid-column: 1 / span 4;
+  margin-left: 0;
+}
+
