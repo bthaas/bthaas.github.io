@@ -8,10 +8,64 @@
 }
 
 .site-nav {
+  position: relative;
   display: flex;
   min-height: 58px;
   align-items: center;
   justify-content: space-between;
+}
+
+.nav-name,
+.nav-links {
+  position: relative;
+  z-index: 1;
+}
+
+.sun-arc {
+  position: absolute;
+  top: 13px;
+  left: 50%;
+  width: clamp(9rem, 18vw, 15rem);
+  height: 32px;
+  color: var(--ink);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.sun-arc svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sun-arc__track,
+.sun-arc__horizon,
+.sun-arc__halo {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.sun-arc__track {
+  opacity: 0.2;
+}
+
+.sun-arc__horizon {
+  opacity: 0.42;
+}
+
+.sun-arc__halo {
+  stroke: var(--solar);
+  opacity: 0.55;
+}
+
+.sun-arc__disc {
+  fill: var(--solar);
+  stroke: var(--ink);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
 
 .nav-name {
@@ -66,3 +120,12 @@
   transform-origin: left;
 }
 
+.nav-links a[aria-current="true"]::after {
+  transform: scaleX(0.5);
+  transform-origin: left;
+}
+
+.nav-links a[aria-current="true"]:hover::after,
+.nav-links a[aria-current="true"]:focus-visible::after {
+  transform: scaleX(1);
+}

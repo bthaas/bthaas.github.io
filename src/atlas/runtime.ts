@@ -1,6 +1,7 @@
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
+import { setupSectionWayfinding, setupSunArc } from './sun-arc'
 
 interface AtlasRuntimeOptions {
   readonly createBus?: () => ScrollBus
@@ -10,6 +11,8 @@ interface AtlasRuntimeOptions {
   readonly prepareHero?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareReveals?: () => () => void
+  readonly prepareSun?: (document: Document, window: Window) => () => void
+  readonly prepareWayfinding?: (document: Document) => () => void
   readonly window?: Window
 }
 
@@ -21,9 +24,12 @@ export function initializeAtlas({
   prepareHero = setupHeroParallax,
   prepareMetrics = setupMetricCountUps,
   prepareReveals = setupReveals,
+  prepareSun = setupSunArc,
+  prepareWayfinding = setupSectionWayfinding,
   window: runtimeWindow = window,
 }: AtlasRuntimeOptions = {}): () => void {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return () => undefined
+  const cleanupWayfinding = prepareWayfinding(runtimeDocument)
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return cleanupWayfinding
 
   const html = runtimeDocument.documentElement
   html.classList.add('atlas-js')
@@ -32,6 +38,7 @@ export function initializeAtlas({
   const cleanupEntrance = prepareEntrance(runtimeDocument)
   const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
+  const cleanupSun = prepareSun(runtimeDocument, runtimeWindow)
   const scrollBus = createBus()
   const unsubscribe = scrollBus.subscribe((snapshot) => {
     runtimeWindow.dispatchEvent(new CustomEvent('atlas:scroll', { detail: snapshot }))
@@ -46,6 +53,8 @@ export function initializeAtlas({
     cleanupEntrance()
     cleanupHero()
     cleanupMetrics()
+    cleanupSun()
+    cleanupWayfinding()
     cleanupReveals()
     scrollBus.destroy()
     runtimeWindow.removeEventListener('pagehide', destroy)
