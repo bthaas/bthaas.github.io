@@ -10,7 +10,6 @@ export default defineConfig({
       '**/.git/**',
       '**/.next/**',
       '**/out/**',
-      '**/_legacy/**',
     ],
     coverage: {
       provider: 'v8',
