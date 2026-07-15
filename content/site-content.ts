@@ -15,10 +15,9 @@ export interface AboutItem {
   readonly targetId: string | null
 }
 
-export interface FeaturedMetric {
+export interface ProjectMetric {
   readonly value: string
   readonly label: string
-  readonly sourceId: string
 }
 
 export interface ProjectCaseStudy {
@@ -36,6 +35,7 @@ export interface Project {
   readonly description: string
   readonly longDescription: string
   readonly technologies: readonly string[]
+  readonly metrics: readonly ProjectMetric[]
   readonly caseStudy: ProjectCaseStudy
   readonly links: {
     readonly repository: string
@@ -86,7 +86,6 @@ export interface SiteContent {
   }
   readonly about: readonly AboutItem[]
   readonly craftCapabilities: readonly string[]
-  readonly featuredMetrics: readonly FeaturedMetric[]
   readonly projects: readonly Project[]
   readonly experience: readonly ExperienceEntry[]
   readonly education: readonly EducationEntry[]
@@ -172,28 +171,6 @@ export const siteContent = {
     'Production engineering',
     'Human-centered interfaces',
   ],
-  featuredMetrics: [
-    {
-      value: '616K+',
-      label: 'COCO captions filtered',
-      sourceId: 'uva-ml-research',
-    },
-    {
-      value: '28.9%',
-      label: 'RMS next-token bias reduction',
-      sourceId: 'uva-ml-research',
-    },
-    {
-      value: '55%',
-      label: 'load-time improvement',
-      sourceId: 'refraction-innovation-hub',
-    },
-    {
-      value: '99.5%',
-      label: 'crash-free sessions',
-      sourceId: 'refraction-innovation-hub',
-    },
-  ],
   projects: [
     {
       id: 'courtvision',
@@ -203,7 +180,17 @@ export const siteContent = {
         'Computer vision basketball analytics platform for shot tracking and player movement insights.',
       longDescription:
         'CourtVision analyzes basketball footage to extract event-level insights like shot attempts, player movement trends, and possession patterns. The project focuses on practical, coach-friendly metrics with a clean visualization layer for fast game review.',
-      technologies: ['Computer Vision', 'Python', 'Analytics', 'Sports Tech'],
+      technologies: ['React Native', 'TensorFlow Lite', 'Flask', 'WebSockets', 'AWS EC2'],
+      metrics: [
+        {
+          value: '89%',
+          label: 'shot-detection accuracy',
+        },
+        {
+          value: '<200ms',
+          label: 'on-device inference latency',
+        },
+      ],
       caseStudy: {
         brief:
           'Turn basketball footage into practical, coach-friendly signals for reviewing shots, movement, and possession.',
@@ -223,17 +210,27 @@ export const siteContent = {
       visualKey: 'beatstream',
       name: 'Beat Stream',
       description:
-        'Music streaming and discovery experience focused on smooth playback, curation, and social sharing.',
+        'A real-time collaborative music production platform built for low-latency multi-user sessions.',
       longDescription:
-        'BeatStream is a modern music web app centered on quick playback, rich discovery, and playlist sharing. The interface emphasizes fast interaction loops and clean information hierarchy so users can move from search to listening with minimal friction.',
-      technologies: ['React', 'Audio', 'Streaming', 'UI/UX'],
+        'BeatStream is a collaborative digital audio workstation where multiple users can produce music together in real time. WebSockets, operational transformation, and CRDT-based state management keep sessions responsive and synchronized.',
+      technologies: ['TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'WebSockets'],
+      metrics: [
+        {
+          value: '20+',
+          label: 'concurrent collaborators',
+        },
+        {
+          value: '<100ms',
+          label: 'real-time sync latency',
+        },
+      ],
       caseStudy: {
         brief:
-          'Make music discovery, playback, curation, and playlist sharing feel immediate in a modern web experience.',
+          'Let musicians produce together in the same browser-based session without collaboration getting in the way.',
         approach:
-          'Reduce the distance between search and listening with quick interaction loops and a clear information hierarchy.',
+          'Coordinate multi-user changes through WebSockets, operational transformation, and CRDT-based state management.',
         focus:
-          'React interface architecture, audio playback, discovery flows, and responsive product design.',
+          'Low-latency synchronization, complex PostgreSQL session models, and a component-driven Next.js interface.',
       },
       links: {
         repository: 'https://github.com/bthaas/BeatStream',
@@ -250,6 +247,20 @@ export const siteContent = {
       longDescription:
         'Vision Bias Steering is a research codebase for training, validating, and evaluating steering vectors that shift language-model outputs between spatial and descriptive captioning behavior. It includes local and multi-model sweep runners, evaluation utilities, and plotting workflows built around PyTorch, Transformers, and NNSight.',
       technologies: ['Python', 'PyTorch', 'NNSight', 'LLM Evaluation'],
+      metrics: [
+        {
+          value: '616K+',
+          label: 'COCO captions filtered',
+        },
+        {
+          value: '28.9%',
+          label: 'RMS next-token bias reduction',
+        },
+        {
+          value: '<0.1%',
+          label: 'output degeneration',
+        },
+      ],
       caseStudy: {
         brief:
           'Study whether inference-time steering can shift captions between spatial and descriptive language without retraining model weights.',

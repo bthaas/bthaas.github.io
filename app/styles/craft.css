@@ -1,5 +1,5 @@
 .craft-section {
-  --chapter-wipe-base: var(--cream);
+  --chapter-wipe-base: var(--dusk);
   --chapter-wipe-color: var(--citron);
   position: relative;
   isolation: isolate;

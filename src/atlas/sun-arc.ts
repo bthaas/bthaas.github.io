@@ -6,7 +6,7 @@ import {
 
 import type { ScrollSnapshot } from './scroll-bus'
 
-const WAYPOINT_IDS = ['craft', 'experience', 'projects', 'contact'] as const
+const WAYPOINT_IDS = ['experience', 'projects', 'craft', 'contact'] as const
 
 type ObserverFactory = (
   callback: IntersectionObserverCallback,

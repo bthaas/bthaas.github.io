@@ -486,8 +486,13 @@
   }
 
   .case-study-copy,
+  .project-results,
   .repository-link {
     grid-column: 8 / -1;
+  }
+
+  .project-chapter--2 .project-results {
+    grid-column: 1 / span 4;
   }
 }
 
@@ -586,27 +591,6 @@
     font-size: clamp(2.5rem, 12vw, 4rem);
   }
 
-  .signal-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .signal-metric {
-    min-height: 150px;
-    border-bottom: 1px solid rgb(255 253 245 / 24%);
-  }
-
-  .signal-metric:nth-child(2) {
-    border-right: 0;
-  }
-
-  .signal-metric:nth-last-child(-n + 2) {
-    border-bottom: 0;
-  }
-
-  .signal-metric strong {
-    font-size: clamp(2.7rem, 15vw, 4.2rem);
-  }
-
   .craft-heading,
   .craft-copy,
   .experience-kicker,
@@ -682,6 +666,16 @@
     padding: 2rem 0 0;
   }
 
+  .project-results,
+  .project-chapter--2 .project-results {
+    padding: 0;
+    margin-top: 0.5rem;
+  }
+
+  .project-results__metrics dt {
+    font-size: clamp(2.3rem, 13vw, 3.8rem);
+  }
+
   .repository-link,
   .project-chapter--2 .repository-link {
     display: inline-block;
@@ -721,14 +715,6 @@
 }
 
 @media (max-width: 420px) {
-  .signal-metric {
-    padding: 1rem;
-  }
-
-  .signal-metric span {
-    font-size: 0.69rem;
-  }
-
   .site-footer > div {
     gap: 0.85rem;
   }

@@ -6,17 +6,24 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
 const scriptPreloadPattern = /<link\b(?=[^>]*\brel="preload")(?=[^>]*\bas="script")[^>]*\/?>(?:<\/link>)?/gi
 const atlasScriptSourcePattern = /\bsrc=(['"])\/atlas\.js\1/i
+const atlasScriptTag = '<script src="/atlas.js" defer></script>'
 const atlasBudgetBytes = 12 * 1024
 
 export function stripStaticRuntime(source) {
   let atlasScriptKept = false
-  return source.replace(scriptPreloadPattern, '').replace(scriptPattern, (script) => {
+  const stripped = source.replace(scriptPreloadPattern, '').replace(scriptPattern, (script) => {
     if (!atlasScriptKept && atlasScriptSourcePattern.test(script)) {
       atlasScriptKept = true
       return script
     }
     return ''
   })
+
+  if (atlasScriptKept) return stripped
+  if (/<\/body>/i.test(stripped)) {
+    return stripped.replace(/<\/body>/i, `${atlasScriptTag}</body>`)
+  }
+  return `${stripped}${atlasScriptTag}`
 }
 
 export function assertAtlasBudget(gzipBytes) {
@@ -59,7 +66,7 @@ async function main() {
   const { gzipBytes, htmlFiles } = await processStaticExport(exportDirectory, atlasPath)
 
   console.log(
-    `Preserved /atlas.js (${gzipBytes} bytes gzip) and removed the framework runtime from ${htmlFiles.length} static HTML files.`,
+    `Ensured /atlas.js (${gzipBytes} bytes gzip) and removed the framework runtime from ${htmlFiles.length} static HTML files.`,
   )
 }
 

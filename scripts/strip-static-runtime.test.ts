@@ -22,6 +22,15 @@ describe('static runtime stripping', () => {
     expect(stripped).not.toContain('/_next/runtime.js')
   })
 
+  it('injects one deferred Atlas script when Next schedules it through its runtime', () => {
+    const html = '<html><body><main>Portfolio</main><script>self.__next_s.push([])</script></body></html>'
+
+    const stripped = stripStaticRuntime(html)
+
+    expect(stripped.match(/<script/g)).toHaveLength(1)
+    expect(stripped).toContain('<script src="/atlas.js" defer></script></body>')
+  })
+
   it('enforces the inclusive 12 KiB gzip ceiling', () => {
     expect(() => assertAtlasBudget(12 * 1024)).not.toThrow()
     expect(() => assertAtlasBudget(12 * 1024 + 1)).toThrow(/12 KiB/)
@@ -45,7 +54,9 @@ describe('static runtime stripping', () => {
       expect(await readFile(join(root, 'index.html'), 'utf8')).toBe(
         '<script src="/atlas.js"></script>',
       )
-      expect(await readFile(join(nested, 'page.html'), 'utf8')).toBe('')
+      expect(await readFile(join(nested, 'page.html'), 'utf8')).toBe(
+        '<script src="/atlas.js" defer></script>',
+      )
     } finally {
       await rm(root, { force: true, recursive: true })
     }

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 
 import './globals.css'
 
@@ -79,12 +80,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           imageSizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
           fetchPriority="high"
         />
-        <script src="/atlas.js" defer />
         <noscript>
           <style>{noScriptHeroStyles}</style>
         </noscript>
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Script src="/atlas.js" strategy="afterInteractive" />
+      </body>
     </html>
   )
 }

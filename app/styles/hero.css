@@ -3,8 +3,7 @@
 .art-caption,
 .flight-index,
 .project-meta,
-.craft-notes,
-.signal-metric small {
+.craft-notes {
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -124,49 +123,4 @@
   color: var(--muted);
   font-size: clamp(0.9rem, 1.25vw, 1.06rem);
   line-height: 1.65;
-}
-
-.signal-strip {
-  display: grid;
-  overflow: hidden;
-  margin-top: 1.25rem;
-  border-radius: 12px;
-  background: var(--ink);
-  color: var(--paper);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.signal-metric {
-  display: flex;
-  min-height: 166px;
-  padding: 1.25rem;
-  flex-direction: column;
-  border-right: 1px solid rgb(255 253 245 / 24%);
-}
-
-.signal-metric:last-child {
-  border-right: 0;
-}
-
-.signal-metric strong {
-  margin-bottom: auto;
-  color: var(--citron);
-  font-family: var(--serif);
-  font-size: clamp(2.6rem, 5vw, 5.2rem);
-  font-weight: 500;
-  letter-spacing: -0.06em;
-  line-height: 0.86;
-}
-
-.signal-metric span {
-  margin-top: 1.75rem;
-  font-size: 0.76rem;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.signal-metric small {
-  margin-top: 0.45rem;
-  color: rgb(255 253 245 / 56%);
-  letter-spacing: 0.09em;
 }

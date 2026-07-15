@@ -16,15 +16,15 @@ describe('Portfolio', () => {
         name: 'I build intelligent systems that hold up in the real world.',
       }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'The craft behind the flight.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Trajectory' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Selected work' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'The craft behind the flight.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Keep building.' })).toBeInTheDocument()
 
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
     )
-    expect(ids).toEqual(['hero', 'craft', 'experience', 'projects', 'contact'])
+    expect(ids).toEqual(['hero', 'experience', 'projects', 'craft', 'contact'])
   })
 
   it('keeps navigation visible, concise, and anchored to the editorial sections', () => {
@@ -35,17 +35,17 @@ describe('Portfolio', () => {
       'href',
       '#hero',
     )
-    expect(within(navigation).getByRole('link', { name: 'Craft' })).toHaveAttribute(
-      'href',
-      '#craft',
-    )
-    expect(within(navigation).getByRole('link', { name: 'Trajectory' })).toHaveAttribute(
+    expect(within(navigation).getByRole('link', { name: 'Experience' })).toHaveAttribute(
       'href',
       '#experience',
     )
-    expect(within(navigation).getByRole('link', { name: 'Work' })).toHaveAttribute(
+    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
       'href',
       '#projects',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Craft' })).toHaveAttribute(
+      'href',
+      '#craft',
     )
     expect(within(navigation).getByRole('link', { name: 'Contact' })).toHaveAttribute(
       'href',
@@ -53,30 +53,17 @@ describe('Portfolio', () => {
     )
   })
 
-  it('surfaces the four verified field metrics with their source labels', () => {
-    render(<Portfolio />)
+  it('removes the standalone metrics strip from the hero', () => {
+    const { container } = render(<Portfolio />)
 
-    const metrics = screen.getAllByTestId('featured-metric')
-    expect(metrics).toHaveLength(4)
-    expect(metrics.map((metric) => within(metric).getByTestId('metric-value').textContent)).toEqual([
-      '616K+',
-      '28.9%',
-      '55%',
-      '99.5%',
-    ])
-    expect(screen.getByText('COCO captions filtered')).toBeInTheDocument()
-    expect(screen.getByText('RMS next-token bias reduction')).toBeInTheDocument()
-    expect(screen.getByText('load-time improvement')).toBeInTheDocument()
-    expect(screen.getByText('crash-free sessions')).toBeInTheDocument()
+    expect(container.querySelector('.signal-strip')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('featured-metric')).not.toBeInTheDocument()
   })
 
   it('labels portfolio groups with valid native and ARIA semantics', () => {
     render(<Portfolio />)
 
     expect(screen.getByRole('group', { name: 'Portfolio introduction' })).toBeInTheDocument()
-
-    const metrics = screen.getByRole('list', { name: 'Selected verified results' })
-    expect(within(metrics).getAllByRole('listitem')).toHaveLength(4)
 
     expect(
       screen.getByRole('region', { name: 'Core capabilities ticker; focus to pause' }),
@@ -192,6 +179,33 @@ describe('Portfolio', () => {
     expect(
       screen.getByRole('link', { name: 'View Vision Bias Steering repository' }),
     ).toHaveAttribute('href', 'https://github.com/bthaas/vision-bias-steering')
+  })
+
+  it('reveals resume-verified stats when each project results control is clicked', () => {
+    render(<Portfolio />)
+
+    const expectedMetrics = [
+      ['89%', '<200ms'],
+      ['20+', '<100ms'],
+      ['616K+', '28.9%'],
+    ]
+    const projectNames = ['Court Vision', 'Beat Stream', 'Vision Bias Steering']
+
+    screen.getAllByTestId('project-case-study').forEach((study, index) => {
+      const results = within(study).getByTestId('project-results')
+      const toggle = within(results).getByText('View project results')
+
+      expect(results).not.toHaveAttribute('open')
+      expect(toggle.closest('summary')).toHaveAttribute(
+        'aria-label',
+        `View ${projectNames[index]} results`,
+      )
+      fireEvent.click(toggle)
+      expect(results).toHaveAttribute('open')
+      expectedMetrics[index].forEach((value) => {
+        expect(within(results).getByText(value)).toBeInTheDocument()
+      })
+    })
   })
 
   it('marks project chapters for alternating wipes, pans, cascades, and magnetic links', () => {

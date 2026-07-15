@@ -489,12 +489,12 @@ describe('atlas DOM capabilities', () => {
     document.body.innerHTML = `
       <nav>
         <div class="nav-links">
-          <a href="#craft">Craft</a><a href="#experience">Trajectory</a>
-          <a href="#projects">Work</a><a href="#contact">Contact</a>
+          <a href="#experience">Experience</a><a href="#projects">Projects</a>
+          <a href="#craft">Craft</a><a href="#contact">Contact</a>
         </div>
       </nav>
-      <section id="craft"></section><section id="experience"></section>
-      <section id="projects"></section><section id="contact"></section>
+      <section id="experience"></section><section id="projects"></section>
+      <section id="craft"></section><section id="contact"></section>
     `
     const observed: Element[] = []
     let update: IntersectionObserverCallback | undefined
@@ -510,14 +510,14 @@ describe('atlas DOM capabilities', () => {
     update?.([
       { boundingClientRect: { top: 100 }, isIntersecting: true, target: observed[0] },
     ] as IntersectionObserverEntry[], {} as IntersectionObserver)
-    expect(document.querySelector('a[href="#craft"]')).toHaveAttribute('aria-current', 'true')
+    expect(document.querySelector('a[href="#experience"]')).toHaveAttribute('aria-current', 'true')
 
     update?.([
       { boundingClientRect: { top: -100 }, isIntersecting: false, target: observed[0] },
       { boundingClientRect: { top: 120 }, isIntersecting: true, target: observed[1] },
     ] as IntersectionObserverEntry[], {} as IntersectionObserver)
-    expect(document.querySelector('a[href="#craft"]')).not.toHaveAttribute('aria-current')
-    expect(document.querySelector('a[href="#experience"]')).toHaveAttribute('aria-current', 'true')
+    expect(document.querySelector('a[href="#experience"]')).not.toHaveAttribute('aria-current')
+    expect(document.querySelector('a[href="#projects"]')).toHaveAttribute('aria-current', 'true')
     cleanup()
   })
 

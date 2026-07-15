@@ -18,22 +18,19 @@ describe('siteContent', () => {
       expect(project.caseStudy.brief.length).toBeGreaterThan(20)
       expect(project.caseStudy.approach.length).toBeGreaterThan(20)
       expect(project.caseStudy.focus.length).toBeGreaterThan(20)
+      expect(project.metrics.length).toBeGreaterThanOrEqual(2)
+      expect(project.metrics.every(({ value, label }) => value.length > 0 && label.length > 8)).toBe(
+        true,
+      )
     }
   })
 
-  it('keeps every featured metric verified and traceable to an experience entry', () => {
-    expect(siteContent.featuredMetrics.map(({ value }) => value)).toEqual([
-      '616K+',
-      '28.9%',
-      '55%',
-      '99.5%',
+  it('keeps resume-verified metrics attached to the matching projects', () => {
+    expect(siteContent.projects.map(({ metrics }) => metrics.map(({ value }) => value))).toEqual([
+      ['89%', '<200ms'],
+      ['20+', '<100ms'],
+      ['616K+', '28.9%', '<0.1%'],
     ])
-
-    const experienceIds = new Set(siteContent.experience.map(({ id }) => id))
-    expect(siteContent.featuredMetrics).toHaveLength(4)
-    expect(
-      siteContent.featuredMetrics.every(({ sourceId }) => experienceIds.has(sourceId)),
-    ).toBe(true)
   })
 
   it('preserves the current experience and education details', () => {

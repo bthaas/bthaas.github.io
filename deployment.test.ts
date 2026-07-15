@@ -19,4 +19,12 @@ describe('GitHub Pages export', () => {
 
     expect(workflow).toContain('cp -R out/_next out/static-v1/_next')
   })
+
+  it('starts the Atlas enhancement only after React hydration', () => {
+    const layout = readFileSync(resolve(process.cwd(), 'app/layout.tsx'), 'utf8')
+
+    expect(layout).toContain("import Script from 'next/script'")
+    expect(layout).toContain('strategy="afterInteractive"')
+    expect(layout).not.toContain('<script src="/atlas.js"')
+  })
 })

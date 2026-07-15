@@ -121,8 +121,7 @@ function FlightDossier({ entry }: { readonly entry: ExperienceEntry }) {
 }
 
 export function Portfolio() {
-  const { identity, contact, featuredMetrics, experience, education, projects, craftCapabilities } =
-    siteContent
+  const { identity, contact, experience, education, projects, craftCapabilities } = siteContent
 
   return (
     <>
@@ -145,9 +144,9 @@ export function Portfolio() {
             </svg>
           </div>
           <div className="nav-links">
+            <a href="#experience">Experience</a>
+            <a href="#projects">Projects</a>
             <a href="#craft">Craft</a>
-            <a href="#experience">Trajectory</a>
-            <a href="#projects">Work</a>
             <a href="#contact">Contact</a>
           </div>
         </nav>
@@ -188,79 +187,6 @@ export function Portfolio() {
             </div>
           </div>
 
-          <div className="signal-strip" role="list" aria-label="Selected verified results">
-            {featuredMetrics.map((metric) => {
-              const source = experience.find(({ id }) => id === metric.sourceId)
-              return (
-                <div
-                  className="signal-metric"
-                  role="listitem"
-                  data-testid="featured-metric"
-                  key={metric.value}
-                >
-                  <strong data-atlas-count data-testid="metric-value">{metric.value}</strong>
-                  <span>{metric.label}</span>
-                  <small>{source?.organization}</small>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-
-        <section
-          className="craft-section chapter-wipe chapter-wipe--ltr"
-          id="craft"
-          aria-labelledby="craft-title"
-          data-chapter-wipe
-          data-wipe-direction="ltr"
-        >
-          <div className="atlas-shell craft-layout">
-            <div className="craft-narrative editorial-grid">
-              <div className="section-heading craft-heading">
-                <span className="craft-ghost" data-craft-ghost aria-hidden="true">
-                  01
-                </span>
-                <p className="eyebrow">01 / Craft</p>
-                <h2 id="craft-title">The craft behind the flight.</h2>
-              </div>
-              <div className="craft-copy">
-                <p className="lede">
-                  My work sits where software engineering, machine learning, and product judgment
-                  meet.
-                </p>
-                <p>
-                  I like difficult systems with visible stakes: steering model behavior, testing
-                  frontier agents, and shipping cross-platform products whose performance can be
-                  measured—not merely described.
-                </p>
-              </div>
-            </div>
-            <div className="craft-plate-row editorial-grid">
-              <AtlasPicture
-                visual={atlasVisuals.craft}
-                alt="A cliffside workshop with sculptural wings"
-                className="atlas-picture craft-art"
-                sizes="(max-width: 720px) 100vw, 66vw"
-              />
-              <div className="craft-notes" aria-label="Core capabilities">
-                {craftCapabilities.map((capability) => (
-                  <p key={capability}>{capability}</p>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div
-            className="craft-marquee"
-            data-craft-marquee
-            role="region"
-            aria-label="Core capabilities ticker; focus to pause"
-            tabIndex={0}
-          >
-            <div className="craft-marquee__track">
-              <CraftCapabilitySequence capabilities={craftCapabilities} />
-              <CraftCapabilitySequence capabilities={craftCapabilities} duplicate />
-            </div>
-          </div>
         </section>
 
         <section className="experience-section" id="experience" aria-labelledby="experience-title">
@@ -275,7 +201,7 @@ export function Portfolio() {
           <div className="atlas-shell">
             <div className="experience-intro editorial-grid">
               <div className="section-heading">
-                <p className="eyebrow">02 / Flight log</p>
+                <p className="eyebrow">01 / Flight log</p>
                 <h2 id="experience-title">Trajectory</h2>
               </div>
               <p className="experience-kicker">
@@ -340,12 +266,12 @@ export function Portfolio() {
         <section className="projects-section" id="projects" aria-labelledby="projects-title">
           <div className="atlas-shell projects-intro editorial-grid">
             <div className="section-heading">
-              <p className="eyebrow">03 / Field studies</p>
+              <p className="eyebrow">02 / Field studies</p>
               <h2 id="projects-title">Selected work</h2>
             </div>
             <p>
-              Three builds across computer vision, product interface, and language-model research.
-              Each chapter is presented in full—no hidden cards or modal detours.
+              Three builds across computer vision, real-time collaboration, and language-model
+              research. Open any project’s results to see the résumé-verified outcomes.
             </p>
           </div>
 
@@ -396,6 +322,23 @@ export function Portfolio() {
                     </div>
                   </div>
 
+                  <details className="project-results" data-testid="project-results">
+                    <summary aria-label={`View ${project.name} results`} data-cursor="expand">
+                      <span>View project results</span>
+                      <span className="project-results__symbol" aria-hidden="true">
+                        +
+                      </span>
+                    </summary>
+                    <dl className="project-results__metrics">
+                      {project.metrics.map((metric) => (
+                        <div key={`${metric.value}-${metric.label}`}>
+                          <dt>{metric.value}</dt>
+                          <dd>{metric.label}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </details>
+
                   <a
                     className="repository-link"
                     href={project.links.repository}
@@ -409,6 +352,62 @@ export function Portfolio() {
                 </div>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section
+          className="craft-section chapter-wipe chapter-wipe--ltr"
+          id="craft"
+          aria-labelledby="craft-title"
+          data-chapter-wipe
+          data-wipe-direction="ltr"
+        >
+          <div className="atlas-shell craft-layout">
+            <div className="craft-narrative editorial-grid">
+              <div className="section-heading craft-heading">
+                <span className="craft-ghost" data-craft-ghost aria-hidden="true">
+                  03
+                </span>
+                <p className="eyebrow">03 / Craft</p>
+                <h2 id="craft-title">The craft behind the flight.</h2>
+              </div>
+              <div className="craft-copy">
+                <p className="lede">
+                  My work sits where software engineering, machine learning, and product judgment
+                  meet.
+                </p>
+                <p>
+                  I like difficult systems with visible stakes: steering model behavior, testing
+                  frontier agents, and shipping cross-platform products whose performance can be
+                  measured—not merely described.
+                </p>
+              </div>
+            </div>
+            <div className="craft-plate-row editorial-grid">
+              <AtlasPicture
+                visual={atlasVisuals.craft}
+                alt="A cliffside workshop with sculptural wings"
+                className="atlas-picture craft-art"
+                sizes="(max-width: 720px) 100vw, 66vw"
+              />
+              <div className="craft-notes" aria-label="Core capabilities">
+                {craftCapabilities.map((capability) => (
+                  <p key={capability}>{capability}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div
+            className="craft-marquee"
+            data-craft-marquee
+            role="region"
+            aria-label="Core capabilities ticker; focus to pause"
+            tabIndex={0}
+          >
+            <div className="craft-marquee__track">
+              <CraftCapabilitySequence capabilities={craftCapabilities} />
+              <CraftCapabilitySequence capabilities={craftCapabilities} duplicate />
+            </div>
           </div>
         </section>
 

@@ -32,6 +32,7 @@
 .project-chapter--1 {
   --chapter-wipe-base: var(--cobalt-deep);
   --chapter-wipe-color: var(--cobalt);
+  --project-results-accent: var(--citron);
   --repository-inverted: var(--cobalt);
   background: var(--cobalt);
   color: var(--paper);
@@ -43,6 +44,7 @@
   --project-tech-start: -48px;
   --project-pan-start: 6.522%;
   --project-pan-end: -6.522%;
+  --project-results-accent: var(--cobalt);
   --repository-inverted: var(--citron);
   background: var(--citron);
   color: var(--ink);
@@ -51,6 +53,7 @@
 .project-chapter--3 {
   --chapter-wipe-base: var(--dusk-deep);
   --chapter-wipe-color: var(--dusk);
+  --project-results-accent: var(--citron);
   --repository-inverted: var(--dusk);
   background: var(--dusk);
   color: var(--paper);
@@ -150,6 +153,73 @@
   opacity: 0.78;
 }
 
+.project-results {
+  grid-column: 9 / -1;
+  padding-left: clamp(1rem, 2vw, 2rem);
+}
+
+.project-results summary {
+  display: flex;
+  padding: 0.85rem 0;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  align-items: center;
+  justify-content: space-between;
+  color: currentColor;
+  cursor: pointer;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.project-results summary::-webkit-details-marker {
+  display: none;
+}
+
+.project-results__symbol {
+  color: var(--project-results-accent);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 220ms var(--ease-out);
+}
+
+.project-results[open] .project-results__symbol {
+  transform: rotate(45deg);
+}
+
+.project-results__metrics {
+  display: grid;
+  margin: 0;
+  padding: 1rem 0 0.35rem;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.project-results__metrics > div {
+  padding-right: 0.5rem;
+}
+
+.project-results__metrics dt {
+  margin-bottom: 0.25rem;
+  color: var(--project-results-accent);
+  font-family: var(--serif);
+  font-size: clamp(2rem, 3.4vw, 3.3rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+
+.project-results__metrics dd {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
 .repository-link {
   --repository-foreground: currentColor;
   grid-column: 9 / -1;
@@ -204,8 +274,15 @@
   padding-left: 0;
 }
 
-.project-chapter--2 .repository-link {
+.project-chapter--2 .project-results {
   grid-row: 4;
+  grid-column: 1 / span 4;
+  padding-right: clamp(1rem, 2vw, 2rem);
+  padding-left: 0;
+}
+
+.project-chapter--2 .repository-link {
+  grid-row: 5;
   grid-column: 1 / span 4;
   margin-left: 0;
 }
