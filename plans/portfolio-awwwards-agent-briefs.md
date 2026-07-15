@@ -435,8 +435,17 @@ Next static export serves `404.html`).
    soft-light`/`overlay`, scrubbed opacity — artwork file untouched);
    simultaneously the header sun glyph lands on its horizon tick (consume
    Step 3's progress handshake).
-2. **"Keep building."** word-level mask reveal; `letter-spacing` eases
-   -0.08em → -0.06em across the section scroll span.
+2. **"Keep building."** word-level mask reveal on enter. The "type
+   exhales" effect is transform-only (invariant 8): `letter-spacing` stays
+   static at its current CSS value and is never animated. Instead, split
+   the headline into characters (Step 1's `splitText`) and scrub each
+   character's `translateX` outward from the headline's center,
+   proportional to its distance from center, across the section scroll
+   span — max spread ≈0.02em-equivalent per gap, so it reads as tracking
+   easing, not movement. If per-character offsets look noisy at display
+   size, fall back to one subtle `scaleX(1 → 1.01)` scrub on the headline
+   block (transform-origin center). Either way: no `letter-spacing`,
+   `font-*`, or other layout property in any scroll-linked animation.
 3. **Email link:** underline draw on enter + magnetic hover (reuse Step 6
    utility); keep serif scale.
 4. **Footer local time:** "Charlottesville, VA — HH:MM" rendered by
@@ -538,3 +547,12 @@ affected. Cloudflare dashboard changes (script-injection settings) are out of
 scope for Steps 5–7; the "only /atlas.js ships" check runs against the local
 production build (`out/`), and the live-domain Cloudflare script audit is a
 deferred Step 8 item.
+
+**2026-07-15 (later) — Step 7 task 2 letter-spacing scrub replaced.**
+The Step 7 executor correctly flagged that scroll-scrubbing `letter-spacing`
+is a layout animation with no exemption under invariant 8. Resolution: the
+static `letter-spacing` is unchanged; the exhale effect is now per-character
+`translateX` spread (via Step 1's `splitText`) or, as fallback, a subtle
+headline `scaleX` scrub — both compositor-only. A full sweep of the
+remaining unexecuted steps (7–8) found no other scroll-linked layout or
+paint property animations. Completed steps (0–6) are untouched.
