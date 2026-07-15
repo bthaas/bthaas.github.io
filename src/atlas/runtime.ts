@@ -6,7 +6,7 @@ import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
-import { setupProjectPanels, setupProjectPans } from './projects'
+import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
 import { setupSectionWayfinding, setupSunArc } from './sun-arc'
@@ -26,7 +26,6 @@ interface AtlasRuntimeOptions {
   readonly prepareMagnetic?: (document: Document) => () => void
   readonly prepareLocalTime?: (document: Document) => () => void
   readonly prepareProjects?: (document: Document, window: Window) => () => void
-  readonly prepareProjectPanels?: (document: Document) => () => void
   readonly prepareReveals?: () => () => void
   readonly prepareSun?: (document: Document, window: Window) => () => void
   readonly prepareWayfinding?: (document: Document) => () => void
@@ -49,7 +48,6 @@ export function initializeAtlas({
   prepareMagnetic = setupMagnetic,
   prepareLocalTime = setupLocalTime,
   prepareProjects = setupProjectPans,
-  prepareProjectPanels = setupProjectPanels,
   prepareReveals = setupReveals,
   prepareSun = setupSunArc,
   prepareWayfinding = setupSectionWayfinding,
@@ -58,13 +56,11 @@ export function initializeAtlas({
 }: AtlasRuntimeOptions = {}): () => void {
   const cleanupWayfinding = prepareWayfinding(runtimeDocument)
   const cleanupLocalTime = prepareLocalTime(runtimeDocument)
-  const cleanupProjectPanels = prepareProjectPanels(runtimeDocument)
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const cleanupDossiers = prepareDossiers(runtimeDocument)
     return () => {
       cleanupDossiers()
       cleanupLocalTime()
-      cleanupProjectPanels()
       cleanupWayfinding()
     }
   }
@@ -106,7 +102,6 @@ export function initializeAtlas({
     cleanupMetrics()
     cleanupMagnetic()
     cleanupProjects()
-    cleanupProjectPanels()
     cleanupSun()
     cleanupWipes()
     cleanupLocalTime()

@@ -157,86 +157,38 @@ describe('Portfolio', () => {
     document.documentElement.classList.remove('atlas-js')
   })
 
-  it('presents every project as an inline case study with a repository link', () => {
+  it('keeps project details off the homepage and links every panel to its own page', () => {
     render(<Portfolio />)
 
     const panelTriggers = screen.getAllByTestId('project-panel-trigger')
-    const studies = screen.getAllByTestId('project-case-study')
     expect(panelTriggers).toHaveLength(3)
-    expect(studies).toHaveLength(3)
+    expect(screen.queryAllByTestId('project-case-study')).toHaveLength(0)
 
     siteContent.projects.forEach((project, index) => {
       const trigger = panelTriggers[index]
 
-      expect(trigger).toHaveAttribute('href', `#project-${project.id}`)
-      expect(trigger).toHaveAttribute('aria-controls', `project-${project.id}`)
+      expect(trigger).toHaveAttribute('href', `/projects/${project.id}`)
+      expect(trigger).not.toHaveAttribute('aria-controls')
+      expect(trigger).not.toHaveAttribute('aria-expanded')
       expect(within(trigger).getByText(project.name)).toBeInTheDocument()
       expect(within(trigger).getByText(project.description)).toBeInTheDocument()
-      expect(studies[index]).not.toHaveAttribute('hidden')
     })
 
-    expect(within(studies[0]).getByRole('heading', { name: 'Court Vision' })).toBeInTheDocument()
-    expect(within(studies[1]).getByRole('heading', { name: 'Beat Stream' })).toBeInTheDocument()
-    expect(
-      within(studies[2]).getByRole('heading', { name: 'Vision Bias Steering' }),
-    ).toBeInTheDocument()
-
-    expect(screen.getByRole('link', { name: 'View Court Vision repository' })).toHaveAttribute(
-      'href',
-      'https://github.com/bthaas/CourtVision',
-    )
-    expect(screen.getByRole('link', { name: 'View Beat Stream repository' })).toHaveAttribute(
-      'href',
-      'https://github.com/bthaas/BeatStream',
-    )
-    expect(
-      screen.getByRole('link', { name: 'View Vision Bias Steering repository' }),
-    ).toHaveAttribute('href', 'https://github.com/bthaas/vision-bias-steering')
+    expect(screen.queryByText('View project results')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /repository/i })).not.toBeInTheDocument()
   })
 
-  it('reveals resume-verified stats when each project results control is clicked', () => {
+  it('marks project panels for staggered reveals and scroll-linked image pans', () => {
     render(<Portfolio />)
 
-    const expectedMetrics = [
-      ['89%', '<200ms'],
-      ['20+', '<100ms'],
-      ['616K+', '28.9%'],
-    ]
-    const projectNames = ['Court Vision', 'Beat Stream', 'Vision Bias Steering']
+    const panelList = screen.getByRole('navigation', { name: 'Select a project' })
+    const panels = screen.getAllByTestId('project-panel-trigger')
 
-    screen.getAllByTestId('project-case-study').forEach((study, index) => {
-      const results = within(study).getByTestId('project-results')
-      const toggle = within(results).getByText('View project results')
-
-      expect(results).not.toHaveAttribute('open')
-      expect(toggle.closest('summary')).toHaveAttribute(
-        'aria-label',
-        `View ${projectNames[index]} results`,
-      )
-      fireEvent.click(toggle)
-      expect(results).toHaveAttribute('open')
-      expectedMetrics[index].forEach((value) => {
-        expect(within(results).getByText(value)).toBeInTheDocument()
-      })
-    })
-  })
-
-  it('marks project chapters for alternating wipes, pans, cascades, and magnetic links', () => {
-    render(<Portfolio />)
-
-    const studies = screen.getAllByTestId('project-case-study')
-    expect(studies.map((study) => study.getAttribute('data-wipe-direction'))).toEqual([
-      'ltr',
-      'rtl',
-      'ltr',
-    ])
-
-    studies.forEach((study) => {
-      expect(study).toHaveAttribute('data-chapter-wipe')
-      expect(study.querySelector('[data-project-pan]')).not.toBeNull()
-      expect(study.querySelector('.case-study-copy')).toHaveAttribute('data-reveal-stagger')
-      expect(within(study).getByRole('link', { name: /repository/i })).toHaveAttribute(
-        'data-magnetic',
+    expect(panelList).toHaveAttribute('data-reveal-stagger')
+    panels.forEach((panel, index) => {
+      expect(panel.querySelector('[data-project-pan]')).toHaveAttribute(
+        'data-project-pan-index',
+        String(index),
       )
     })
   })

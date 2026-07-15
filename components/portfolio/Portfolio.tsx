@@ -1,72 +1,10 @@
-import { atlasVisuals, type AtlasVisual } from '@/content/editorial-visuals'
+import { atlasVisuals } from '@/content/editorial-visuals'
 import {
   siteContent,
   type ExperienceEntry,
-  type ProjectVisualKey,
 } from '@/content/site-content'
-import { getProjectDirection } from '@/lib/atlas-motion/project-choreography'
-
-interface AtlasPictureProps {
-  readonly visual: AtlasVisual
-  readonly alt: string
-  readonly className?: string
-  readonly cursor?: 'expand' | 'read'
-  readonly priority?: boolean
-  readonly projectPan?: boolean
-  readonly projectPanIndex?: number
-  readonly reveal?: boolean
-  readonly sizes: string
-}
-
-const projectAlts: Record<ProjectVisualKey, string> = {
-  courtvision: 'A geometric arena with analytical trajectory arcs',
-  beatstream: 'Coastal architecture crossed by rhythmic signal ribbons',
-  'vision-bias-steering': 'A labyrinth observatory with two controlled light paths',
-}
-
-function AtlasPicture({
-  visual,
-  alt,
-  className,
-  cursor = 'read',
-  priority = false,
-  projectPan = false,
-  projectPanIndex,
-  reveal = false,
-  sizes,
-}: AtlasPictureProps) {
-  return (
-    <picture
-      className={className}
-      data-cursor={cursor}
-      data-project-pan={projectPan ? '' : undefined}
-      data-project-pan-index={projectPan ? projectPanIndex : undefined}
-      data-reveal={reveal ? '' : undefined}
-    >
-      <source
-        type="image/avif"
-        srcSet={`${visual.smallSrc} ${visual.smallWidth}w, ${visual.src} ${visual.width}w`}
-        sizes={sizes}
-      />
-      <source
-        type="image/webp"
-        srcSet={`${visual.smallFallback} ${visual.smallWidth}w, ${visual.fallback} ${visual.width}w`}
-        sizes={sizes}
-      />
-      <img
-        src={visual.fallback}
-        srcSet={`${visual.smallFallback} ${visual.smallWidth}w, ${visual.fallback} ${visual.width}w`}
-        sizes={sizes}
-        alt={alt}
-        width={visual.width}
-        height={visual.height}
-        loading={priority ? undefined : 'lazy'}
-        fetchPriority={priority ? 'high' : undefined}
-        decoding={priority ? 'sync' : 'async'}
-      />
-    </picture>
-  )
-}
+import { AtlasPicture } from './AtlasPicture'
+import { projectVisualAlts } from './ProjectCaseStudy'
 
 function CraftCapabilitySequence({
   capabilities,
@@ -276,7 +214,7 @@ export function Portfolio() {
             </div>
             <p>
               Three builds across computer vision, real-time collaboration, and language-model
-              research. Choose a panel to unfold the complete case study and verified outcomes.
+              research. Choose a panel to open the complete case study on its own page.
             </p>
           </div>
 
@@ -289,17 +227,15 @@ export function Portfolio() {
             {projects.map((project, index) => (
               <a
                 className={`project-panel project-panel--${index + 1}`}
-                href={`#project-${project.id}`}
-                aria-controls={`project-${project.id}`}
+                href={`/projects/${project.id}`}
                 aria-label={`Open ${project.name} case study`}
-                data-project-trigger
                 data-testid="project-panel-trigger"
                 data-cursor="expand"
                 key={project.id}
               >
                 <AtlasPicture
                   visual={atlasVisuals.projects[project.visualKey]}
-                  alt=""
+                  alt={projectVisualAlts[project.visualKey]}
                   className="atlas-picture project-panel__art"
                   cursor="expand"
                   projectPan
@@ -318,87 +254,6 @@ export function Portfolio() {
             ))}
           </nav>
 
-          <div className="project-chapters">
-            {projects.map((project, index) => (
-              <article
-                className={`project-chapter project-chapter--${index + 1} chapter-wipe chapter-wipe--${getProjectDirection(index)}`}
-                data-testid="project-case-study"
-                data-project-detail
-                data-chapter-wipe
-                data-wipe-direction={getProjectDirection(index)}
-                aria-labelledby={`project-${project.id}-title`}
-                id={`project-${project.id}`}
-                key={project.id}
-              >
-                <div className="atlas-shell project-grid">
-                  <div className="project-meta" data-reveal-stagger>
-                    <p className="eyebrow project-case-label">
-                      Case {String(index + 1).padStart(2, '0')}
-                    </p>
-                    <p className="project-tech-list">{project.technologies.join(' · ')}</p>
-                  </div>
-
-                  <div className="project-title">
-                    <h3 id={`project-${project.id}-title`}>{project.name}</h3>
-                    <p>{project.description}</p>
-                  </div>
-
-                  <AtlasPicture
-                    visual={atlasVisuals.projects[project.visualKey]}
-                    alt={projectAlts[project.visualKey]}
-                    className="atlas-picture project-art frame-reveal"
-                    projectPan
-                    projectPanIndex={index}
-                    reveal
-                    sizes="(max-width: 720px) 100vw, 58vw"
-                  />
-
-                  <div className="case-study-copy" data-reveal-stagger>
-                    <div>
-                      <h4>Brief</h4>
-                      <p>{project.caseStudy.brief}</p>
-                    </div>
-                    <div>
-                      <h4>Approach</h4>
-                      <p>{project.caseStudy.approach}</p>
-                    </div>
-                    <div>
-                      <h4>Technical focus</h4>
-                      <p>{project.caseStudy.focus}</p>
-                    </div>
-                  </div>
-
-                  <details className="project-results" data-testid="project-results">
-                    <summary aria-label={`View ${project.name} results`} data-cursor="expand">
-                      <span>View project results</span>
-                      <span className="project-results__symbol" aria-hidden="true">
-                        +
-                      </span>
-                    </summary>
-                    <dl className="project-results__metrics">
-                      {project.metrics.map((metric) => (
-                        <div key={`${metric.value}-${metric.label}`}>
-                          <dt>{metric.value}</dt>
-                          <dd>{metric.label}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </details>
-
-                  <a
-                    className="repository-link"
-                    href={project.links.repository}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`View ${project.name} repository`}
-                    data-magnetic
-                  >
-                    Repository <span aria-hidden="true">↗</span>
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
         </section>
 
         <section

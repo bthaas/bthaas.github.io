@@ -654,7 +654,7 @@
     margin: 0 0 0 0.6rem;
   }
 
-  .project-title h3 {
+  .project-title :is(h1, h3) {
     font-size: clamp(4rem, 19vw, 6rem);
   }
 
