@@ -1,7 +1,44 @@
 .experience-section {
+  position: relative;
+  isolation: isolate;
   padding: clamp(5rem, 10vw, 10rem) 0;
   background: var(--dusk-deep);
   color: var(--paper);
+}
+
+.experience-section::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--ink);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.experience-section > .atlas-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.experience-light-step {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.experience-light-step:nth-of-type(1) {
+  top: 18%;
+}
+
+.experience-light-step:nth-of-type(2) {
+  top: 50%;
+}
+
+.experience-light-step:nth-of-type(3) {
+  top: 82%;
 }
 
 .experience-intro {
@@ -23,9 +60,26 @@
   color: rgb(255 253 245 / 72%);
 }
 
+.experience-plate {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: clamp(3rem, 6vw, 6rem);
+  border-radius: var(--radius);
+}
+
 .experience-art {
   aspect-ratio: 16 / 7.5;
-  margin-bottom: clamp(3rem, 6vw, 6rem);
+  border-radius: 0;
+}
+
+.experience-plate__warmth {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(135deg, var(--solar), var(--coral));
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .flight-log {
@@ -33,13 +87,24 @@
 }
 
 .flight-entry {
+  position: relative;
   display: grid;
   min-height: 146px;
   align-items: start;
   padding: 1.4rem 0 1.8rem;
-  border-bottom: 1px solid rgb(255 253 245 / 25%);
   column-gap: clamp(0.75rem, 1.45vw, 1.5rem);
   grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.flight-entry::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: rgb(255 253 245 / 25%);
+  content: "";
+  transform-origin: left;
 }
 
 .flight-index {
@@ -47,7 +112,7 @@
   color: var(--coral);
 }
 
-.flight-entry > div {
+.flight-heading {
   grid-column: 2 / span 4;
 }
 
@@ -88,3 +153,221 @@
   margin-top: 0.45rem;
 }
 
+.flight-dossier {
+  grid-column: 2 / -1;
+  margin-top: 1.15rem;
+}
+
+.flight-dossier__toggle {
+  display: none;
+  width: 100%;
+  padding: 0.65rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--coral);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.flight-dossier[data-dossier-ready] .flight-dossier__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flight-dossier__symbol {
+  font-size: 1rem;
+  transform: rotate(45deg);
+  transition: transform 240ms var(--ease-out);
+}
+
+.flight-dossier[data-state="closed"] .flight-dossier__symbol {
+  transform: rotate(0);
+}
+
+.flight-dossier__panel {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.flight-dossier[data-state="closed"] .flight-dossier__panel {
+  grid-template-rows: 0fr;
+}
+
+.flight-dossier__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.flight-highlights {
+  display: grid;
+  max-width: 58rem;
+  margin: 0;
+  padding: 0.9rem 0 0 1.05rem;
+  gap: 0.7rem;
+  color: rgb(255 253 245 / 78%);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.flight-highlights li::marker {
+  color: var(--coral);
+}
+
+.flight-technologies {
+  display: flex;
+  margin: 1rem 0 0;
+  padding: 0 0 0.2rem;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+}
+
+.flight-technologies li {
+  padding: 0.42rem 0.62rem;
+  border: 1px solid rgb(255 253 245 / 28%);
+  border-radius: 999px;
+  color: rgb(255 253 245 / 74%);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flight-dossier[data-dossier-animate] .flight-dossier__panel {
+    transition: grid-template-rows 360ms var(--ease-out);
+  }
+
+  html.atlas-js.atlas-reveal-ready .flight-entry::after {
+    transform: scaleX(0);
+    transition: transform 520ms var(--ease-out) var(--atlas-reveal-delay, 0ms);
+  }
+
+  html.atlas-js.atlas-reveal-ready .flight-index {
+    opacity: 0;
+    transform: translateY(85%) rotateX(-78deg);
+    transform-origin: bottom;
+    transition:
+      opacity 420ms var(--ease-out) calc(var(--atlas-reveal-delay, 0ms) + 100ms),
+      transform 420ms var(--ease-out) calc(var(--atlas-reveal-delay, 0ms) + 100ms);
+  }
+
+  html.atlas-js.atlas-reveal-ready .flight-heading,
+  html.atlas-js.atlas-reveal-ready .flight-summary,
+  html.atlas-js.atlas-reveal-ready .flight-period,
+  html.atlas-js.atlas-reveal-ready .flight-dossier {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 520ms var(--ease-out) calc(var(--atlas-reveal-delay, 0ms) + 180ms),
+      transform 520ms var(--ease-out) calc(var(--atlas-reveal-delay, 0ms) + 180ms);
+  }
+
+  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed::after {
+    transform: scaleX(1);
+  }
+
+  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-index,
+  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-heading,
+  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-summary,
+  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-period,
+  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-dossier {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js .experience-section::before {
+      animation: atlas-experience-darken both linear;
+      animation-range: entry 0% exit 100%;
+      animation-timeline: view();
+    }
+
+    html.atlas-js .experience-art img {
+      position: relative;
+      top: -5%;
+      height: 110%;
+      max-width: none;
+      animation: atlas-experience-parallax both linear;
+      animation-range: entry 0% exit 100%;
+      animation-timeline: view();
+    }
+
+    html.atlas-js .experience-plate__warmth {
+      animation: atlas-experience-warmth both linear;
+      animation-range: entry 0% exit 100%;
+      animation-timeline: view();
+    }
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js.atlas-experience-fallback .experience-section::before {
+      opacity: var(--atlas-experience-darkness, 0);
+      transition: opacity 320ms var(--ease-out);
+    }
+
+    html.atlas-js.atlas-experience-fallback .experience-plate__warmth {
+      opacity: var(--atlas-experience-warmth, 0.06);
+      transition: opacity 320ms var(--ease-out);
+    }
+  }
+}
+
+@keyframes atlas-experience-darken {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.175;
+  }
+
+  100% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes atlas-experience-warmth {
+  0% {
+    opacity: 0.06;
+  }
+
+  50% {
+    opacity: 0.12;
+  }
+
+  100% {
+    opacity: 0.18;
+  }
+}
+
+@keyframes atlas-experience-parallax {
+  from {
+    transform: translate3d(0, -3%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 3%, 0);
+  }
+}
+
+@media (max-width: 720px) {
+  .flight-dossier {
+    grid-column: 2;
+  }
+
+  .flight-highlights {
+    padding-top: 0.75rem;
+    font-size: 0.8rem;
+  }
+}

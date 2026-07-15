@@ -643,13 +643,13 @@
     grid-column: 1;
   }
 
-  .flight-entry > div,
+  .flight-heading,
   .flight-summary,
   .flight-period {
     grid-column: 2;
   }
 
-  .flight-entry > div {
+  .flight-heading {
     margin-bottom: 1rem;
   }
 

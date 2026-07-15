@@ -10,6 +10,11 @@ export interface DescentLighting {
   readonly fogNear: number
 }
 
+export interface ExperienceLighting {
+  readonly darknessOpacity: number
+  readonly warmthOpacity: number
+}
+
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
 
 const smoothstep = (value: number) => {
@@ -39,5 +44,15 @@ export function getDescentLighting(progress: number): DescentLighting {
     warmth: Number((1 - bounded * 0.82).toFixed(4)),
     exposure: Number((0.82 - bounded * 0.18).toFixed(4)),
     fogNear: Number((8 - bounded * 2.5).toFixed(4)),
+  }
+}
+
+export function getExperienceLighting(progress: number): ExperienceLighting {
+  const { warmth } = getDescentLighting(progress)
+  const descentProgress = (1 - warmth) / 0.82
+
+  return {
+    darknessOpacity: Number((descentProgress * 0.35).toFixed(4)),
+    warmthOpacity: Number((0.06 + descentProgress * 0.12).toFixed(4)),
   }
 }

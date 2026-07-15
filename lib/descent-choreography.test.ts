@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getCloudTransition,
   getDescentLighting,
+  getExperienceLighting,
   getLandingProgress,
 } from './descent-choreography'
 
@@ -25,5 +26,11 @@ describe('descent choreography', () => {
   it('cools and darkens the atmosphere as the descent progresses', () => {
     expect(getDescentLighting(0)).toEqual({ warmth: 1, exposure: 0.82, fogNear: 8 })
     expect(getDescentLighting(1)).toEqual({ warmth: 0.18, exposure: 0.64, fogNear: 5.5 })
+  })
+
+  it('maps the descent curve to bounded compositor-friendly overlay opacities', () => {
+    expect(getExperienceLighting(-1)).toEqual({ darknessOpacity: 0, warmthOpacity: 0.06 })
+    expect(getExperienceLighting(0.5)).toEqual({ darknessOpacity: 0.175, warmthOpacity: 0.12 })
+    expect(getExperienceLighting(2)).toEqual({ darknessOpacity: 0.35, warmthOpacity: 0.18 })
   })
 })
