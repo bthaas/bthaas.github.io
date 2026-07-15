@@ -1,5 +1,9 @@
 import { atlasVisuals, type AtlasVisual } from '@/content/editorial-visuals'
-import { siteContent, type ProjectVisualKey } from '@/content/site-content'
+import {
+  siteContent,
+  type ExperienceEntry,
+  type ProjectVisualKey,
+} from '@/content/site-content'
 
 interface AtlasPictureProps {
   readonly visual: AtlasVisual
@@ -65,6 +69,44 @@ function CraftCapabilitySequence({
           {capability} <span aria-hidden="true">·</span>
         </span>
       ))}
+    </div>
+  )
+}
+
+function FlightDossier({ entry }: { readonly entry: ExperienceEntry }) {
+  const panelId = `flight-dossier-${entry.id}`
+
+  return (
+    <div className="flight-dossier" data-dossier data-state="open">
+      <button
+        className="flight-dossier__toggle"
+        type="button"
+        aria-controls={panelId}
+        aria-expanded="true"
+        aria-label="Field notes +"
+      >
+        <span>Field notes</span>
+        <span className="flight-dossier__symbol" aria-hidden="true">
+          +
+        </span>
+      </button>
+      <div className="flight-dossier__panel" id={panelId}>
+        <div className="flight-dossier__inner">
+          <ul className="flight-highlights">
+            {entry.highlights.map((highlight) => (
+              <li key={highlight}>{highlight}</li>
+            ))}
+          </ul>
+          <ul
+            className="flight-technologies"
+            aria-label={`${entry.organization} technologies`}
+          >
+            {entry.technologies.map((technology) => (
+              <li key={technology}>{technology}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   )
 }
@@ -202,6 +244,14 @@ export function Portfolio() {
         </section>
 
         <section className="experience-section" id="experience" aria-labelledby="experience-title">
+          {[1, 2, 3].map((step) => (
+            <span
+              className="experience-light-step"
+              data-experience-light-step={step}
+              aria-hidden="true"
+              key={step}
+            />
+          ))}
           <div className="atlas-shell">
             <div className="experience-intro editorial-grid">
               <div className="section-heading">
@@ -214,19 +264,26 @@ export function Portfolio() {
               </p>
             </div>
 
-            <AtlasPicture
-              visual={atlasVisuals.experience}
-              alt="A rising coastal city and lighthouse at dusk"
-              className="atlas-picture experience-art frame-reveal"
-              reveal
-              sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
-            />
+            <div className="experience-plate frame-reveal" data-reveal>
+              <AtlasPicture
+                visual={atlasVisuals.experience}
+                alt="A rising coastal city and lighthouse at dusk"
+                className="atlas-picture experience-art"
+                sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
+              />
+              <span className="experience-plate__warmth" aria-hidden="true" />
+            </div>
 
-            <div className="flight-log" role="list" aria-label="Professional experience">
+            <div
+              className="flight-log"
+              role="list"
+              aria-label="Professional experience"
+              data-reveal-stagger
+            >
               {experience.map((entry, index) => (
                 <article className="flight-entry" role="listitem" key={entry.id}>
                   <p className="flight-index">{String(index + 1).padStart(2, '0')}</p>
-                  <div>
+                  <div className="flight-heading">
                     <h3>{entry.organization}</h3>
                     <p className="flight-role">
                       {entry.role}
@@ -238,12 +295,13 @@ export function Portfolio() {
                     {entry.period}
                     <span>{entry.location}</span>
                   </p>
+                  <FlightDossier entry={entry} />
                 </article>
               ))}
               {education.map((entry) => (
                 <article className="flight-entry flight-entry--education" role="listitem" key={entry.degree}>
                   <p className="flight-index">04</p>
-                  <div>
+                  <div className="flight-heading">
                     <h3>{entry.institution}</h3>
                     <p className="flight-role">{entry.degree}</p>
                   </div>

@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
+import { setupDossiers } from '@/src/atlas/experience'
 
 import { Portfolio } from './Portfolio'
 
@@ -85,6 +86,63 @@ describe('Portfolio', () => {
     expect(sequences?.[0]).not.toHaveAttribute('aria-hidden')
     expect(sequences?.[1]).toHaveAttribute('aria-hidden', 'true')
     expect(sequences?.[0].textContent).toBe(sequences?.[1].textContent)
+  })
+
+  it('server-renders every professional dossier from content and skips education', () => {
+    const { container } = render(<Portfolio />)
+    const entries = Array.from(container.querySelectorAll<HTMLElement>('.flight-entry'))
+
+    expect(entries).toHaveLength(4)
+    siteContent.experience.forEach((experience, index) => {
+      const entry = entries[index]
+      const toggle = within(entry).getByRole('button', { name: 'Field notes +' })
+      const panelId = toggle.getAttribute('aria-controls')
+
+      expect(toggle).toHaveAttribute('aria-expanded', 'true')
+      expect(panelId).toBe(`flight-dossier-${experience.id}`)
+      expect(entry.querySelector(`#${panelId}`)).not.toBeNull()
+      experience.highlights.forEach((highlight) => {
+        expect(within(entry).getByText(highlight)).toBeInTheDocument()
+      })
+      experience.technologies.forEach((technology) => {
+        expect(within(entry).getByText(technology)).toBeInTheDocument()
+      })
+    })
+
+    expect(within(entries[3]).queryByRole('button', { name: 'Field notes +' })).toBeNull()
+  })
+
+  it('collapses enhanced dossiers on init and toggles ARIA state without moving focus', () => {
+    document.documentElement.classList.add('atlas-js')
+    render(<Portfolio />)
+    const cleanup = setupDossiers(document)
+    const toggles = screen.getAllByRole('button', { name: 'Field notes +' })
+    const firstToggle = toggles[0]
+    const firstDossier = firstToggle.closest<HTMLElement>('[data-dossier]')
+
+    expect(toggles).toHaveLength(3)
+    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
+    expect(firstDossier).toHaveAttribute('data-state', 'closed')
+
+    firstToggle.focus()
+    fireEvent.click(firstToggle)
+    expect(firstToggle).toHaveAttribute('aria-expanded', 'true')
+    expect(firstDossier).toHaveAttribute('data-state', 'open')
+    expect(firstToggle).toHaveFocus()
+
+    fireEvent.click(firstToggle)
+    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
+    expect(firstDossier).toHaveAttribute('data-state', 'closed')
+
+    fireEvent.keyDown(firstToggle, { key: ' ' })
+    expect(firstToggle).toHaveAttribute('aria-expanded', 'true')
+    fireEvent.keyDown(firstToggle, { key: 'Enter' })
+    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.keyDown(firstToggle, { key: 'Escape' })
+    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
+
+    cleanup()
+    document.documentElement.classList.remove('atlas-js')
   })
 
   it('presents every project as an inline case study with a repository link', () => {

@@ -1,4 +1,5 @@
 import { setupCraftChapter } from './craft'
+import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
@@ -10,7 +11,9 @@ interface AtlasRuntimeOptions {
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
   readonly prepareEntrance?: (document: Document) => () => void
   readonly prepareCraft?: (document: Document, window: Window) => () => void
+  readonly prepareDossiers?: (document: Document) => () => void
   readonly prepareHero?: (document: Document, window: Window) => () => void
+  readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareReveals?: () => () => void
   readonly prepareSun?: (document: Document, window: Window) => () => void
@@ -24,7 +27,9 @@ export function initializeAtlas({
   matchMedia = (query) => window.matchMedia(query),
   prepareEntrance = setupEntrance,
   prepareCraft = setupCraftChapter,
+  prepareDossiers = setupDossiers,
   prepareHero = setupHeroParallax,
+  prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
   prepareReveals = setupReveals,
   prepareSun = setupSunArc,
@@ -32,7 +37,13 @@ export function initializeAtlas({
   window: runtimeWindow = window,
 }: AtlasRuntimeOptions = {}): () => void {
   const cleanupWayfinding = prepareWayfinding(runtimeDocument)
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return cleanupWayfinding
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const cleanupDossiers = prepareDossiers(runtimeDocument)
+    return () => {
+      cleanupDossiers()
+      cleanupWayfinding()
+    }
+  }
 
   const html = runtimeDocument.documentElement
   html.classList.add('atlas-js')
@@ -40,6 +51,8 @@ export function initializeAtlas({
 
   const cleanupEntrance = prepareEntrance(runtimeDocument)
   const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
+  const cleanupDossiers = prepareDossiers(runtimeDocument)
+  const cleanupExperience = prepareExperience(runtimeDocument, runtimeWindow)
   const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupSun = prepareSun(runtimeDocument, runtimeWindow)
@@ -56,6 +69,8 @@ export function initializeAtlas({
     unsubscribe()
     cleanupEntrance()
     cleanupCraft()
+    cleanupDossiers()
+    cleanupExperience()
     cleanupHero()
     cleanupMetrics()
     cleanupSun()

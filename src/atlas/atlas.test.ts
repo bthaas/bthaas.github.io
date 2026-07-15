@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { countUp } from './count-up'
 import { setupCraftChapter } from './craft'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
+import { setupExperienceChapter } from './experience'
 import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
 import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
@@ -209,6 +210,59 @@ describe('atlas DOM capabilities', () => {
     expect(section).not.toHaveClass('is-craft-visible')
   })
 
+  it('steps the Trajectory overlay lighting through three IO fallback depths', () => {
+    document.body.innerHTML = `
+      <section class="experience-section">
+        <span data-experience-light-step="1"></span>
+        <span data-experience-light-step="2"></span>
+        <span data-experience-light-step="3"></span>
+      </section>
+    `
+    const section = document.querySelector<HTMLElement>('.experience-section')!
+    const steps = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-experience-light-step]'),
+    )
+    const tops = [400, 600, 800]
+    steps.forEach((step, index) => {
+      vi.spyOn(step, 'getBoundingClientRect').mockImplementation(() => ({
+        bottom: tops[index] + 1,
+        height: 1,
+        left: 0,
+        right: 1,
+        top: tops[index],
+        width: 1,
+        x: 0,
+        y: tops[index],
+        toJSON: () => undefined,
+      }))
+    })
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
+    let update: IntersectionObserverCallback | undefined
+    const observer = {
+      disconnect: vi.fn(),
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+    } as unknown as IntersectionObserver
+    const cleanup = setupExperienceChapter(document, window, false, (callback) => {
+      update = callback
+      return observer
+    })
+
+    expect(document.documentElement).toHaveClass('atlas-experience-fallback')
+    expect(observer.observe).toHaveBeenCalledTimes(3)
+    expect(section.style.getPropertyValue('--atlas-experience-darkness')).toBe('0.0907')
+    expect(section.style.getPropertyValue('--atlas-experience-warmth')).toBe('0.0911')
+
+    tops[1] = 480
+    update?.([], observer)
+    expect(section.style.getPropertyValue('--atlas-experience-darkness')).toBe('0.2593')
+    expect(section.style.getPropertyValue('--atlas-experience-warmth')).toBe('0.1489')
+
+    cleanup()
+    expect(document.documentElement).not.toHaveClass('atlas-experience-fallback')
+    expect(section.style.getPropertyValue('--atlas-experience-darkness')).toBe('')
+  })
+
   it('sets one active nav link from the four observed narrative sections', () => {
     document.body.innerHTML = `
       <nav>
@@ -273,6 +327,9 @@ describe('atlas DOM capabilities', () => {
     const prepareHero = vi.fn()
     const prepareCraft = vi.fn()
     const prepareMetrics = vi.fn()
+    const cleanupDossiers = vi.fn()
+    const prepareDossiers = vi.fn(() => cleanupDossiers)
+    const prepareExperience = vi.fn()
     const prepareReveals = vi.fn()
     const cleanupWayfinding = vi.fn()
     const prepareSun = vi.fn()
@@ -286,7 +343,9 @@ describe('atlas DOM capabilities', () => {
       prepareEntrance,
       prepareHero,
       prepareCraft,
+      prepareDossiers,
       prepareMetrics,
+      prepareExperience,
       prepareReveals,
       prepareSun,
       prepareWayfinding,
@@ -300,10 +359,13 @@ describe('atlas DOM capabilities', () => {
     expect(prepareHero).not.toHaveBeenCalled()
     expect(prepareCraft).not.toHaveBeenCalled()
     expect(prepareMetrics).not.toHaveBeenCalled()
+    expect(prepareDossiers).toHaveBeenCalledOnce()
+    expect(prepareExperience).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
     expect(prepareSun).not.toHaveBeenCalled()
     expect(prepareWayfinding).toHaveBeenCalledOnce()
     cleanup()
+    expect(cleanupDossiers).toHaveBeenCalledOnce()
     expect(cleanupWayfinding).toHaveBeenCalledOnce()
   })
 
@@ -316,6 +378,8 @@ describe('atlas DOM capabilities', () => {
     const cleanupHero = vi.fn()
     const cleanupCraft = vi.fn()
     const cleanupMetrics = vi.fn()
+    const cleanupDossiers = vi.fn()
+    const cleanupExperience = vi.fn()
     const cleanupSun = vi.fn()
     const cleanupWayfinding = vi.fn()
     const createBus = vi.fn(() => ({
@@ -334,7 +398,9 @@ describe('atlas DOM capabilities', () => {
       prepareEntrance: () => cleanupEntrance,
       prepareHero: () => cleanupHero,
       prepareCraft: () => cleanupCraft,
+      prepareDossiers: () => cleanupDossiers,
       prepareMetrics: () => cleanupMetrics,
+      prepareExperience: () => cleanupExperience,
       prepareReveals: () => cleanupReveals,
       prepareSun: () => cleanupSun,
       prepareWayfinding: () => cleanupWayfinding,
@@ -352,6 +418,8 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupHero).toHaveBeenCalledOnce()
     expect(cleanupCraft).toHaveBeenCalledOnce()
     expect(cleanupMetrics).toHaveBeenCalledOnce()
+    expect(cleanupDossiers).toHaveBeenCalledOnce()
+    expect(cleanupExperience).toHaveBeenCalledOnce()
     expect(cleanupSun).toHaveBeenCalledOnce()
     expect(cleanupWayfinding).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()
