@@ -2,9 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { countUp } from './count-up'
 import { setupChapterWipes } from './chapter-wipe'
+import { setupContactFinale } from './contact'
 import { setupCraftChapter } from './craft'
+import { setupCursor } from './cursor'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupExperienceChapter } from './experience'
+import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
 import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
@@ -157,6 +160,114 @@ describe('atlas DOM capabilities', () => {
     )
     expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: SUN_PROGRESS_EVENT }))
     cleanup()
+  })
+
+  it('scrubs the contact glow, word reveal, and centered character exhale from shared progress', () => {
+    document.body.innerHTML = `
+      <section id="contact" data-contact-finale>
+        <span data-contact-sunrise></span>
+        <h2 data-contact-title>Keep building.</h2>
+      </section>
+    `
+    const section = document.getElementById('contact')!
+    vi.spyOn(section, 'getBoundingClientRect').mockReturnValue({
+      bottom: 3200,
+      height: 1200,
+      left: 0,
+      right: 1200,
+      top: 2000,
+      width: 1200,
+      x: 0,
+      y: 2000,
+      toJSON: () => undefined,
+    })
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
+    vi.spyOn(window, 'scrollY', 'get').mockReturnValue(0)
+
+    const cleanup = setupContactFinale(document, window)
+    const characters = Array.from(
+      section.querySelectorAll<HTMLElement>('.atlas-split-mask--character > .atlas-split-token'),
+    )
+    const words = Array.from(
+      section.querySelectorAll<HTMLElement>('[data-contact-word]'),
+    )
+
+    expect(characters).toHaveLength(13)
+    expect(words).toHaveLength(2)
+    window.dispatchEvent(new CustomEvent(SUN_PROGRESS_EVENT, { detail: { progress: 0.98 } }))
+    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 2200 } }))
+
+    expect(section.style.getPropertyValue('--atlas-contact-glow')).toBe('1')
+    expect(words.map((word) => word.style.getPropertyValue('--atlas-contact-word-reveal'))).toEqual([
+      '1',
+      '1',
+    ])
+    expect(characters[0].style.getPropertyValue('--atlas-contact-character-x')).toBe('-0.12em')
+    expect(characters[6].style.getPropertyValue('--atlas-contact-character-x')).toBe('0em')
+    expect(characters[12].style.getPropertyValue('--atlas-contact-character-x')).toBe('0.12em')
+    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 2200 } }))
+    expect(section.getBoundingClientRect).toHaveBeenCalledTimes(2)
+
+    cleanup()
+    expect(section.style.getPropertyValue('--atlas-contact-glow')).toBe('')
+  })
+
+  it('renders Charlottesville time without depending on the viewer timezone', () => {
+    document.body.innerHTML = '<p data-atlas-local-time>Charlottesville, VA</p>'
+    const schedule = vi.fn(() => 17)
+    const clear = vi.fn()
+    const cleanup = setupLocalTime(
+      document,
+      () => new Date('2026-07-15T12:34:00.000Z'),
+      schedule,
+      clear,
+    )
+
+    expect(document.querySelector('[data-atlas-local-time]')).toHaveTextContent(
+      'Charlottesville, VA — 08:34',
+    )
+    expect(schedule).toHaveBeenCalledWith(expect.any(Function), 60_000)
+    cleanup()
+    expect(clear).toHaveBeenCalledWith(17)
+  })
+
+  it('creates a fine-pointer cursor with external, dossier, and plate modes only', () => {
+    document.body.innerHTML = `
+      <a id="external" href="https://example.com" target="_blank">External</a>
+      <button id="dossier" data-cursor="expand">Field notes</button>
+      <picture id="plate" data-cursor="read"></picture>
+    `
+    const frames: FrameRequestCallback[] = []
+    const requestFrame = vi.fn((callback: FrameRequestCallback) => {
+      frames.push(callback)
+      return frames.length
+    })
+    const cleanup = setupCursor(document, () => true, requestFrame, vi.fn())
+    const cursor = document.querySelector<HTMLElement>('[data-atlas-cursor]')!
+
+    document.getElementById('external')?.dispatchEvent(new MouseEvent('pointerover', {
+      bubbles: true,
+    }))
+    expect(cursor).toHaveAttribute('data-cursor-mode', 'external')
+    expect(cursor.querySelector('[data-atlas-cursor-label]')).toHaveTextContent('↗')
+
+    document.getElementById('dossier')?.dispatchEvent(new MouseEvent('pointerover', {
+      bubbles: true,
+    }))
+    expect(cursor).toHaveAttribute('data-cursor-mode', 'expand')
+    expect(cursor.querySelector('[data-atlas-cursor-label]')).toHaveTextContent('+')
+
+    document.getElementById('plate')?.dispatchEvent(new MouseEvent('pointerover', {
+      bubbles: true,
+    }))
+    expect(cursor).toHaveAttribute('data-cursor-mode', 'read')
+    expect(cursor.querySelector('[data-atlas-cursor-label]')).toHaveTextContent('read')
+    cleanup()
+    expect(document.querySelector('[data-atlas-cursor]')).not.toBeInTheDocument()
+
+    const touchCleanup = setupCursor(document, () => false, requestFrame, vi.fn())
+    expect(document.querySelector('[data-atlas-cursor]')).not.toBeInTheDocument()
+    touchCleanup()
   })
 
   it('provides an IO wipe and scroll-scrubbed Craft fallback', () => {
@@ -417,8 +528,12 @@ describe('atlas DOM capabilities', () => {
     const prepareEntrance = vi.fn()
     const prepareHero = vi.fn()
     const prepareCraft = vi.fn()
+    const prepareContact = vi.fn()
+    const prepareCursor = vi.fn()
     const prepareMetrics = vi.fn()
     const prepareMagnetic = vi.fn()
+    const cleanupLocalTime = vi.fn()
+    const prepareLocalTime = vi.fn(() => cleanupLocalTime)
     const prepareProjects = vi.fn()
     const prepareWipes = vi.fn()
     const cleanupDossiers = vi.fn()
@@ -437,9 +552,12 @@ describe('atlas DOM capabilities', () => {
       prepareEntrance,
       prepareHero,
       prepareCraft,
+      prepareContact,
+      prepareCursor,
       prepareDossiers,
       prepareMetrics,
       prepareMagnetic,
+      prepareLocalTime,
       prepareProjects,
       prepareExperience,
       prepareReveals,
@@ -455,8 +573,11 @@ describe('atlas DOM capabilities', () => {
     expect(prepareEntrance).not.toHaveBeenCalled()
     expect(prepareHero).not.toHaveBeenCalled()
     expect(prepareCraft).not.toHaveBeenCalled()
+    expect(prepareContact).not.toHaveBeenCalled()
+    expect(prepareCursor).not.toHaveBeenCalled()
     expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareMagnetic).not.toHaveBeenCalled()
+    expect(prepareLocalTime).toHaveBeenCalledOnce()
     expect(prepareProjects).not.toHaveBeenCalled()
     expect(prepareWipes).not.toHaveBeenCalled()
     expect(prepareDossiers).toHaveBeenCalledOnce()
@@ -466,6 +587,7 @@ describe('atlas DOM capabilities', () => {
     expect(prepareWayfinding).toHaveBeenCalledOnce()
     cleanup()
     expect(cleanupDossiers).toHaveBeenCalledOnce()
+    expect(cleanupLocalTime).toHaveBeenCalledOnce()
     expect(cleanupWayfinding).toHaveBeenCalledOnce()
   })
 
@@ -477,11 +599,14 @@ describe('atlas DOM capabilities', () => {
     const cleanupEntrance = vi.fn()
     const cleanupHero = vi.fn()
     const cleanupCraft = vi.fn()
+    const cleanupContact = vi.fn()
+    const cleanupCursor = vi.fn()
     const cleanupMetrics = vi.fn()
     const cleanupDossiers = vi.fn()
     const cleanupExperience = vi.fn()
     const cleanupSun = vi.fn()
     const cleanupMagnetic = vi.fn()
+    const cleanupLocalTime = vi.fn()
     const cleanupProjects = vi.fn()
     const cleanupWipes = vi.fn()
     const cleanupWayfinding = vi.fn()
@@ -501,9 +626,12 @@ describe('atlas DOM capabilities', () => {
       prepareEntrance: () => cleanupEntrance,
       prepareHero: () => cleanupHero,
       prepareCraft: () => cleanupCraft,
+      prepareContact: () => cleanupContact,
+      prepareCursor: () => cleanupCursor,
       prepareDossiers: () => cleanupDossiers,
       prepareMetrics: () => cleanupMetrics,
       prepareMagnetic: () => cleanupMagnetic,
+      prepareLocalTime: () => cleanupLocalTime,
       prepareProjects: () => cleanupProjects,
       prepareExperience: () => cleanupExperience,
       prepareReveals: () => cleanupReveals,
@@ -523,11 +651,14 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupEntrance).toHaveBeenCalledOnce()
     expect(cleanupHero).toHaveBeenCalledOnce()
     expect(cleanupCraft).toHaveBeenCalledOnce()
+    expect(cleanupContact).toHaveBeenCalledOnce()
+    expect(cleanupCursor).toHaveBeenCalledOnce()
     expect(cleanupMetrics).toHaveBeenCalledOnce()
     expect(cleanupDossiers).toHaveBeenCalledOnce()
     expect(cleanupExperience).toHaveBeenCalledOnce()
     expect(cleanupSun).toHaveBeenCalledOnce()
     expect(cleanupMagnetic).toHaveBeenCalledOnce()
+    expect(cleanupLocalTime).toHaveBeenCalledOnce()
     expect(cleanupProjects).toHaveBeenCalledOnce()
     expect(cleanupWipes).toHaveBeenCalledOnce()
     expect(cleanupWayfinding).toHaveBeenCalledOnce()
