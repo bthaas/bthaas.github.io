@@ -1,6 +1,8 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { siteContent } from '@/content/site-content'
+
 import { Portfolio } from './Portfolio'
 
 describe('Portfolio', () => {
@@ -65,6 +67,24 @@ describe('Portfolio', () => {
     expect(screen.getByText('RMS next-token bias reduction')).toBeInTheDocument()
     expect(screen.getByText('load-time improvement')).toBeInTheDocument()
     expect(screen.getByText('crash-free sessions')).toBeInTheDocument()
+  })
+
+  it('keeps Craft capabilities static while providing one hidden marquee duplicate', () => {
+    const { container } = render(<Portfolio />)
+    const capabilities = siteContent.craftCapabilities
+    const notes = container.querySelector('.craft-notes')
+    const marquee = container.querySelector<HTMLElement>('[data-craft-marquee]')
+    const sequences = marquee?.querySelectorAll('.craft-marquee__sequence')
+
+    expect(notes).not.toBeNull()
+    expect(Array.from(notes?.querySelectorAll('p') ?? [], ({ textContent }) => textContent)).toEqual(
+      capabilities,
+    )
+    expect(marquee).toHaveAttribute('tabindex', '0')
+    expect(sequences).toHaveLength(2)
+    expect(sequences?.[0]).not.toHaveAttribute('aria-hidden')
+    expect(sequences?.[1]).toHaveAttribute('aria-hidden', 'true')
+    expect(sequences?.[0].textContent).toBe(sequences?.[1].textContent)
   })
 
   it('presents every project as an inline case study with a repository link', () => {
