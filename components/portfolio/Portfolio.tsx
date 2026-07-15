@@ -156,7 +156,7 @@ export function Portfolio() {
 
       <main id="main-content">
         <section className="hero-section atlas-shell" id="hero" aria-labelledby="hero-name">
-          <div className="board-meta hero-meta" aria-label="Portfolio introduction">
+          <div className="board-meta hero-meta" role="group" aria-label="Portfolio introduction">
             <p>Portfolio / 2026</p>
             <p>{identity.title}</p>
             <p>{identity.location}</p>
@@ -189,11 +189,16 @@ export function Portfolio() {
             </div>
           </div>
 
-          <div className="signal-strip" aria-label="Selected verified results">
+          <div className="signal-strip" role="list" aria-label="Selected verified results">
             {featuredMetrics.map((metric) => {
               const source = experience.find(({ id }) => id === metric.sourceId)
               return (
-                <div className="signal-metric" data-testid="featured-metric" key={metric.value}>
+                <div
+                  className="signal-metric"
+                  role="listitem"
+                  data-testid="featured-metric"
+                  key={metric.value}
+                >
                   <strong data-atlas-count data-testid="metric-value">{metric.value}</strong>
                   <span>{metric.label}</span>
                   <small>{source?.organization}</small>
@@ -248,6 +253,7 @@ export function Portfolio() {
           <div
             className="craft-marquee"
             data-craft-marquee
+            role="region"
             aria-label="Core capabilities ticker; focus to pause"
             tabIndex={0}
           >
@@ -289,14 +295,13 @@ export function Portfolio() {
               <span className="experience-plate__warmth" aria-hidden="true" />
             </div>
 
-            <div
+            <ol
               className="flight-log"
-              role="list"
               aria-label="Professional experience"
               data-reveal-stagger
             >
               {experience.map((entry, index) => (
-                <article className="flight-entry" role="listitem" key={entry.id}>
+                <li className="flight-entry" key={entry.id}>
                   <p className="flight-index">{String(index + 1).padStart(2, '0')}</p>
                   <div className="flight-heading">
                     <h3>{entry.organization}</h3>
@@ -311,10 +316,10 @@ export function Portfolio() {
                     <span>{entry.location}</span>
                   </p>
                   <FlightDossier entry={entry} />
-                </article>
+                </li>
               ))}
               {education.map((entry) => (
-                <article className="flight-entry flight-entry--education" role="listitem" key={entry.degree}>
+                <li className="flight-entry flight-entry--education" key={entry.degree}>
                   <p className="flight-index">04</p>
                   <div className="flight-heading">
                     <h3>{entry.institution}</h3>
@@ -327,9 +332,9 @@ export function Portfolio() {
                     {entry.graduation}
                     <span>GPA {entry.gpa}</span>
                   </p>
-                </article>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
         </section>
 
@@ -443,7 +448,11 @@ export function Portfolio() {
 
             <footer className="site-footer">
               <p>© 2026 Brett Haas</p>
-              <p data-atlas-local-time aria-label="Local time in Charlottesville, Virginia">
+              <p
+                data-atlas-local-time
+                role="timer"
+                aria-label="Local time in Charlottesville, Virginia"
+              >
                 Charlottesville, VA
               </p>
               <div>
