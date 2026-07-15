@@ -34,6 +34,7 @@ function AtlasPicture({
   return (
     <picture
       className={className}
+      data-cursor="read"
       data-project-pan={projectPan ? '' : undefined}
       data-reveal={reveal ? '' : undefined}
     >
@@ -91,6 +92,7 @@ function FlightDossier({ entry }: { readonly entry: ExperienceEntry }) {
         aria-controls={panelId}
         aria-expanded="true"
         aria-label="Field notes +"
+        data-cursor="expand"
       >
         <span>Field notes</span>
         <span className="flight-dossier__symbol" aria-hidden="true">
@@ -406,26 +408,34 @@ export function Portfolio() {
           </div>
         </section>
 
-        <section className="contact-section" id="contact" aria-labelledby="contact-title">
+        <section
+          className="contact-section"
+          id="contact"
+          aria-labelledby="contact-title"
+          data-contact-finale
+        >
           <div className="atlas-shell contact-board">
-            <AtlasPicture
-              visual={atlasVisuals.ending}
-              alt="A calm sunrise horizon between distant mountain ridges"
-              className="atlas-picture contact-art frame-reveal"
-              reveal
-              sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
-            />
+            <div className="contact-plate">
+              <AtlasPicture
+                visual={atlasVisuals.ending}
+                alt="A calm sunrise horizon between distant mountain ridges"
+                className="atlas-picture contact-art frame-reveal"
+                reveal
+                sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
+              />
+              <span className="contact-sunrise" data-contact-sunrise aria-hidden="true" />
+            </div>
             <div className="contact-copy editorial-grid">
               <div>
                 <p className="eyebrow">04 / Next horizon</p>
-                <h2 id="contact-title">Keep building.</h2>
+                <h2 id="contact-title" data-contact-title>Keep building.</h2>
               </div>
               <div>
                 <p>
                   I’m interested in ambitious engineering teams working across intelligent systems,
                   reliable products, and applied research.
                 </p>
-                <a className="contact-email" href={`mailto:${contact.email}`}>
+                <a className="contact-email" href={`mailto:${contact.email}`} data-magnetic>
                   Email Brett <span aria-hidden="true">↗</span>
                 </a>
               </div>
@@ -433,6 +443,9 @@ export function Portfolio() {
 
             <footer className="site-footer">
               <p>© 2026 Brett Haas</p>
+              <p data-atlas-local-time aria-label="Local time in Charlottesville, Virginia">
+                Charlottesville, VA
+              </p>
               <div>
                 <a href={contact.github} target="_blank" rel="noreferrer">
                   GitHub
@@ -441,7 +454,9 @@ export function Portfolio() {
                   LinkedIn
                 </a>
               </div>
-              <a href="#hero">Back to top ↑</a>
+              <a href="#hero">
+                Back to top <span aria-hidden="true">↑</span>
+              </a>
             </footer>
           </div>
         </section>

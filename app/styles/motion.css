@@ -14,6 +14,11 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  body::before {
+    animation: atlas-live-grain 1.6s steps(8, end) infinite;
+    will-change: transform;
+  }
+
   .atlas-picture--hero img {
     position: absolute;
     top: -6%;
@@ -73,6 +78,37 @@
 
   html.atlas-js [data-atlas-count-ready].is-counting strong {
     animation: atlas-ink-settle 120ms steps(1, end) both;
+  }
+
+  html.atlas-js [data-contact-ready] [data-contact-word] {
+    opacity: var(--atlas-contact-word-reveal, 0);
+    transform: translate3d(
+      0,
+      calc((1 - var(--atlas-contact-word-reveal, 0)) * 105%),
+      0
+    );
+    will-change: transform, opacity;
+  }
+
+  html.atlas-js [data-contact-ready]
+    > .contact-board .atlas-split-mask--word {
+    margin-inline: -0.15em;
+    padding-inline: 0.15em;
+  }
+
+  html.atlas-js [data-contact-ready]
+    .atlas-split-mask--character {
+    overflow: visible;
+  }
+
+  html.atlas-js [data-contact-ready]
+    .atlas-split-mask--character > .atlas-split-token {
+    transform: translate3d(var(--atlas-contact-character-x, 0), 0, 0);
+    will-change: transform;
+  }
+
+  html.atlas-js [data-contact-ready] .contact-email[data-magnetic-ready] {
+    transform: translate3d(var(--atlas-magnet-x, 0), var(--atlas-magnet-y, 0), 0);
   }
 
   html.atlas-hero-fallback .atlas-picture--hero {
@@ -186,6 +222,16 @@
 
   to {
     clip-path: inset(0);
+  }
+}
+
+@keyframes atlas-live-grain {
+  from {
+    transform: translate3d(-2%, 1.5%, 0);
+  }
+
+  to {
+    transform: translate3d(2%, -1.5%, 0);
   }
 }
 
@@ -651,6 +697,7 @@
     row-gap: 1.5rem;
   }
 
+  .site-footer > p:nth-child(2),
   .site-footer > div {
     justify-self: end;
   }

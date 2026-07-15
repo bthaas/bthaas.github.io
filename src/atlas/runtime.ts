@@ -1,7 +1,10 @@
 import { setupChapterWipes } from './chapter-wipe'
+import { setupContactFinale } from './contact'
 import { setupCraftChapter } from './craft'
+import { setupCursor } from './cursor'
 import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
+import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
 import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
@@ -14,11 +17,14 @@ interface AtlasRuntimeOptions {
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
   readonly prepareEntrance?: (document: Document) => () => void
   readonly prepareCraft?: (document: Document, window: Window) => () => void
+  readonly prepareContact?: (document: Document, window: Window) => () => void
+  readonly prepareCursor?: (document: Document) => () => void
   readonly prepareDossiers?: (document: Document) => () => void
   readonly prepareHero?: (document: Document, window: Window) => () => void
   readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareMagnetic?: (document: Document) => () => void
+  readonly prepareLocalTime?: (document: Document) => () => void
   readonly prepareProjects?: (document: Document, window: Window) => () => void
   readonly prepareReveals?: () => () => void
   readonly prepareSun?: (document: Document, window: Window) => () => void
@@ -33,11 +39,14 @@ export function initializeAtlas({
   matchMedia = (query) => window.matchMedia(query),
   prepareEntrance = setupEntrance,
   prepareCraft = setupCraftChapter,
+  prepareContact = setupContactFinale,
+  prepareCursor = setupCursor,
   prepareDossiers = setupDossiers,
   prepareHero = setupHeroParallax,
   prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
   prepareMagnetic = setupMagnetic,
+  prepareLocalTime = setupLocalTime,
   prepareProjects = setupProjectPans,
   prepareReveals = setupReveals,
   prepareSun = setupSunArc,
@@ -46,10 +55,12 @@ export function initializeAtlas({
   window: runtimeWindow = window,
 }: AtlasRuntimeOptions = {}): () => void {
   const cleanupWayfinding = prepareWayfinding(runtimeDocument)
+  const cleanupLocalTime = prepareLocalTime(runtimeDocument)
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const cleanupDossiers = prepareDossiers(runtimeDocument)
     return () => {
       cleanupDossiers()
+      cleanupLocalTime()
       cleanupWayfinding()
     }
   }
@@ -60,6 +71,8 @@ export function initializeAtlas({
 
   const cleanupEntrance = prepareEntrance(runtimeDocument)
   const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
+  const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
+  const cleanupCursor = prepareCursor(runtimeDocument)
   const cleanupDossiers = prepareDossiers(runtimeDocument)
   const cleanupExperience = prepareExperience(runtimeDocument, runtimeWindow)
   const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
@@ -81,6 +94,8 @@ export function initializeAtlas({
     unsubscribe()
     cleanupEntrance()
     cleanupCraft()
+    cleanupContact()
+    cleanupCursor()
     cleanupDossiers()
     cleanupExperience()
     cleanupHero()
@@ -89,6 +104,7 @@ export function initializeAtlas({
     cleanupProjects()
     cleanupSun()
     cleanupWipes()
+    cleanupLocalTime()
     cleanupWayfinding()
     cleanupReveals()
     scrollBus.destroy()

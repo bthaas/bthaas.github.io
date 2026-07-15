@@ -1,0 +1,70 @@
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .atlas-cursor {
+    position: fixed;
+    z-index: 1900;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms linear;
+  }
+
+  .atlas-cursor.is-visible {
+    opacity: 1;
+  }
+
+  .atlas-cursor__dot,
+  .atlas-cursor__ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: grid;
+    border-radius: 50%;
+    place-items: center;
+    pointer-events: none;
+  }
+
+  .atlas-cursor__dot {
+    width: 5px;
+    height: 5px;
+    background: var(--ink);
+    transform: translate3d(
+      var(--atlas-cursor-dot-x, -20px),
+      var(--atlas-cursor-dot-y, -20px),
+      0
+    ) translate(-50%, -50%);
+  }
+
+  .atlas-cursor__ring {
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgb(17 19 15 / 56%);
+    transform: translate3d(
+      var(--atlas-cursor-ring-x, -20px),
+      var(--atlas-cursor-ring-y, -20px),
+      0
+    ) translate(-50%, -50%);
+    transition:
+      width 180ms var(--ease-out),
+      height 180ms var(--ease-out),
+      background 180ms var(--ease-out),
+      color 180ms var(--ease-out);
+  }
+
+  .atlas-cursor__label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .atlas-cursor[data-cursor-mode="external"] .atlas-cursor__ring,
+  .atlas-cursor[data-cursor-mode="expand"] .atlas-cursor__ring,
+  .atlas-cursor[data-cursor-mode="read"] .atlas-cursor__ring {
+    width: 48px;
+    height: 48px;
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--cream);
+  }
+}

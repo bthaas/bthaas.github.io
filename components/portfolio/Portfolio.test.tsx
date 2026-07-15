@@ -202,12 +202,13 @@ describe('Portfolio', () => {
   })
 
   it('keeps the contact destinations explicit and keyboard reachable', () => {
-    render(<Portfolio />)
+    const { container } = render(<Portfolio />)
 
     expect(screen.getByRole('link', { name: 'Email Brett' })).toHaveAttribute(
       'href',
       'mailto:bthaas15@gmail.com',
     )
+    expect(screen.getByRole('link', { name: 'Email Brett' })).toHaveAttribute('data-magnetic')
     expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
       'href',
       'https://github.com/bthaas',
@@ -216,5 +217,11 @@ describe('Portfolio', () => {
       'href',
       'https://linkedin.com/in/brett-haas',
     )
+    expect(container.querySelector('[data-contact-title]')).toHaveTextContent('Keep building.')
+    expect(container.querySelector('[data-contact-sunrise]')).toBeInTheDocument()
+    expect(container.querySelector('[data-atlas-local-time]')).toHaveTextContent(
+      'Charlottesville, VA',
+    )
+    expect(container.querySelector('[data-atlas-local-time]')).not.toHaveTextContent(/\d{2}:\d{2}/)
   })
 })
