@@ -8,8 +8,178 @@
   vertical-align: bottom;
 }
 
+.atlas-split-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .atlas-picture--hero img {
+    position: absolute;
+    top: -6%;
+    left: 0;
+    width: 100%;
+    height: 112%;
+    max-width: none;
+  }
+
+  .hero-copy-release {
+    padding-bottom: 40vh;
+  }
+
+  .hero-copy {
+    position: sticky;
+    z-index: 1;
+    top: clamp(4.5rem, 9vh, 7rem);
+    align-items: start;
+    background: var(--cream);
+  }
+
+  html.atlas-entering .hero-art {
+    animation: atlas-plate-press var(--atlas-entrance-plate-duration) var(--ease-out) both;
+  }
+
+  html.atlas-entering body::before {
+    animation: atlas-grain-press var(--atlas-entrance-grain-duration) steps(1, end)
+      var(--atlas-entrance-grain-delay) both;
+  }
+
+  html.atlas-entering [data-atlas-masthead] .atlas-split-token {
+    animation: atlas-masthead-rise var(--atlas-entrance-character-duration) var(--ease-out) both;
+    animation-delay: calc(
+      var(--atlas-entrance-masthead-start) +
+      var(--atlas-split-index) * var(--atlas-entrance-character-stagger)
+    );
+  }
+
+  html.atlas-entering .site-nav,
+  html.atlas-entering .hero-meta {
+    animation: atlas-entrance-chrome var(--atlas-entrance-chrome-duration) var(--ease-out) both;
+    animation-delay: var(--atlas-entrance-chrome-start);
+  }
+
+  html.atlas-js [data-atlas-count-ready] small {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 240ms var(--ease-out) var(--atlas-source-delay),
+      transform 240ms var(--ease-out) var(--atlas-source-delay);
+  }
+
+  html.atlas-js [data-atlas-count-ready].is-counted small {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  html.atlas-js [data-atlas-count-ready].is-counting strong {
+    animation: atlas-ink-settle 120ms steps(1, end) both;
+  }
+
+  html.atlas-hero-fallback .atlas-picture--hero {
+    transform: scale(var(--atlas-hero-scale, 1.05));
+  }
+
+  html.atlas-hero-fallback .atlas-picture--hero img {
+    transform: translate3d(0, var(--atlas-hero-image-y, 0%), 0);
+  }
+
+  html.atlas-hero-fallback .art-caption {
+    transform: translate3d(0, var(--atlas-hero-caption-y, 0), 0);
+  }
+}
+
+@media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
+  .hero-art {
+    height: clamp(28rem, 48vh, 34rem);
+  }
+
+  .atlas-picture--hero {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+}
+
+@keyframes atlas-plate-press {
+  from {
+    clip-path: inset(100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes atlas-grain-press {
+  from {
+    opacity: 0.075;
+  }
+
+  to {
+    opacity: 0.04;
+  }
+}
+
+@keyframes atlas-masthead-rise {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes atlas-entrance-chrome {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes atlas-ink-settle {
+  from {
+    opacity: 0.82;
+    transform: scaleX(1.012);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js .hero-art {
+      view-timeline-axis: block;
+      view-timeline-name: --atlas-hero;
+    }
+
+    html.atlas-js .atlas-picture--hero {
+      animation: atlas-hero-settle both linear;
+      animation-range: exit 0% exit 100%;
+      animation-timeline: --atlas-hero;
+    }
+
+    html.atlas-js .atlas-picture--hero img {
+      animation: atlas-hero-parallax both linear;
+      animation-range: exit 0% exit 100%;
+      animation-timeline: --atlas-hero;
+    }
+
+    html.atlas-js .art-caption--light {
+      animation: atlas-caption-drift both linear;
+      animation-range: exit 0% exit 100%;
+      animation-timeline: --atlas-hero;
+    }
+
     .frame-reveal[data-reveal] {
       animation: atlas-reveal both linear;
       animation-range: entry 8% cover 34%;
@@ -25,6 +195,36 @@
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @keyframes atlas-hero-settle {
+      from {
+        transform: scale(1.05);
+      }
+
+      to {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes atlas-hero-parallax {
+      from {
+        transform: translate3d(0, 0, 0);
+      }
+
+      to {
+        transform: translate3d(0, 10.7%, 0);
+      }
+    }
+
+    @keyframes atlas-caption-drift {
+      from {
+        transform: translate3d(0, 0, 0);
+      }
+
+      to {
+        transform: translate3d(0, -2.5vh, 0);
       }
     }
   }

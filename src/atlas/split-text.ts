@@ -5,10 +5,12 @@ export function splitText(element: HTMLElement, mode: SplitTextMode = 'word'): v
 
   const plan = planSplitText(element.textContent ?? '', mode)
   const fragment = document.createDocumentFragment()
+  let word: HTMLSpanElement | undefined
 
   for (const segment of plan.segments) {
     if (segment.isWhitespace) {
       fragment.append(document.createTextNode(segment.value))
+      word = undefined
       continue
     }
 
@@ -20,7 +22,16 @@ export function splitText(element: HTMLElement, mode: SplitTextMode = 'word'): v
     token.className = 'atlas-split-token'
     token.textContent = segment.value
     mask.append(token)
-    fragment.append(mask)
+    if (mode === 'character') {
+      if (!word) {
+        word = document.createElement('span')
+        word.className = 'atlas-split-word'
+        fragment.append(word)
+      }
+      word.append(mask)
+    } else {
+      fragment.append(mask)
+    }
   }
 
   element.setAttribute('aria-label', plan.accessibleLabel)

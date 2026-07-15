@@ -2,6 +2,34 @@ import type { Metadata, Viewport } from 'next'
 
 import './globals.css'
 
+const noScriptHeroStyles = `
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-copy-release { padding-bottom: 0 !important; }
+    .hero-copy {
+      position: static !important;
+      z-index: auto !important;
+      top: auto !important;
+      align-items: end !important;
+      background: transparent !important;
+    }
+    .atlas-picture--hero img {
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+  @media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
+    .hero-art { height: auto !important; }
+    .atlas-picture--hero {
+      height: auto !important;
+      aspect-ratio: 16 / 8.7 !important;
+    }
+  }
+`
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://bthaas.github.io'),
   title: 'Brett Haas',
@@ -52,6 +80,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           fetchPriority="high"
         />
         <script src="/atlas.js" defer />
+        <noscript>
+          <style>{noScriptHeroStyles}</style>
+        </noscript>
       </head>
       <body>{children}</body>
     </html>

@@ -93,17 +93,19 @@ export function Portfolio() {
             <p className="art-caption art-caption--light">Plate 01 / Ambition needs systems</p>
           </div>
 
-          <div className="hero-copy editorial-grid">
-            <div className="hero-identity">
-              <p className="eyebrow">Engineer · Researcher · Builder</p>
-              <h1 id="hero-name">{identity.name}</h1>
-            </div>
-            <div className="hero-statement">
-              <h2>I build intelligent systems that hold up in the real world.</h2>
-              <p>{identity.descriptor}</p>
-              <a className="text-link" href="#projects">
-                Explore selected work <span aria-hidden="true">↓</span>
-              </a>
+          <div className="hero-copy-release">
+            <div className="hero-copy editorial-grid">
+              <div className="hero-identity">
+                <p className="eyebrow">Engineer · Researcher · Builder</p>
+                <h1 data-atlas-masthead id="hero-name">{identity.name}</h1>
+              </div>
+              <div className="hero-statement">
+                <h2>I build intelligent systems that hold up in the real world.</h2>
+                <p>{identity.descriptor}</p>
+                <a className="text-link" href="#projects">
+                  Explore selected work <span aria-hidden="true">↓</span>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -112,7 +114,7 @@ export function Portfolio() {
               const source = experience.find(({ id }) => id === metric.sourceId)
               return (
                 <div className="signal-metric" data-testid="featured-metric" key={metric.value}>
-                  <strong data-testid="metric-value">{metric.value}</strong>
+                  <strong data-atlas-count data-testid="metric-value">{metric.value}</strong>
                   <span>{metric.label}</span>
                   <small>{source?.organization}</small>
                 </div>

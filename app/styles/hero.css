@@ -86,6 +86,10 @@
   border-bottom: 1px solid var(--ink);
 }
 
+.hero-copy-release {
+  position: relative;
+}
+
 .hero-identity {
   grid-column: 1 / span 5;
 }
@@ -166,4 +170,3 @@
   color: rgb(255 253 245 / 56%);
   letter-spacing: 0.09em;
 }
-
