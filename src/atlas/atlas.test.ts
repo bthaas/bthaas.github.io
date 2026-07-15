@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { countUp } from './count-up'
+import { setupChapterWipes } from './chapter-wipe'
 import { setupCraftChapter } from './craft'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupExperienceChapter } from './experience'
+import { setupMagnetic } from './magnetic'
+import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
 import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
@@ -177,28 +180,9 @@ describe('atlas DOM capabilities', () => {
       y: 2000,
       toJSON: () => undefined,
     })
-    let update: IntersectionObserverCallback | undefined
-    const observer = {
-      disconnect: vi.fn(),
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-    } as unknown as IntersectionObserver
-    const cleanup = setupCraftChapter(
-      document,
-      window,
-      false,
-      (callback) => {
-        update = callback
-        return observer
-      },
-    )
+    const cleanup = setupCraftChapter(document, window, false)
 
     expect(document.documentElement).toHaveClass('atlas-craft-fallback')
-    expect(observer.observe).toHaveBeenCalledWith(section)
-    update?.([
-      { isIntersecting: true, target: section },
-    ] as unknown as IntersectionObserverEntry[], observer)
-    expect(section).toHaveClass('is-craft-visible')
 
     window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 1702.5 } }))
     expect(plate.style.getPropertyValue('--atlas-craft-clip-bottom')).toBe('50%')
@@ -207,7 +191,114 @@ describe('atlas DOM capabilities', () => {
 
     cleanup()
     expect(document.documentElement).not.toHaveClass('atlas-craft-fallback')
-    expect(section).not.toHaveClass('is-craft-visible')
+  })
+
+  it('reveals Craft and project page turns through one shared IO fallback', () => {
+    document.body.innerHTML = `
+      <section data-chapter-wipe></section>
+      <article data-chapter-wipe></article>
+      <article data-chapter-wipe></article>
+      <article data-chapter-wipe></article>
+    `
+    const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-chapter-wipe]'))
+    let update: IntersectionObserverCallback | undefined
+    const observer = {
+      disconnect: vi.fn(),
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+    } as unknown as IntersectionObserver
+    const cleanup = setupChapterWipes(document, false, (callback) => {
+      update = callback
+      return observer
+    })
+
+    expect(document.documentElement).toHaveClass('atlas-chapter-wipe-fallback')
+    expect(observer.observe).toHaveBeenCalledTimes(4)
+    update?.(
+      [{ isIntersecting: true, target: chapters[1] }] as unknown as IntersectionObserverEntry[],
+      observer,
+    )
+    expect(chapters[1]).toHaveClass('is-chapter-visible')
+    expect(observer.unobserve).toHaveBeenCalledWith(chapters[1])
+    cleanup()
+    expect(document.documentElement).not.toHaveClass('atlas-chapter-wipe-fallback')
+  })
+
+  it('writes alternating project pan transforms from the shared scroll event', () => {
+    document.body.innerHTML = `
+      <picture class="project-art" data-project-pan><img /></picture>
+      <picture class="project-art" data-project-pan><img /></picture>
+      <picture class="project-art" data-project-pan><img /></picture>
+    `
+    const plates = Array.from(document.querySelectorAll<HTMLElement>('[data-project-pan]'))
+    plates.forEach((plate) => {
+      vi.spyOn(plate, 'getBoundingClientRect').mockReturnValue({
+        bottom: 2600,
+        height: 600,
+        left: 0,
+        right: 900,
+        top: 2000,
+        width: 900,
+        x: 0,
+        y: 2000,
+        toJSON: () => undefined,
+      })
+    })
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
+    const cleanup = setupProjectPans(document, window, false)
+
+    expect(document.documentElement).toHaveClass('atlas-project-fallback')
+    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 1000 } }))
+    expect(plates.map((plate) => plate.style.getPropertyValue('--atlas-project-pan-x'))).toEqual([
+      '-6.522%',
+      '6.522%',
+      '-6.522%',
+    ])
+    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 1800 } }))
+    expect(plates.map((plate) => plate.style.getPropertyValue('--atlas-project-pan-x'))).toEqual([
+      '0%',
+      '0%',
+      '0%',
+    ])
+    cleanup()
+    expect(document.documentElement).not.toHaveClass('atlas-project-fallback')
+  })
+
+  it('damps fine-pointer magnetic links without exceeding six pixels', () => {
+    document.body.innerHTML = '<a data-magnetic href="#"><span>↗</span></a>'
+    const link = document.querySelector<HTMLElement>('[data-magnetic]')!
+    vi.spyOn(link, 'getBoundingClientRect').mockReturnValue({
+      bottom: 100,
+      height: 100,
+      left: 0,
+      right: 100,
+      top: 0,
+      width: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => undefined,
+    })
+    const frames: FrameRequestCallback[] = []
+    const requestFrame = vi.fn((callback: FrameRequestCallback) => {
+      frames.push(callback)
+      return frames.length
+    })
+    const cancelFrame = vi.fn()
+    const cleanup = setupMagnetic(document, () => true, requestFrame, cancelFrame)
+
+    link.dispatchEvent(new MouseEvent('pointerenter', { clientX: 50, clientY: 50 }))
+    link.dispatchEvent(new MouseEvent('pointermove', { clientX: 500, clientY: -500 }))
+    for (let index = 0; index < 30 && frames.length > 0; index += 1) frames.shift()?.(index)
+
+    expect(Number.parseFloat(link.style.getPropertyValue('--atlas-magnet-x'))).toBeLessThanOrEqual(6)
+    expect(Number.parseFloat(link.style.getPropertyValue('--atlas-magnet-y'))).toBeGreaterThanOrEqual(-6)
+    expect(link).toHaveAttribute('data-magnetic-ready')
+    cleanup()
+    expect(link).not.toHaveAttribute('data-magnetic-ready')
+
+    const touchCleanup = setupMagnetic(document, () => false, requestFrame, cancelFrame)
+    expect(link).not.toHaveAttribute('data-magnetic-ready')
+    touchCleanup()
   })
 
   it('steps the Trajectory overlay lighting through three IO fallback depths', () => {
@@ -327,6 +418,9 @@ describe('atlas DOM capabilities', () => {
     const prepareHero = vi.fn()
     const prepareCraft = vi.fn()
     const prepareMetrics = vi.fn()
+    const prepareMagnetic = vi.fn()
+    const prepareProjects = vi.fn()
+    const prepareWipes = vi.fn()
     const cleanupDossiers = vi.fn()
     const prepareDossiers = vi.fn(() => cleanupDossiers)
     const prepareExperience = vi.fn()
@@ -345,9 +439,12 @@ describe('atlas DOM capabilities', () => {
       prepareCraft,
       prepareDossiers,
       prepareMetrics,
+      prepareMagnetic,
+      prepareProjects,
       prepareExperience,
       prepareReveals,
       prepareSun,
+      prepareWipes,
       prepareWayfinding,
       window,
     })
@@ -359,6 +456,9 @@ describe('atlas DOM capabilities', () => {
     expect(prepareHero).not.toHaveBeenCalled()
     expect(prepareCraft).not.toHaveBeenCalled()
     expect(prepareMetrics).not.toHaveBeenCalled()
+    expect(prepareMagnetic).not.toHaveBeenCalled()
+    expect(prepareProjects).not.toHaveBeenCalled()
+    expect(prepareWipes).not.toHaveBeenCalled()
     expect(prepareDossiers).toHaveBeenCalledOnce()
     expect(prepareExperience).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
@@ -381,6 +481,9 @@ describe('atlas DOM capabilities', () => {
     const cleanupDossiers = vi.fn()
     const cleanupExperience = vi.fn()
     const cleanupSun = vi.fn()
+    const cleanupMagnetic = vi.fn()
+    const cleanupProjects = vi.fn()
+    const cleanupWipes = vi.fn()
     const cleanupWayfinding = vi.fn()
     const createBus = vi.fn(() => ({
       destroy: destroyBus,
@@ -400,9 +503,12 @@ describe('atlas DOM capabilities', () => {
       prepareCraft: () => cleanupCraft,
       prepareDossiers: () => cleanupDossiers,
       prepareMetrics: () => cleanupMetrics,
+      prepareMagnetic: () => cleanupMagnetic,
+      prepareProjects: () => cleanupProjects,
       prepareExperience: () => cleanupExperience,
       prepareReveals: () => cleanupReveals,
       prepareSun: () => cleanupSun,
+      prepareWipes: () => cleanupWipes,
       prepareWayfinding: () => cleanupWayfinding,
       window,
     })
@@ -421,6 +527,9 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupDossiers).toHaveBeenCalledOnce()
     expect(cleanupExperience).toHaveBeenCalledOnce()
     expect(cleanupSun).toHaveBeenCalledOnce()
+    expect(cleanupMagnetic).toHaveBeenCalledOnce()
+    expect(cleanupProjects).toHaveBeenCalledOnce()
+    expect(cleanupWipes).toHaveBeenCalledOnce()
     expect(cleanupWayfinding).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()
     expect(destroyBus).toHaveBeenCalledOnce()

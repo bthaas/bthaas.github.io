@@ -1,4 +1,6 @@
 .craft-section {
+  --chapter-wipe-base: var(--cream);
+  --chapter-wipe-color: var(--citron);
   position: relative;
   isolation: isolate;
   padding: clamp(5rem, 10vw, 10rem) 0;

@@ -169,6 +169,26 @@ describe('Portfolio', () => {
     ).toHaveAttribute('href', 'https://github.com/bthaas/vision-bias-steering')
   })
 
+  it('marks project chapters for alternating wipes, pans, cascades, and magnetic links', () => {
+    render(<Portfolio />)
+
+    const studies = screen.getAllByTestId('project-case-study')
+    expect(studies.map((study) => study.getAttribute('data-wipe-direction'))).toEqual([
+      'ltr',
+      'rtl',
+      'ltr',
+    ])
+
+    studies.forEach((study) => {
+      expect(study).toHaveAttribute('data-chapter-wipe')
+      expect(study.querySelector('[data-project-pan]')).not.toBeNull()
+      expect(study.querySelector('.case-study-copy')).toHaveAttribute('data-reveal-stagger')
+      expect(within(study).getByRole('link', { name: /repository/i })).toHaveAttribute(
+        'data-magnetic',
+      )
+    })
+  })
+
   it('contains no legacy cinematic or modal presentation surfaces', () => {
     const { container } = render(<Portfolio />)
 

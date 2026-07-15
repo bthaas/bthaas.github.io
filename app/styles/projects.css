@@ -19,25 +19,46 @@
 }
 
 .project-chapter {
+  --chapter-wipe-base: var(--cream);
+  --project-case-start: -48px;
+  --project-tech-start: 48px;
+  --project-pan-start: -6.522%;
+  --project-pan-end: 6.522%;
+  position: relative;
+  isolation: isolate;
   padding: clamp(4rem, 8vw, 8rem) 0;
 }
 
 .project-chapter--1 {
+  --chapter-wipe-base: var(--cobalt-deep);
+  --chapter-wipe-color: var(--cobalt);
+  --repository-inverted: var(--cobalt);
   background: var(--cobalt);
   color: var(--paper);
 }
 
 .project-chapter--2 {
+  --chapter-wipe-color: var(--citron);
+  --project-case-start: 48px;
+  --project-tech-start: -48px;
+  --project-pan-start: 6.522%;
+  --project-pan-end: -6.522%;
+  --repository-inverted: var(--citron);
   background: var(--citron);
   color: var(--ink);
 }
 
 .project-chapter--3 {
+  --chapter-wipe-base: var(--dusk-deep);
+  --chapter-wipe-color: var(--dusk);
+  --repository-inverted: var(--dusk);
   background: var(--dusk);
   color: var(--paper);
 }
 
 .project-grid {
+  position: relative;
+  z-index: 1;
   align-items: start;
 }
 
@@ -86,6 +107,10 @@
 }
 
 .project-art img {
+  position: relative;
+  left: -7.6%;
+  width: 115%;
+  max-width: none;
   object-position: center;
 }
 
@@ -95,9 +120,20 @@
 }
 
 .case-study-copy > div {
+  position: relative;
   padding: 0 0 1.4rem;
-  border-bottom: 1px solid currentColor;
   margin-bottom: 1.4rem;
+}
+
+.case-study-copy > div::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  transform-origin: left;
 }
 
 .case-study-copy h4 {
@@ -115,9 +151,46 @@
 }
 
 .repository-link {
+  --repository-foreground: currentColor;
   grid-column: 9 / -1;
+  display: inline-flex;
+  padding: 0.72rem 1rem;
+  border: 1px solid var(--repository-foreground);
+  border-radius: 999px;
   justify-self: start;
+  align-items: center;
+  gap: 0.55rem;
   margin: 1.5rem 0 0 clamp(1rem, 2vw, 2rem);
+  background: transparent;
+  color: var(--repository-foreground);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: translate3d(var(--atlas-magnet-x, 0), var(--atlas-magnet-y, 0), 0);
+  transition:
+    background-color 180ms var(--ease-out),
+    color 180ms var(--ease-out);
+}
+
+.repository-link span {
+  transition: transform 220ms var(--ease-out);
+}
+
+.repository-link:hover span,
+.repository-link:focus-visible span {
+  transform: translate3d(3px, -3px, 0);
+}
+
+.repository-link:hover,
+.repository-link:focus-visible,
+.repository-link:active {
+  background: var(--repository-foreground);
+  color: var(--repository-inverted);
+}
+
+.repository-link[data-magnetic-ready] {
+  will-change: transform;
 }
 
 .project-chapter--2 .project-art {
@@ -137,3 +210,160 @@
   margin-left: 0;
 }
 
+.chapter-wipe::before {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.atlas-js.atlas-reveal-ready .case-study-copy[data-reveal-stagger] > div {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 560ms var(--ease-out) var(--atlas-reveal-delay, 0ms),
+      transform 560ms var(--ease-out) var(--atlas-reveal-delay, 0ms);
+  }
+
+  html.atlas-js.atlas-reveal-ready .case-study-copy[data-reveal-stagger] > div::after {
+    transform: scaleX(0);
+    transition: transform 620ms var(--ease-out) var(--atlas-reveal-delay, 0ms);
+  }
+
+  html.atlas-js.atlas-reveal-ready .case-study-copy[data-reveal-stagger] > .is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  html.atlas-js.atlas-reveal-ready
+    .case-study-copy[data-reveal-stagger]
+    > .is-revealed::after {
+    transform: scaleX(1);
+  }
+}
+
+@media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
+  html.atlas-js .project-title {
+    position: sticky;
+    z-index: 2;
+    top: clamp(5.5rem, 12vh, 8rem);
+    align-self: start;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js .chapter-wipe {
+      background: var(--chapter-wipe-base);
+    }
+
+    html.atlas-js .chapter-wipe::before {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      background: var(--chapter-wipe-color);
+      content: "";
+      animation: atlas-chapter-wipe both linear;
+      animation-range: entry 0% cover 28%;
+      animation-timeline: view();
+    }
+
+    html.atlas-js .chapter-wipe--ltr::before {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    html.atlas-js .chapter-wipe--rtl::before {
+      clip-path: inset(0 0 0 100%);
+    }
+
+    html.atlas-js .project-chapter {
+      view-timeline-axis: block;
+      view-timeline-name: --atlas-project-chapter;
+    }
+
+    html.atlas-js .project-case-label,
+    html.atlas-js .project-tech-list {
+      animation: atlas-project-lockup both linear;
+      animation-range: entry 0% cover 24%;
+      animation-timeline: --atlas-project-chapter;
+    }
+
+    html.atlas-js .project-case-label {
+      --project-lockup-start: var(--project-case-start);
+    }
+
+    html.atlas-js .project-tech-list {
+      --project-lockup-start: var(--project-tech-start);
+    }
+
+    html.atlas-js .project-art {
+      view-timeline-axis: block;
+      view-timeline-name: --atlas-project-plate;
+    }
+
+    html.atlas-js .project-art img {
+      animation: atlas-project-pan both linear;
+      animation-range: entry 0% exit 100%;
+      animation-timeline: --atlas-project-plate;
+    }
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe {
+      background: var(--chapter-wipe-base);
+    }
+
+    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe::before {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      background: var(--chapter-wipe-color);
+      content: "";
+      transition: clip-path 900ms var(--ease-out);
+    }
+
+    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe--ltr::before {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe--rtl::before {
+      clip-path: inset(0 0 0 100%);
+    }
+
+    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe.is-chapter-visible::before {
+      clip-path: inset(0);
+    }
+
+    html.atlas-js.atlas-project-fallback .project-art img {
+      transform: translate3d(var(--atlas-project-pan-x, 0%), 0, 0);
+    }
+  }
+}
+
+@keyframes atlas-chapter-wipe {
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes atlas-project-lockup {
+  from {
+    opacity: 0.35;
+    transform: translate3d(var(--project-lockup-start), 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes atlas-project-pan {
+  from {
+    transform: translate3d(var(--project-pan-start), 0, 0);
+  }
+
+  to {
+    transform: translate3d(var(--project-pan-end), 0, 0);
+  }
+}

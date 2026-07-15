@@ -243,23 +243,6 @@
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    html.atlas-js .craft-section {
-      background: var(--cream);
-    }
-
-    html.atlas-js .craft-section::before {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      background: var(--citron);
-      clip-path: inset(0 100% 0 0);
-      content: "";
-      animation: atlas-craft-wipe both linear;
-      animation-range: entry 0% cover 28%;
-      animation-timeline: view();
-      pointer-events: none;
-    }
-
     html.atlas-js .craft-narrative {
       view-timeline-axis: block;
       view-timeline-name: --atlas-craft-narrative;
@@ -356,12 +339,6 @@
       }
     }
 
-    @keyframes atlas-craft-wipe {
-      to {
-        clip-path: inset(0);
-      }
-    }
-
     @keyframes atlas-craft-counter-parallax {
       from {
         transform: translate3d(0, 28px, 0);
@@ -396,25 +373,6 @@
 
 @supports not (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    html.atlas-js.atlas-craft-fallback .craft-section {
-      background: var(--cream);
-    }
-
-    html.atlas-js.atlas-craft-fallback .craft-section::before {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      background: var(--citron);
-      clip-path: inset(0 100% 0 0);
-      content: "";
-      pointer-events: none;
-      transition: clip-path 900ms var(--ease-out);
-    }
-
-    html.atlas-js.atlas-craft-fallback .craft-section.is-craft-visible::before {
-      clip-path: inset(0);
-    }
-
     html.atlas-js.atlas-craft-fallback .craft-ghost {
       transform: translate3d(0, var(--atlas-craft-ghost-y, 28px), 0);
     }

@@ -1,6 +1,9 @@
+import { setupChapterWipes } from './chapter-wipe'
 import { setupCraftChapter } from './craft'
 import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
+import { setupMagnetic } from './magnetic'
+import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
 import { setupSectionWayfinding, setupSunArc } from './sun-arc'
@@ -15,9 +18,12 @@ interface AtlasRuntimeOptions {
   readonly prepareHero?: (document: Document, window: Window) => () => void
   readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
+  readonly prepareMagnetic?: (document: Document) => () => void
+  readonly prepareProjects?: (document: Document, window: Window) => () => void
   readonly prepareReveals?: () => () => void
   readonly prepareSun?: (document: Document, window: Window) => () => void
   readonly prepareWayfinding?: (document: Document) => () => void
+  readonly prepareWipes?: (document: Document) => () => void
   readonly window?: Window
 }
 
@@ -31,9 +37,12 @@ export function initializeAtlas({
   prepareHero = setupHeroParallax,
   prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
+  prepareMagnetic = setupMagnetic,
+  prepareProjects = setupProjectPans,
   prepareReveals = setupReveals,
   prepareSun = setupSunArc,
   prepareWayfinding = setupSectionWayfinding,
+  prepareWipes = setupChapterWipes,
   window: runtimeWindow = window,
 }: AtlasRuntimeOptions = {}): () => void {
   const cleanupWayfinding = prepareWayfinding(runtimeDocument)
@@ -55,7 +64,10 @@ export function initializeAtlas({
   const cleanupExperience = prepareExperience(runtimeDocument, runtimeWindow)
   const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
+  const cleanupMagnetic = prepareMagnetic(runtimeDocument)
+  const cleanupProjects = prepareProjects(runtimeDocument, runtimeWindow)
   const cleanupSun = prepareSun(runtimeDocument, runtimeWindow)
+  const cleanupWipes = prepareWipes(runtimeDocument)
   const scrollBus = createBus()
   const unsubscribe = scrollBus.subscribe((snapshot) => {
     runtimeWindow.dispatchEvent(new CustomEvent('atlas:scroll', { detail: snapshot }))
@@ -73,7 +85,10 @@ export function initializeAtlas({
     cleanupExperience()
     cleanupHero()
     cleanupMetrics()
+    cleanupMagnetic()
+    cleanupProjects()
     cleanupSun()
+    cleanupWipes()
     cleanupWayfinding()
     cleanupReveals()
     scrollBus.destroy()
