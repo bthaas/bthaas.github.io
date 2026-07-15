@@ -55,8 +55,15 @@ Every agent brief below assumes these repo facts:
 6. New interactive elements are keyboard-operable with visible focus and
    correct ARIA.
 7. No file exceeds 800 lines.
-8. Transform/opacity/clip-path only for animation (no layout-thrashing
-   properties); scroll work compositor-side or rAF-batched.
+8. Scroll-linked and continuous animation uses compositor-friendly
+   properties only (`transform`, `opacity`, `clip-path`), compositor-side or
+   rAF-batched — never scrub `filter`, `background-*`, or any layout
+   property with scroll; achieve color/light shifts with opacity-scrubbed
+   overlay layers. Discrete, user-triggered transitions (e.g. the Step 5
+   dossier expanders) may animate a layout property such as
+   `grid-template-rows` when they are ≤400 ms, below the fold or
+   self-contained, and a DevTools performance trace shows no dropped frames.
+   *(Amended 2026-07-15 — see Amendments.)*
 
 ### Dependency graph
 
@@ -323,18 +330,25 @@ currently-unused `highlights[]` content. Spec: plan §5.3.
 `content/site-content.ts` (`experience[].highlights`, `technologies`).
 
 **Tasks**
-1. **Dusk deepens:** interpolate section background from `--dusk-deep`
-   slightly darker across the section's scroll span (scroll-driven custom
-   property; fallback: three IO-stepped values). Use/adapt
-   `getDescentLighting` so the curve stays unit-tested.
-2. **Plate:** lighthouse image parallax + scrubbed warmth shift
-   (`filter: saturate/hue` within ±5% — subtle).
+1. **Dusk deepens:** a full-section darkening overlay (near-black ink
+   layer, `pointer-events: none`, behind content) whose `opacity` scrubs
+   0 → ~0.35 across the section's scroll span (scroll-timeline; fallback:
+   three IO-stepped opacity values). Do NOT scrub `background-color` or a
+   color custom property (invariant 8). Use/adapt `getDescentLighting` so
+   the curve stays unit-tested; tune the max opacity visually.
+2. **Plate:** lighthouse image parallax + a warm-tint overlay inside the
+   plate frame (solar/coral tint, `mix-blend-mode: soft-light` or plain)
+   whose `opacity` scrubs subtly with view progress. Do NOT animate
+   `filter` (invariant 8) — the overlay is the visual equivalent.
 3. **Entry entrances:** per `flight-entry`: bottom rule draws `scaleX 0→1`,
    index numeral odometer-flips, then title/summary rise. IO + stagger from
    Step 1 orchestrator.
 4. **Dossier expanders:** each experience entry gets a `<button>` toggle
    ("Field notes +") revealing `highlights[]` bullets + technology tags with
-   a smooth `grid-template-rows: 0fr→1fr` height animation.
+   a smooth `grid-template-rows: 0fr→1fr` height animation — explicitly
+   sanctioned by invariant 8 as a discrete, user-triggered, below-the-fold
+   transition ≤400 ms (FLIP is not required; verify with a performance
+   trace).
    - Server-rendered markup: content present in DOM. No-JS/SEO base state =
      expanded (via `html:not(.atlas-js)` styling); collapsed under
      `html.atlas-js` (Step 1's marker). The section is far below the fold,
@@ -432,8 +446,10 @@ Next static export serves `404.html`).
    no-reduced-motion only; ring morphs to "↗" over external links, "+" over
    dossier expanders, "read" over plates. Never `cursor: none` — native
    cursor remains; element is `aria-hidden`, `pointer-events: none`.
-6. **Live grain:** animate the existing `body::before` noise with an 8-step
-   `steps()` background-position loop at current opacity; static under
+6. **Live grain:** size the existing `body::before` noise layer to ~130%
+   of the viewport and loop an 8-step `steps()` `transform: translate(…)`
+   through offset positions (compositor-only; do NOT animate
+   `background-position` — invariant 8) at current opacity; static under
    reduced motion.
 7. **Themed 404:** create `app/not-found.tsx` — "This plate is missing from
    the atlas." + wing mark + link home; styled entirely with existing
@@ -503,3 +519,22 @@ command or documented procedure; `npm run verify` green.
   (mutation protocol: append, never rewrite history of completed steps).
 - After each merge, watch the `Deploy to GitHub Pages` action and the live
   site before dispatching the next step.
+
+---
+
+## Amendments
+
+**2026-07-15 — invariant 8 clarified; Steps 5 & 7 made consistent with it.**
+The Step 5 executor correctly flagged that the original Step 5 tasks required
+animating `filter` and `grid-template-rows` while invariant 8 permitted only
+transform/opacity/clip-path. Resolution: invariant 8 now states its actual
+intent — compositor-only properties for anything scroll-linked/continuous,
+with a narrow allowance for discrete user-triggered layout transitions
+(≤400 ms, below the fold, trace-verified). Step 5's dusk deepening and plate
+warmth became opacity-scrubbed overlay layers; the dossier expander keeps
+`grid-template-rows` under the discrete allowance; Step 7's grain loop became
+a stepped transform on an oversized layer. No completed steps (0–4) are
+affected. Cloudflare dashboard changes (script-injection settings) are out of
+scope for Steps 5–7; the "only /atlas.js ships" check runs against the local
+production build (`out/`), and the live-domain Cloudflare script audit is a
+deferred Step 8 item.
