@@ -40,7 +40,6 @@
 }
 
 .sun-arc__track,
-.sun-arc__horizon,
 .sun-arc__halo {
   fill: none;
   stroke: currentColor;
@@ -50,10 +49,6 @@
 
 .sun-arc__track {
   opacity: 0.2;
-}
-
-.sun-arc__horizon {
-  opacity: 0.42;
 }
 
 .sun-arc__halo {

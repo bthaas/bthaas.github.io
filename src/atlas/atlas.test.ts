@@ -162,6 +162,26 @@ describe('atlas DOM capabilities', () => {
     cleanup()
   })
 
+  it('moves the current header sun when hydration replaces the original SVG node', () => {
+    document.body.innerHTML = `
+      <svg><g data-atlas-sun transform="translate(0 0)"></g></svg>
+      <section id="experience"></section>
+    `
+    const originalSun = document.querySelector('[data-atlas-sun]')!
+    const cleanup = setupSunArc(document, window, () => 0.4)
+
+    originalSun.replaceWith(originalSun.cloneNode(true))
+    window.dispatchEvent(new CustomEvent('atlas:scroll', {
+      detail: { documentProgress: 0.4, scrollY: 1000 },
+    }))
+
+    expect(document.querySelector('[data-atlas-sun]')).toHaveAttribute(
+      'transform',
+      'translate(112 -14)',
+    )
+    cleanup()
+  })
+
   it('scrubs the contact glow, word reveal, and centered character exhale from shared progress', () => {
     document.body.innerHTML = `
       <section id="contact" data-contact-finale>

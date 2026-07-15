@@ -43,15 +43,21 @@ export function setupSunArc(
   runtimeWindow: Window = window,
   getApexProgress: () => number = () => measureTrajectoryApex(root, runtimeWindow),
 ): () => void {
-  const sun = root.querySelector<SVGGElement>('[data-atlas-sun]')
+  let sun = root.querySelector<SVGGElement>('[data-atlas-sun]')
   if (!sun) return () => undefined
 
   let apexProgress = getApexProgress()
   let latestProgress = 0
+  const getCurrentSun = () => {
+    if (!sun?.isConnected) {
+      sun = root.querySelector<SVGGElement>('[data-atlas-sun]')
+    }
+    return sun
+  }
   const render = (progress: number) => {
     latestProgress = progress
     const position = getSunArcPosition(progress, apexProgress)
-    sun.setAttribute('transform', `translate(${position.x} ${position.y})`)
+    getCurrentSun()?.setAttribute('transform', `translate(${position.x} ${position.y})`)
     runtimeWindow.dispatchEvent(new CustomEvent<SunProgressDetail>(SUN_PROGRESS_EVENT, {
       detail: { position, progress: position.progress },
     }))
@@ -70,7 +76,7 @@ export function setupSunArc(
   return () => {
     runtimeWindow.removeEventListener('atlas:scroll', handleScroll)
     runtimeWindow.removeEventListener('resize', handleResize)
-    sun.setAttribute('transform', 'translate(0 0)')
+    getCurrentSun()?.setAttribute('transform', 'translate(0 0)')
   }
 }
 

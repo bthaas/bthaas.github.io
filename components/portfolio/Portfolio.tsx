@@ -138,7 +138,6 @@ export function Portfolio() {
           <div className="sun-arc" aria-hidden="true">
             <svg focusable="false" viewBox="0 0 240 32">
               <path className="sun-arc__track" d="M8 23 Q120 -5 232 23" />
-              <path className="sun-arc__horizon" d="M220 23 H239 M232 18 V28" />
               <g data-atlas-sun transform="translate(0 0)">
                 <circle className="sun-arc__halo" cx="8" cy="23" r="9" />
                 <circle className="sun-arc__disc" cx="8" cy="23" r="6" />
