@@ -1,4 +1,5 @@
 import { formatCountUpFrame } from '../../lib/atlas-motion/count-up'
+import { getMetricCountProgress } from '../../lib/atlas-motion/hero-choreography'
 
 export interface CountUpOptions {
   readonly durationMs?: number
@@ -21,7 +22,7 @@ export function countUp(
   const render = (timestamp: number) => {
     startTime ??= timestamp
     const progress = Math.min(1, (timestamp - startTime) / durationMs)
-    element.textContent = formatCountUpFrame(target, progress, steps)
+    element.textContent = formatCountUpFrame(target, getMetricCountProgress(progress, steps), steps)
     if (progress < 1) animationFrame = requestAnimationFrame(render)
   }
 

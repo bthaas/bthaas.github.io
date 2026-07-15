@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { countUp } from './count-up'
+import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
 import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
@@ -26,6 +27,7 @@ describe('atlas DOM capabilities', () => {
     expect(heading.getAttribute('aria-label')).toBe('Brett Haas')
     expect(heading.textContent).toBe('Brett Haas')
     expect(heading.querySelectorAll('[aria-hidden="true"]')).toHaveLength(9)
+    expect(heading.querySelectorAll('.atlas-split-word')).toHaveLength(2)
   })
 
   it('renders a complete metric synchronously when duration is zero', () => {
@@ -35,6 +37,100 @@ describe('atlas DOM capabilities', () => {
     countUp(metric, '616K+', { durationMs: 0 })
 
     expect(metric.textContent).toBe('616K+')
+  })
+
+  it('plays the entrance once per session and clears its start state at 1.2 seconds', () => {
+    vi.useFakeTimers()
+    document.body.innerHTML = '<h1 data-atlas-masthead>Brett Haas</h1>'
+    const storage = new Map<string, string>()
+    const session = {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+    }
+
+    const cleanup = setupEntrance(document, session)
+
+    expect(document.documentElement).toHaveClass('atlas-entering')
+    expect(document.querySelectorAll('.atlas-split-token')).toHaveLength(9)
+    expect(storage.get('atlas-entered')).toBe('1')
+    vi.advanceTimersByTime(1200)
+    expect(document.documentElement).not.toHaveClass('atlas-entering')
+    expect(document.documentElement).toHaveClass('atlas-entered')
+    cleanup()
+
+    document.documentElement.className = ''
+    document.body.innerHTML = '<h1 data-atlas-masthead>Brett Haas</h1>'
+    setupEntrance(document, session)
+    expect(document.documentElement).not.toHaveClass('atlas-entering')
+    expect(document.querySelectorAll('.atlas-split-token')).toHaveLength(0)
+    vi.useRealTimers()
+  })
+
+  it('counts metric values read from the rendered content and reveals sources afterward', () => {
+    vi.useFakeTimers()
+    document.body.innerHTML = `
+      <div class="signal-strip">
+        <div class="signal-metric"><strong data-atlas-count>12.5%</strong><small>Alpha</small></div>
+        <div class="signal-metric"><strong data-atlas-count>7K+</strong><small>Beta</small></div>
+      </div>
+    `
+    const observed: Element[] = []
+    const unobserve = vi.fn()
+    let reveal: (() => void) | undefined
+    const animate = vi.fn((_element: HTMLElement, _target: string) => vi.fn())
+    const cleanup = setupMetricCountUps(
+      document,
+      (callback) => {
+        reveal = () => callback(
+          observed.map((target) => ({ isIntersecting: true, target }) as IntersectionObserverEntry),
+          {} as IntersectionObserver,
+        )
+        return {
+          disconnect: vi.fn(),
+          observe: (target: Element) => observed.push(target),
+          unobserve,
+        } as unknown as IntersectionObserver
+      },
+      animate,
+    )
+
+    expect(observed).toHaveLength(1)
+    reveal?.()
+    expect(animate.mock.calls.map(([, target]) => target)).toEqual(['12.5%', '7K+'])
+    expect(unobserve).toHaveBeenCalledOnce()
+    expect(document.querySelector('.signal-strip')).toHaveClass('is-counting')
+    vi.advanceTimersByTime(900)
+    expect(document.querySelector('.signal-strip')).toHaveClass('is-counted')
+    cleanup()
+    vi.useRealTimers()
+  })
+
+  it('writes fallback hero transforms from the shared scroll event without layout reads per frame', () => {
+    document.body.innerHTML = `
+      <div class="hero-art"><picture class="atlas-picture--hero"></picture><p class="art-caption"></p></div>
+    `
+    const hero = document.querySelector<HTMLElement>('.hero-art')!
+    vi.spyOn(hero, 'getBoundingClientRect').mockReturnValue({
+      bottom: 800,
+      height: 700,
+      left: 0,
+      right: 1000,
+      top: 100,
+      width: 1000,
+      x: 0,
+      y: 100,
+      toJSON: () => undefined,
+    })
+
+    const cleanup = setupHeroParallax(document, window, false)
+    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 450 } }))
+
+    expect(document.documentElement).toHaveClass('atlas-hero-fallback')
+    expect(hero.style.getPropertyValue('--atlas-hero-image-y')).toBe('5.35%')
+    expect(hero.style.getPropertyValue('--atlas-hero-caption-y')).toBe('-1.25vh')
+    expect(hero.style.getPropertyValue('--atlas-hero-scale')).toBe('1.025')
+    expect(hero.getBoundingClientRect).toHaveBeenCalledOnce()
+    cleanup()
   })
 
   it('animates and cancels a count-up through requestAnimationFrame', () => {
@@ -61,14 +157,29 @@ describe('atlas DOM capabilities', () => {
 
   it('does no enhancement work when reduced motion is requested', () => {
     const createBus = vi.fn()
+    const prepareEntrance = vi.fn()
+    const prepareHero = vi.fn()
+    const prepareMetrics = vi.fn()
     const prepareReveals = vi.fn()
     const matchMedia = vi.fn(() => ({ matches: true }))
 
-    initializeAtlas({ createBus, document, matchMedia, prepareReveals, window })
+    initializeAtlas({
+      createBus,
+      document,
+      matchMedia,
+      prepareEntrance,
+      prepareHero,
+      prepareMetrics,
+      prepareReveals,
+      window,
+    })
 
     expect(document.documentElement).not.toHaveClass('atlas-js')
     expect(document.documentElement).not.toHaveAttribute('data-atlas')
     expect(createBus).not.toHaveBeenCalled()
+    expect(prepareEntrance).not.toHaveBeenCalled()
+    expect(prepareHero).not.toHaveBeenCalled()
+    expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
   })
 
@@ -77,6 +188,9 @@ describe('atlas DOM capabilities', () => {
     const unsubscribe = vi.fn()
     const destroyBus = vi.fn()
     const cleanupReveals = vi.fn()
+    const cleanupEntrance = vi.fn()
+    const cleanupHero = vi.fn()
+    const cleanupMetrics = vi.fn()
     const createBus = vi.fn(() => ({
       destroy: destroyBus,
       subscribe: (next: (snapshot: ScrollSnapshot) => void) => {
@@ -90,6 +204,9 @@ describe('atlas DOM capabilities', () => {
       createBus,
       document,
       matchMedia: () => ({ matches: false }),
+      prepareEntrance: () => cleanupEntrance,
+      prepareHero: () => cleanupHero,
+      prepareMetrics: () => cleanupMetrics,
       prepareReveals: () => cleanupReveals,
       window,
     })
@@ -101,6 +218,9 @@ describe('atlas DOM capabilities', () => {
     expect(document.documentElement).toHaveAttribute('data-atlas', 'ready')
     expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'atlas:scroll' }))
     expect(unsubscribe).toHaveBeenCalledOnce()
+    expect(cleanupEntrance).toHaveBeenCalledOnce()
+    expect(cleanupHero).toHaveBeenCalledOnce()
+    expect(cleanupMetrics).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()
     expect(destroyBus).toHaveBeenCalledOnce()
   })
