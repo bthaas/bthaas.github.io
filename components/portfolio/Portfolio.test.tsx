@@ -70,6 +70,31 @@ describe('Portfolio', () => {
     expect(screen.getByText('crash-free sessions')).toBeInTheDocument()
   })
 
+  it('labels portfolio groups with valid native and ARIA semantics', () => {
+    render(<Portfolio />)
+
+    expect(screen.getByRole('group', { name: 'Portfolio introduction' })).toBeInTheDocument()
+
+    const metrics = screen.getByRole('list', { name: 'Selected verified results' })
+    expect(within(metrics).getAllByRole('listitem')).toHaveLength(4)
+
+    expect(
+      screen.getByRole('region', { name: 'Core capabilities ticker; focus to pause' }),
+    ).toBeInTheDocument()
+
+    const flightLog = screen.getByRole('list', { name: 'Professional experience' })
+    expect(flightLog.tagName).toBe('OL')
+    const flightEntries = Array.from(flightLog.children)
+    expect(flightEntries).toHaveLength(4)
+    flightEntries.forEach((entry) => {
+      expect(entry.tagName).toBe('LI')
+    })
+
+    expect(
+      screen.getByRole('timer', { name: 'Local time in Charlottesville, Virginia' }),
+    ).toBeInTheDocument()
+  })
+
   it('keeps Craft capabilities static while providing one hidden marquee duplicate', () => {
     const { container } = render(<Portfolio />)
     const capabilities = siteContent.craftCapabilities
