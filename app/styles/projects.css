@@ -18,6 +18,193 @@
   color: var(--muted);
 }
 
+.project-panel-list {
+  display: grid;
+  padding-bottom: clamp(5rem, 10vw, 10rem);
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.project-panel {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 0.7;
+  overflow: clip;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: clamp(1rem, 1.8vw, 1.6rem);
+  background: var(--dusk-deep);
+  box-shadow: 0 1.5rem 4rem rgb(17 19 15 / 12%);
+  color: var(--paper);
+  scroll-snap-align: center;
+}
+
+.project-panel::after {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  border: 1px solid rgb(255 255 255 / 0%);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  transition:
+    border-color 400ms var(--ease-out),
+    box-shadow 400ms var(--ease-out);
+}
+
+.project-panel__art {
+  position: absolute;
+  z-index: 0;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  border-radius: inherit;
+  transition:
+    filter 700ms var(--ease-out),
+    transform 900ms var(--ease-out);
+}
+
+.project-panel__art img {
+  position: absolute;
+  top: 0;
+  left: -8%;
+  width: 116%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.project-panel--1 .project-panel__art img {
+  object-position: 49% center;
+}
+
+.project-panel--2 .project-panel__art img {
+  object-position: 60% center;
+}
+
+.project-panel--3 .project-panel__art img {
+  object-position: 51% center;
+}
+
+.project-panel__shade {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(5 8 15 / 5%) 35%, rgb(5 8 15 / 78%) 100%),
+    linear-gradient(135deg, transparent 45%, rgb(216 239 75 / 8%));
+  pointer-events: none;
+  transition: background-color 500ms var(--ease-out);
+}
+
+.project-panel__copy {
+  position: absolute;
+  z-index: 2;
+  right: clamp(1.25rem, 2.3vw, 2.2rem);
+  bottom: clamp(1.35rem, 2.5vw, 2.4rem);
+  left: clamp(1.25rem, 2.3vw, 2.2rem);
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.project-panel__name {
+  font-family: var(--serif);
+  font-size: clamp(2.35rem, 4vw, 4.4rem);
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  line-height: 0.86;
+  text-wrap: balance;
+  transform: translateY(0);
+  transition: transform 520ms var(--ease-out);
+}
+
+.project-panel__description {
+  max-width: 28rem;
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  font-size: clamp(0.76rem, 1vw, 0.92rem);
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    max-height 520ms var(--ease-out),
+    margin-top 520ms var(--ease-out),
+    opacity 320ms ease,
+    transform 520ms var(--ease-out);
+}
+
+.project-panel__action {
+  position: absolute;
+  z-index: 3;
+  top: clamp(1rem, 1.6vw, 1.5rem);
+  right: clamp(1rem, 1.6vw, 1.5rem);
+  display: grid;
+  width: clamp(2.5rem, 3.5vw, 3.5rem);
+  aspect-ratio: 1;
+  border: 1px solid rgb(255 255 255 / 55%);
+  border-radius: 50%;
+  place-items: center;
+  background: rgb(17 19 15 / 12%);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: rotate(-24deg) scale(0.72);
+  transition:
+    background-color 360ms var(--ease-out),
+    opacity 300ms ease,
+    transform 520ms var(--ease-out);
+}
+
+.project-panel__action span {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.project-panel:hover .project-panel__art,
+.project-panel:focus-visible .project-panel__art,
+.project-panel.is-project-selected .project-panel__art {
+  filter: saturate(1.08) contrast(1.03);
+  transform: scale(1.045);
+}
+
+.project-panel:hover .project-panel__description,
+.project-panel:focus-visible .project-panel__description,
+.project-panel.is-project-selected .project-panel__description {
+  max-height: 7rem;
+  margin-top: 1rem;
+  opacity: 0.92;
+  transform: translateY(0);
+}
+
+.project-panel:hover .project-panel__action,
+.project-panel:focus-visible .project-panel__action,
+.project-panel.is-project-selected .project-panel__action {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+.project-panel:hover::after,
+.project-panel:focus-visible::after,
+.project-panel.is-project-selected::after {
+  border-color: rgb(216 239 75 / 78%);
+  box-shadow: inset 0 0 0 1px rgb(216 239 75 / 16%);
+}
+
+.project-panel.is-project-selected .project-panel__action {
+  background: var(--citron);
+  color: var(--ink);
+}
+
+.project-chapter[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .project-chapter.is-project-open .project-grid {
+    animation: atlas-project-detail-open 780ms var(--ease-out) both;
+  }
+}
+
 .project-chapter {
   --chapter-wipe-base: var(--cream);
   --project-case-start: -48px;
@@ -371,15 +558,40 @@
       --project-lockup-start: var(--project-tech-start);
     }
 
-    html.atlas-js .project-art {
+    html.atlas-js [data-project-pan] {
       view-timeline-axis: block;
       view-timeline-name: --atlas-project-plate;
     }
 
-    html.atlas-js .project-art img {
+    html.atlas-js [data-project-pan] img {
       animation: atlas-project-pan both linear;
       animation-range: entry 0% exit 100%;
       animation-timeline: --atlas-project-plate;
+    }
+
+    html.atlas-js .project-panel-list {
+      view-timeline-axis: block;
+      view-timeline-name: --atlas-project-panels;
+    }
+
+    html.atlas-js .project-panel {
+      animation: atlas-project-panel-rise both linear;
+      animation-timeline: --atlas-project-panels;
+    }
+
+    html.atlas-js .project-panel:nth-child(1) {
+      --project-panel-entry-y: 7rem;
+      animation-range: entry 2% cover 34%;
+    }
+
+    html.atlas-js .project-panel:nth-child(2) {
+      --project-panel-entry-y: 10rem;
+      animation-range: entry 8% cover 40%;
+    }
+
+    html.atlas-js .project-panel:nth-child(3) {
+      --project-panel-entry-y: 13rem;
+      animation-range: entry 14% cover 46%;
     }
   }
 }
@@ -411,7 +623,7 @@
       clip-path: inset(0);
     }
 
-    html.atlas-js.atlas-project-fallback .project-art img {
+    html.atlas-js.atlas-project-fallback [data-project-pan] img {
       transform: translate3d(var(--atlas-project-pan-x, 0%), 0, 0);
     }
   }
@@ -442,5 +654,67 @@
 
   to {
     transform: translate3d(var(--project-pan-end), 0, 0);
+  }
+}
+
+@keyframes atlas-project-panel-rise {
+  from {
+    opacity: 0.18;
+    transform: translate3d(0, var(--project-panel-entry-y), 0);
+    clip-path: inset(14% 0 0 round clamp(1rem, 1.8vw, 1.6rem));
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 round clamp(1rem, 1.8vw, 1.6rem));
+  }
+}
+
+@keyframes atlas-project-detail-open {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 3.5rem, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 720px) {
+  .project-panel-list {
+    width: 100%;
+    padding: 0 14px clamp(4.5rem, 18vw, 6rem);
+    gap: 0.9rem;
+    grid-auto-columns: min(82vw, 23rem);
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    overflow-x: auto;
+    scroll-padding-inline: 14px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .project-panel-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .project-panel {
+    aspect-ratio: 0.69;
+  }
+
+  .project-panel__name {
+    font-size: clamp(2.8rem, 14vw, 4.2rem);
+  }
+
+  .project-panel__description {
+    font-size: 0.82rem;
+  }
+
+  .project-panel__action {
+    opacity: 1;
+    transform: rotate(0) scale(1);
   }
 }

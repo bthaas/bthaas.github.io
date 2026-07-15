@@ -10,6 +10,75 @@ interface ProjectPlateMetrics {
   elementTop: number
 }
 
+interface ProjectPanelPair {
+  readonly detail: HTMLElement
+  readonly detailWasHidden: boolean
+  readonly expandedValue: string | null
+  readonly trigger: HTMLAnchorElement
+}
+
+export function setupProjectPanels(root: Document = document): () => void {
+  const pairs: ProjectPanelPair[] = Array.from(
+    root.querySelectorAll<HTMLAnchorElement>('[data-project-trigger]'),
+  ).flatMap((trigger) => {
+    const detailId = trigger.getAttribute('aria-controls')
+    const detail = detailId ? root.getElementById(detailId) : null
+    if (!detail?.matches('[data-project-detail]')) return []
+
+    return [{
+      detail,
+      detailWasHidden: detail.hidden,
+      expandedValue: trigger.getAttribute('aria-expanded'),
+      trigger,
+    }]
+  })
+  if (pairs.length === 0) return () => undefined
+
+  let openIndex: number | null = null
+
+  const setOpenIndex = (nextIndex: number | null) => {
+    openIndex = nextIndex
+    pairs.forEach(({ detail, trigger }, index) => {
+      const isOpen = index === nextIndex
+      detail.hidden = !isOpen
+      detail.classList.toggle('is-project-open', isOpen)
+      trigger.classList.toggle('is-project-selected', isOpen)
+      trigger.setAttribute('aria-expanded', String(isOpen))
+    })
+  }
+  const cleanups = pairs.map(({ trigger }, index) => {
+    const handleClick = (event: MouseEvent) => {
+      event.preventDefault()
+      setOpenIndex(openIndex === index ? null : index)
+    }
+    trigger.addEventListener('click', handleClick)
+    return () => trigger.removeEventListener('click', handleClick)
+  })
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape' || openIndex === null) return
+    const activeTrigger = pairs[openIndex].trigger
+    setOpenIndex(null)
+    activeTrigger.focus()
+  }
+
+  root.documentElement.classList.add('atlas-project-panels-ready')
+  root.addEventListener('keydown', handleKeyDown)
+  setOpenIndex(null)
+
+  return () => {
+    cleanups.forEach((cleanup) => cleanup())
+    root.removeEventListener('keydown', handleKeyDown)
+    root.documentElement.classList.remove('atlas-project-panels-ready')
+    pairs.forEach(({ detail, detailWasHidden, expandedValue, trigger }) => {
+      detail.hidden = detailWasHidden
+      detail.classList.remove('is-project-open')
+      trigger.classList.remove('is-project-selected')
+      if (expandedValue === null) trigger.removeAttribute('aria-expanded')
+      else trigger.setAttribute('aria-expanded', expandedValue)
+    })
+  }
+}
+
 export function setupProjectPans(
   root: Document = document,
   runtimeWindow: Window = window,
@@ -18,7 +87,12 @@ export function setupProjectPans(
 ): () => void {
   const plates: ProjectPlateMetrics[] = Array.from(
     root.querySelectorAll<HTMLElement>('[data-project-pan]'),
-    (element, index) => ({ element, index, elementHeight: 0, elementTop: 0 }),
+    (element, index) => ({
+      element,
+      index: Number(element.dataset.projectPanIndex ?? index),
+      elementHeight: 0,
+      elementTop: 0,
+    }),
   )
   if (supportsScrollDriven || plates.length === 0) return () => undefined
 

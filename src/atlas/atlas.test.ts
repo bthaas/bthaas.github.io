@@ -9,7 +9,7 @@ import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupExperienceChapter } from './experience'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
-import { setupProjectPans } from './projects'
+import { setupProjectPanels, setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
 import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
@@ -393,6 +393,56 @@ describe('atlas DOM capabilities', () => {
     ])
     cleanup()
     expect(document.documentElement).not.toHaveClass('atlas-project-fallback')
+  })
+
+  it('opens one project panel at a time and restores the static content on cleanup', () => {
+    document.body.innerHTML = `
+      <div data-project-panel-list>
+        <a data-project-trigger href="#project-alpha" aria-controls="project-alpha">Alpha</a>
+        <a data-project-trigger href="#project-beta" aria-controls="project-beta">Beta</a>
+        <a data-project-trigger href="#project-gamma" aria-controls="project-gamma">Gamma</a>
+      </div>
+      <article data-project-detail id="project-alpha">Alpha detail</article>
+      <article data-project-detail id="project-beta">Beta detail</article>
+      <article data-project-detail id="project-gamma">Gamma detail</article>
+    `
+    const triggers = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>('[data-project-trigger]'),
+    )
+    const details = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-project-detail]'),
+    )
+    const cleanup = setupProjectPanels(document)
+
+    expect(document.documentElement).toHaveClass('atlas-project-panels-ready')
+    expect(triggers.map((trigger) => trigger.getAttribute('aria-expanded'))).toEqual([
+      'false',
+      'false',
+      'false',
+    ])
+    expect(details.every((detail) => detail.hidden)).toBe(true)
+
+    triggers[0].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    expect(triggers[0]).toHaveAttribute('aria-expanded', 'true')
+    expect(details[0]).not.toHaveAttribute('hidden')
+    expect(details[0]).toHaveClass('is-project-open')
+
+    triggers[1].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    expect(triggers[0]).toHaveAttribute('aria-expanded', 'false')
+    expect(details[0]).toHaveAttribute('hidden')
+    expect(triggers[1]).toHaveAttribute('aria-expanded', 'true')
+    expect(details[1]).not.toHaveAttribute('hidden')
+
+    triggers[1].focus()
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    expect(triggers[1]).toHaveAttribute('aria-expanded', 'false')
+    expect(details[1]).toHaveAttribute('hidden')
+    expect(triggers[1]).toHaveFocus()
+
+    cleanup()
+    expect(document.documentElement).not.toHaveClass('atlas-project-panels-ready')
+    expect(triggers.every((trigger) => !trigger.hasAttribute('aria-expanded'))).toBe(true)
+    expect(details.every((detail) => !detail.hidden)).toBe(true)
   })
 
   it('damps fine-pointer magnetic links without exceeding six pixels', () => {

@@ -160,8 +160,21 @@ describe('Portfolio', () => {
   it('presents every project as an inline case study with a repository link', () => {
     render(<Portfolio />)
 
+    const panelTriggers = screen.getAllByTestId('project-panel-trigger')
     const studies = screen.getAllByTestId('project-case-study')
+    expect(panelTriggers).toHaveLength(3)
     expect(studies).toHaveLength(3)
+
+    siteContent.projects.forEach((project, index) => {
+      const trigger = panelTriggers[index]
+
+      expect(trigger).toHaveAttribute('href', `#project-${project.id}`)
+      expect(trigger).toHaveAttribute('aria-controls', `project-${project.id}`)
+      expect(within(trigger).getByText(project.name)).toBeInTheDocument()
+      expect(within(trigger).getByText(project.description)).toBeInTheDocument()
+      expect(studies[index]).not.toHaveAttribute('hidden')
+    })
+
     expect(within(studies[0]).getByRole('heading', { name: 'Court Vision' })).toBeInTheDocument()
     expect(within(studies[1]).getByRole('heading', { name: 'Beat Stream' })).toBeInTheDocument()
     expect(

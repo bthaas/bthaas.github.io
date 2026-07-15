@@ -10,8 +10,10 @@ interface AtlasPictureProps {
   readonly visual: AtlasVisual
   readonly alt: string
   readonly className?: string
+  readonly cursor?: 'expand' | 'read'
   readonly priority?: boolean
   readonly projectPan?: boolean
+  readonly projectPanIndex?: number
   readonly reveal?: boolean
   readonly sizes: string
 }
@@ -26,16 +28,19 @@ function AtlasPicture({
   visual,
   alt,
   className,
+  cursor = 'read',
   priority = false,
   projectPan = false,
+  projectPanIndex,
   reveal = false,
   sizes,
 }: AtlasPictureProps) {
   return (
     <picture
       className={className}
-      data-cursor="read"
+      data-cursor={cursor}
       data-project-pan={projectPan ? '' : undefined}
+      data-project-pan-index={projectPan ? projectPanIndex : undefined}
       data-reveal={reveal ? '' : undefined}
     >
       <source
@@ -271,17 +276,57 @@ export function Portfolio() {
             </div>
             <p>
               Three builds across computer vision, real-time collaboration, and language-model
-              research. Open any project’s results to see the résumé-verified outcomes.
+              research. Choose a panel to unfold the complete case study and verified outcomes.
             </p>
           </div>
+
+          <nav
+            className="atlas-shell project-panel-list"
+            aria-label="Select a project"
+            data-project-panel-list
+            data-reveal-stagger
+          >
+            {projects.map((project, index) => (
+              <a
+                className={`project-panel project-panel--${index + 1}`}
+                href={`#project-${project.id}`}
+                aria-controls={`project-${project.id}`}
+                aria-label={`Open ${project.name} case study`}
+                data-project-trigger
+                data-testid="project-panel-trigger"
+                data-cursor="expand"
+                key={project.id}
+              >
+                <AtlasPicture
+                  visual={atlasVisuals.projects[project.visualKey]}
+                  alt=""
+                  className="atlas-picture project-panel__art"
+                  cursor="expand"
+                  projectPan
+                  projectPanIndex={index}
+                  sizes="(max-width: 720px) 82vw, 32vw"
+                />
+                <span className="project-panel__shade" aria-hidden="true" />
+                <span className="project-panel__copy">
+                  <span className="project-panel__name">{project.name}</span>
+                  <span className="project-panel__description">{project.description}</span>
+                </span>
+                <span className="project-panel__action" aria-hidden="true">
+                  <span>↗</span>
+                </span>
+              </a>
+            ))}
+          </nav>
 
           <div className="project-chapters">
             {projects.map((project, index) => (
               <article
                 className={`project-chapter project-chapter--${index + 1} chapter-wipe chapter-wipe--${getProjectDirection(index)}`}
                 data-testid="project-case-study"
+                data-project-detail
                 data-chapter-wipe
                 data-wipe-direction={getProjectDirection(index)}
+                aria-labelledby={`project-${project.id}-title`}
                 id={`project-${project.id}`}
                 key={project.id}
               >
@@ -294,7 +339,7 @@ export function Portfolio() {
                   </div>
 
                   <div className="project-title">
-                    <h3>{project.name}</h3>
+                    <h3 id={`project-${project.id}-title`}>{project.name}</h3>
                     <p>{project.description}</p>
                   </div>
 
@@ -303,6 +348,7 @@ export function Portfolio() {
                     alt={projectAlts[project.visualKey]}
                     className="atlas-picture project-art frame-reveal"
                     projectPan
+                    projectPanIndex={index}
                     reveal
                     sizes="(max-width: 720px) 100vw, 58vw"
                   />
