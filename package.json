@@ -4,8 +4,10 @@
   "version": "3.0.0",
   "type": "module",
   "scripts": {
+    "prebuild": "npm run build:atlas",
     "dev": "next dev",
     "build": "next build",
+    "build:atlas": "node scripts/build-atlas.mjs",
     "postbuild": "node scripts/strip-static-runtime.mjs",
     "start": "next start",
     "test": "vitest run",
@@ -25,6 +27,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "^4.1.10",
     "autoprefixer": "^10.5.2",
+    "esbuild": "^0.28.1",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.16",
     "tailwindcss": "^3.4.19",

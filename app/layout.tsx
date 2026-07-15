@@ -51,6 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           imageSizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
           fetchPriority="high"
         />
+        <script src="/atlas.js" defer />
       </head>
       <body>{children}</body>
     </html>

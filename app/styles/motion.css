@@ -1,6 +1,16 @@
+.atlas-split-mask,
+.atlas-split-token {
+  display: inline-block;
+}
+
+.atlas-split-mask {
+  overflow: clip;
+  vertical-align: bottom;
+}
+
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .frame-reveal {
+    .frame-reveal[data-reveal] {
       animation: atlas-reveal both linear;
       animation-range: entry 8% cover 34%;
       animation-timeline: view();
@@ -16,6 +26,25 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.atlas-js.atlas-reveal-ready [data-reveal],
+    html.atlas-js.atlas-reveal-ready [data-reveal-stagger] > * {
+      opacity: 0.4;
+      transform: translateY(26px);
+      transition:
+        opacity 700ms var(--ease-out) var(--atlas-reveal-delay, 0ms),
+        transform 700ms var(--ease-out) var(--atlas-reveal-delay, 0ms);
+    }
+
+    html.atlas-js.atlas-reveal-ready [data-reveal].is-revealed,
+    html.atlas-js.atlas-reveal-ready [data-reveal-stagger] > .is-revealed {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }

@@ -6,6 +6,7 @@ interface AtlasPictureProps {
   readonly alt: string
   readonly className?: string
   readonly priority?: boolean
+  readonly reveal?: boolean
   readonly sizes: string
 }
 
@@ -15,9 +16,16 @@ const projectAlts: Record<ProjectVisualKey, string> = {
   'vision-bias-steering': 'A labyrinth observatory with two controlled light paths',
 }
 
-function AtlasPicture({ visual, alt, className, priority = false, sizes }: AtlasPictureProps) {
+function AtlasPicture({
+  visual,
+  alt,
+  className,
+  priority = false,
+  reveal = false,
+  sizes,
+}: AtlasPictureProps) {
   return (
-    <picture className={className}>
+    <picture className={className} data-reveal={reveal ? '' : undefined}>
       <source
         type="image/avif"
         srcSet={`${visual.smallSrc} ${visual.smallWidth}w, ${visual.src} ${visual.width}w`}
@@ -134,6 +142,7 @@ export function Portfolio() {
               visual={atlasVisuals.craft}
               alt="A cliffside workshop with sculptural wings"
               className="atlas-picture craft-art frame-reveal"
+              reveal
               sizes="(max-width: 720px) 100vw, 66vw"
             />
             <div className="craft-notes" aria-label="Core capabilities">
@@ -161,6 +170,7 @@ export function Portfolio() {
               visual={atlasVisuals.experience}
               alt="A rising coastal city and lighthouse at dusk"
               className="atlas-picture experience-art frame-reveal"
+              reveal
               sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
             />
 
@@ -237,6 +247,7 @@ export function Portfolio() {
                     visual={atlasVisuals.projects[project.visualKey]}
                     alt={projectAlts[project.visualKey]}
                     className="atlas-picture project-art frame-reveal"
+                    reveal
                     sizes="(max-width: 720px) 100vw, 58vw"
                   />
 
@@ -276,6 +287,7 @@ export function Portfolio() {
               visual={atlasVisuals.ending}
               alt="A calm sunrise horizon between distant mountain ridges"
               className="atlas-picture contact-art frame-reveal"
+              reveal
               sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
             />
             <div className="contact-copy editorial-grid">
