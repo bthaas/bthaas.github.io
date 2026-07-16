@@ -383,9 +383,9 @@ export function Portfolio() {
             </div>
             <div className="contact-panel">
               <div className="contact-copy">
-                <p className="eyebrow">04 / Next horizon</p>
+                <p className="eyebrow" data-contact-detail>04 / Next horizon</p>
                 <h2 id="contact-title" data-contact-title>Connect with me.</h2>
-                <p className="contact-intro">
+                <p className="contact-intro" data-contact-detail>
                   Always open to a conversation about interesting ideas, thoughtful products, and
                   the systems that make them work.
                 </p>
@@ -395,6 +395,7 @@ export function Portfolio() {
                     href={`mailto:${contact.email}`}
                     aria-label="Email Brett"
                     title="Email Brett"
+                    data-contact-detail
                     data-magnetic
                   >
                     <ContactIcon name="email" />
@@ -406,6 +407,7 @@ export function Portfolio() {
                     rel="noreferrer"
                     aria-label="GitHub"
                     title="GitHub"
+                    data-contact-detail
                     data-magnetic
                   >
                     <ContactIcon name="github" />
@@ -417,6 +419,7 @@ export function Portfolio() {
                     rel="noreferrer"
                     aria-label="LinkedIn"
                     title="LinkedIn"
+                    data-contact-detail
                     data-magnetic
                   >
                     <ContactIcon name="linkedin" />
@@ -424,7 +427,7 @@ export function Portfolio() {
                 </nav>
               </div>
 
-              <footer className="site-footer">
+              <footer className="site-footer" data-contact-detail>
                 <p>© 2026 Brett Haas</p>
                 <p
                   data-atlas-local-time

@@ -90,6 +90,29 @@
     will-change: transform, opacity;
   }
 
+  html.atlas-js [data-contact-ready] .contact-plate {
+    opacity: calc(0.45 + var(--atlas-contact-plate-reveal, 0) * 0.55);
+    transform: translate3d(
+        0,
+        calc((1 - var(--atlas-contact-plate-reveal, 0)) * 2rem),
+        0
+      )
+      scale(calc(0.96 + var(--atlas-contact-plate-reveal, 0) * 0.04));
+    transform-origin: 50% 70%;
+    will-change: transform, opacity;
+  }
+
+  html.atlas-js [data-contact-ready] .contact-art img {
+    transform: translate3d(0, var(--atlas-contact-image-y, 2.5%), 0) scale(1.08);
+    will-change: transform;
+  }
+
+  html.atlas-js [data-contact-ready] [data-contact-detail] {
+    opacity: var(--atlas-contact-detail-reveal, 0);
+    translate: 0 calc((1 - var(--atlas-contact-detail-reveal, 0)) * 1.25rem);
+    will-change: translate, opacity;
+  }
+
   html.atlas-js [data-contact-ready]
     > .contact-board .atlas-split-mask--word {
     margin-inline: -0.15em;

@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getContactCharacterOffsetEm,
+  getContactDetailRevealProgress,
   getContactDocumentProgress,
   getContactGlowProgress,
+  getContactImageOffsetPercent,
+  getContactPlateRevealProgress,
   getContactScrollProgress,
   getContactWordRevealProgress,
 } from './contact-choreography'
@@ -44,6 +47,30 @@ describe('contact choreography', () => {
     expect(getContactWordRevealProgress(0.25, 0)).toBe(1)
     expect(getContactWordRevealProgress(0.25, 1)).toBeGreaterThan(0)
     expect(getContactWordRevealProgress(0.4, 1)).toBe(1)
+  })
+
+  it('settles the horizon plate during the opening third of the finale', () => {
+    expect(getContactPlateRevealProgress(0)).toBe(0)
+    expect(getContactPlateRevealProgress(0.17)).toBe(0.5)
+    expect(getContactPlateRevealProgress(0.34)).toBe(1)
+    expect(getContactPlateRevealProgress(1)).toBe(1)
+  })
+
+  it('pans the horizon image gently across the complete contact scroll', () => {
+    expect(getContactImageOffsetPercent(0)).toBe(2.5)
+    expect(getContactImageOffsetPercent(0.5)).toBe(0)
+    expect(getContactImageOffsetPercent(1)).toBe(-2.5)
+  })
+
+  it('reveals contact details in reading order after the headline', () => {
+    expect(getContactDetailRevealProgress(0.1, 0)).toBe(0.5)
+    expect(getContactDetailRevealProgress(0.2, 0)).toBe(1)
+    expect(getContactDetailRevealProgress(0.2, 1)).toBe(0)
+    expect(getContactDetailRevealProgress(0.53, 1)).toBe(1)
+    expect(getContactDetailRevealProgress(0.53, 2)).toBe(0.5)
+    expect(getContactDetailRevealProgress(0.93, 5)).toBe(1)
+    expect(() => getContactDetailRevealProgress(0.5, -1)).toThrow(RangeError)
+    expect(() => getContactDetailRevealProgress(0.5, 6)).toThrow(RangeError)
   })
 
   it('completes the glow only when both the finale and sun handshake complete', () => {

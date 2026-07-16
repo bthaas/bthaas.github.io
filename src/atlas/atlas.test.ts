@@ -182,11 +182,17 @@ describe('atlas DOM capabilities', () => {
     cleanup()
   })
 
-  it('scrubs the contact glow, word reveal, and centered character exhale from shared progress', () => {
+  it('scrubs the complete contact finale from shared progress', () => {
     document.body.innerHTML = `
       <section id="contact" data-contact-finale>
         <span data-contact-sunrise></span>
+        <p data-contact-detail>Next horizon</p>
         <h2 data-contact-title>Keep building.</h2>
+        <p data-contact-detail>Start a conversation.</p>
+        <a data-contact-detail href="mailto:test@example.com">Email</a>
+        <a data-contact-detail href="https://github.com">GitHub</a>
+        <a data-contact-detail href="https://linkedin.com">LinkedIn</a>
+        <footer data-contact-detail>Footer</footer>
       </section>
     `
     const section = document.getElementById('contact')!
@@ -211,13 +217,25 @@ describe('atlas DOM capabilities', () => {
     const words = Array.from(
       section.querySelectorAll<HTMLElement>('[data-contact-word]'),
     )
+    const details = Array.from(
+      section.querySelectorAll<HTMLElement>('[data-contact-detail]'),
+    )
 
     expect(characters).toHaveLength(13)
     expect(words).toHaveLength(2)
+    expect(details).toHaveLength(6)
+    expect(section.style.getPropertyValue('--atlas-contact-plate-reveal')).toBe('0')
+    expect(section.style.getPropertyValue('--atlas-contact-image-y')).toBe('2.5%')
+    expect(details.map((detail) => detail.style.getPropertyValue('--atlas-contact-detail-reveal')))
+      .toEqual(['0', '0', '0', '0', '0', '0'])
     window.dispatchEvent(new CustomEvent(SUN_PROGRESS_EVENT, { detail: { progress: 0.98 } }))
     window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 2200 } }))
 
     expect(section.style.getPropertyValue('--atlas-contact-glow')).toBe('1')
+    expect(section.style.getPropertyValue('--atlas-contact-plate-reveal')).toBe('1')
+    expect(section.style.getPropertyValue('--atlas-contact-image-y')).toBe('-2.5%')
+    expect(details.map((detail) => detail.style.getPropertyValue('--atlas-contact-detail-reveal')))
+      .toEqual(['1', '1', '1', '1', '1', '1'])
     expect(words.map((word) => word.style.getPropertyValue('--atlas-contact-word-reveal'))).toEqual([
       '1',
       '1',
@@ -230,6 +248,10 @@ describe('atlas DOM capabilities', () => {
 
     cleanup()
     expect(section.style.getPropertyValue('--atlas-contact-glow')).toBe('')
+    expect(section.style.getPropertyValue('--atlas-contact-plate-reveal')).toBe('')
+    expect(section.style.getPropertyValue('--atlas-contact-image-y')).toBe('')
+    expect(details.map((detail) => detail.style.getPropertyValue('--atlas-contact-detail-reveal')))
+      .toEqual(['', '', '', '', '', ''])
   })
 
   it('renders Charlottesville time without depending on the viewer timezone', () => {

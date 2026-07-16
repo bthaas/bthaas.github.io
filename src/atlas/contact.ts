@@ -1,7 +1,10 @@
 import {
   getContactCharacterOffsetEm,
+  getContactDetailRevealProgress,
   getContactDocumentProgress,
   getContactGlowProgress,
+  getContactImageOffsetPercent,
+  getContactPlateRevealProgress,
   getContactScrollProgress,
   getContactWordRevealProgress,
 } from '../../lib/atlas-motion/contact-choreography'
@@ -53,6 +56,9 @@ export function setupContactFinale(
   if (!section || !title) return () => undefined
 
   const { characters, words } = prepareContactTitle(title)
+  const details = Array.from(
+    section.querySelectorAll<HTMLElement>('[data-contact-detail]'),
+  )
   const metrics: ContactMetrics = { elementHeight: 0, elementTop: 0 }
   let latestScrollY = runtimeWindow.scrollY
   let latestDocumentProgress = 0
@@ -80,6 +86,14 @@ export function setupContactFinale(
 
     section.style.setProperty('--atlas-contact-glow', String(glow))
     section.style.setProperty(
+      '--atlas-contact-plate-reveal',
+      String(getContactPlateRevealProgress(progress)),
+    )
+    section.style.setProperty(
+      '--atlas-contact-image-y',
+      `${getContactImageOffsetPercent(progress)}%`,
+    )
+    section.style.setProperty(
       '--atlas-contact-email-reveal',
       String(getContactWordRevealProgress(progress, 2)),
     )
@@ -92,6 +106,12 @@ export function setupContactFinale(
     characters.forEach((character, index) => {
       const offset = getContactCharacterOffsetEm(index, characters.length, progress)
       character.style.setProperty('--atlas-contact-character-x', `${offset}em`)
+    })
+    details.forEach((detail, index) => {
+      detail.style.setProperty(
+        '--atlas-contact-detail-reveal',
+        String(getContactDetailRevealProgress(progress, index)),
+      )
     })
   }
   const handleScroll = (event: Event) => {
@@ -150,11 +170,16 @@ export function setupContactFinale(
     runtimeWindow.removeEventListener('resize', handleResize)
     runtimeWindow.removeEventListener('load', handleLoad)
     section.style.removeProperty('--atlas-contact-glow')
+    section.style.removeProperty('--atlas-contact-plate-reveal')
+    section.style.removeProperty('--atlas-contact-image-y')
     section.style.removeProperty('--atlas-contact-email-reveal')
     delete section.dataset.contactReady
     words.forEach((word) => word.style.removeProperty('--atlas-contact-word-reveal'))
     characters.forEach((character) => {
       character.style.removeProperty('--atlas-contact-character-x')
+    })
+    details.forEach((detail) => {
+      detail.style.removeProperty('--atlas-contact-detail-reveal')
     })
   }
 }

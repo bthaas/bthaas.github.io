@@ -242,6 +242,7 @@ describe('Portfolio', () => {
     expect(screen.getByText(/Always open to a conversation about interesting ideas/i)).toBeVisible()
     expect(container.querySelector('[data-contact-title]')).toHaveTextContent('Connect with me.')
     expect(container.querySelector('[data-contact-sunrise]')).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-contact-detail]')).toHaveLength(6)
     expect(container.querySelector('[data-atlas-local-time]')).toHaveTextContent(
       'Charlottesville, VA',
     )
