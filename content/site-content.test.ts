@@ -68,6 +68,6 @@ describe('siteContent', () => {
   })
 
   it('keeps the ending copy to the requested closing line only', () => {
-    expect(siteContent.editorial).toEqual({ closingLine: 'Keep Building.' })
+    expect(siteContent.editorial).toEqual({ closingLine: 'Connect with me.' })
   })
 })

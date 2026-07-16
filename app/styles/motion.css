@@ -107,10 +107,6 @@
     will-change: transform;
   }
 
-  html.atlas-js [data-contact-ready] .contact-email[data-magnetic-ready] {
-    transform: translate3d(var(--atlas-magnet-x, 0), var(--atlas-magnet-y, 0), 0);
-  }
-
   html.atlas-hero-fallback .atlas-picture--hero {
     transform: scale(var(--atlas-hero-scale, 1.05));
   }
@@ -594,8 +590,7 @@
   .craft-heading,
   .craft-copy,
   .experience-kicker,
-  .projects-intro > p,
-  .contact-copy > div:last-child {
+  .projects-intro > p {
     margin-top: 2rem;
   }
 
@@ -605,8 +600,7 @@
 
   .craft-art,
   .experience-art,
-  .project-art,
-  .contact-art {
+  .project-art {
     aspect-ratio: 4 / 3;
   }
 
@@ -682,24 +676,6 @@
     margin: 0.5rem 0 0;
   }
 
-  .contact-copy h2 {
-    font-size: clamp(4.5rem, 23vw, 7rem);
-  }
-
-  .site-footer {
-    grid-template-columns: 1fr auto;
-    row-gap: 1.5rem;
-  }
-
-  .site-footer > p:nth-child(2),
-  .site-footer > div {
-    justify-self: end;
-  }
-
-  .site-footer > a {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
 }
 
 @media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
@@ -711,12 +687,6 @@
   html.atlas-js .craft-heading {
     position: relative;
     top: auto;
-  }
-}
-
-@media (max-width: 420px) {
-  .site-footer > div {
-    gap: 0.85rem;
   }
 }
 
