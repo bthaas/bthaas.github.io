@@ -49,6 +49,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <header className="site-header project-site-header">
         <nav className="site-nav atlas-shell" aria-label="Project navigation">
           <a className="nav-name" href="/">
+            <img
+              className="nav-name__mark"
+              src="/original-wing-filled.png"
+              alt=""
+              width="128"
+              height="128"
+              aria-hidden="true"
+            />
             Brett Haas
           </a>
           <a className="project-back-link" href="/#projects">

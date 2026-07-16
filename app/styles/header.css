@@ -64,10 +64,21 @@
 }
 
 .nav-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   font-family: var(--serif);
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.035em;
+}
+
+.nav-name__mark {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  filter: brightness(0);
+  object-fit: contain;
 }
 
 .nav-links {
