@@ -269,4 +269,39 @@ describe('Portfolio', () => {
       }),
     ).toBeInTheDocument()
   })
+
+  it('pairs Experience and Skills artwork with dedicated editorial copy panels', () => {
+    const { container } = render(<Portfolio />)
+    const experienceBoard = container.querySelector<HTMLElement>('.experience-board')
+    const craftBoard = container.querySelector<HTMLElement>('.craft-board')
+
+    expect(experienceBoard?.children).toHaveLength(2)
+    expect(experienceBoard?.firstElementChild).toHaveClass(
+      'experience-plate',
+      'experience-plate--inset',
+    )
+    expect(experienceBoard?.lastElementChild).toHaveClass('experience-panel')
+    expect(
+      within(experienceBoard as HTMLElement).getByRole('img', {
+        name: 'A rising coastal city and lighthouse at dusk',
+      }),
+    ).toBeInTheDocument()
+    expect(
+      within(experienceBoard as HTMLElement).getByRole('heading', { name: 'Experience' }),
+    ).toBeInTheDocument()
+
+    expect(craftBoard?.children).toHaveLength(2)
+    expect(craftBoard?.firstElementChild).toHaveClass('craft-plate', 'craft-plate--inset')
+    expect(craftBoard?.lastElementChild).toHaveClass('craft-panel')
+    expect(
+      within(craftBoard as HTMLElement).getByRole('img', {
+        name: 'A cliffside workshop with sculptural wings',
+      }),
+    ).toBeInTheDocument()
+    expect(
+      within(craftBoard as HTMLElement).getByRole('heading', {
+        name: 'The skills behind the flight.',
+      }),
+    ).toBeInTheDocument()
+  })
 })

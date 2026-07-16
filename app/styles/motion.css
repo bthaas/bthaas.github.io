@@ -143,13 +143,13 @@
   }
 
   html.atlas-js .craft-narrative {
-    min-height: clamp(36rem, 78vh, 46rem);
+    min-height: 0;
   }
 
   html.atlas-js .craft-heading {
-    position: sticky;
+    position: relative;
     z-index: 2;
-    top: clamp(5.5rem, 12vh, 8rem);
+    top: auto;
     align-self: start;
   }
 
@@ -184,13 +184,13 @@
   }
 
   html.atlas-js .craft-notes {
-    visibility: hidden;
+    display: none;
   }
 
   html.atlas-js .craft-marquee {
     display: block;
     overflow: hidden;
-    margin-top: clamp(3rem, 6vw, 6rem);
+    margin-top: 0;
     border-top: 1px solid var(--ink);
     border-bottom: 1px solid var(--ink);
     outline-offset: -5px;
@@ -610,9 +610,7 @@
     font-size: clamp(2.5rem, 12vw, 4rem);
   }
 
-  .craft-heading,
   .craft-copy,
-  .experience-kicker,
   .projects-intro > p {
     margin-top: 2rem;
   }
@@ -704,7 +702,7 @@
 @media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
   html.atlas-js .craft-narrative {
     min-height: auto;
-    padding-bottom: 4rem;
+    padding-bottom: 0;
   }
 
   html.atlas-js .craft-heading {

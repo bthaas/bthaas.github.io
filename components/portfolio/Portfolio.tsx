@@ -193,28 +193,31 @@ export function Portfolio() {
               key={step}
             />
           ))}
-          <div className="atlas-shell">
-            <div className="experience-intro editorial-grid">
-              <div className="section-heading">
-                <p className="eyebrow">01 / Flight log</p>
-                <h2 id="experience-title">Experience</h2>
-              </div>
-              <p className="experience-kicker">
-                From research and evaluation to production mobile systems: a path shaped by rigor,
-                iteration, and useful outcomes.
-              </p>
-            </div>
-
-            <div className="experience-plate frame-reveal" data-reveal>
+          <div className="experience-board">
+            <div className="experience-plate experience-plate--inset frame-reveal" data-reveal>
               <AtlasPicture
                 visual={atlasVisuals.experience}
                 alt="A rising coastal city and lighthouse at dusk"
                 className="atlas-picture experience-art"
-                sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
+                sizes="(max-width: 720px) 100vw, 50vw"
               />
               <span className="experience-plate__warmth" aria-hidden="true" />
             </div>
+            <div className="experience-panel">
+              <div className="experience-intro">
+                <div className="section-heading">
+                  <p className="eyebrow">01 / Flight log</p>
+                  <h2 id="experience-title">Experience</h2>
+                </div>
+                <p className="experience-kicker">
+                  From research and evaluation to production mobile systems: a path shaped by
+                  rigor, iteration, and useful outcomes.
+                </p>
+              </div>
+            </div>
+          </div>
 
+          <div className="atlas-shell experience-log-shell">
             <ol
               className="flight-log"
               aria-label="Professional experience"
@@ -316,38 +319,40 @@ export function Portfolio() {
           data-chapter-wipe
           data-wipe-direction="ltr"
         >
-          <div className="atlas-shell craft-layout">
-            <div className="craft-narrative editorial-grid">
-              <div className="section-heading craft-heading">
-                <span className="craft-ghost" data-craft-ghost aria-hidden="true">
-                  03
-                </span>
-                <p className="eyebrow">03 / Skills</p>
-                <h2 id="craft-title">The skills behind the flight.</h2>
-              </div>
-              <div className="craft-copy">
-                <p className="lede">
-                  My work sits where software engineering, machine learning, and product judgment
-                  meet.
-                </p>
-                <p>
-                  I like difficult systems with visible stakes: steering model behavior, testing
-                  frontier agents, and shipping cross-platform products whose performance can be
-                  measured—not merely described.
-                </p>
-              </div>
-            </div>
-            <div className="craft-plate-row editorial-grid">
+          <div className="craft-board">
+            <div className="craft-plate craft-plate--inset">
               <AtlasPicture
                 visual={atlasVisuals.craft}
                 alt="A cliffside workshop with sculptural wings"
                 className="atlas-picture craft-art"
-                sizes="(max-width: 720px) 100vw, 66vw"
+                sizes="(max-width: 720px) 100vw, 50vw"
               />
-              <div className="craft-notes" aria-label="Core capabilities">
-                {craftCapabilities.map((capability) => (
-                  <p key={capability}>{capability}</p>
-                ))}
+            </div>
+            <div className="craft-panel">
+              <div className="craft-narrative">
+                <div className="section-heading craft-heading">
+                  <span className="craft-ghost" data-craft-ghost aria-hidden="true">
+                    03
+                  </span>
+                  <p className="eyebrow">03 / Skills</p>
+                  <h2 id="craft-title">The skills behind the flight.</h2>
+                </div>
+                <div className="craft-copy">
+                  <p className="lede">
+                    My work sits where software engineering, machine learning, and product
+                    judgment meet.
+                  </p>
+                  <p>
+                    I like difficult systems with visible stakes: steering model behavior, testing
+                    frontier agents, and shipping cross-platform products whose performance can be
+                    measured—not merely described.
+                  </p>
+                </div>
+                <div className="craft-notes" aria-label="Core capabilities">
+                  {craftCapabilities.map((capability) => (
+                    <p key={capability}>{capability}</p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

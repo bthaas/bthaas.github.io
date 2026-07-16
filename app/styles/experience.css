@@ -1,7 +1,6 @@
 .experience-section {
   position: relative;
   isolation: isolate;
-  padding: clamp(5rem, 10vw, 10rem) 0;
   background: var(--dusk-deep);
   color: var(--paper);
 }
@@ -16,9 +15,17 @@
   pointer-events: none;
 }
 
+.experience-board,
 .experience-section > .atlas-shell {
   position: relative;
   z-index: 1;
+}
+
+.experience-board {
+  display: grid;
+  min-height: min(50rem, calc(100svh - 59px));
+  border-bottom: 1px solid rgb(255 253 245 / 25%);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .experience-light-step {
@@ -42,34 +49,57 @@
 }
 
 .experience-intro {
-  align-items: end;
-  margin-bottom: clamp(3rem, 5vw, 5rem);
-}
-
-.experience-intro .section-heading {
-  grid-column: 1 / span 7;
+  width: min(100%, 40rem);
 }
 
 .experience-intro .section-heading h2 {
+  max-width: 7ch;
+  margin-bottom: clamp(1.5rem, 2.6vw, 2.5rem);
   color: var(--coral);
+  font-size: clamp(4rem, 7.3vw, 8.3rem);
+  line-height: 0.8;
 }
 
 .experience-kicker {
-  grid-column: 9 / -1;
   margin-bottom: 0;
+  max-width: 32rem;
   color: rgb(255 253 245 / 72%);
 }
 
 .experience-plate {
   position: relative;
+  min-height: 0;
   overflow: hidden;
-  margin-bottom: clamp(3rem, 6vw, 6rem);
-  border-radius: var(--radius);
+  background: var(--dusk);
+}
+
+.experience-plate--inset {
+  margin: clamp(1rem, 1.5vw, 1.75rem);
+  border: 1px solid rgb(255 253 245 / 18%);
+  border-radius: clamp(1rem, 1.8vw, 1.6rem);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 18%);
 }
 
 .experience-art {
-  aspect-ratio: 16 / 7.5;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 0;
+}
+
+.experience-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.experience-panel {
+  display: flex;
+  min-width: 0;
+  padding: clamp(2rem, 4vw, 4.5rem) clamp(1.5rem, 4.6vw, 5.5rem);
+  border-left: 1px solid rgb(255 253 245 / 25%);
+  align-items: center;
 }
 
 .experience-plate__warmth {
@@ -80,6 +110,11 @@
   mix-blend-mode: soft-light;
   opacity: 0;
   pointer-events: none;
+}
+
+.experience-log-shell {
+  padding-top: clamp(3.5rem, 7vw, 7rem);
+  padding-bottom: clamp(5rem, 10vw, 10rem);
 }
 
 .flight-log {
@@ -373,6 +408,34 @@
 }
 
 @media (max-width: 720px) {
+  .experience-board {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(18rem, 46svh) auto;
+  }
+
+  .experience-panel {
+    padding: 2.8rem 1.1rem 3.2rem;
+    border-top: 1px solid rgb(255 253 245 / 25%);
+    border-left: 0;
+  }
+
+  .experience-intro .section-heading h2 {
+    max-width: none;
+    margin-bottom: 1.25rem;
+    font-size: clamp(3.8rem, 18vw, 5.6rem);
+  }
+
+  .experience-kicker {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .experience-log-shell {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+  }
+
   .flight-dossier {
     grid-column: 2;
   }

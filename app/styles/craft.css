@@ -3,19 +3,20 @@
   --chapter-wipe-color: var(--citron);
   position: relative;
   isolation: isolate;
-  padding: clamp(5rem, 10vw, 10rem) 0;
   background: var(--citron);
 }
 
-.craft-layout,
+.craft-board,
 .craft-marquee {
   position: relative;
   z-index: 1;
 }
 
-.craft-narrative,
-.craft-plate-row {
-  align-items: start;
+.craft-board {
+  display: grid;
+  min-height: min(50rem, calc(100svh - 59px));
+  border-bottom: 1px solid var(--ink);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .section-heading h2 {
@@ -29,13 +30,14 @@
 
 .craft-heading {
   position: relative;
-  grid-column: 1 / span 6;
 }
 
 .craft-heading h2 {
   position: relative;
   z-index: 1;
   max-width: 8ch;
+  font-size: clamp(3.5rem, 5.7vw, 6.7rem);
+  line-height: 0.86;
 }
 
 .craft-ghost {
@@ -43,8 +45,8 @@
 }
 
 .craft-copy {
-  grid-column: 8 / -1;
-  padding-top: 2.1rem;
+  width: min(100%, 34rem);
+  margin-top: clamp(1.75rem, 3vw, 3rem);
 }
 
 .craft-copy p,
@@ -58,22 +60,55 @@
 .craft-copy .lede {
   margin-bottom: 1.25rem;
   font-family: var(--serif);
-  font-size: clamp(1.6rem, 2.7vw, 2.8rem);
+  font-size: clamp(1.5rem, 2.25vw, 2.5rem);
   letter-spacing: -0.035em;
   line-height: 1.08;
 }
 
+.craft-plate {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: #a8a97b;
+}
+
+.craft-plate--inset {
+  margin: clamp(1rem, 1.5vw, 1.75rem);
+  border: 1px solid rgb(17 19 15 / 24%);
+  border-radius: clamp(1rem, 1.8vw, 1.6rem);
+  box-shadow: 0 1.5rem 4rem rgb(17 19 15 / 12%);
+}
+
 .craft-art {
-  grid-column: 1 / span 9;
-  aspect-ratio: 16 / 9;
-  margin-top: clamp(3rem, 6vw, 6rem);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.craft-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.craft-panel {
+  display: flex;
+  min-width: 0;
+  padding: clamp(2rem, 4vw, 4.5rem) clamp(1.5rem, 4.6vw, 5.5rem);
+  border-left: 1px solid var(--ink);
+  align-items: center;
+}
+
+.craft-narrative {
+  width: min(100%, 42rem);
 }
 
 .craft-notes {
   display: grid;
-  align-self: end;
-  grid-column: 10 / -1;
-  margin-top: clamp(3rem, 6vw, 6rem);
+  width: min(100%, 34rem);
+  margin-top: clamp(1.5rem, 3vw, 2.75rem);
   border-top: 1px solid var(--ink);
 }
 
@@ -85,4 +120,31 @@
 
 .craft-marquee {
   display: none;
+}
+
+@media (max-width: 720px) {
+  .craft-board {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(18rem, 46svh) auto;
+  }
+
+  .craft-panel {
+    padding: 2.8rem 1.1rem 3.2rem;
+    border-top: 1px solid var(--ink);
+    border-left: 0;
+  }
+
+  .craft-heading h2 {
+    max-width: 8ch;
+    font-size: clamp(3.5rem, 16vw, 5.3rem);
+  }
+
+  .craft-copy {
+    margin-top: 1.75rem;
+  }
+
+  .craft-copy .lede {
+    font-size: clamp(1.45rem, 7.5vw, 2rem);
+  }
 }
