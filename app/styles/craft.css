@@ -109,16 +109,56 @@
 }
 
 .craft-notes {
-  display: grid;
   width: min(100%, 34rem);
   margin-top: clamp(1.5rem, 3vw, 2.75rem);
-  border-top: 1px solid var(--ink);
 }
 
-.craft-notes p {
+.craft-logo-grid {
+  display: grid;
+  overflow: hidden;
   margin: 0;
-  padding: 0.9rem 0;
-  border-bottom: 1px solid var(--ink);
+  padding: 1px;
+  border-radius: 0.8rem;
+  background: var(--ink);
+  gap: 1px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  list-style: none;
+}
+
+.skill-logo {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  aspect-ratio: 1;
+  background: rgb(255 253 245 / 96%);
+  place-items: center;
+  transition:
+    background-color 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.skill-logo:hover {
+  z-index: 1;
+  background: var(--paper);
+  transform: scale(1.08);
+}
+
+.skill-logo__glyph {
+  width: clamp(1.45rem, 2.1vw, 2rem);
+  height: auto;
+}
+
+.skill-logo__name {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 .craft-marquee {
@@ -151,5 +191,13 @@
 
   .craft-copy .lede {
     font-size: clamp(1.45rem, 7.5vw, 2rem);
+  }
+
+  .craft-logo-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .skill-logo__glyph {
+    width: clamp(1.35rem, 7vw, 1.8rem);
   }
 }

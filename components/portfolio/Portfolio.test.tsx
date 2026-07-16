@@ -5,6 +5,7 @@ import { siteContent } from '@/content/site-content'
 import { setupDossiers } from '@/src/atlas/experience'
 
 import { Portfolio } from './Portfolio'
+import { getSkillLogos } from './SkillLogos'
 
 describe('Portfolio', () => {
   it('renders the complete editorial atlas as a semantic static journey', () => {
@@ -71,7 +72,7 @@ describe('Portfolio', () => {
     expect(screen.getByRole('group', { name: 'Portfolio introduction' })).toBeInTheDocument()
 
     expect(
-      screen.getByRole('region', { name: 'Core capabilities ticker; focus to pause' }),
+      screen.getByRole('region', { name: 'Technology logo ticker; focus to pause' }),
     ).toBeInTheDocument()
 
     const flightLog = screen.getByRole('list', { name: 'Professional experience' })
@@ -87,22 +88,36 @@ describe('Portfolio', () => {
     ).toBeInTheDocument()
   })
 
-  it('keeps Craft capabilities static while providing one hidden marquee duplicate', () => {
+  it('renders resume technologies as labeled logos with a decorative marquee duplicate', () => {
     const { container } = render(<Portfolio />)
-    const capabilities = siteContent.craftCapabilities
-    const notes = container.querySelector('.craft-notes')
+    const logos = getSkillLogos(siteContent.skills)
+    const grid = screen.getByRole('list', {
+      name: "Technologies and programming languages from Brett Haas's resume",
+    })
     const marquee = container.querySelector<HTMLElement>('[data-craft-marquee]')
     const sequences = marquee?.querySelectorAll('.craft-marquee__sequence')
 
-    expect(notes).not.toBeNull()
-    expect(Array.from(notes?.querySelectorAll('p') ?? [], ({ textContent }) => textContent)).toEqual(
-      capabilities,
+    expect(within(grid).getAllByRole('listitem')).toHaveLength(logos.length)
+    expect(
+      within(grid).getAllByRole('listitem').map((item) => item.getAttribute('title')),
+    ).toEqual(logos.map(({ label }) => label))
+    expect(logos.map(({ label }) => label)).toEqual(
+      expect.arrayContaining([
+        'TypeScript',
+        'Python',
+        'React',
+        'Amazon Web Services',
+        'Docker',
+        'PostgreSQL',
+        'OpenAI API',
+      ]),
     )
     expect(marquee).toHaveAttribute('tabindex', '0')
     expect(sequences).toHaveLength(2)
-    expect(sequences?.[0]).not.toHaveAttribute('aria-hidden')
+    expect(sequences?.[0]).toHaveAttribute('aria-hidden', 'true')
     expect(sequences?.[1]).toHaveAttribute('aria-hidden', 'true')
-    expect(sequences?.[0].textContent).toBe(sequences?.[1].textContent)
+    expect(sequences?.[0].querySelectorAll('svg')).toHaveLength(logos.length)
+    expect(sequences?.[1].querySelectorAll('svg')).toHaveLength(logos.length)
   })
 
   it('server-renders every professional dossier from content and skips education', () => {

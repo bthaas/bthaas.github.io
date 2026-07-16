@@ -85,7 +85,6 @@ export interface SiteContent {
     readonly resume: string | null
   }
   readonly about: readonly AboutItem[]
-  readonly craftCapabilities: readonly string[]
   readonly projects: readonly Project[]
   readonly experience: readonly ExperienceEntry[]
   readonly education: readonly EducationEntry[]
@@ -165,11 +164,6 @@ export const siteContent = {
       kind: 'education',
       targetId: null,
     },
-  ],
-  craftCapabilities: [
-    'Research systems',
-    'Production engineering',
-    'Human-centered interfaces',
   ],
   projects: [
     {
@@ -365,19 +359,47 @@ export const siteContent = {
     },
   ],
   skills: {
-    Languages: ['Python', 'Java', 'JavaScript', 'TypeScript', 'C/C++', 'Go', 'Rust', 'SQL'],
+    Languages: [
+      'TypeScript',
+      'JavaScript',
+      'Python',
+      'Java',
+      'C/C++',
+      'Go',
+      'Rust',
+      'SQL',
+      'Bash',
+      'HTML/CSS',
+    ],
     Frameworks: [
       'React',
-      'React Native',
-      'Node.js',
       'Next.js',
+      'Node.js',
+      'React Native',
       'Flask',
       'PyTorch',
-      'TensorFlow Lite',
-      'WebSockets',
+      'TensorFlow',
+      'NNSight',
+      'REST APIs',
     ],
-    Infrastructure: ['AWS', 'Docker', 'Kubernetes', 'GCP', 'Firebase', 'PostgreSQL', 'MongoDB'],
-    'AI / ML': ['OpenAI API', 'Fine-tuning', 'RLHF', 'LLM Evaluation', 'Activation Steering'],
+    'Cloud & DevOps': [
+      'AWS',
+      'Docker',
+      'Kubernetes',
+      'CI/CD',
+      'Google Cloud',
+      'Linux',
+    ],
+    Databases: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Azure SQL'],
+    'AI / ML': [
+      'OpenAI API',
+      'ML Data Pipelines',
+      'RLHF',
+      'LLM Evaluation',
+      'Activation Steering',
+      'Mechanistic Interpretability',
+      'Prompt Engineering',
+    ],
   },
   assets: [
     {

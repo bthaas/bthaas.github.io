@@ -5,6 +5,11 @@ import {
 } from '@/content/site-content'
 import { AtlasPicture } from './AtlasPicture'
 import { projectVisualAlts } from './ProjectCaseStudy'
+import {
+  getSkillLogos,
+  SkillLogoGrid,
+  SkillLogoSequence,
+} from './SkillLogos'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
 
@@ -50,24 +55,6 @@ function ContactIcon({ name }: { readonly name: ContactIconName }) {
   )
 }
 
-function CraftCapabilitySequence({
-  capabilities,
-  duplicate = false,
-}: {
-  readonly capabilities: readonly string[]
-  readonly duplicate?: boolean
-}) {
-  return (
-    <div className="craft-marquee__sequence" aria-hidden={duplicate || undefined}>
-      {capabilities.map((capability) => (
-        <span key={capability}>
-          {capability} <span aria-hidden="true">·</span>
-        </span>
-      ))}
-    </div>
-  )
-}
-
 function FlightDossier({ entry }: { readonly entry: ExperienceEntry }) {
   const panelId = `flight-dossier-${entry.id}`
 
@@ -108,7 +95,8 @@ function FlightDossier({ entry }: { readonly entry: ExperienceEntry }) {
 }
 
 export function Portfolio() {
-  const { identity, contact, experience, education, projects, craftCapabilities } = siteContent
+  const { identity, contact, experience, education, projects, skills } = siteContent
+  const skillLogos = getSkillLogos(skills)
 
   return (
     <>
@@ -348,10 +336,8 @@ export function Portfolio() {
                     measured—not merely described.
                   </p>
                 </div>
-                <div className="craft-notes" aria-label="Core capabilities">
-                  {craftCapabilities.map((capability) => (
-                    <p key={capability}>{capability}</p>
-                  ))}
+                <div className="craft-notes">
+                  <SkillLogoGrid logos={skillLogos} />
                 </div>
               </div>
             </div>
@@ -360,12 +346,12 @@ export function Portfolio() {
             className="craft-marquee"
             data-craft-marquee
             role="region"
-            aria-label="Core capabilities ticker; focus to pause"
+            aria-label="Technology logo ticker; focus to pause"
             tabIndex={0}
           >
             <div className="craft-marquee__track">
-              <CraftCapabilitySequence capabilities={craftCapabilities} />
-              <CraftCapabilitySequence capabilities={craftCapabilities} duplicate />
+              <SkillLogoSequence logos={skillLogos} />
+              <SkillLogoSequence logos={skillLogos} duplicate />
             </div>
           </div>
         </section>

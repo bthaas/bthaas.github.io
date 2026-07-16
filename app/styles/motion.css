@@ -183,10 +183,6 @@
     max-width: none;
   }
 
-  html.atlas-js .craft-notes {
-    display: none;
-  }
-
   html.atlas-js .craft-marquee {
     display: block;
     overflow: hidden;
@@ -206,15 +202,22 @@
   html.atlas-js .craft-marquee__sequence {
     display: flex;
     min-width: 100vw;
-    padding: 0.9rem clamp(1.5rem, 4vw, 4rem);
+    padding: 0.8rem clamp(1rem, 2vw, 2rem);
     align-items: center;
-    justify-content: space-around;
-    gap: clamp(2rem, 5vw, 6rem);
-    font-size: clamp(0.68rem, 0.85vw, 0.8rem);
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    gap: clamp(1.75rem, 3vw, 3rem);
     white-space: nowrap;
+  }
+
+  html.atlas-js .craft-marquee__logo {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: 0 0 auto;
+    place-items: center;
+  }
+
+  html.atlas-js .craft-marquee__logo .skill-logo__glyph {
+    width: 1.75rem;
   }
 
   html.atlas-js .craft-marquee:hover .craft-marquee__track,
