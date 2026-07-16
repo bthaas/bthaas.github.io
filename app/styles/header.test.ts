@@ -5,7 +5,7 @@ import postcss from 'postcss'
 import { describe, expect, it } from 'vitest'
 
 describe('header brand mark', () => {
-  it('renders the favicon slightly larger than its original size without shifting it', () => {
+  it('renders the centered favicon one pixel larger than the approved size', () => {
     const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/header.css'), 'utf8')
     const root = postcss.parse(stylesheet)
     let filter: string | undefined
@@ -30,9 +30,9 @@ describe('header brand mark', () => {
 
     expect(filter).toBeUndefined()
     expect({ height, transform, width }).toEqual({
-      height: '1.4rem',
+      height: 'calc(1.4rem + 1px)',
       transform: undefined,
-      width: '1.4rem',
+      width: 'calc(1.4rem + 1px)',
     })
   })
 })

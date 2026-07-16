@@ -74,8 +74,8 @@
 }
 
 .nav-name__mark {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: calc(1.4rem + 1px);
+  height: calc(1.4rem + 1px);
   flex: 0 0 auto;
   object-fit: contain;
 }
