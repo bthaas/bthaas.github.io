@@ -16,6 +16,7 @@
   display: grid;
   min-height: min(50rem, calc(100svh - 59px));
   border-bottom: 1px solid var(--ink);
+  grid-template-areas: "copy artwork";
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -70,6 +71,7 @@
   min-height: 0;
   overflow: hidden;
   background: #a8a97b;
+  grid-area: artwork;
 }
 
 .craft-plate--inset {
@@ -97,8 +99,9 @@
   display: flex;
   min-width: 0;
   padding: clamp(2rem, 4vw, 4.5rem) clamp(1.5rem, 4.6vw, 5.5rem);
-  border-left: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
   align-items: center;
+  grid-area: copy;
 }
 
 .craft-narrative {
@@ -125,6 +128,7 @@
 @media (max-width: 720px) {
   .craft-board {
     min-height: 0;
+    grid-template-areas: "artwork" "copy";
     grid-template-columns: 1fr;
     grid-template-rows: minmax(18rem, 46svh) auto;
   }
@@ -133,6 +137,7 @@
     padding: 2.8rem 1.1rem 3.2rem;
     border-top: 1px solid var(--ink);
     border-left: 0;
+    border-right: 0;
   }
 
   .craft-heading h2 {

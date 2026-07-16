@@ -41,7 +41,14 @@ describe('Experience and Skills split boards', () => {
     })
     expect(declarationsFor(craftStyles, '.craft-board')).toMatchObject({
       display: 'grid',
+      'grid-template-areas': '"copy artwork"',
       'grid-template-columns': 'repeat(2, minmax(0, 1fr))',
+    })
+    expect(declarationsFor(craftStyles, '.craft-panel')).toMatchObject({
+      'grid-area': 'copy',
+    })
+    expect(declarationsFor(craftStyles, '.craft-plate')).toMatchObject({
+      'grid-area': 'artwork',
     })
     expect(declarationsFor(experienceStyles, '.experience-plate--inset')).toMatchObject({
       margin: 'clamp(1rem, 1.5vw, 1.75rem)',
@@ -65,6 +72,7 @@ describe('Experience and Skills split boards', () => {
       'grid-template-columns': '1fr',
     })
     expect(declarationsFor(craftStyles, '.craft-board', mediaQuery)).toMatchObject({
+      'grid-template-areas': '"artwork" "copy"',
       'grid-template-columns': '1fr',
     })
   })
