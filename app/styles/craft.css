@@ -184,6 +184,15 @@
   transform: translateY(0);
 }
 
+.skill-logo[data-skill-logo="PostgreSQL"] .skill-logo__name,
+.skill-logo[data-skill-logo="Kubernetes"] .skill-logo__name,
+.skill-logo[data-skill-logo="TensorFlow"] .skill-logo__name {
+  padding-inline: 0.2rem;
+  font-size: clamp(0.4rem, 0.52vw, 0.52rem);
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
 .craft-marquee {
   display: none;
 }
