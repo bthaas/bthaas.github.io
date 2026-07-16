@@ -23,8 +23,8 @@ describe('hero to experience spacing', () => {
     const motionStyles = readFileSync(resolve(process.cwd(), 'app/styles/motion.css'), 'utf8')
 
     expect(declarationValue(heroStyles, '.hero-section', 'padding')).toBe(
-      'clamp(1rem, 2vw, 1.8rem) 0 clamp(3rem, 5vw, 5rem)',
+      'clamp(1rem, 2vw, 1.8rem) 0 clamp(2rem, 3vw, 3rem)',
     )
-    expect(declarationValue(motionStyles, '.hero-copy-release', 'padding-bottom')).toBe('16vh')
+    expect(declarationValue(motionStyles, '.hero-copy-release', 'padding-bottom')).toBe('8vh')
   })
 })

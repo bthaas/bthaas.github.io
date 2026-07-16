@@ -141,7 +141,7 @@ export function Portfolio() {
           <div className="nav-links">
             <a href="#experience">Experience</a>
             <a href="#projects">Projects</a>
-            <a href="#craft">Craft</a>
+            <a href="#craft">Skills</a>
             <a href="#contact">Contact</a>
           </div>
         </nav>
@@ -321,8 +321,8 @@ export function Portfolio() {
                 <span className="craft-ghost" data-craft-ghost aria-hidden="true">
                   03
                 </span>
-                <p className="eyebrow">03 / Craft</p>
-                <h2 id="craft-title">The craft behind the flight.</h2>
+                <p className="eyebrow">03 / Skills</p>
+                <h2 id="craft-title">The skills behind the flight.</h2>
               </div>
               <div className="craft-copy">
                 <p className="lede">

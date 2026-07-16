@@ -22,7 +22,8 @@ describe('Portfolio', () => {
       'href',
       '#projects',
     )
-    expect(screen.getByRole('heading', { name: 'The craft behind the flight.' })).toBeInTheDocument()
+    expect(screen.getByText('03 / Skills')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'The skills behind the flight.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connect with me.' })).toBeInTheDocument()
 
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
@@ -47,7 +48,7 @@ describe('Portfolio', () => {
       'href',
       '#projects',
     )
-    expect(within(navigation).getByRole('link', { name: 'Craft' })).toHaveAttribute(
+    expect(within(navigation).getByRole('link', { name: 'Skills' })).toHaveAttribute(
       'href',
       '#craft',
     )
