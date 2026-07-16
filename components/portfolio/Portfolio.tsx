@@ -119,6 +119,14 @@ export function Portfolio() {
       <header className="site-header">
         <nav className="site-nav atlas-shell" aria-label="Primary navigation">
           <a className="nav-name" href="#hero">
+            <img
+              className="nav-name__mark"
+              src="/original-wing-filled.png"
+              alt=""
+              width="128"
+              height="128"
+              aria-hidden="true"
+            />
             Brett Haas
           </a>
           <div className="sun-arc" aria-hidden="true">

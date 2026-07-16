@@ -41,6 +41,10 @@ describe('project detail pages', () => {
     render(page)
 
     expect(screen.getByRole('heading', { level: 1, name: 'Court Vision' })).toBeInTheDocument()
+    const brandLink = screen.getByRole('link', { name: 'Brett Haas' })
+    expect(brandLink).toHaveAttribute('href', '/')
+    expect(brandLink.querySelector('img')).toHaveAttribute('src', '/original-wing-filled.png')
+    expect(brandLink.querySelector('img')).toHaveAttribute('alt', '')
     expect(screen.getByRole('link', { name: 'Back to projects' })).toHaveAttribute(
       'href',
       '/#projects',

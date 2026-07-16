@@ -35,10 +35,10 @@ describe('Portfolio', () => {
     render(<Portfolio />)
 
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
-    expect(within(navigation).getByRole('link', { name: 'Brett Haas' })).toHaveAttribute(
-      'href',
-      '#hero',
-    )
+    const brandLink = within(navigation).getByRole('link', { name: 'Brett Haas' })
+    expect(brandLink).toHaveAttribute('href', '#hero')
+    expect(brandLink.querySelector('img')).toHaveAttribute('src', '/original-wing-filled.png')
+    expect(brandLink.querySelector('img')).toHaveAttribute('alt', '')
     expect(within(navigation).getByRole('link', { name: 'Experience' })).toHaveAttribute(
       'href',
       '#experience',
