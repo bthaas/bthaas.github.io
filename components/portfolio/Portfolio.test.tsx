@@ -246,4 +246,17 @@ describe('Portfolio', () => {
     )
     expect(container.querySelector('[data-atlas-local-time]')).not.toHaveTextContent(/\d{2}:\d{2}/)
   })
+
+  it('frames the horizon artwork as an inset plate on the contact canvas', () => {
+    const { container } = render(<Portfolio />)
+    const contact = container.querySelector('#contact')
+    const plate = contact?.querySelector('.contact-plate')
+
+    expect(plate).toHaveClass('contact-plate--inset')
+    expect(
+      within(plate as HTMLElement).getByRole('img', {
+        name: 'A calm sunrise horizon between distant mountain ridges',
+      }),
+    ).toBeInTheDocument()
+  })
 })

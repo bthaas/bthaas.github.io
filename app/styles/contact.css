@@ -17,6 +17,13 @@
   background: #dca97c;
 }
 
+.contact-plate--inset {
+  margin: clamp(1rem, 1.5vw, 1.75rem);
+  border: 1px solid var(--rule);
+  border-radius: clamp(1rem, 1.8vw, 1.6rem);
+  box-shadow: 0 1.5rem 4rem rgb(17 19 15 / 10%);
+}
+
 .contact-art {
   position: absolute;
   inset: 0;

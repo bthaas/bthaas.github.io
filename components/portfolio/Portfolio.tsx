@@ -371,7 +371,7 @@ export function Portfolio() {
           data-contact-finale
         >
           <div className="contact-board">
-            <div className="contact-plate">
+            <div className="contact-plate contact-plate--inset">
               <AtlasPicture
                 visual={atlasVisuals.ending}
                 alt="A calm sunrise horizon between distant mountain ridges"
