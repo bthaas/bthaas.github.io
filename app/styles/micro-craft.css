@@ -59,8 +59,7 @@
   }
 
   .atlas-cursor[data-cursor-mode="external"] .atlas-cursor__ring,
-  .atlas-cursor[data-cursor-mode="expand"] .atlas-cursor__ring,
-  .atlas-cursor[data-cursor-mode="read"] .atlas-cursor__ring {
+  .atlas-cursor[data-cursor-mode="expand"] .atlas-cursor__ring {
     width: 48px;
     height: 48px;
     border-color: var(--ink);

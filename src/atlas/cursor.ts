@@ -1,6 +1,6 @@
 import { hasFinePointer } from './capabilities'
 
-type CursorMode = 'default' | 'expand' | 'external' | 'read'
+type CursorMode = 'default' | 'expand' | 'external'
 type FinePointerCheck = () => boolean
 type RequestFrame = (callback: FrameRequestCallback) => number
 type CancelFrame = (handle: number) => void
@@ -9,14 +9,12 @@ const labels: Record<CursorMode, string> = {
   default: '',
   expand: '+',
   external: '↗',
-  read: 'read',
 }
 
 function getCursorMode(target: EventTarget | null): CursorMode {
   if (!(target instanceof Element)) return 'default'
   if (target.closest('[data-cursor="expand"]')) return 'expand'
   if (target.closest('a[target="_blank"]')) return 'external'
-  if (target.closest('[data-cursor="read"]')) return 'read'
   return 'default'
 }
 

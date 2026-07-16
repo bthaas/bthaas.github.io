@@ -275,11 +275,11 @@ describe('atlas DOM capabilities', () => {
     expect(clear).toHaveBeenCalledWith(17)
   })
 
-  it('creates a fine-pointer cursor with external, dossier, and plate modes only', () => {
+  it('creates a fine-pointer cursor with external and dossier modes only', () => {
     document.body.innerHTML = `
       <a id="external" href="https://example.com" target="_blank">External</a>
       <button id="dossier" data-cursor="expand">Field notes</button>
-      <picture id="plate" data-cursor="read"></picture>
+      <picture id="plate"></picture>
     `
     const frames: FrameRequestCallback[] = []
     const requestFrame = vi.fn((callback: FrameRequestCallback) => {
@@ -304,8 +304,8 @@ describe('atlas DOM capabilities', () => {
     document.getElementById('plate')?.dispatchEvent(new MouseEvent('pointerover', {
       bubbles: true,
     }))
-    expect(cursor).toHaveAttribute('data-cursor-mode', 'read')
-    expect(cursor.querySelector('[data-atlas-cursor-label]')).toHaveTextContent('read')
+    expect(cursor).toHaveAttribute('data-cursor-mode', 'default')
+    expect(cursor.querySelector('[data-atlas-cursor-label]')).toHaveTextContent('')
     cleanup()
     expect(document.querySelector('[data-atlas-cursor]')).not.toBeInTheDocument()
 

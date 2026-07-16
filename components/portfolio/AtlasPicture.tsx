@@ -4,7 +4,7 @@ interface AtlasPictureProps {
   readonly visual: AtlasVisual
   readonly alt: string
   readonly className?: string
-  readonly cursor?: 'expand' | 'read'
+  readonly cursor?: 'expand'
   readonly priority?: boolean
   readonly projectPan?: boolean
   readonly projectPanIndex?: number
@@ -16,7 +16,7 @@ export function AtlasPicture({
   visual,
   alt,
   className,
-  cursor = 'read',
+  cursor,
   priority = false,
   projectPan = false,
   projectPanIndex,
