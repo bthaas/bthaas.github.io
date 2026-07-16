@@ -438,6 +438,6 @@ export const siteContent = {
     },
   ],
   editorial: {
-    closingLine: 'Keep Building.',
+    closingLine: 'Connect with me.',
   },
 } as const satisfies SiteContent

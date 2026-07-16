@@ -19,7 +19,7 @@ describe('Portfolio', () => {
     expect(screen.getByRole('heading', { name: 'Trajectory' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Selected work' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'The craft behind the flight.' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Keep building.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Connect with me.' })).toBeInTheDocument()
 
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
@@ -208,20 +208,34 @@ describe('Portfolio', () => {
   it('keeps the contact destinations explicit and keyboard reachable', () => {
     const { container } = render(<Portfolio />)
 
-    expect(screen.getByRole('link', { name: 'Email Brett' })).toHaveAttribute(
+    const contactLinks = screen.getByRole('navigation', { name: 'Contact links' })
+    const email = within(contactLinks).getByRole('link', { name: 'Email Brett' })
+    const github = within(contactLinks).getByRole('link', { name: 'GitHub' })
+    const linkedin = within(contactLinks).getByRole('link', { name: 'LinkedIn' })
+
+    expect(email).toHaveAttribute(
       'href',
       'mailto:bthaas15@gmail.com',
     )
-    expect(screen.getByRole('link', { name: 'Email Brett' })).toHaveAttribute('data-magnetic')
-    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+    expect(email).toHaveAttribute('data-magnetic')
+    expect(github).toHaveAttribute(
       'href',
       'https://github.com/bthaas',
     )
-    expect(screen.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute(
+    expect(linkedin).toHaveAttribute(
       'href',
       'https://linkedin.com/in/brett-haas',
     )
-    expect(container.querySelector('[data-contact-title]')).toHaveTextContent('Keep building.')
+    expect(github).toHaveAttribute('data-magnetic')
+    expect(linkedin).toHaveAttribute('data-magnetic')
+    expect(contactLinks.querySelectorAll('svg')).toHaveLength(3)
+    expect(
+      Array.from(contactLinks.querySelectorAll('svg')).every(
+        (icon) => icon.getAttribute('aria-hidden') === 'true',
+      ),
+    ).toBe(true)
+    expect(screen.getByText(/Always open to a conversation about interesting ideas/i)).toBeVisible()
+    expect(container.querySelector('[data-contact-title]')).toHaveTextContent('Connect with me.')
     expect(container.querySelector('[data-contact-sunrise]')).toBeInTheDocument()
     expect(container.querySelector('[data-atlas-local-time]')).toHaveTextContent(
       'Charlottesville, VA',

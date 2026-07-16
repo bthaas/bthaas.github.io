@@ -6,6 +6,50 @@ import {
 import { AtlasPicture } from './AtlasPicture'
 import { projectVisualAlts } from './ProjectCaseStudy'
 
+type ContactIconName = 'email' | 'github' | 'linkedin'
+
+function ContactIcon({ name }: { readonly name: ContactIconName }) {
+  if (name === 'github') {
+    return (
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M12 .7a11.5 11.5 0 0 0-3.64 22.4c.58.1.79-.25.79-.56v-2.24c-3.23.7-3.91-1.37-3.91-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.72 1.27 3.38.97.1-.75.4-1.27.74-1.56-2.58-.3-5.29-1.29-5.29-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.47.11-3.05 0 0 .97-.31 3.16 1.18a10.9 10.9 0 0 1 5.76 0c2.19-1.49 3.15-1.18 3.15-1.18.63 1.58.23 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.72 5.39-5.3 5.68.42.36.79 1.06.79 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"
+        />
+      </svg>
+    )
+  }
+
+  if (name === 'linkedin') {
+    return (
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S.02 4.88.02 3.5 1.13 1 2.5 1s2.48 1.12 2.48 2.5ZM.26 8h4.48v14H.26V8Zm7.16 0h4.29v1.91h.06c.6-1.13 2.06-2.33 4.24-2.33 4.53 0 5.37 2.98 5.37 6.86V22H16.9v-6.7c0-1.6-.03-3.66-2.23-3.66-2.23 0-2.57 1.74-2.57 3.54V22H7.42V8Z"
+        />
+      </svg>
+    )
+  }
+
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+      <path
+        d="M3 5.5h18v13H3z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="m4 6.5 8 6 8-6"
+        fill="none"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  )
+}
+
 function CraftCapabilitySequence({
   capabilities,
   duplicate = false,
@@ -318,54 +362,74 @@ export function Portfolio() {
           aria-labelledby="contact-title"
           data-contact-finale
         >
-          <div className="atlas-shell contact-board">
+          <div className="contact-board">
             <div className="contact-plate">
               <AtlasPicture
                 visual={atlasVisuals.ending}
                 alt="A calm sunrise horizon between distant mountain ridges"
                 className="atlas-picture contact-art frame-reveal"
                 reveal
-                sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
+                sizes="(max-width: 720px) 100vw, 50vw"
               />
               <span className="contact-sunrise" data-contact-sunrise aria-hidden="true" />
             </div>
-            <div className="contact-copy editorial-grid">
-              <div>
+            <div className="contact-panel">
+              <div className="contact-copy">
                 <p className="eyebrow">04 / Next horizon</p>
-                <h2 id="contact-title" data-contact-title>Keep building.</h2>
-              </div>
-              <div>
-                <p>
-                  I’m interested in ambitious engineering teams working across intelligent systems,
-                  reliable products, and applied research.
+                <h2 id="contact-title" data-contact-title>Connect with me.</h2>
+                <p className="contact-intro">
+                  Always open to a conversation about interesting ideas, thoughtful products, and
+                  the systems that make them work.
                 </p>
-                <a className="contact-email" href={`mailto:${contact.email}`} data-magnetic>
-                  Email Brett <span aria-hidden="true">↗</span>
-                </a>
+                <nav className="contact-links" aria-label="Contact links">
+                  <a
+                    className="contact-link"
+                    href={`mailto:${contact.email}`}
+                    aria-label="Email Brett"
+                    title="Email Brett"
+                    data-magnetic
+                  >
+                    <ContactIcon name="email" />
+                  </a>
+                  <a
+                    className="contact-link"
+                    href={contact.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="GitHub"
+                    title="GitHub"
+                    data-magnetic
+                  >
+                    <ContactIcon name="github" />
+                  </a>
+                  <a
+                    className="contact-link"
+                    href={contact.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="LinkedIn"
+                    title="LinkedIn"
+                    data-magnetic
+                  >
+                    <ContactIcon name="linkedin" />
+                  </a>
+                </nav>
               </div>
-            </div>
 
-            <footer className="site-footer">
-              <p>© 2026 Brett Haas</p>
-              <p
-                data-atlas-local-time
-                role="timer"
-                aria-label="Local time in Charlottesville, Virginia"
-              >
-                Charlottesville, VA
-              </p>
-              <div>
-                <a href={contact.github} target="_blank" rel="noreferrer">
-                  GitHub
+              <footer className="site-footer">
+                <p>© 2026 Brett Haas</p>
+                <p
+                  data-atlas-local-time
+                  role="timer"
+                  aria-label="Local time in Charlottesville, Virginia"
+                >
+                  Charlottesville, VA
+                </p>
+                <a href="#hero">
+                  Back to top <span aria-hidden="true">↑</span>
                 </a>
-                <a href={contact.linkedin} target="_blank" rel="noreferrer">
-                  LinkedIn
-                </a>
-              </div>
-              <a href="#hero">
-                Back to top <span aria-hidden="true">↑</span>
-              </a>
-            </footer>
+              </footer>
+            </div>
           </div>
         </section>
       </main>
