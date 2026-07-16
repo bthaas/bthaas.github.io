@@ -5,7 +5,7 @@ import postcss from 'postcss'
 import { describe, expect, it } from 'vitest'
 
 describe('header brand mark', () => {
-  it('preserves the favicon feather detail against the light header', () => {
+  it('renders the favicon with its original light and dark colors', () => {
     const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/header.css'), 'utf8')
     const root = postcss.parse(stylesheet)
     let filter: string | undefined
@@ -16,6 +16,6 @@ describe('header brand mark', () => {
       })
     })
 
-    expect(filter).toBe('invert(1)')
+    expect(filter).toBeUndefined()
   })
 })
