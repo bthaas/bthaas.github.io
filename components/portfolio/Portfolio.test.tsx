@@ -17,7 +17,11 @@ describe('Portfolio', () => {
       }),
     ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Trajectory' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Selected work' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Explore projects' })).toHaveAttribute(
+      'href',
+      '#projects',
+    )
     expect(screen.getByRole('heading', { name: 'The craft behind the flight.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connect with me.' })).toBeInTheDocument()
 

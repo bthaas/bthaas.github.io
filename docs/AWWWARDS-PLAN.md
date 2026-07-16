@@ -143,7 +143,7 @@ feature/motion checks — never a prerequisite for content.
   the three bullet achievements + tech tags. Real content, zero new copy
   needed, and it rewards exploration (jury behavior).
 
-### 5.4 Selected Work — cobalt / citron / dusk chapters
+### 5.4 Projects — cobalt / citron / dusk chapters
 - **Chapter wipes #2–4:** each project chapter's background wipes in with its
   color; direction alternates (L→R, R→L) like page turns.
 - **Pinned case masthead:** project title pins briefly; "Case 0N" and the tech

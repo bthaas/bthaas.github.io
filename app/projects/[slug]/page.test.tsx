@@ -41,7 +41,11 @@ describe('project detail pages', () => {
     render(page)
 
     expect(screen.getByRole('heading', { level: 1, name: 'Court Vision' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Back to selected work' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Back to projects' })).toHaveAttribute(
+      'href',
+      '/#projects',
+    )
+    expect(screen.getByRole('link', { name: 'All projects' })).toHaveAttribute(
       'href',
       '/#projects',
     )

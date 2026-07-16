@@ -168,7 +168,7 @@ export function Portfolio() {
                 <h2>I build intelligent systems that hold up in the real world.</h2>
                 <p>{identity.descriptor}</p>
                 <a className="text-link" href="#projects">
-                  Explore selected work <span aria-hidden="true">↓</span>
+                  Explore projects <span aria-hidden="true">↓</span>
                 </a>
               </div>
             </div>
@@ -254,7 +254,7 @@ export function Portfolio() {
           <div className="atlas-shell projects-intro editorial-grid">
             <div className="section-heading">
               <p className="eyebrow">02 / Field studies</p>
-              <h2 id="projects-title">Selected work</h2>
+              <h2 id="projects-title">Projects</h2>
             </div>
             <p>
               Three builds across computer vision, real-time collaboration, and language-model

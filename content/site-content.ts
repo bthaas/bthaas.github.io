@@ -149,7 +149,7 @@ export const siteContent = {
     },
     {
       id: 'about-projects',
-      label: 'Selected Work',
+      label: 'Projects',
       caption: 'Products built where intelligent systems meet real human workflows.',
       detail:
         'The selected project set covers computer-vision sports analytics, music discovery, and research tooling for controlling and evaluating language-model behavior.',

@@ -60,7 +60,7 @@ describe('siteContent', () => {
       'AI Research',
       'Scale AI',
       'Refraction',
-      'Selected Work',
+      'Projects',
       'UVA · CS',
     ])
     expect(siteContent.about.some(({ label }) => String(label) === 'Amazon')).toBe(false)
