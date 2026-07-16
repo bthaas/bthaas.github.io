@@ -448,7 +448,7 @@ Next static export serves `404.html`).
    `font-*`, or other layout property in any scroll-linked animation.
 3. **Email link:** underline draw on enter + magnetic hover (reuse Step 6
    utility); keep serif scale.
-4. **Footer local time:** "Charlottesville, VA — HH:MM" rendered by
+4. **Footer local time:** "Bellevue, WA — HH:MM" rendered by
    atlas.js, updating per minute; server markup shows the location string
    only (no wrong-time flash; no hydration involved).
 5. **Custom cursor:** ink dot + trailing ring, `(pointer: fine)` +

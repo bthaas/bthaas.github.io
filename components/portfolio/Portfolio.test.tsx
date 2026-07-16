@@ -83,7 +83,7 @@ describe('Portfolio', () => {
     })
 
     expect(
-      screen.getByRole('timer', { name: 'Local time in Charlottesville, Virginia' }),
+      screen.getByRole('timer', { name: 'Local time in Bellevue, Washington' }),
     ).toBeInTheDocument()
   })
 
@@ -244,7 +244,7 @@ describe('Portfolio', () => {
     expect(container.querySelector('[data-contact-sunrise]')).toBeInTheDocument()
     expect(container.querySelectorAll('[data-contact-detail]')).toHaveLength(6)
     expect(container.querySelector('[data-atlas-local-time]')).toHaveTextContent(
-      'Charlottesville, VA',
+      'Bellevue, WA',
     )
     expect(container.querySelector('[data-atlas-local-time]')).not.toHaveTextContent(/\d{2}:\d{2}/)
   })

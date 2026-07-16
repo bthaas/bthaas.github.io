@@ -110,7 +110,7 @@ export const siteContent = {
     title: 'Software Engineer',
     descriptor:
       'Full-stack software engineer building reliable, intelligent products across web, mobile, and AI systems.',
-    location: 'Charlottesville, Virginia',
+    location: 'Bellevue, Washington',
     availability: 'Open for opportunities',
   },
   contact: {
@@ -283,7 +283,7 @@ export const siteContent = {
       role: 'ML Research Assistant',
       team: null,
       period: 'Nov 2025 – May 2026',
-      location: 'Charlottesville, VA',
+      location: 'Bellevue, WA',
       summary:
         'Inference-time activation-steering research focused on language-model visual bias.',
       highlights: [
@@ -345,7 +345,7 @@ export const siteContent = {
       institution: 'University of Virginia',
       degree: 'B.S. in Computer Science',
       graduation: 'May 2026',
-      location: 'Charlottesville, VA',
+      location: 'Bellevue, WA',
       gpa: '3.7',
       coursework: [
         'Data Structures and Algorithms',

@@ -254,8 +254,8 @@ describe('atlas DOM capabilities', () => {
       .toEqual(['', '', '', '', '', ''])
   })
 
-  it('renders Charlottesville time without depending on the viewer timezone', () => {
-    document.body.innerHTML = '<p data-atlas-local-time>Charlottesville, VA</p>'
+  it('renders Bellevue time without depending on the viewer timezone', () => {
+    document.body.innerHTML = '<p data-atlas-local-time>Bellevue, WA</p>'
     const schedule = vi.fn(() => 17)
     const clear = vi.fn()
     const cleanup = setupLocalTime(
@@ -266,7 +266,7 @@ describe('atlas DOM capabilities', () => {
     )
 
     expect(document.querySelector('[data-atlas-local-time]')).toHaveTextContent(
-      'Charlottesville, VA — 08:34',
+      'Bellevue, WA — 05:34',
     )
     expect(schedule).toHaveBeenCalledWith(expect.any(Function), 60_000)
     cleanup()

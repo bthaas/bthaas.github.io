@@ -432,9 +432,9 @@ export function Portfolio() {
                 <p
                   data-atlas-local-time
                   role="timer"
-                  aria-label="Local time in Charlottesville, Virginia"
+                  aria-label="Local time in Bellevue, Washington"
                 >
-                  Charlottesville, VA
+                  Bellevue, WA
                 </p>
                 <a href="#hero">
                   Back to top <span aria-hidden="true">↑</span>

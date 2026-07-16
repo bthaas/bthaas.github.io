@@ -1,14 +1,14 @@
-const CHARLOTTESVILLE_TIME_ZONE = 'America/New_York'
+const BELLEVUE_TIME_ZONE = 'America/Los_Angeles'
 
 type IntervalScheduler = (callback: () => void, delay: number) => number
 type IntervalClearer = (handle: number) => void
 
-export function formatCharlottesvilleTime(date: Date): string {
+export function formatBellevueTime(date: Date): string {
   const parts = new Intl.DateTimeFormat('en-US', {
     hour: '2-digit',
     hourCycle: 'h23',
     minute: '2-digit',
-    timeZone: CHARLOTTESVILLE_TIME_ZONE,
+    timeZone: BELLEVUE_TIME_ZONE,
   }).formatToParts(date)
   const hour = parts.find(({ type }) => type === 'hour')?.value ?? '00'
   const minute = parts.find(({ type }) => type === 'minute')?.value ?? '00'
@@ -25,7 +25,7 @@ export function setupLocalTime(
   if (!clock) return () => undefined
 
   const render = () => {
-    clock.textContent = `Charlottesville, VA — ${formatCharlottesvilleTime(now())}`
+    clock.textContent = `Bellevue, WA — ${formatBellevueTime(now())}`
   }
   render()
   const interval = schedule(render, 60_000)

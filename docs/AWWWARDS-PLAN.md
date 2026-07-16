@@ -164,7 +164,7 @@ feature/motion checks — never a prerequisite for content.
 - **"Keep building."** word-mask reveal; letter-spacing eases from -0.08em to
   -0.06em across the section (type exhales).
 - **Email:** oversized serif link with underline draw + magnetic hover.
-- **Footer:** add live Charlottesville local time (in-theme: an atlas records
+- **Footer:** add live Bellevue local time (in-theme: an atlas records
   coordinates); "Back to top ↑" gets a fast eased ascent.
 
 ### 5.6 Global micro-craft
