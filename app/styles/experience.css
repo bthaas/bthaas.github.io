@@ -145,6 +145,14 @@
   line-height: 1.55;
 }
 
+.flight-summary--education span {
+  display: block;
+}
+
+.flight-summary--education span + span {
+  margin-top: 0.45rem;
+}
+
 .flight-period {
   grid-column: 11 / -1;
   margin-bottom: 0;

@@ -126,7 +126,15 @@ describe('Portfolio', () => {
       })
     })
 
-    expect(within(entries[3]).queryByRole('button', { name: 'Field notes +' })).toBeNull()
+    const educationEntry = entries[3]
+    expect(within(educationEntry).queryByRole('button', { name: 'Field notes +' })).toBeNull()
+    expect(within(educationEntry).getByText('GPA: 3.7')).toBeVisible()
+    expect(
+      within(educationEntry).getByText(
+        'Relevant coursework: Computer Systems, Data Structures and Algorithms, Software Engineering, Cybersecurity, Machine Learning, Reinforcement Learning',
+      ),
+    ).toBeVisible()
+    expect(within(educationEntry).getByText('Charlottesville, VA')).toBeVisible()
   })
 
   it('collapses enhanced dossiers on init and toggles ARIA state without moving focus', () => {

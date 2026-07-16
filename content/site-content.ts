@@ -283,7 +283,7 @@ export const siteContent = {
       role: 'ML Research Assistant',
       team: null,
       period: 'Nov 2025 – May 2026',
-      location: 'Bellevue, WA',
+      location: 'Charlottesville, VA',
       summary:
         'Inference-time activation-steering research focused on language-model visual bias.',
       highlights: [
@@ -302,7 +302,7 @@ export const siteContent = {
       role: 'GenAI Technical Advisor Intern',
       team: 'SEAL',
       period: 'Jun 2025 – Dec 2025',
-      location: 'Remote, USA',
+      location: 'Remote',
       summary:
         'Frontier-model safety, evaluation, and agent reliability work on the Scale AI SEAL team.',
       highlights: [
@@ -345,15 +345,15 @@ export const siteContent = {
       institution: 'University of Virginia',
       degree: 'B.S. in Computer Science',
       graduation: 'May 2026',
-      location: 'Bellevue, WA',
+      location: 'Charlottesville, VA',
       gpa: '3.7',
       coursework: [
+        'Computer Systems',
         'Data Structures and Algorithms',
-        'Software Development',
-        'Software Testing',
-        'Computer Systems and Organization',
+        'Software Engineering',
         'Cybersecurity',
-        'Machine Learning Research',
+        'Machine Learning',
+        'Reinforcement Learning',
       ],
       focusAreas: [
         'Computer Science',

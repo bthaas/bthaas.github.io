@@ -40,7 +40,20 @@ describe('siteContent', () => {
       'Refraction Innovation Hub',
     ])
     expect(siteContent.education).toHaveLength(1)
-    expect(siteContent.education[0]?.gpa).toBe('3.7')
+    expect(siteContent.experience[0]?.location).toBe('Charlottesville, VA')
+    expect(siteContent.experience[1]?.location).toBe('Remote')
+    expect(siteContent.education[0]).toMatchObject({
+      location: 'Charlottesville, VA',
+      gpa: '3.7',
+      coursework: [
+        'Computer Systems',
+        'Data Structures and Algorithms',
+        'Software Engineering',
+        'Cybersecurity',
+        'Machine Learning',
+        'Reinforcement Learning',
+      ],
+    })
   })
 
   it('keeps contact destinations and missing resume state explicit', () => {

@@ -245,12 +245,13 @@ export function Portfolio() {
                     <h3>{entry.institution}</h3>
                     <p className="flight-role">{entry.degree}</p>
                   </div>
-                  <p className="flight-summary">
-                    Systems, cybersecurity, software engineering, and machine-learning research.
+                  <p className="flight-summary flight-summary--education">
+                    <span>GPA: {entry.gpa}</span>
+                    <span>Relevant coursework: {entry.coursework.join(', ')}</span>
                   </p>
                   <p className="flight-period">
                     {entry.graduation}
-                    <span>GPA {entry.gpa}</span>
+                    <span>{entry.location}</span>
                   </p>
                 </li>
               ))}
