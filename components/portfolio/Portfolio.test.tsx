@@ -92,26 +92,31 @@ describe('Portfolio', () => {
     const { container } = render(<Portfolio />)
     const logos = getSkillLogos(siteContent.skills)
     const grid = screen.getByRole('list', {
-      name: "Technologies and programming languages from Brett Haas's resume",
+      name: 'Technologies and programming languages Brett Haas works with',
     })
     const marquee = container.querySelector<HTMLElement>('[data-craft-marquee]')
     const sequences = marquee?.querySelectorAll('.craft-marquee__sequence')
 
     expect(within(grid).getAllByRole('listitem')).toHaveLength(logos.length)
-    expect(
-      within(grid).getAllByRole('listitem').map((item) => item.getAttribute('title')),
-    ).toEqual(logos.map(({ label }) => label))
+    expect(within(grid).getAllByRole('listitem').map((item) => item.textContent)).toEqual(
+      logos.map(({ label }) => label),
+    )
+    within(grid).getAllByRole('listitem').forEach((item) => {
+      expect(item).toHaveAttribute('tabindex', '0')
+    })
     expect(logos.map(({ label }) => label)).toEqual(
       expect.arrayContaining([
         'TypeScript',
         'Python',
         'React',
+        'Claude Code',
         'Amazon Web Services',
         'Docker',
         'PostgreSQL',
         'OpenAI API',
       ]),
     )
+    expect(logos.map(({ label }) => label)).not.toContain('REST APIs')
     expect(marquee).toHaveAttribute('tabindex', '0')
     expect(sequences).toHaveLength(2)
     expect(sequences?.[0]).toHaveAttribute('aria-hidden', 'true')

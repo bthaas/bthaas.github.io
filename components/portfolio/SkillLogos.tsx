@@ -16,7 +16,6 @@ import {
   siNextdotjs,
   siNodedotjs,
   siOpenai,
-  siOpenapiinitiative,
   siOpenjdk,
   siPostgresql,
   siPytorch,
@@ -45,6 +44,11 @@ function logo(label: string, icon: IconData): SkillLogo {
   return { label, hex: icon.hex, path: icon.path }
 }
 
+const claudeCodeIcon: IconData = {
+  hex: 'D97757',
+  path: 'M21 10.5h3v3h-3v3h-1.5v3H18v-3h-1.5v3H15v-3H9v3H7.5v-3H6v3H4.5v-3H3v-3H0v-3h3v-6h18Zm-15 0h1.5v-3H6Zm10.5 0H18v-3h-1.5z',
+}
+
 const skillLogoCatalog: Readonly<Partial<Record<string, readonly SkillLogo[]>>> = {
   TypeScript: [logo('TypeScript', siTypescript)],
   JavaScript: [logo('JavaScript', siJavascript)],
@@ -62,7 +66,7 @@ const skillLogoCatalog: Readonly<Partial<Record<string, readonly SkillLogo[]>>> 
   Flask: [logo('Flask', siFlask)],
   PyTorch: [logo('PyTorch', siPytorch)],
   TensorFlow: [logo('TensorFlow', siTensorflow)],
-  'REST APIs': [logo('REST APIs', siOpenapiinitiative)],
+  'Claude Code': [logo('Claude Code', claudeCodeIcon)],
   AWS: [logo('Amazon Web Services', siAmazonwebservices)],
   Docker: [logo('Docker', siDocker)],
   Kubernetes: [logo('Kubernetes', siKubernetes)],
@@ -106,14 +110,15 @@ export function SkillLogoGrid({ logos }: { readonly logos: readonly SkillLogo[] 
   return (
     <ul
       className="craft-logo-grid"
-      aria-label="Technologies and programming languages from Brett Haas's resume"
+      aria-label="Technologies and programming languages Brett Haas works with"
     >
       {logos.map((logoEntry) => (
         <li
           className="skill-logo"
+          data-skill-logo={logoEntry.label}
           key={logoEntry.label}
           style={{ color: `#${logoEntry.hex}` }}
-          title={logoEntry.label}
+          tabIndex={0}
         >
           <SkillLogoGlyph logoEntry={logoEntry} />
           <span className="skill-logo__name">{logoEntry.label}</span>

@@ -128,6 +128,7 @@
 .skill-logo {
   position: relative;
   display: grid;
+  overflow: hidden;
   min-width: 0;
   margin: 0;
   aspect-ratio: 1;
@@ -138,27 +139,49 @@
     transform 180ms var(--ease-out);
 }
 
-.skill-logo:hover {
+.skill-logo:is(:hover, :focus-visible) {
   z-index: 1;
-  background: var(--paper);
-  transform: scale(1.08);
+  background: var(--ink);
+  transform: scale(1.04);
 }
 
 .skill-logo__glyph {
   width: clamp(1.45rem, 2.1vw, 2rem);
   height: auto;
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.skill-logo:is(:hover, :focus-visible) .skill-logo__glyph {
+  opacity: 0.12;
+  transform: scale(0.8);
 }
 
 .skill-logo__name {
   position: absolute;
-  overflow: hidden;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  border: 0;
-  margin: -1px;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
+  display: grid;
+  padding: 0.35rem;
+  color: var(--paper);
+  font-size: clamp(0.48rem, 0.65vw, 0.64rem);
+  font-weight: 700;
+  inset: 0;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  opacity: 0;
+  place-items: center;
+  pointer-events: none;
+  text-align: center;
+  text-transform: uppercase;
+  transform: translateY(0.3rem);
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.skill-logo:is(:hover, :focus-visible) .skill-logo__name {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .craft-marquee {

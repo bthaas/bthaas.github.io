@@ -380,7 +380,7 @@ export const siteContent = {
       'PyTorch',
       'TensorFlow',
       'NNSight',
-      'REST APIs',
+      'Claude Code',
     ],
     'Cloud & DevOps': [
       'AWS',
