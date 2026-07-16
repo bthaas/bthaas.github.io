@@ -197,7 +197,7 @@ export function Portfolio() {
             <div className="experience-intro editorial-grid">
               <div className="section-heading">
                 <p className="eyebrow">01 / Flight log</p>
-                <h2 id="experience-title">Trajectory</h2>
+                <h2 id="experience-title">Experience</h2>
               </div>
               <p className="experience-kicker">
                 From research and evaluation to production mobile systems: a path shaped by rigor,

@@ -16,7 +16,7 @@ describe('Portfolio', () => {
         name: 'I build intelligent systems that hold up in the real world.',
       }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Trajectory' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Experience' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Explore projects' })).toHaveAttribute(
       'href',
