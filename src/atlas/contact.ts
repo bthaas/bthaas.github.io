@@ -146,6 +146,7 @@ export function setupContactFinale(
   section.dataset.contactReady = ''
   measure()
   render()
+  section.dataset.contactScrollReady = ''
   resizeObserver?.observe(section)
   runtimeWindow.addEventListener('atlas:scroll', handleScroll)
   runtimeWindow.addEventListener(SUN_PROGRESS_EVENT, handleSunProgress)
@@ -174,6 +175,7 @@ export function setupContactFinale(
     section.style.removeProperty('--atlas-contact-image-y')
     section.style.removeProperty('--atlas-contact-email-reveal')
     delete section.dataset.contactReady
+    delete section.dataset.contactScrollReady
     words.forEach((word) => word.style.removeProperty('--atlas-contact-word-reveal'))
     characters.forEach((character) => {
       character.style.removeProperty('--atlas-contact-character-x')

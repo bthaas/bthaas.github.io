@@ -4,7 +4,14 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 // @ts-expect-error The postbuild script is intentionally native ESM JavaScript.
-import { assertAtlasBudget, processStaticExport, stripStaticRuntime } from './strip-static-runtime.mjs'
+import * as staticRuntime from './strip-static-runtime.mjs'
+
+const {
+  assertAtlasBudget,
+  getAtlasScriptSource,
+  processStaticExport,
+  stripStaticRuntime,
+} = staticRuntime
 
 describe('static runtime stripping', () => {
   it('preserves only the Atlas enhancement script', () => {
@@ -31,6 +38,18 @@ describe('static runtime stripping', () => {
     expect(stripped).toContain('<script src="/atlas.js" defer></script></body>')
   })
 
+  it('rewrites Atlas to a content-versioned source', () => {
+    const firstSource = getAtlasScriptSource('first build')
+    const secondSource = getAtlasScriptSource('second build')
+    const html = '<script src="/atlas.js" defer></script><script>next()</script>'
+
+    expect(firstSource).toMatch(/^\/atlas\.js\?v=[a-f0-9]{12}$/)
+    expect(secondSource).not.toBe(firstSource)
+    expect(stripStaticRuntime(html, firstSource)).toBe(
+      `<script src="${firstSource}" defer></script>`,
+    )
+  })
+
   it('enforces the inclusive 12 KiB gzip ceiling', () => {
     expect(() => assertAtlasBudget(12 * 1024)).not.toThrow()
     expect(() => assertAtlasBudget(12 * 1024 + 1)).toThrow(/12 KiB/)
@@ -41,7 +60,9 @@ describe('static runtime stripping', () => {
     const nested = join(root, 'nested')
     const atlasPath = join(root, 'atlas.js')
     await mkdir(nested)
-    await writeFile(atlasPath, 'document.documentElement.dataset.atlas="ready"')
+    const atlasSource = 'document.documentElement.dataset.atlas="ready"'
+    const versionedAtlasSource = getAtlasScriptSource(atlasSource)
+    await writeFile(atlasPath, atlasSource)
     await writeFile(join(root, 'index.html'), '<script src="/atlas.js"></script><script>next()</script>')
     await writeFile(join(nested, 'page.html'), '<script src="/_next/runtime.js"></script>')
     await writeFile(join(root, 'robots.txt'), 'User-agent: *')
@@ -52,10 +73,10 @@ describe('static runtime stripping', () => {
       expect(result.htmlFiles).toHaveLength(2)
       expect(result.gzipBytes).toBeGreaterThan(0)
       expect(await readFile(join(root, 'index.html'), 'utf8')).toBe(
-        '<script src="/atlas.js"></script>',
+        `<script src="${versionedAtlasSource}"></script>`,
       )
       expect(await readFile(join(nested, 'page.html'), 'utf8')).toBe(
-        '<script src="/atlas.js" defer></script>',
+        `<script src="${versionedAtlasSource}" defer></script>`,
       )
     } finally {
       await rm(root, { force: true, recursive: true })

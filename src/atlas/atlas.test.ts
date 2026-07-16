@@ -224,6 +224,7 @@ describe('atlas DOM capabilities', () => {
     expect(characters).toHaveLength(13)
     expect(words).toHaveLength(2)
     expect(details).toHaveLength(6)
+    expect(section).toHaveAttribute('data-contact-scroll-ready')
     expect(section.style.getPropertyValue('--atlas-contact-plate-reveal')).toBe('0')
     expect(section.style.getPropertyValue('--atlas-contact-image-y')).toBe('2.5%')
     expect(details.map((detail) => detail.style.getPropertyValue('--atlas-contact-detail-reveal')))
@@ -247,6 +248,7 @@ describe('atlas DOM capabilities', () => {
     expect(section.getBoundingClientRect).toHaveBeenCalledTimes(2)
 
     cleanup()
+    expect(section).not.toHaveAttribute('data-contact-scroll-ready')
     expect(section.style.getPropertyValue('--atlas-contact-glow')).toBe('')
     expect(section.style.getPropertyValue('--atlas-contact-plate-reveal')).toBe('')
     expect(section.style.getPropertyValue('--atlas-contact-image-y')).toBe('')
