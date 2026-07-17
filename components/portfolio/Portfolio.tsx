@@ -172,6 +172,14 @@ export function Portfolio() {
 
         </section>
 
+        <section className="dive-section" id="dive" aria-hidden="true">
+          <div className="dive-track">
+            <div className="dive-sticky">
+              <canvas className="dive-canvas" data-dive-canvas />
+            </div>
+          </div>
+        </section>
+
         <section className="experience-section" id="experience" aria-labelledby="experience-title">
           {[1, 2, 3].map((step) => (
             <span

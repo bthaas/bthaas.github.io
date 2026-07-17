@@ -30,7 +30,13 @@ describe('Portfolio', () => {
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
     )
-    expect(ids).toEqual(['hero', 'experience', 'projects', 'craft', 'contact'])
+    expect(ids).toEqual(['hero', 'dive', 'experience', 'projects', 'craft', 'contact'])
+
+    const dive = container.querySelector<HTMLElement>('#dive')
+    expect(dive).toHaveAttribute('aria-hidden', 'true')
+    expect(dive?.previousElementSibling).toHaveAttribute('id', 'hero')
+    expect(dive?.nextElementSibling).toHaveAttribute('id', 'experience')
+    expect(dive?.querySelector('[data-dive-canvas]')).toBeInstanceOf(HTMLCanvasElement)
   })
 
   it('keeps navigation visible, concise, and anchored to the editorial sections', () => {
@@ -57,6 +63,7 @@ describe('Portfolio', () => {
       'href',
       '#contact',
     )
+    expect(within(navigation).queryByRole('link', { name: /dive/i })).not.toBeInTheDocument()
   })
 
   it('removes the standalone metrics strip from the hero', () => {
@@ -226,10 +233,11 @@ describe('Portfolio', () => {
     })
   })
 
-  it('contains no legacy cinematic or modal presentation surfaces', () => {
+  it('contains only the dive canvas and no legacy cinematic or modal surfaces', () => {
     const { container } = render(<Portfolio />)
 
-    expect(container.querySelector('canvas')).not.toBeInTheDocument()
+    expect(container.querySelectorAll('canvas')).toHaveLength(1)
+    expect(container.querySelector('canvas')).toHaveAttribute('data-dive-canvas')
     expect(container.querySelector('video')).not.toBeInTheDocument()
     expect(container.querySelector('[data-webgl]')).not.toBeInTheDocument()
     expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()

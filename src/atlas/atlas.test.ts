@@ -5,6 +5,7 @@ import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
 import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
+import { setupDiveScroll } from './dive'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupExperienceChapter } from './experience'
 import { setupLocalTime } from './local-time'
@@ -140,6 +141,209 @@ describe('atlas DOM capabilities', () => {
     expect(hero.style.getPropertyValue('--atlas-hero-scale')).toBe('1.025')
     expect(hero.getBoundingClientRect).toHaveBeenCalledOnce()
     cleanup()
+  })
+
+  it('wires the dive canvas lazily and detaches its observers and listeners on cleanup', () => {
+    document.body.innerHTML = `
+      <section class="dive-section">
+        <div class="dive-track">
+          <div class="dive-sticky"><canvas data-dive-canvas></canvas></div>
+        </div>
+      </section>
+    `
+    const section = document.querySelector<HTMLElement>('.dive-section')!
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-dive-canvas]')!
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      bottom: 360,
+      height: 360,
+      left: 0,
+      right: 640,
+      top: 0,
+      width: 640,
+      x: 0,
+      y: 0,
+      toJSON: () => undefined,
+    })
+    const observer = { disconnect: vi.fn(), observe: vi.fn() }
+    const createObserver = vi.fn(() => observer)
+    const addEventListener = vi.spyOn(window, 'addEventListener')
+    const removeEventListener = vi.spyOn(window, 'removeEventListener')
+
+    const cleanup = setupDiveScroll(document, window, { createObserver })
+
+    expect(createObserver).toHaveBeenCalledWith(expect.any(Function), {
+      rootMargin: '150%',
+      threshold: 0,
+    })
+    expect(observer.observe).toHaveBeenCalledWith(section)
+    expect(canvas.width).toBe(640)
+    expect(canvas.height).toBe(360)
+    expect(addEventListener).toHaveBeenCalledWith('atlas:scroll', expect.any(Function))
+    expect(addEventListener).toHaveBeenCalledWith('resize', expect.any(Function), {
+      passive: true,
+    })
+
+    cleanup()
+    expect(observer.disconnect).toHaveBeenCalledOnce()
+    expect(removeEventListener).toHaveBeenCalledWith('atlas:scroll', expect.any(Function))
+    expect(removeEventListener).toHaveBeenCalledWith('resize', expect.any(Function))
+  })
+
+  it('loads dive frames coarse-first and draws loaded fallbacks through the end wash', async () => {
+    document.body.innerHTML = `
+      <section class="dive-section">
+        <div class="dive-track"><canvas data-dive-canvas></canvas></div>
+      </section>
+    `
+    const section = document.querySelector<HTMLElement>('.dive-section')!
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-dive-canvas]')!
+    let sectionTop = 0
+    vi.spyOn(section, 'getBoundingClientRect').mockImplementation(() => ({
+      bottom: sectionTop + 4000,
+      height: 4000,
+      left: 0,
+      right: 640,
+      top: sectionTop,
+      width: 640,
+      x: 0,
+      y: sectionTop,
+      toJSON: () => undefined,
+    }))
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      bottom: 360,
+      height: 360,
+      left: 0,
+      right: 640,
+      top: 0,
+      width: 640,
+      x: 0,
+      y: 0,
+      toJSON: () => undefined,
+    })
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1200)
+    vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(3)
+    const context = {
+      drawImage: vi.fn(),
+      fillRect: vi.fn(),
+      fillStyle: '',
+    }
+    vi.spyOn(canvas, 'getContext').mockReturnValue(
+      context as unknown as CanvasRenderingContext2D,
+    )
+    const images: HTMLImageElement[] = []
+    const createImage = vi.fn(() => {
+      const image = document.createElement('img')
+      const decode = images.length === 1
+        ? vi.fn().mockRejectedValue(new Error('decode failed'))
+        : vi.fn().mockResolvedValue(undefined)
+      Object.defineProperty(image, 'decode', { value: decode })
+      images.push(image)
+      return image
+    })
+    let update: IntersectionObserverCallback | undefined
+    const observer = { disconnect: vi.fn(), observe: vi.fn() }
+    const cleanup = setupDiveScroll(document, window, {
+      createImage,
+      createObserver: (callback) => {
+        update = callback
+        return observer
+      },
+    })
+
+    update?.(
+      [{ isIntersecting: false }] as IntersectionObserverEntry[],
+      {} as IntersectionObserver,
+    )
+    expect(createImage).not.toHaveBeenCalled()
+    update?.(
+      [{ isIntersecting: true }] as IntersectionObserverEntry[],
+      {} as IntersectionObserver,
+    )
+    await vi.waitFor(() => expect(createImage).toHaveBeenCalledTimes(144))
+
+    expect(images.slice(0, 4).map((image) => image.src)).toEqual([
+      'http://localhost:3000/frames/dive/frame_000.webp',
+      'http://localhost:3000/frames/dive/frame_008.webp',
+      'http://localhost:3000/frames/dive/frame_016.webp',
+      'http://localhost:3000/frames/dive/frame_024.webp',
+    ])
+    expect(canvas.width).toBe(1280)
+    expect(canvas.height).toBe(720)
+    expect(context.drawImage).toHaveBeenCalled()
+
+    sectionTop = -177.1
+    window.dispatchEvent(new CustomEvent('atlas:scroll'))
+    expect((context.drawImage.mock.calls.at(-1)?.[0] as HTMLImageElement).src).toContain(
+      'frame_007.webp',
+    )
+
+    sectionTop = -1500
+    window.dispatchEvent(new CustomEvent('atlas:scroll'))
+    expect((context.drawImage.mock.calls.at(-1)?.[0] as HTMLImageElement).src).toContain(
+      'frame_072.webp',
+    )
+
+    sectionTop = -3000
+    window.dispatchEvent(new CustomEvent('atlas:scroll'))
+    expect(context.fillStyle).toBe('rgba(32, 42, 68, 1)')
+    expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 1280, 720)
+
+    window.dispatchEvent(new Event('resize'))
+    cleanup()
+  })
+
+  it('requests only the 72 even dive frames on mobile', async () => {
+    document.body.innerHTML = `
+      <section class="dive-section">
+        <div class="dive-track"><canvas data-dive-canvas></canvas></div>
+      </section>
+    `
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-dive-canvas]')!
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      bottom: 800,
+      height: 800,
+      left: 0,
+      right: 390,
+      top: 0,
+      width: 390,
+      x: 0,
+      y: 0,
+      toJSON: () => undefined,
+    })
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(390)
+    const images: HTMLImageElement[] = []
+    const createImage = vi.fn(() => {
+      const image = document.createElement('img')
+      Object.defineProperty(image, 'decode', { value: vi.fn().mockResolvedValue(undefined) })
+      images.push(image)
+      return image
+    })
+    let update: IntersectionObserverCallback | undefined
+    const cleanup = setupDiveScroll(document, window, {
+      createImage,
+      createObserver: (callback) => {
+        update = callback
+        return { disconnect: vi.fn(), observe: vi.fn() }
+      },
+    })
+
+    update?.(
+      [{ isIntersecting: true }] as IntersectionObserverEntry[],
+      {} as IntersectionObserver,
+    )
+    await vi.waitFor(() => expect(createImage).toHaveBeenCalledTimes(72))
+
+    const frameIndexes = images.map((image) => Number(image.src.match(/frame_(\d+)/)?.[1]))
+    expect(frameIndexes.every((index) => index % 2 === 0)).toBe(true)
+    expect(frameIndexes.slice(0, 4)).toEqual([0, 8, 16, 24])
+    cleanup()
+  })
+
+  it('does nothing when dive markup is absent', () => {
+    const cleanup = setupDiveScroll(document, window)
+
+    expect(cleanup()).toBeUndefined()
   })
 
   it('moves the header sun from shared progress and publishes the Step 7 handshake', () => {
@@ -570,6 +774,7 @@ describe('atlas DOM capabilities', () => {
   it('does no enhancement work when reduced motion is requested', () => {
     const createBus = vi.fn()
     const prepareEntrance = vi.fn()
+    const prepareDive = vi.fn()
     const prepareHero = vi.fn()
     const prepareCraft = vi.fn()
     const prepareContact = vi.fn()
@@ -594,6 +799,7 @@ describe('atlas DOM capabilities', () => {
       document,
       matchMedia,
       prepareEntrance,
+      prepareDive,
       prepareHero,
       prepareCraft,
       prepareContact,
@@ -615,6 +821,7 @@ describe('atlas DOM capabilities', () => {
     expect(document.documentElement).not.toHaveAttribute('data-atlas')
     expect(createBus).not.toHaveBeenCalled()
     expect(prepareEntrance).not.toHaveBeenCalled()
+    expect(prepareDive).not.toHaveBeenCalled()
     expect(prepareHero).not.toHaveBeenCalled()
     expect(prepareCraft).not.toHaveBeenCalled()
     expect(prepareContact).not.toHaveBeenCalled()
@@ -641,6 +848,7 @@ describe('atlas DOM capabilities', () => {
     const destroyBus = vi.fn()
     const cleanupReveals = vi.fn()
     const cleanupEntrance = vi.fn()
+    const cleanupDive = vi.fn()
     const cleanupHero = vi.fn()
     const cleanupCraft = vi.fn()
     const cleanupContact = vi.fn()
@@ -668,6 +876,7 @@ describe('atlas DOM capabilities', () => {
       document,
       matchMedia: () => ({ matches: false }),
       prepareEntrance: () => cleanupEntrance,
+      prepareDive: () => cleanupDive,
       prepareHero: () => cleanupHero,
       prepareCraft: () => cleanupCraft,
       prepareContact: () => cleanupContact,
@@ -693,6 +902,7 @@ describe('atlas DOM capabilities', () => {
     expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'atlas:scroll' }))
     expect(unsubscribe).toHaveBeenCalledOnce()
     expect(cleanupEntrance).toHaveBeenCalledOnce()
+    expect(cleanupDive).toHaveBeenCalledOnce()
     expect(cleanupHero).toHaveBeenCalledOnce()
     expect(cleanupCraft).toHaveBeenCalledOnce()
     expect(cleanupContact).toHaveBeenCalledOnce()
