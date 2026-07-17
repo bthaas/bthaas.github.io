@@ -2,6 +2,7 @@ import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
 import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
+import { setupDiveScroll } from './dive'
 import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupLocalTime } from './local-time'
@@ -16,6 +17,7 @@ interface AtlasRuntimeOptions {
   readonly document?: Document
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
   readonly prepareEntrance?: (document: Document) => () => void
+  readonly prepareDive?: (document: Document, window: Window) => () => void
   readonly prepareCraft?: (document: Document, window: Window) => () => void
   readonly prepareContact?: (document: Document, window: Window) => () => void
   readonly prepareCursor?: (document: Document) => () => void
@@ -38,6 +40,7 @@ export function initializeAtlas({
   document: runtimeDocument = document,
   matchMedia = (query) => window.matchMedia(query),
   prepareEntrance = setupEntrance,
+  prepareDive = setupDiveScroll,
   prepareCraft = setupCraftChapter,
   prepareContact = setupContactFinale,
   prepareCursor = setupCursor,
@@ -70,6 +73,7 @@ export function initializeAtlas({
   html.dataset.atlas = 'ready'
 
   const cleanupEntrance = prepareEntrance(runtimeDocument)
+  const cleanupDive = prepareDive(runtimeDocument, runtimeWindow)
   const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
   const cleanupCursor = prepareCursor(runtimeDocument)
@@ -93,6 +97,7 @@ export function initializeAtlas({
     isActive = false
     unsubscribe()
     cleanupEntrance()
+    cleanupDive()
     cleanupCraft()
     cleanupContact()
     cleanupCursor()
