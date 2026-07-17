@@ -1,7 +1,7 @@
 .experience-section {
   position: relative;
   isolation: isolate;
-  background: var(--abyss);
+  background: var(--dusk-deep);
   color: var(--paper);
 }
 
