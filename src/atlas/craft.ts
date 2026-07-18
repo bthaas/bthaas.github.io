@@ -1,57 +1,82 @@
 import {
-  getCraftMotion,
-  getCraftViewProgress,
-} from '../../lib/atlas-motion/craft-choreography'
+  getElementTraversalRange,
+  getViewportEntryRange,
+} from '../../lib/atlas-motion/scroll-trigger-range'
+
+import { getAtlasEngine, type AtlasEngine } from './engine'
 
 export function setupCraftChapter(
   root: Document = document,
   runtimeWindow: Window = window,
-  supportsScrollDriven =
-    typeof CSS !== 'undefined' && CSS.supports('animation-timeline: view()'),
+  engine: AtlasEngine | null = getAtlasEngine(),
 ): () => void {
   const section = root.querySelector<HTMLElement>('.craft-section')
   const plate = root.querySelector<HTMLElement>('.craft-art')
-  if (supportsScrollDriven || !section || !plate) return () => undefined
-
-  let elementHeight = 0
-  let elementTop = 0
-  const measure = () => {
-    const bounds = plate.getBoundingClientRect()
-    elementHeight = bounds.height
-    elementTop = bounds.top + runtimeWindow.scrollY
+  const panel = section?.querySelector<HTMLElement>('.craft-panel')
+  const heading = section?.querySelector<HTMLElement>('.craft-heading')
+  const ghost = section?.querySelector<HTMLElement>('.craft-ghost')
+  const image = plate?.querySelector<HTMLImageElement>('img')
+  if (!section || !plate || !panel || !heading || !ghost || !image || !engine) {
+    return () => undefined
   }
-  const render = (scrollY: number) => {
-    const progress = getCraftViewProgress({
-      elementHeight,
-      elementTop,
-      scrollY,
+  const measurePlateRange = () => getViewportEntryRange({
+    elementTop: plate.getBoundingClientRect().top + runtimeWindow.scrollY,
+    endViewportRatio: 0.28,
+    startViewportRatio: 0.92,
+    viewportHeight: runtimeWindow.innerHeight,
+  })
+  const measureSectionRange = () => {
+    const bounds = section.getBoundingClientRect()
+    return getElementTraversalRange({
+      elementHeight: bounds.height,
+      elementTop: bounds.top + runtimeWindow.scrollY,
       viewportHeight: runtimeWindow.innerHeight,
     })
-    const frame = getCraftMotion(progress)
-    plate.style.setProperty('--atlas-craft-clip-bottom', `${frame.clipBottomPercent}%`)
-    plate.style.setProperty('--atlas-craft-image-y', `${frame.imageTranslatePercent}%`)
-    section.style.setProperty('--atlas-craft-ghost-y', `${frame.ghostTranslatePixels}px`)
   }
-  const handleScroll = (event: Event) => {
-    const { detail } = event as CustomEvent<{ scrollY?: number }>
-    render(detail?.scrollY ?? runtimeWindow.scrollY)
-  }
-  const handleResize = () => {
-    measure()
-    render(runtimeWindow.scrollY)
-  }
-  root.documentElement.classList.add('atlas-craft-fallback')
-  measure()
-  render(runtimeWindow.scrollY)
-  runtimeWindow.addEventListener('atlas:scroll', handleScroll)
-  runtimeWindow.addEventListener('resize', handleResize, { passive: true })
+
+  const plateTimeline = engine.gsap.timeline({
+    scrollTrigger: {
+      trigger: plate,
+      start: () => measurePlateRange().start,
+      end: () => measurePlateRange().end,
+      refreshPriority: 1,
+      scrub: 0.7,
+    },
+  })
+  plateTimeline.fromTo(
+    plate,
+    { clipPath: 'inset(0 0 100%)' },
+    { clipPath: 'inset(0 0 0%)', ease: 'none' },
+    0,
+  )
+  plateTimeline.fromTo(image, { yPercent: -4 }, { ease: 'none', yPercent: 4 }, 0)
+
+  const ghostTimeline = engine.gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: () => measureSectionRange().start,
+      end: () => measureSectionRange().end,
+      refreshPriority: 1,
+      scrub: 0.8,
+    },
+  })
+  ghostTimeline.fromTo(ghost, { y: 28 }, { ease: 'none', y: -28 }, 0)
+
+  const pin = engine.isCoarsePointer || runtimeWindow.innerWidth <= 720
+    ? null
+    : engine.ScrollTrigger.create({
+        trigger: panel,
+        start: 'top top+=88',
+        end: () => `+=${Math.max(1, panel.offsetHeight - heading.offsetHeight - 120)}`,
+        invalidateOnRefresh: true,
+        pin: heading,
+        pinSpacing: false,
+        refreshPriority: -1,
+      })
 
   return () => {
-    runtimeWindow.removeEventListener('atlas:scroll', handleScroll)
-    runtimeWindow.removeEventListener('resize', handleResize)
-    root.documentElement.classList.remove('atlas-craft-fallback')
-    section.style.removeProperty('--atlas-craft-ghost-y')
-    plate.style.removeProperty('--atlas-craft-clip-bottom')
-    plate.style.removeProperty('--atlas-craft-image-y')
+    pin?.kill()
+    plateTimeline.kill()
+    ghostTimeline.kill()
   }
 }

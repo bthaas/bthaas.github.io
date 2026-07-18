@@ -5,6 +5,7 @@ import {
 } from '../../lib/atlas-motion/sun-arc'
 
 import type { ScrollSnapshot } from './scroll-bus'
+import { getAtlasEngine, type AtlasEngine } from './engine'
 
 const WAYPOINT_IDS = ['experience', 'projects', 'craft', 'contact'] as const
 
@@ -42,22 +43,17 @@ export function setupSunArc(
   root: Document = document,
   runtimeWindow: Window = window,
   getApexProgress: () => number = () => measureTrajectoryApex(root, runtimeWindow),
+  engine: AtlasEngine | null = getAtlasEngine(),
 ): () => void {
-  let sun = root.querySelector<SVGGElement>('[data-atlas-sun]')
-  if (!sun) return () => undefined
+  const sun = root.querySelector<SVGGElement>('[data-atlas-sun]')
+  const path = root.querySelector<SVGPathElement>('[data-atlas-sun-path]')
+  if (!sun || !path || !engine) return () => undefined
 
   let apexProgress = getApexProgress()
   let latestProgress = 0
-  const getCurrentSun = () => {
-    if (!sun?.isConnected) {
-      sun = root.querySelector<SVGGElement>('[data-atlas-sun]')
-    }
-    return sun
-  }
   const render = (progress: number) => {
     latestProgress = progress
     const position = getSunArcPosition(progress, apexProgress)
-    getCurrentSun()?.setAttribute('transform', `translate(${position.x} ${position.y})`)
     runtimeWindow.dispatchEvent(new CustomEvent<SunProgressDetail>(SUN_PROGRESS_EVENT, {
       detail: { position, progress: position.progress },
     }))
@@ -71,12 +67,39 @@ export function setupSunArc(
     render(latestProgress)
   }
 
+  const timeline = engine.gsap.timeline({
+    scrollTrigger: {
+      start: 0,
+      end: 'max',
+      scrub: 0.5,
+    },
+  })
+  timeline.fromTo(
+    path,
+    { drawSVG: '0%' },
+    { drawSVG: '100%', ease: 'none' },
+    0,
+  )
+  timeline.to(
+    sun,
+    {
+      ease: 'none',
+      motionPath: {
+        align: path,
+        alignOrigin: [0.5, 0.5],
+        autoRotate: false,
+        path,
+      },
+    },
+    0,
+  )
+
   runtimeWindow.addEventListener('atlas:scroll', handleScroll)
   runtimeWindow.addEventListener('resize', handleResize, { passive: true })
   return () => {
+    timeline.kill()
     runtimeWindow.removeEventListener('atlas:scroll', handleScroll)
     runtimeWindow.removeEventListener('resize', handleResize)
-    getCurrentSun()?.setAttribute('transform', 'translate(0 0)')
   }
 }
 

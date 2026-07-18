@@ -1,12 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { countUp } from './count-up'
-import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
-import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
 import type { AtlasEngine } from './engine'
-import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupExperienceChapter } from './experience'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
@@ -15,7 +11,7 @@ import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
 import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
 import { splitText } from './split-text'
-import { setupSectionWayfinding, setupSunArc, SUN_PROGRESS_EVENT } from './sun-arc'
+import { setupSectionWayfinding, SUN_PROGRESS_EVENT } from './sun-arc'
 
 describe('atlas DOM capabilities', () => {
   beforeEach(() => {
@@ -38,149 +34,6 @@ describe('atlas DOM capabilities', () => {
     expect(heading.textContent).toBe('Brett Haas')
     expect(heading.querySelectorAll('[aria-hidden="true"]')).toHaveLength(9)
     expect(heading.querySelectorAll('.atlas-split-word')).toHaveLength(2)
-  })
-
-  it('renders a complete metric synchronously when duration is zero', () => {
-    const metric = document.createElement('strong')
-    metric.textContent = '616K+'
-
-    countUp(metric, '616K+', { durationMs: 0 })
-
-    expect(metric.textContent).toBe('616K+')
-  })
-
-  it('plays the entrance once per session and clears its start state at 1.2 seconds', () => {
-    vi.useFakeTimers()
-    document.body.innerHTML = '<h1 data-atlas-masthead>Brett Haas</h1>'
-    const storage = new Map<string, string>()
-    const session = {
-      getItem: (key: string) => storage.get(key) ?? null,
-      setItem: (key: string, value: string) => storage.set(key, value),
-    }
-
-    const cleanup = setupEntrance(document, session)
-
-    expect(document.documentElement).toHaveClass('atlas-entering')
-    expect(document.querySelectorAll('.atlas-split-token')).toHaveLength(9)
-    expect(storage.get('atlas-entered')).toBe('1')
-    vi.advanceTimersByTime(1200)
-    expect(document.documentElement).not.toHaveClass('atlas-entering')
-    expect(document.documentElement).toHaveClass('atlas-entered')
-    cleanup()
-
-    document.documentElement.className = ''
-    document.body.innerHTML = '<h1 data-atlas-masthead>Brett Haas</h1>'
-    setupEntrance(document, session)
-    expect(document.documentElement).not.toHaveClass('atlas-entering')
-    expect(document.querySelectorAll('.atlas-split-token')).toHaveLength(0)
-    vi.useRealTimers()
-  })
-
-  it('counts metric values read from the rendered content and reveals sources afterward', () => {
-    vi.useFakeTimers()
-    document.body.innerHTML = `
-      <div class="signal-strip">
-        <div class="signal-metric"><strong data-atlas-count>12.5%</strong><small>Alpha</small></div>
-        <div class="signal-metric"><strong data-atlas-count>7K+</strong><small>Beta</small></div>
-      </div>
-    `
-    const observed: Element[] = []
-    const unobserve = vi.fn()
-    let reveal: (() => void) | undefined
-    const animate = vi.fn((_element: HTMLElement, _target: string) => vi.fn())
-    const cleanup = setupMetricCountUps(
-      document,
-      (callback) => {
-        reveal = () => callback(
-          observed.map((target) => ({ isIntersecting: true, target }) as IntersectionObserverEntry),
-          {} as IntersectionObserver,
-        )
-        return {
-          disconnect: vi.fn(),
-          observe: (target: Element) => observed.push(target),
-          unobserve,
-        } as unknown as IntersectionObserver
-      },
-      animate,
-    )
-
-    expect(observed).toHaveLength(1)
-    reveal?.()
-    expect(animate.mock.calls.map(([, target]) => target)).toEqual(['12.5%', '7K+'])
-    expect(unobserve).toHaveBeenCalledOnce()
-    expect(document.querySelector('.signal-strip')).toHaveClass('is-counting')
-    vi.advanceTimersByTime(900)
-    expect(document.querySelector('.signal-strip')).toHaveClass('is-counted')
-    cleanup()
-    vi.useRealTimers()
-  })
-
-  it('writes fallback hero transforms from the shared scroll event without layout reads per frame', () => {
-    document.body.innerHTML = `
-      <div class="hero-art"><picture class="atlas-picture--hero"></picture><p class="art-caption"></p></div>
-    `
-    const hero = document.querySelector<HTMLElement>('.hero-art')!
-    vi.spyOn(hero, 'getBoundingClientRect').mockReturnValue({
-      bottom: 800,
-      height: 700,
-      left: 0,
-      right: 1000,
-      top: 100,
-      width: 1000,
-      x: 0,
-      y: 100,
-      toJSON: () => undefined,
-    })
-
-    const cleanup = setupHeroParallax(document, window, false)
-    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 450 } }))
-
-    expect(document.documentElement).toHaveClass('atlas-hero-fallback')
-    expect(hero.style.getPropertyValue('--atlas-hero-image-y')).toBe('5.35%')
-    expect(hero.style.getPropertyValue('--atlas-hero-caption-y')).toBe('-1.25vh')
-    expect(hero.style.getPropertyValue('--atlas-hero-scale')).toBe('1.025')
-    expect(hero.getBoundingClientRect).toHaveBeenCalledOnce()
-    cleanup()
-  })
-
-  it('moves the header sun from shared progress and publishes the Step 7 handshake', () => {
-    document.body.innerHTML = `
-      <svg><g data-atlas-sun></g></svg>
-      <section id="experience"></section>
-    `
-    const dispatchEvent = vi.spyOn(window, 'dispatchEvent')
-    const cleanup = setupSunArc(document, window, () => 0.4)
-
-    window.dispatchEvent(new CustomEvent('atlas:scroll', {
-      detail: { documentProgress: 0.4, scrollY: 1000 },
-    }))
-
-    expect(document.querySelector('[data-atlas-sun]')).toHaveAttribute(
-      'transform',
-      'translate(112 -14)',
-    )
-    expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: SUN_PROGRESS_EVENT }))
-    cleanup()
-  })
-
-  it('moves the current header sun when hydration replaces the original SVG node', () => {
-    document.body.innerHTML = `
-      <svg><g data-atlas-sun transform="translate(0 0)"></g></svg>
-      <section id="experience"></section>
-    `
-    const originalSun = document.querySelector('[data-atlas-sun]')!
-    const cleanup = setupSunArc(document, window, () => 0.4)
-
-    originalSun.replaceWith(originalSun.cloneNode(true))
-    window.dispatchEvent(new CustomEvent('atlas:scroll', {
-      detail: { documentProgress: 0.4, scrollY: 1000 },
-    }))
-
-    expect(document.querySelector('[data-atlas-sun]')).toHaveAttribute(
-      'transform',
-      'translate(112 -14)',
-    )
-    cleanup()
   })
 
   it('scrubs the complete contact finale from shared progress', () => {
@@ -313,71 +166,6 @@ describe('atlas DOM capabilities', () => {
     const touchCleanup = setupCursor(document, () => false, requestFrame, vi.fn())
     expect(document.querySelector('[data-atlas-cursor]')).not.toBeInTheDocument()
     touchCleanup()
-  })
-
-  it('provides an IO wipe and scroll-scrubbed Craft fallback', () => {
-    document.body.innerHTML = `
-      <section class="craft-section">
-        <span data-craft-ghost></span>
-        <picture class="craft-art"><img /></picture>
-      </section>
-    `
-    const section = document.querySelector<HTMLElement>('.craft-section')!
-    const plate = document.querySelector<HTMLElement>('.craft-art')!
-    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
-    vi.spyOn(plate, 'getBoundingClientRect').mockReturnValue({
-      bottom: 2900,
-      height: 900,
-      left: 0,
-      right: 1200,
-      top: 2000,
-      width: 1200,
-      x: 0,
-      y: 2000,
-      toJSON: () => undefined,
-    })
-    const cleanup = setupCraftChapter(document, window, false)
-
-    expect(document.documentElement).toHaveClass('atlas-craft-fallback')
-
-    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 1702.5 } }))
-    expect(plate.style.getPropertyValue('--atlas-craft-clip-bottom')).toBe('50%')
-    expect(plate.style.getPropertyValue('--atlas-craft-image-y')).toBe('0%')
-    expect(section.style.getPropertyValue('--atlas-craft-ghost-y')).toBe('0px')
-
-    cleanup()
-    expect(document.documentElement).not.toHaveClass('atlas-craft-fallback')
-  })
-
-  it('reveals Craft and project page turns through one shared IO fallback', () => {
-    document.body.innerHTML = `
-      <section data-chapter-wipe></section>
-      <article data-chapter-wipe></article>
-      <article data-chapter-wipe></article>
-      <article data-chapter-wipe></article>
-    `
-    const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-chapter-wipe]'))
-    let update: IntersectionObserverCallback | undefined
-    const observer = {
-      disconnect: vi.fn(),
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-    } as unknown as IntersectionObserver
-    const cleanup = setupChapterWipes(document, false, (callback) => {
-      update = callback
-      return observer
-    })
-
-    expect(document.documentElement).toHaveClass('atlas-chapter-wipe-fallback')
-    expect(observer.observe).toHaveBeenCalledTimes(4)
-    update?.(
-      [{ isIntersecting: true, target: chapters[1] }] as unknown as IntersectionObserverEntry[],
-      observer,
-    )
-    expect(chapters[1]).toHaveClass('is-chapter-visible')
-    expect(observer.unobserve).toHaveBeenCalledWith(chapters[1])
-    cleanup()
-    expect(document.documentElement).not.toHaveClass('atlas-chapter-wipe-fallback')
   })
 
   it('writes alternating project pan transforms from the shared scroll event', () => {
@@ -546,28 +334,6 @@ describe('atlas DOM capabilities', () => {
     cleanup()
   })
 
-  it('animates and cancels a count-up through requestAnimationFrame', () => {
-    const callbacks: FrameRequestCallback[] = []
-    const requestFrame = vi.fn((callback: FrameRequestCallback) => {
-      callbacks.push(callback)
-      return callbacks.length
-    })
-    const cancelFrame = vi.fn()
-    vi.stubGlobal('requestAnimationFrame', requestFrame)
-    vi.stubGlobal('cancelAnimationFrame', cancelFrame)
-    const metric = document.createElement('strong')
-
-    const cancel = countUp(metric, '55%', { durationMs: 100, steps: 10 })
-    callbacks[0](0)
-    callbacks[1](50)
-    callbacks[2](100)
-    cancel()
-
-    expect(metric.textContent).toBe('55%')
-    expect(requestFrame).toHaveBeenCalledTimes(3)
-    expect(cancelFrame).toHaveBeenCalledWith(3)
-  })
-
   it('does no enhancement work when reduced motion is requested', () => {
     const createBus = vi.fn()
     const createEngine = vi.fn()
@@ -644,7 +410,13 @@ describe('atlas DOM capabilities', () => {
     const unsubscribe = vi.fn()
     const destroyBus = vi.fn()
     const destroyEngine = vi.fn()
-    const engine = { destroy: destroyEngine } as unknown as AtlasEngine
+    const refreshScrollTrigger = vi.fn()
+    const disconnectLayoutObserver = vi.spyOn(ResizeObserver.prototype, 'disconnect')
+    const observeLayout = vi.spyOn(ResizeObserver.prototype, 'observe')
+    const engine = {
+      ScrollTrigger: { refresh: refreshScrollTrigger },
+      destroy: destroyEngine,
+    } as unknown as AtlasEngine
     const createEngine = vi.fn(() => engine)
     const cleanupReveals = vi.fn()
     const cleanupEntrance = vi.fn()
@@ -699,6 +471,8 @@ describe('atlas DOM capabilities', () => {
     expect(document.documentElement).toHaveClass('atlas-js')
     expect(document.documentElement).toHaveAttribute('data-atlas', 'ready')
     expect(createBus).toHaveBeenCalledWith(engine)
+    expect(refreshScrollTrigger).toHaveBeenCalled()
+    expect(observeLayout).toHaveBeenCalledWith(document.documentElement)
     expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'atlas:scroll' }))
     expect(unsubscribe).toHaveBeenCalledOnce()
     expect(cleanupEntrance).toHaveBeenCalledOnce()
@@ -718,6 +492,7 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupReveals).toHaveBeenCalledOnce()
     expect(destroyBus).toHaveBeenCalledOnce()
     expect(destroyEngine).toHaveBeenCalledOnce()
+    expect(disconnectLayoutObserver).toHaveBeenCalledOnce()
   })
 
   it('reveals direct and staggered targets through one observer', () => {

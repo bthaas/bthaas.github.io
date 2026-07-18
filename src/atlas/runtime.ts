@@ -104,10 +104,37 @@ export function initializeAtlas({
   })
   const cleanupReveals = prepareReveals()
   let isActive = true
+  const refreshScrollTriggers = () => {
+    if (isActive) engine.ScrollTrigger.refresh()
+  }
+  let refreshFrame = 0
+  const scheduleRefresh = () => {
+    if (!isActive) return
+    runtimeWindow.cancelAnimationFrame(refreshFrame)
+    refreshFrame = runtimeWindow.requestAnimationFrame(() => {
+      refreshFrame = runtimeWindow.requestAnimationFrame(() => {
+        refreshFrame = 0
+        refreshScrollTriggers()
+      })
+    })
+  }
+  const handleLoad = () => scheduleRefresh()
+  const ResizeObserverConstructor = runtimeDocument.defaultView?.ResizeObserver
+  const layoutObserver = ResizeObserverConstructor
+    ? new ResizeObserverConstructor(scheduleRefresh)
+    : null
+  layoutObserver?.observe(runtimeDocument.querySelector('main') ?? runtimeDocument.documentElement)
+  refreshScrollTriggers()
+  if (runtimeDocument.readyState === 'complete') scheduleRefresh()
+  else runtimeWindow.addEventListener('load', handleLoad, { once: true })
+  void runtimeDocument.fonts?.ready.then(scheduleRefresh)
 
   const destroy = () => {
     if (!isActive) return
     isActive = false
+    runtimeWindow.cancelAnimationFrame(refreshFrame)
+    runtimeWindow.removeEventListener('load', handleLoad)
+    layoutObserver?.disconnect()
     unsubscribe()
     cleanupEntrance()
     cleanupCraft()

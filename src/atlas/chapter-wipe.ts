@@ -1,37 +1,54 @@
-export type ObserverFactory = (
-  callback: IntersectionObserverCallback,
-  options: IntersectionObserverInit,
-) => IntersectionObserver
+import { getViewportEntryRange } from '../../lib/atlas-motion/scroll-trigger-range'
+
+import { getAtlasEngine, type AtlasEngine } from './engine'
 
 export function setupChapterWipes(
   root: Document = document,
-  supportsScrollDriven =
-    typeof CSS !== 'undefined' && CSS.supports('animation-timeline: view()'),
-  createObserver: ObserverFactory | undefined =
-    typeof IntersectionObserver === 'undefined'
-      ? undefined
-      : (callback, options) => new IntersectionObserver(callback, options),
+  engine: AtlasEngine | null = getAtlasEngine(),
 ): () => void {
   const chapters = Array.from(root.querySelectorAll<HTMLElement>('[data-chapter-wipe]'))
-  if (supportsScrollDriven || chapters.length === 0 || !createObserver) return () => undefined
+  if (chapters.length === 0 || !engine) return () => undefined
+  const runtimeWindow = root.defaultView ?? window
 
-  const observer = createObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return
-        entry.target.classList.add('is-chapter-visible')
-        observer.unobserve(entry.target)
-      })
-    },
-    { rootMargin: '0px 0px -12% 0px', threshold: 0.08 },
-  )
+  const layers = chapters.map((chapter, index) => {
+    const layer = root.createElement('span')
+    const direction = chapter.dataset.wipeDirection ?? (index % 2 === 0 ? 'ltr' : 'rtl')
+    layer.className = 'chapter-wipe__layer'
+    layer.setAttribute('aria-hidden', 'true')
+    chapter.append(layer)
+    const measureRange = () => getViewportEntryRange({
+      elementTop: chapter.getBoundingClientRect().top + runtimeWindow.scrollY,
+      endViewportRatio: 0.22,
+      startViewportRatio: 0.92,
+      viewportHeight: runtimeWindow.innerHeight,
+    })
 
-  root.documentElement.classList.add('atlas-chapter-wipe-fallback')
-  chapters.forEach((chapter) => observer.observe(chapter))
+    const timeline = engine.gsap.timeline({
+      scrollTrigger: {
+        trigger: chapter,
+        start: () => measureRange().start,
+        end: () => measureRange().end,
+        refreshPriority: 1,
+        scrub: 0.7,
+      },
+    })
+    timeline.fromTo(
+      layer,
+      direction === 'rtl'
+        ? { clipPath: 'inset(0 0 0 100%)' }
+        : { clipPath: 'inset(0 100% 0 0)' },
+      direction === 'rtl'
+        ? { clipPath: 'inset(0 0 0 0%)', ease: 'none' }
+        : { clipPath: 'inset(0 0% 0 0)', ease: 'none' },
+      0,
+    )
+    return { layer, timeline }
+  })
 
   return () => {
-    observer.disconnect()
-    root.documentElement.classList.remove('atlas-chapter-wipe-fallback')
-    chapters.forEach((chapter) => chapter.classList.remove('is-chapter-visible'))
+    layers.forEach(({ layer, timeline }) => {
+      timeline.kill()
+      layer.remove()
+    })
   }
 }

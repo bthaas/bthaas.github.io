@@ -499,8 +499,18 @@
   margin-left: 0;
 }
 
-.chapter-wipe::before {
+html.atlas-js .chapter-wipe {
+  background: var(--chapter-wipe-base);
+}
+
+html.atlas-js .chapter-wipe__layer {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  background: var(--chapter-wipe-color);
   pointer-events: none;
+  will-change: clip-path;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -531,29 +541,6 @@
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    html.atlas-js .chapter-wipe {
-      background: var(--chapter-wipe-base);
-    }
-
-    html.atlas-js .chapter-wipe::before {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      background: var(--chapter-wipe-color);
-      content: "";
-      animation: atlas-chapter-wipe both linear;
-      animation-range: entry 0% cover 28%;
-      animation-timeline: view();
-    }
-
-    html.atlas-js .chapter-wipe--ltr::before {
-      clip-path: inset(0 100% 0 0);
-    }
-
-    html.atlas-js .chapter-wipe--rtl::before {
-      clip-path: inset(0 0 0 100%);
-    }
-
     html.atlas-js .project-chapter {
       view-timeline-axis: block;
       view-timeline-name: --atlas-project-chapter;
@@ -614,40 +601,9 @@
 
 @supports not (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe {
-      background: var(--chapter-wipe-base);
-    }
-
-    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe::before {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      background: var(--chapter-wipe-color);
-      content: "";
-      transition: clip-path 900ms var(--ease-out);
-    }
-
-    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe--ltr::before {
-      clip-path: inset(0 100% 0 0);
-    }
-
-    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe--rtl::before {
-      clip-path: inset(0 0 0 100%);
-    }
-
-    html.atlas-js.atlas-chapter-wipe-fallback .chapter-wipe.is-chapter-visible::before {
-      clip-path: inset(0);
-    }
-
     html.atlas-js.atlas-project-fallback [data-project-pan] img {
       transform: translate3d(var(--atlas-project-pan-x, 0%), 0, 0);
     }
-  }
-}
-
-@keyframes atlas-chapter-wipe {
-  to {
-    clip-path: inset(0);
   }
 }
 
