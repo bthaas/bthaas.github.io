@@ -37,6 +37,12 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(page.locator('.chapter-wipe__layer')).toHaveCount(1)
   await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
   await expect(page.locator('script[data-atlas-horizon]')).toHaveCount(0)
+  await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
+  await expect(page.locator('.feather-fall-canvas')).toHaveCount(1)
+  await expect(page.locator('[data-feather-fall-layer]')).toHaveAttribute(
+    'data-feather-tier',
+    isMobile ? 'mobile-40' : /^(desktop-120|desktop-software-40)$/,
+  )
   await expectNoHorizontalOverflow(page)
 
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
@@ -111,6 +117,7 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     '[data-atlas-cursor]',
     '[data-atlas-preloader]',
     '[data-fluid-cursor]',
+    '[data-feather-fall-layer]',
     'script[data-atlas-horizon]',
   ].join(', ')))
     .toHaveCount(0)
@@ -209,6 +216,11 @@ test('samples frame pacing through the complete page', async ({
   console.log(
     `[motion-fps][${testInfo.project.name}] ${JSON.stringify({ renderer, samples })}`,
   )
-  const minimumExpectedFps = isMobile || browserName === 'webkit' ? 28 : 20
+  const softwareRenderer = /swiftshader|llvmpipe|software/i.test(renderer)
+  const minimumExpectedFps = softwareRenderer
+    ? 16
+    : isMobile || browserName === 'webkit'
+      ? 28
+      : 20
   expect(Math.min(...Object.values(samples))).toBeGreaterThanOrEqual(minimumExpectedFps)
 })

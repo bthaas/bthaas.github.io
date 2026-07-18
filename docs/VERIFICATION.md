@@ -1,9 +1,56 @@
 # Awwwards portfolio verification
 
-Verified on 2026-07-18 from `codex/phase-1-entrance-fluid-cursor`. This pass
-covers the hydrated export, the once-per-session DrawSVG curtain entrance, the
-lazy React Bits fluid cursor, the unchanged GSAP + ScrollTrigger + Lenis
-choreography, and the lazy contact flock.
+Verified on 2026-07-18 from `codex/phase-2-feather-fall`. This pass adds the
+fixed R3F feather narrative to the hydrated export while retaining the Phase 1
+entrance, React Bits fluid cursor, GSAP + ScrollTrigger + Lenis choreography,
+and lazy contact flock.
+
+## Phase 2 feather-fall gates
+
+| Gate | Result |
+| --- | --- |
+| `npm run verify` | Passed: 35 files / 148 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 90.18% statements, 81.34% branches, 81.47% functions, 93.87% lines |
+| `npm run test:e2e` | Passed: 14 tests, 6 intentional project skips, Chromium/Firefox/WebKit desktop plus WebKit iPhone |
+| Blender helper contract | Passed in Blender 5.1.2: four deterministic primitive/material/export tests |
+| Feather GLB | 6,108 bytes, 804 triangles, three centered named nodes, required `KHR_draco_mesh_compression`, no textures |
+| Runtime tiers | 120 records and bounded DPR on hardware desktop; 40 records, DPR 1, and intentional 30 Hz rendering on mobile or detected software WebGL |
+| Reduced motion / no WebGL | The React shell server-renders nothing and never mounts a canvas when either gate fails |
+
+The scroll bus now publishes Lenis velocity with document progress. The R3F
+scene consumes both through mutable refs, allocates matrices, spring arrays,
+materials, and seed records once, and performs no React state updates or object
+allocation in its frame loop. Its three variant/layer batches share two
+materials: a clearer near layer and a softer, lower-opacity far layer. Pointer
+motion above 500 px/s emits a bounded radial impulse and every affected feather
+returns through a damped spring.
+
+Modern initial JavaScript before the deferred scene remains 268,749 bytes gzip,
+192,051 bytes below the 450 KiB soft ceiling. The explicitly accepted Three/R3F,
+GLTFLoader, Stats, and local Draco-wrapper line adds 268,023 bytes gzip after the
+canvas mounts, for 536,772 bytes post-mount (455,583 bytes Brotli). This is a
+documented soft-ceiling exception rather than an initial-route regression: the
+scene is `next/dynamic` with `ssr: false`, mounts after two paints plus an idle
+slot, and the 6 KB model/188 KB decoder WASM are separate binary assets. Phase 3
+must reuse the loaded Three/R3F runtime rather than introduce a second 3D stack.
+
+Frame pacing through 0/25/50/75/100% scroll after Phase 2:
+
+| Project | Renderer / tier | 0% | 25% | 50% | 75% | 100% |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Hardware in-app Chromium | Apple GPU, desktop-120 | 120 | 120 | 120 | 120 | 120 |
+| Chromium desktop automation | SwiftShader, desktop-software-40 | 25.2 | 17.1 | 21.8 | 21.1 | 19.8 |
+| Firefox desktop automation | Apple GPU, desktop-120 | 69.5 | 42.9 | 25.3 | 28.0 | 33.0 |
+| WebKit desktop automation | Apple GPU, desktop-120 | 59.7 | 61.0 | 59.5 | 60.1 | 60.1 |
+| WebKit iPhone automation | Apple GPU, mobile-40 | 60.1 | 60.0 | 60.0 | 60.1 | 59.9 |
+
+The page-level iPhone numbers reflect display `requestAnimationFrame`; the
+feather canvas itself is intentionally invalidated at 30 Hz. SwiftShader is
+explicitly tiered and documented because it is a CPU software renderer, not the
+mid-desktop hardware acceptance target.
+
+Phase 2 captures are in `docs/awwwards/screenshots/step-16/`; the inspected
+reference/runtime montage is `design-refs/comparison.png`.
 
 ## Release gates
 

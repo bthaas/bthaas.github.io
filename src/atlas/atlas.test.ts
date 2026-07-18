@@ -496,7 +496,7 @@ describe('atlas DOM capabilities', () => {
       prepareWayfinding: () => cleanupWayfinding,
       window,
     })
-    subscriber?.({ documentProgress: 0.5, scrollY: 500 })
+    subscriber?.({ documentProgress: 0.5, scrollY: 500, velocity: 8 })
     destroy()
     destroy()
 
@@ -599,7 +599,7 @@ describe('atlas DOM capabilities', () => {
     })
     const engine = {
       ScrollTrigger: { create },
-      lenis: { scroll: 1000 },
+      lenis: { scroll: 1000, velocity: 18 },
     }
     const subscriber = vi.fn()
 
@@ -613,18 +613,32 @@ describe('atlas DOM capabilities', () => {
     engine.lenis.scroll = 1000
     window.dispatchEvent(new Event('scroll'))
 
-    expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.5, scrollY: 1000 })
+    expect(subscriber).toHaveBeenLastCalledWith({
+      documentProgress: 0.5,
+      scrollY: 1000,
+      velocity: 18,
+    })
 
     subscriber.mockClear()
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 1500 })
     engine.lenis.scroll = 0
+    engine.lenis.velocity = -12
     window.dispatchEvent(new Event('scroll'))
-    expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.75, scrollY: 1500 })
+    expect(subscriber).toHaveBeenLastCalledWith({
+      documentProgress: 0.75,
+      scrollY: 1500,
+      velocity: -12,
+    })
 
     subscriber.mockClear()
     engine.lenis.scroll = 1000
+    engine.lenis.velocity = 4
     onUpdate?.()
-    expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.5, scrollY: 1000 })
+    expect(subscriber).toHaveBeenLastCalledWith({
+      documentProgress: 0.5,
+      scrollY: 1000,
+      velocity: 4,
+    })
 
     subscriber.mockClear()
     unsubscribe()

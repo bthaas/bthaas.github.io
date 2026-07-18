@@ -4,6 +4,7 @@ import { getAtlasEngine, type AtlasEngine } from './engine'
 export interface ScrollSnapshot {
   readonly documentProgress: number
   readonly scrollY: number
+  readonly velocity: number
 }
 
 export type ScrollSubscriber = (snapshot: ScrollSnapshot) => void
@@ -36,6 +37,7 @@ export function createScrollBus({
         viewportHeight: runtimeWindow.innerHeight,
       }),
       scrollY,
+      velocity: engine?.lenis.velocity ?? 0,
     }
   }
 
@@ -43,7 +45,8 @@ export function createScrollBus({
     const snapshot = readSnapshot(scrollYOverride)
     if (
       lastPublished?.scrollY === snapshot.scrollY &&
-      lastPublished.documentProgress === snapshot.documentProgress
+      lastPublished.documentProgress === snapshot.documentProgress &&
+      lastPublished.velocity === snapshot.velocity
     ) return
     lastPublished = snapshot
     subscribers.forEach((subscriber) => subscriber(snapshot))
