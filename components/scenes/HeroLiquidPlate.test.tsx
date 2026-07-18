@@ -3,6 +3,10 @@ import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
+import {
+  WEBGL_ACTIVATED_ATTRIBUTE,
+  WEBGL_ACTIVATION_EVENT,
+} from '@/components/motion/WebGLActivationGate'
 
 import { HeroLiquidPlate } from './HeroLiquidPlate'
 
@@ -54,6 +58,7 @@ describe('HeroLiquidPlate', () => {
     listeners.clear()
     reducedMotion = false
     installMatchMedia()
+    document.documentElement.removeAttribute(WEBGL_ACTIVATED_ATTRIBUTE)
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280, writable: true })
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
       globalThis.setTimeout(() => callback(16), 0)
@@ -100,6 +105,12 @@ describe('HeroLiquidPlate', () => {
     vi.clearAllMocks()
     window.innerWidth = 500
     render(<HeroLiquidPlate />)
+    await waitFor(() => expect(shouldRenderWebGL).toHaveBeenCalled())
+    expect(screen.queryByTestId('hero-liquid-scene')).not.toBeInTheDocument()
+    act(() => {
+      document.documentElement.setAttribute(WEBGL_ACTIVATED_ATTRIBUTE, '')
+      window.dispatchEvent(new CustomEvent(WEBGL_ACTIVATION_EVENT))
+    })
     const scene = await screen.findByTestId('hero-liquid-scene')
     expect(scene).toHaveAttribute('data-constrained', 'true')
 

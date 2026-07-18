@@ -1,5 +1,77 @@
 # Awwwards portfolio verification
 
+Verified on 2026-07-18 from `codex/phase-6-resubmission-polish`. Phase 6
+hardens the complete maximalist atlas for submission: heavy WebGL now waits for
+a real gesture, the entrance and spectacle have measured timing headroom,
+Firefox receives an explicit feather tier, production Lighthouse clears every
+gate, and the final four-beat capture set replaces the Phase 0 submission art.
+
+## Phase 6 release gates
+
+| Gate | Result |
+| --- | --- |
+| `npm run verify` | Passed: 46 files / 183 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 89.91% statements, 80.45% branches, 82.47% functions, 93.27% lines |
+| `npm run test:e2e` | Passed: 21 journeys and 15 intentional single-engine/device skips across Chromium, Firefox, desktop WebKit, and iPhone WebKit |
+| Lighthouse | Mobile 92 Performance / 100 Accessibility / 100 Best Practices / 100 SEO; desktop 100 in all four categories |
+| Reduced motion | Zero canvases, no WebGL activation attribute, no preloader, and the complete static editorial document remains usable |
+| Production console | Clean on the homepage, pinned gallery, spectacle, 404, no-JavaScript, and reduced-motion paths |
+
+The shared Three/R3F boundary no longer competes with passive first paint. One
+real `pointermove`, `wheel`, `touchstart`, or `keydown` sets the activation flag
+and releases the existing lazy hero and feather scenes after two frames and an
+idle slot. Lighthouse therefore downloads the hydrated route and lazy Atlas
+engine but never executes the 259,150-byte gzip shared scene chunk, Draco
+decoder, or feather GLB. Reduced motion never arms the activation gate.
+
+The DrawSVG wing/sun and two print curtains now complete in an authored 0.84 s,
+well inside the 1.8 s limit. The five-click/Konami spectacle was shortened to
+3.4 s after CPU Chromium demonstrated that a 3.8 s authored timeline could
+deliver its completion callback at 4.27 s. Unit tests cap the authored duration
+at 3.5 s and the production cross-browser journey now completes below 4 s.
+
+Production JavaScript is 253,094 bytes gzip for initial Next chunks and 335,961
+bytes including lazy Atlas, 124,839 bytes below the 450 KiB soft ceiling. The
+gesture-loaded shared Three/R3F scene is 259,150 bytes gzip and the fluid chunk
+is 5,774 bytes, producing 600,885 bytes after every homepage showpiece mounts.
+`/horizon.js` remains a separate 1,504-byte gzip finale (602,389 bytes only when
+every optional homepage runtime has been exercised).
+
+Final Lighthouse against the prepared production export:
+
+| Profile | Performance | Accessibility | Best practices | SEO | LCP | Trace-observed LCP | CLS | TBT | Speed index |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Mobile | 92 | 100 | 100 | 100 | 2.90 s | 2.29 s | 0.00012 | 14 ms | 4.49 s |
+| Desktop | 100 | 100 | 100 | 100 | 0.50 s | 0.31 s | 0.00009 | 0 ms | 0.91 s |
+
+The standard mobile simulation includes the opaque-looking entrance curtains in
+its visual LCP model, while the underlying preloaded hero actually paints at
+2.29 s in the trace. Both the score gate and the ≤2.5 s real-paint gate pass.
+
+Final page-level frame pacing through 0/25/50/75/100% scroll with feather and
+fluid systems activated:
+
+| Project | Renderer / tier | 0% | 25% | 50% | 75% | 100% |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Chromium desktop automation | SwiftShader, CPU software WebGL | 24.8 | 26.5 | 22.2 | 22.8 | 23.6 |
+| Firefox desktop automation | Apple GPU, Firefox 40-feather/DPR-1 tier | 102.6 | 70.1 | 23.0 | 26.9 | 38.0 |
+| WebKit desktop automation | Apple GPU, desktop-120 | 60.5 | 59.8 | 60.5 | 60.0 | 60.3 |
+| WebKit iPhone automation | Apple GPU, mobile-40 | 60.7 | 60.0 | 60.1 | 59.7 | 60.0 |
+
+Hardware Safari and iPhone meet the display-rate acceptance throughout. The
+Chromium row is the deliberate CPU-rendered SwiftShader tier rather than a
+mid-desktop GPU. Firefox retains the complete horizontal pin, project WebGL,
+halftone mask, anchors, and content; its explicit 40-feather tier reduces scene
+cost, while its Playwright compositor remains bounded by the transformed/masked
+middle chapters. That limitation is documented rather than hidden by dropping
+the showpiece or weakening browser functionality.
+
+The final production captures are in `docs/awwwards/submission/`, Phase 6 QA
+captures are in `docs/awwwards/screenshots/step-20/`, and the inspected labeled
+montage is `design-refs/comparison-phase6.png` plus the current
+`design-refs/comparison.png`. The four frames cover liquid ascent, the peak
+fall, horizontal field studies, and the golden-feather landing.
+
 Verified on 2026-07-18 from `codex/phase-5-micro-insanity`. Phase 5 adds one
 session-gated “too close to the sun” spectacle, an ink-on-paper missing plate,
 iridescent print varnish, and the tab-title wink without changing copy, artwork,

@@ -2,115 +2,111 @@
 
 ## Captures
 
-All submission captures are PNG at exactly 1600 × 1200.
-
-Phase 1 verification adds the DrawSVG entrance and active citron/dusk ink trail
-in [step 15](./screenshots/step-15/); Phase 2 adds the scroll-narrated feather
-field in [step 16](./screenshots/step-16/); and Phase 3 adds the liquid hero,
-reversible masthead scatter, kinetic band, and mobile tier in
-[step 17](./screenshots/step-17/). Phase 4's horizontal flight and halftone
-printing are in [step 18](./screenshots/step-18/); Phase 5's varnish, sun
-blizzard, golden landing, and missing plate are in
-[step 19](./screenshots/step-19/). The four final submission frames remain the
-Phase 0 set until the complete maximalist sequence is assembled in Phase 6.
+The final four submission captures are PNG at exactly 1600 × 1200 and were
+generated from the production export. The inspected two-by-two montage is
+`design-refs/comparison-phase6.png`.
 
 | Frame | File | Purpose |
 | --- | --- | --- |
-| 01 | [Hero](./submission/01-hero-1600x1200.png) | Establishes the sunlit atlas, responsive hero plate, masthead, and editorial grid. |
-| 02 | [Projects-to-craft transition](./submission/02-craft-wipe-mid-1600x1200.png) | Shows a color-blocked page turn and the craft plate's halftone print reveal. |
-| 03 | [Project print reveal](./submission/03-project-pan-1600x1200.png) | Shows the project plate, editorial evidence, and restrained living-material treatment. |
-| 04 | [Flock finale](./submission/04-finale-1600x1200.png) | Resolves the sun on the horizon as the bespoke flock crosses behind the contact statement. |
+| 01 | [Liquid ascent](./submission/01-hero-liquid-1600x1200.png) | Establishes the sunlit atlas, live hero plane, circular sun badge, fluid ink, and editorial masthead. |
+| 02 | [The fall](./submission/02-feather-fall-1600x1200.png) | Holds the dusk flight log at peak feather density during the one-shot sun flare. |
+| 03 | [Horizontal flight](./submission/03-horizontal-gallery-1600x1200.png) | Shows the pinned project route, bent WebGL plates, and ghost case numerals at its midpoint. |
+| 04 | [Landing](./submission/04-finale-1600x1200.png) | Resolves the sun at the Aegean horizon with the last golden feather settled beside email. |
+
+Phase-by-phase evidence remains in [step 15](./screenshots/step-15/) through
+[step 20](./screenshots/step-20/). Step 20 contains the production hero, fall,
+gallery, finale, and a separately verified reduced-motion atlas with no canvas.
 
 ## 50-second recording script
 
 | Time | Direction | Voiceover / caption |
 | --- | --- | --- |
-| 0–7 s | Hold through the fast wing/sun draw and curtain lift, move the pointer once through the ink, then begin a deliberate scroll. | “An editorial atlas for engineering, applied AI, and product craft.” |
-| 7–16 s | Let the masthead release, metrics count, and sun begin its route. | “Verified outcomes lead; motion gives the evidence pace and direction.” |
-| 16–25 s | Enter Experience, open the first Field notes dossier, then close it. | “The flight log expands from concise experience into keyboard-accessible technical detail.” |
-| 25–34 s | Move through Projects and hold as a plate comes off the halftone press. | “Each case study keeps its full narrative in the page while the plates behave like living print.” |
-| 34–42 s | Cross the chapter wipe into Craft and let the capability marquee settle. | “Color, rhythm, and spatial behavior change by chapter without changing the reading order.” |
-| 42–50 s | Arrive at Contact and hold as the sun lands and flock crosses the horizon. | “The flight resolves where it began: ambition, engineered to hold up in the real world.” |
+| 0–6 s | Hold through the 0.84 s drawn-glyph curtain. Move the pointer across the hero once so the plate ripples and citron/dusk ink blooms. | “An editorial flight atlas for engineering, applied AI, and product craft.” |
+| 6–14 s | Scroll out of Hero. Let “Brett Haas” scatter like shed feathers while the first outline type band crosses the fold. | “Icarus is the motion system: ascent, release, fall, and a measured landing.” |
+| 14–23 s | Enter Experience at peak feather density. Open and close one keyboard-accessible Field notes dossier. | “The flight log expands from concise evidence into the technical work behind it.” |
+| 23–34 s | Follow the pinned Projects route through all three WebGL plates; pause on Beat Stream, then continue into the halftone chapter dissolve. | “Field studies bend with velocity while native scroll, links, focus, and reading order stay intact.” |
+| 34–42 s | Cross Craft, showing the print-in dissolve, restrained dossier tilt, varnish sweep, and kinetic `SKILLS` band. | “Every material response belongs to the atlas: ink, paper, light, and flight.” |
+| 42–50 s | Click the header sun five times, follow the brief blizzard, then land at Contact as the golden feather settles by email. | “The spectacle ends where the story must: ambition brought safely back to earth.” |
 
-Record at 1440 px or wider and 60 fps when available. Use one deliberate scroll,
-briefly pause for the dossier and print reveal, and leave one second of stillness
-at the opening and closing frames.
+Record at 1440 px or wider and 60 fps on hardware-backed Safari or Chromium.
+Keep the cursor movement deliberate, use one continuous native scroll, and leave
+one second of stillness on the opening and closing compositions.
 
 ## 100-word description
 
-Brett Haas’s portfolio is an editorial, scroll-led atlas of software engineering,
-applied AI, and product craft. A travelling sun connects five chapters while
-monumental serif typography, cinematic Mediterranean plates, page-turn wipes,
-expandable flight logs, and print-inspired reveals turn a concise résumé into a
-paced story. GSAP, ScrollTrigger, and Lenis make the motion fluid across
-modern browsers; a fast drawn-glyph curtain opens the flight and a lazy fluid
-cursor bleeds citron and dusk ink into the paper before a tiny, separately
-loaded canvas flock completes the Icarus arc at contact. Every project remains
-readable without JavaScript, every dossier
-works from the keyboard, and reduced-motion visitors receive the complete static
-composition. The result pairs measurable engineering outcomes with a calm,
-optimistic visual identity.
+Brett Haas’s portfolio is a maximalist editorial atlas for software engineering,
+applied AI, and product craft. Icarus supplies its motion grammar: a drawn-glyph
+curtain opens the ascent; a liquid Aegean plate and scattered masthead release
+the hero; 120 gold-edged feathers build into the fall; and a pinned horizontal
+gallery bends field-study plates with velocity. Halftone chapter dissolves,
+kinetic serif bands, fluid ink, and a secret sun-triggered blizzard make print
+feel physical without changing the writing, artwork, or reading order. The sun
+finally lands beside a golden feather at contact. No-JavaScript and
+reduced-motion visitors retain the complete, calm atlas with zero decorative
+canvases.
 
 ## 300-word description
 
-Brett Haas’s portfolio reframes a software-engineering résumé as an
-editorial journey. It opens above a sunlit Aegean city, pairing a monumental
-nameplate with a statement of practice: intelligent systems that hold up in the
-real world. A sun follows an SVG route as readers travel through Experience,
-Projects, Craft, and Contact.
+Brett Haas’s portfolio reframes a software-engineering résumé as an Icarus
+editorial atlas. The page opens above a sunlit Aegean city while a wing-and-sun
+glyph draws itself and two fast paper curtains lift. Pointer movement ripples the
+painting like warm glass; citron and dusk ink bleed beneath the existing cursor.
+On departure, the masthead breaks formation like shed feathers and a travelling
+sun begins its route through Experience, Projects, Craft, and Contact.
 
-Each chapter has its own kinetic grammar. SplitText gives the masthead a masked
-baseline rise; metrics land with an ink-bleed beat; the
-flight log expands through Flip without disturbing keyboard or screen-reader
-semantics. Project and craft plates emerge through halftone masks, then
-respond to scroll velocity like ink and paper with mass. ScrambleText decodes
-wayfinding labels, while the capability marquee and magnetic
-details react without hiding the native cursor or changing reading order.
+The flight narrative controls every escalation. Sparse paper-white feathers
+become a gold-rimmed fall over the dusk flight log, react to scroll wind and
+pointer gusts, thin through the field studies, then settle at the horizon.
+Experience dossiers expand with Flip and retain native button semantics. Giant
+outline-serif bands repeat the visible chapter labels without adding copy. The
+three accepted project paintings travel through one native-scroll horizontal
+pin; shared WebGL planes bend and skew with velocity while ghost numerals mark
+the cases. The next chapter prints itself in through a reversible halftone mask,
+and restrained six-degree tilt plus varnish sheen give the paper physical mass.
 
-The finale uses DrawSVG to complete the horizon rule as the sun lands. The atlas
-then lazy-loads a separate 1.5 KB gzip canvas bundle. Its sparse,
-deterministic flock drifts behind the contact copy in dusk and cobalt—the Icarus
-flight completing its story without introducing a stock WebGL template.
+Five activations of the header sun—or the Konami sequence—release one brief
+flare and feather blizzard. A single golden feather completes the route beside
+the contact email. The missing-page experience turns the same ink system into a
+source-vendored React Bits letter glitch with sparse Phase 2 feathers. Even the
+tab title keeps the atlas open when focus leaves.
 
-The site remains progressive enhancement even as it becomes a hydrated canvas
-for the next motion phases. Next.js exports complete static HTML and ships its
-normal React runtime, while an 83.1 KB gzip Atlas bundle loads at window idle to
-own the existing GSAP, ScrollTrigger, and Lenis choreography. Touch scrolling remains native;
-anchor links and keyboard scrolling remain intact. Reduced motion exits before
-any engine or DOM preparation, and the journey remains available with
-JavaScript disabled.
-
-Performance and access are part of the visual idea. The hydrated production
-export scores 97 on throttled mobile Lighthouse and 100 on desktop; conservative
-LCP is 2.45 seconds mobile and 0.47 seconds desktop, with zero CLS. Hardware
-Chrome and Firefox hold roughly 120 fps. Chromium, Firefox, desktop WebKit, and iPhone WebKit journeys cover
-console health, overflow, keyboard dossiers, reduced motion, no-JS, lazy loading,
-and frame pacing.
+The implementation is a hydrated Next.js 16 static export using React 19,
+GSAP, ScrollTrigger, Lenis, React Three Fiber, Three.js, local Draco decoders,
+and tightly reduced React Bits source. Complete semantic HTML and responsive
+images render before enhancement. Heavy scenes wait for a real user gesture;
+the hero image remains preloaded and is always the LCP fallback. Reduced motion
+mounts no motion engine, preloader, simulation, or decorative canvas. Native
+touch, keyboard focus, fragments, case-study links, and no-JavaScript reading
+remain intact. Production Lighthouse scores 92 mobile and 100 desktop for
+Performance, with Accessibility, Best Practices, and SEO at 100 on both.
 
 ## Technical notes
 
-- Next.js 16 static export with normal React 19 hydration and TypeScript.
-- Phase 5 keeps initial Next + Atlas JavaScript at 332,852 bytes gzip and reuses
-  the existing deferred feather scene for both the one-shot blizzard and sparse
-  404 drift. The complete post-mount homepage is 597,524 bytes gzip.
-- Five native-button activations or the Konami sequence trigger one 3.81-second
-  session spectacle. Reduced motion arms none of it; only the tab-title wink is
-  retained.
-- Phase 3 preserves the preloaded responsive hero `<img>` as LCP while a shared,
-  deferred Three/R3F chunk supplies both the liquid plane and feather field.
-- Hero parallax and masthead SplitText now have one React/GSAP owner; the old
-  Atlas choreography was removed. Four outline-serif bands reuse existing
-  chapter labels and remain `aria-hidden` decoration.
-- Initial Next + Atlas JavaScript is 326,246 bytes gzip. Every deferred canvas
-  showpiece totals 591,089 bytes gzip after mount; the documented post-mount
-  exception reuses one Three runtime and adds 54,317 bytes over Phase 2.
-- Phase 1 first-load JavaScript after the lazy cursor mount is 268,732 bytes gzip, including a 5,685-byte fluid chunk and 83,209-byte `/atlas.js`.
-- Phase 1 Lighthouse Performance is 100 with 1.40 s LCP, 0.00018 CLS, and 7 ms TBT.
-- `/horizon.js` is 1,456 bytes gzip and is injected only near Contact on fine-pointer desktop visits.
-- GSAP 3.15 powers ScrollTrigger, SplitText, ScrambleText, Flip, DrawSVG, and MotionPath; Lenis 1.3.25 is synchronized through the GSAP ticker.
-- Native touch is preserved, while programmatic, keyboard, and anchor scrolling synchronize the same progress bus.
-- Scroll-linked work is limited to transforms, opacity, clip paths, filters, and CSS custom properties; pointer work uses GSAP quick setters.
-- Responsive AVIF/WebP artwork, explicit dimensions, and the immediate hero plate keep LCP and CLS controlled.
-- The authoritative reduced-motion kill switch creates no motion engine or decorative enhancement; the no-JS document remains complete.
-- Phase 0 performance Lighthouse: 97 mobile and 100 desktop; mobile LCP 2.45 s, desktop LCP 0.47 s, CLS 0.
-- Verified with Chromium, Firefox, desktop WebKit, and iPhone WebKit production journeys; hardware Chrome and Firefox sustain approximately 120 fps.
+- Next.js 16 static export, React 19 hydration, strict TypeScript, and
+  `@gsap/react` ownership for React motion components.
+- GSAP 3.15 supplies ScrollTrigger, SplitText, ScrambleText, Flip, DrawSVG, and
+  MotionPath; Lenis publishes scroll progress and velocity through one mutable
+  bus.
+- A real pointer, wheel, touch, or key gesture activates the shared deferred
+  Three/R3F scene chunk. Lighthouse and passive first paint never download or
+  execute it.
+- The server-rendered responsive hero `<picture>` stays preloaded and visible
+  until the liquid canvas has produced its first frame.
+- Hardware desktop uses 120 instanced feathers. Mobile, software WebGL, and
+  Firefox use the coherent 40-feather performance tier with the same seeded
+  shapes, two depth layers, scroll wind, gusts, and story keyframes.
+- Desktop Projects uses one native ScrollTrigger pin and one shared R3F canvas.
+  Mobile remains vertical; every `#project-*` fragment and keyboard focus target
+  maps to normal document scroll.
+- The entrance choreography is 0.84 s. The sun spectacle is a session-gated
+  3.4 s timeline and remains keyboard accessible through the native sun button
+  and Konami sequence.
+- The final production Lighthouse reports are 92/100 mobile/desktop Performance
+  and 100/100/100 Accessibility, Best Practices, and SEO on both profiles.
+- The reduced-motion audit records zero canvases, no WebGL activation attribute,
+  and no preloader. The title visibility wink is the only retained behavior.
+- `/horizon.js` remains a separate approximately 1.5 KB gzip contact finale;
+  local Draco decoder assets avoid a third-party runtime dependency.
+- Chromium, Firefox, desktop WebKit, and iPhone WebKit production journeys cover
+  console health, native scrolling, overflow, dossiers, fragments, no-JavaScript,
+  reduced motion, lazy activation, the spectacle, the 404, and frame pacing.

@@ -23,12 +23,21 @@ async function expectNoHorizontalOverflow(page: Page) {
   ))).toBeLessThanOrEqual(1)
 }
 
+async function activateDecorativeWebGL(page: Page, isMobile: boolean) {
+  if (isMobile) {
+    await page.evaluate(() => window.dispatchEvent(new Event('touchstart')))
+  } else {
+    await page.mouse.move(4, 4)
+  }
+}
+
 test('ships clean cross-browser choreography and an accessible dossier', async ({
   isMobile,
   page,
 }) => {
   const errors = observeApplicationErrors(page)
   await page.goto('/', { waitUntil: 'networkidle' })
+  await activateDecorativeWebGL(page, isMobile)
 
   await expect(page.locator('script[src*="/_next/static/"]')).not.toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-atlas', 'ready')
@@ -116,6 +125,7 @@ test('keeps reduced motion identical to the static render', async ({ browserName
 
   await expect(page.locator('html')).not.toHaveClass(/atlas-js/)
   await expect(page.locator('html')).not.toHaveAttribute('data-atlas')
+  await expect(page.locator('html')).not.toHaveAttribute('data-atlas-webgl-activated')
   await expect(page.locator([
     '.chapter-wipe__layer',
     '[data-atlas-cursor]',
@@ -159,6 +169,7 @@ test('releases one four-second sun spectacle and leaves the golden feather at co
     }
   })
   await page.goto('/', { waitUntil: 'networkidle' })
+  await activateDecorativeWebGL(page, isMobile)
   await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
 
   const heroPlate = page.locator('.hero-liquid__visual')
@@ -215,6 +226,7 @@ test('prints the missing plate in glitching ink with sparse feathers', async ({
   test.skip(browserName !== 'chromium' || isMobile, 'One WebGL engine verifies the 404 scene.')
   const errors = observeApplicationErrors(page)
   await page.goto('/404.html', { waitUntil: 'networkidle' })
+  await activateDecorativeWebGL(page, isMobile)
 
   await expect(page.getByRole('heading', {
     name: 'This plate is missing from the atlas.',
@@ -237,6 +249,7 @@ test('reverses the feather-like masthead scatter and keeps kinetic type alive', 
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/', { waitUntil: 'networkidle' })
+  await activateDecorativeWebGL(page, isMobile)
   await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
 
   const characters = page.locator('.hero-masthead__line > div')
@@ -378,6 +391,7 @@ test('samples frame pacing through the complete page', async ({
   page,
 }, testInfo) => {
   await page.goto('/?stats=1', { waitUntil: 'networkidle' })
+  await activateDecorativeWebGL(page, isMobile)
   await expect(page.locator('html')).toHaveAttribute('data-atlas', 'ready')
   await page.evaluate(async () => {
     const images = Array.from(document.images)

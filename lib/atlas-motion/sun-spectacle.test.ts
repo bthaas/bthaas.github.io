@@ -37,6 +37,8 @@ describe('sun spectacle choreography', () => {
   it('flares first, peaks in a blizzard, then lands one golden feather', () => {
     const frame = createSunSpectacleFrame()
 
+    expect(SUN_SPECTACLE_DURATION_MS).toBeLessThanOrEqual(3_500)
+
     writeSunSpectacleFrame(220, frame)
     expect(frame.flare).toBeGreaterThan(0.9)
     expect(frame.blizzard).toBeGreaterThan(0)

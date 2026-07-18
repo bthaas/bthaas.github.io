@@ -5,6 +5,7 @@ import {
   createFeatherFrame,
   getPointerGustStrength,
   getVisibleFeatherCount,
+  shouldUseConstrainedFeatherTier,
   writeFeatherFrame,
 } from './feather-fall'
 
@@ -64,6 +65,12 @@ describe('feather-fall choreography', () => {
     expect(nearCount).toBeGreaterThanOrEqual(45)
     expect(nearCount).toBeLessThanOrEqual(55)
     expect(desktop.every((seed) => seed.readability >= 0.34 && seed.readability <= 1)).toBe(true)
+  })
+
+  it('uses the 40-feather performance tier for software renderers and Firefox', () => {
+    expect(shouldUseConstrainedFeatherTier(true, 'Chrome/126.0')).toBe(true)
+    expect(shouldUseConstrainedFeatherTier(false, 'Firefox/128.0')).toBe(true)
+    expect(shouldUseConstrainedFeatherTier(false, 'Version/18.0 Safari/605.1.15')).toBe(false)
   })
 
   it('reveals only the narrative subset and bounds radial pointer gusts', () => {

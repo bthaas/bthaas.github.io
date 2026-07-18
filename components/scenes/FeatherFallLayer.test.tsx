@@ -3,6 +3,10 @@ import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
+import {
+  WEBGL_ACTIVATED_ATTRIBUTE,
+  WEBGL_ACTIVATION_EVENT,
+} from '@/components/motion/WebGLActivationGate'
 
 import { FeatherFallLayer } from './FeatherFallLayer'
 
@@ -54,6 +58,7 @@ describe('FeatherFallLayer', () => {
     listeners.clear()
     reducedMotion = false
     installMatchMedia()
+    document.documentElement.removeAttribute(WEBGL_ACTIVATED_ATTRIBUTE)
     window.history.replaceState({}, '', '/')
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280, writable: true })
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
@@ -103,6 +108,13 @@ describe('FeatherFallLayer', () => {
     window.innerWidth = 500
     window.history.replaceState({}, '', '/?stats=1')
     render(<FeatherFallLayer />)
+
+    await waitFor(() => expect(shouldRenderWebGL).toHaveBeenCalled())
+    expect(screen.queryByTestId('feather-fall-scene')).not.toBeInTheDocument()
+    act(() => {
+      document.documentElement.setAttribute(WEBGL_ACTIVATED_ATTRIBUTE, '')
+      window.dispatchEvent(new CustomEvent(WEBGL_ACTIVATION_EVENT))
+    })
 
     const scene = await screen.findByTestId('feather-fall-scene')
     expect(scene).toHaveAttribute('data-mobile', 'true')

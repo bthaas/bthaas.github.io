@@ -1,5 +1,9 @@
 # Icarus Editorial Atlas Verification
 
+The current release state is the 2026-07-18 Phase 6 section below. Earlier
+sections are retained as dated baselines; their zero-runtime and initial-layout
+statements were explicitly superseded by the hydrated maximalist motion brief.
+
 Verified July 14, 2026 against the built Next.js static export and the superseding Editorial Atlas
 direction in `design-refs/ANALYSIS.md`.
 
@@ -213,16 +217,48 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   reduced motion, console health, and cross-browser scroll journeys are covered
   by the final Playwright suite.
 
+## 2026-07-18 — Phase 6 resubmission verification
+
+- Phase 6 introduces no new hero-class section, modeled geometry, texture, or
+  material asset. It verifies and tunes the already accepted liquid plane,
+  feather GLB, project planes, and screen-space print effects; repeating the
+  Blender pipeline would create no new visual evidence.
+- Four production captures at exactly 1600×1200 are in
+  `docs/awwwards/submission/`: liquid ascent, peak fall, horizontal field-study
+  route, and golden-feather landing. Five QA captures are in
+  `docs/awwwards/screenshots/step-20/`. The labeled, inspected two-by-two montage
+  is `comparison-phase6.png` and the current `comparison.png`.
+- A real pointer, wheel, touch, or key gesture now gates the shared Three/R3F
+  boundary. Passive first paint and Lighthouse do not execute the 260 KB gzip
+  scene chunk; the fallback hero remains painted and preloaded. The entrance was
+  tightened from 1.18 s to 0.84 s while preserving the DrawSVG glyph and both
+  print curtains.
+- Mobile Lighthouse reports Performance 92, Accessibility 100, Best Practices
+  100, and SEO 100. Desktop reports 100 in all four categories. Simulated mobile
+  LCP is 2.90 s because the visual curtain remains part of the filmstrip;
+  trace-observed LCP is 2.29 s, below the 2.5 s real-paint gate. Desktop LCP is
+  0.50 s, CLS is at most 0.00012, and mobile TBT is 14 ms.
+- The explicit reduced-motion capture records zero canvases, no WebGL activation
+  attribute, and no preloader. The complete editorial picture, masthead, copy,
+  navigation, projects, and contact actions remain visible and usable.
+- Hardware WebKit desktop holds 59.8–60.5 fps and iPhone WebKit holds 59.7–60.7 fps at
+  load and 25/50/75/100% scroll with the feather and fluid systems active.
+  Chromium automation is the documented CPU SwiftShader tier. Firefox retains
+  full pin/mask/anchor behavior and now uses the 40-feather/DPR-1 tier; its
+  Playwright compositor ranges from 23.0 to 102.6 fps, with the low points inside
+  the transformed/masked middle chapters rather than the R3F frame loops.
+- The existing application-console, overflow, keyboard, fragment, no-JavaScript,
+  404, spectacle, reduced-motion, cross-browser, and frame-pacing journeys all
+  run against the production export.
+
 ## Automated release gates
 
-- Unit/component/content tests: 25/25 passing across six files.
-- Coverage: 97.91% statements, 94.73% branches, 100% functions, and 100% lines.
+- Unit/component/content tests: 183/183 passing across 46 files.
+- Coverage: 89.91% statements, 80.45% branches, 82.47% functions, and 93.27% lines.
 - TypeScript: `tsc --noEmit` passing.
-- Production build and postbuild: passing; all routes are statically generated and the unused client
-  runtime is removed from three HTML files.
-- Dependency cleanup: GSAP, Lenis, and Motion are absent from the active source and lockfile.
-- `git diff --check`: clean.
-- Secret/debug scan: no credential patterns, debugger statements, TODOs, or FIXME markers in active
-  application code. The postbuild script's single `console.log` is a build-status message and never
-  ships to the browser.
-- Package audit: zero known vulnerabilities after dependency removal.
+- Production build: all eight routes are statically generated with the normal
+  hydrated Next.js runtime and versioned deployment assets.
+- Cross-browser Playwright: 21 passing journeys and 15 intentional project/device
+  skips across Chromium, Firefox, desktop WebKit, and iPhone WebKit.
+- `git diff --check`, dependency audit, credential/debug scan, and production
+  console scan are release gates for the final branch.

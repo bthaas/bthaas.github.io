@@ -51,8 +51,8 @@ describe('GitHub Pages export', () => {
     expect(nextConfig.assetPrefix).toBe('/static-v1')
   })
 
-  it('inlines the compact Atlas stylesheet to protect hydrated first paint', () => {
-    expect(nextConfig.experimental?.inlineCss).toBe(true)
+  it('keeps production CSS cacheable instead of duplicating it into every HTML route', () => {
+    expect(nextConfig.experimental?.inlineCss).not.toBe(true)
   })
 
   it('copies generated Next.js assets into the prefixed deployment path', () => {

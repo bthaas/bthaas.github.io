@@ -1,4 +1,4 @@
-export const SUN_SPECTACLE_DURATION_MS = 3_800
+export const SUN_SPECTACLE_DURATION_MS = 3_400
 
 const KONAMI_SEQUENCE = [
   'ArrowUp',

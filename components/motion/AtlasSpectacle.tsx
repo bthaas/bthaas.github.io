@@ -106,7 +106,7 @@ export function AtlasSpectacle() {
           }, 0)
           .to(goldenFeather, { duration: 0.18, opacity: 1 }, 0.56)
           .to(goldenFeather, {
-            duration: 2.92,
+            duration: 2.72,
             ease: 'power2.inOut',
             rotate: 960,
             scale: 1,

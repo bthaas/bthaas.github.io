@@ -5,6 +5,11 @@ import { gsap } from 'gsap'
 import dynamic from 'next/dynamic'
 import { Component, useEffect, useRef, useState } from 'react'
 
+import {
+  WEBGL_ACTIVATED_ATTRIBUTE,
+  WEBGL_ACTIVATION_EVENT,
+} from '@/components/motion/WebGLActivationGate'
+import { shouldUseConstrainedFeatherTier } from '@/lib/atlas-motion/feather-fall'
 import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
 
 gsap.registerPlugin(useGSAP)
@@ -54,15 +59,23 @@ export function FeatherFallLayer() {
     const update = () => {
       cancelSchedule()
       const profile = detectWebGLProfile()
+      const constrained = shouldUseConstrainedFeatherTier(
+        profile.constrained,
+        navigator.userAgent,
+      )
       const eligible = shouldRenderWebGL({
         reducedMotion: reducedMotion.matches,
         webGLAvailable: profile.available,
         width: window.innerWidth,
       })
-      setIsConstrained(profile.constrained)
+      setIsConstrained(constrained)
       setIsMobile(window.innerWidth < 768)
       setShowStats(new URLSearchParams(window.location.search).get('stats') === '1')
       if (!eligible) {
+        setMounted(false)
+        return
+      }
+      if (!document.documentElement.hasAttribute(WEBGL_ACTIVATED_ATTRIBUTE)) {
         setMounted(false)
         return
       }
@@ -80,10 +93,12 @@ export function FeatherFallLayer() {
 
     update()
     window.addEventListener('resize', update, { passive: true })
+    window.addEventListener(WEBGL_ACTIVATION_EVENT, update)
     reducedMotion.addEventListener('change', update)
     return () => {
       cancelSchedule()
       window.removeEventListener('resize', update)
+      window.removeEventListener(WEBGL_ACTIVATION_EVENT, update)
       reducedMotion.removeEventListener('change', update)
     }
   }, [])

@@ -56,6 +56,13 @@ const smoothstep = (progress: number) => {
   return bounded * bounded * (3 - 2 * bounded)
 }
 
+export function shouldUseConstrainedFeatherTier(
+  rendererConstrained: boolean,
+  userAgent: string,
+) {
+  return rendererConstrained || /firefox\//i.test(userAgent)
+}
+
 export function createFeatherFrame(): FeatherFrame {
   return {
     density: 0,

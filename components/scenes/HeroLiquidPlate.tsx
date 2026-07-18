@@ -7,6 +7,10 @@ import dynamic from 'next/dynamic'
 import { Component, useCallback, useEffect, useRef, useState } from 'react'
 
 import { AtlasPicture } from '@/components/portfolio/AtlasPicture'
+import {
+  WEBGL_ACTIVATED_ATTRIBUTE,
+  WEBGL_ACTIVATION_EVENT,
+} from '@/components/motion/WebGLActivationGate'
 import { atlasVisuals } from '@/content/editorial-visuals'
 import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
 
@@ -68,6 +72,11 @@ export function HeroLiquidPlate() {
         setCanvasReady(false)
         return
       }
+      if (!document.documentElement.hasAttribute(WEBGL_ACTIVATED_ATTRIBUTE)) {
+        setMounted(false)
+        setCanvasReady(false)
+        return
+      }
       firstFrame = requestAnimationFrame(() => {
         secondFrame = requestAnimationFrame(() => {
           const mount = () => setMounted(true)
@@ -80,10 +89,12 @@ export function HeroLiquidPlate() {
     update()
     reducedMotion.addEventListener('change', update)
     window.addEventListener('resize', update, { passive: true })
+    window.addEventListener(WEBGL_ACTIVATION_EVENT, update)
     return () => {
       cancelSchedule()
       reducedMotion.removeEventListener('change', update)
       window.removeEventListener('resize', update)
+      window.removeEventListener(WEBGL_ACTIVATION_EVENT, update)
     }
   }, [])
 

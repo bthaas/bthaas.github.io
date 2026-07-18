@@ -1,4 +1,4 @@
-export const PRELOADER_DURATION_SECONDS = 1.18
+export const PRELOADER_DURATION_SECONDS = 0.84
 
 export interface PreloaderFrame {
   readonly counter: number
