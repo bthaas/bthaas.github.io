@@ -1,4 +1,5 @@
 .projects-section {
+  overflow: clip;
   padding-top: clamp(5rem, 10vw, 10rem);
   background: var(--cream);
 }
@@ -18,17 +19,52 @@
   color: var(--muted);
 }
 
-.project-panel-list {
-  display: grid;
-  padding-bottom: clamp(5rem, 10vw, 10rem);
-  gap: clamp(0.75rem, 1.5vw, 1.5rem);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.project-flight {
+  position: relative;
+  height: max(40rem, calc(100svh - 58px));
+  overflow: clip;
+}
+
+.project-flight__track {
+  --project-flight-card-width: min(72vw, 68rem);
+  position: relative;
+  display: flex;
+  width: max-content;
+  height: 100%;
+  padding-inline: max(2rem, calc((100vw - var(--project-flight-card-width)) / 2));
+  align-items: center;
+  gap: clamp(3rem, 5vw, 6rem);
+  will-change: transform;
+}
+
+.project-flight__item {
+  position: relative;
+  width: var(--project-flight-card-width);
+  height: min(72svh, 47rem);
+  flex: 0 0 var(--project-flight-card-width);
+}
+
+.project-flight__ghost {
+  position: absolute;
+  z-index: 0;
+  top: -0.14em;
+  left: -0.08em;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(11rem, 24vw, 26rem);
+  font-weight: 500;
+  letter-spacing: -0.09em;
+  line-height: 0.72;
+  opacity: 0.08;
+  pointer-events: none;
+  transform: translate3d(-5%, 0, 0);
 }
 
 .project-panel {
   position: relative;
-  isolation: isolate;
-  aspect-ratio: 0.7;
+  display: block;
+  width: 100%;
+  height: 100%;
   overflow: clip;
   border: 1px solid rgb(255 255 255 / 20%);
   border-radius: clamp(1rem, 1.8vw, 1.6rem);
@@ -40,7 +76,7 @@
 
 .project-panel::after {
   position: absolute;
-  z-index: 4;
+  z-index: 5;
   inset: 0;
   border: 1px solid rgb(255 255 255 / 0%);
   border-radius: inherit;
@@ -51,6 +87,7 @@
     box-shadow 400ms var(--ease-out);
 }
 
+.project-panel__visual,
 .project-panel__art {
   position: absolute;
   z-index: 0;
@@ -58,18 +95,24 @@
   width: calc(100% + 2px);
   height: calc(100% + 2px);
   border-radius: inherit;
-  transition:
-    filter 700ms var(--ease-out),
-    transform 900ms var(--ease-out);
+}
+
+.project-panel__visual {
+  overflow: clip;
+  border-radius: inherit;
+  will-change: transform;
+}
+
+.project-panel__art {
+  transition: filter 700ms var(--ease-out), opacity 260ms ease;
 }
 
 .project-panel__art img {
   position: absolute;
   top: 0;
-  left: -8%;
-  width: 116%;
+  left: 0;
+  width: 100%;
   height: 100%;
-  max-width: none;
   object-fit: cover;
 }
 
@@ -87,7 +130,7 @@
 
 .project-panel__shade {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   inset: 0;
   background:
     linear-gradient(180deg, rgb(5 8 15 / 5%) 35%, rgb(5 8 15 / 78%) 100%),
@@ -98,7 +141,7 @@
 
 .project-panel__copy {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   right: clamp(1.25rem, 2.3vw, 2.2rem);
   bottom: clamp(1.35rem, 2.5vw, 2.4rem);
   left: clamp(1.25rem, 2.3vw, 2.2rem);
@@ -109,7 +152,7 @@
 
 .project-panel__name {
   font-family: var(--serif);
-  font-size: clamp(2.35rem, 4vw, 4.4rem);
+  font-size: clamp(3.4rem, 6.5vw, 7rem);
   font-weight: 500;
   letter-spacing: -0.065em;
   line-height: 0.86;
@@ -123,7 +166,7 @@
   max-height: 0;
   overflow: hidden;
   margin-top: 0;
-  font-size: clamp(0.76rem, 1vw, 0.92rem);
+  font-size: clamp(0.82rem, 1vw, 1rem);
   line-height: 1.5;
   opacity: 0;
   transform: translateY(1rem);
@@ -136,7 +179,7 @@
 
 .project-panel__action {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   top: clamp(1rem, 1.6vw, 1.5rem);
   right: clamp(1rem, 1.6vw, 1.5rem);
   display: grid;
@@ -160,10 +203,14 @@
   line-height: 1;
 }
 
-.project-panel:hover .project-panel__art,
-.project-panel:focus-visible .project-panel__art {
+.project-panel:hover .project-panel__art img,
+.project-panel:focus-visible .project-panel__art img {
   filter: saturate(1.08) contrast(1.03);
   transform: scale(1.045);
+}
+
+.project-panel__art img {
+  transition: filter 700ms var(--ease-out), transform 900ms var(--ease-out);
 }
 
 .project-panel:hover .project-panel__description,
@@ -184,6 +231,27 @@
 .project-panel:focus-visible::after {
   border-color: rgb(216 239 75 / 78%);
   box-shadow: inset 0 0 0 1px rgb(216 239 75 / 16%);
+}
+
+.project-flight__webgl {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.project-flight__webgl canvas {
+  pointer-events: none !important;
+}
+
+.project-flight[data-project-flight-ready] .project-flight__webgl {
+  opacity: 1;
+}
+
+.project-flight[data-project-flight-ready] .project-panel__art {
+  opacity: 0;
 }
 
 .project-site-header .project-back-link,
@@ -503,13 +571,31 @@ html.atlas-js .chapter-wipe {
 }
 
 html.atlas-js .chapter-wipe__layer {
+  --chapter-dot-radius: 0px;
+  --chapter-dot-x: 12px;
   position: absolute;
   z-index: 0;
   inset: 0;
   display: block;
   background: var(--chapter-wipe-color);
+  mask-image: radial-gradient(
+    circle,
+    #000 0 var(--chapter-dot-radius),
+    transparent calc(var(--chapter-dot-radius) + 0.6px)
+  );
+  mask-position: var(--chapter-dot-x) 0;
+  mask-repeat: repeat;
+  mask-size: 12px 12px;
   pointer-events: none;
-  will-change: clip-path;
+  will-change: mask-position, -webkit-mask-position;
+  -webkit-mask-image: radial-gradient(
+    circle,
+    #000 0 var(--chapter-dot-radius),
+    transparent calc(var(--chapter-dot-radius) + 0.6px)
+  );
+  -webkit-mask-position: var(--chapter-dot-x) 0;
+  -webkit-mask-repeat: repeat;
+  -webkit-mask-size: 12px 12px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -571,30 +657,6 @@ html.atlas-js .chapter-wipe__layer {
       animation-timeline: --atlas-project-plate;
     }
 
-    html.atlas-js .project-panel-list {
-      view-timeline-axis: block;
-      view-timeline-name: --atlas-project-panels;
-    }
-
-    html.atlas-js .project-panel {
-      animation: atlas-project-panel-rise both linear;
-      animation-timeline: --atlas-project-panels;
-    }
-
-    html.atlas-js .project-panel:nth-child(1) {
-      --project-panel-entry-y: 7rem;
-      animation-range: entry 2% cover 34%;
-    }
-
-    html.atlas-js .project-panel:nth-child(2) {
-      --project-panel-entry-y: 10rem;
-      animation-range: entry 8% cover 40%;
-    }
-
-    html.atlas-js .project-panel:nth-child(3) {
-      --project-panel-entry-y: 13rem;
-      animation-range: entry 14% cover 46%;
-    }
   }
 }
 
@@ -628,44 +690,60 @@ html.atlas-js .chapter-wipe__layer {
   }
 }
 
-@keyframes atlas-project-panel-rise {
-  from {
-    opacity: 0.18;
-    transform: translate3d(0, var(--project-panel-entry-y), 0)
-      skewY(calc(var(--atlas-plate-skew, 0) * 1deg))
-      scale(var(--atlas-plate-scale, 1));
-    clip-path: inset(14% 0 0 round clamp(1rem, 1.8vw, 1.6rem));
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0)
-      skewY(calc(var(--atlas-plate-skew, 0) * 1deg))
-      scale(var(--atlas-plate-scale, 1));
-    clip-path: inset(0 round clamp(1rem, 1.8vw, 1.6rem));
-  }
+html:not(.atlas-js) .project-flight:not([data-project-flight-enhanced]) {
+  width: var(--shell);
+  height: auto;
+  padding-bottom: clamp(5rem, 10vw, 10rem);
+  margin-inline: auto;
+  overflow: visible;
 }
 
-@media (max-width: 720px) {
-  .project-panel-list {
+html:not(.atlas-js) .project-flight:not([data-project-flight-enhanced]) .project-flight__track {
+  display: grid;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  transform: none !important;
+}
+
+html:not(.atlas-js) .project-flight:not([data-project-flight-enhanced]) .project-flight__item {
+  width: auto;
+  height: auto;
+  aspect-ratio: 0.7;
+}
+
+@media (max-width: 767px) {
+  .project-flight,
+  html:not(.atlas-js) .project-flight:not([data-project-flight-enhanced]) {
     width: 100%;
+    height: auto;
     padding: 0 14px clamp(4.5rem, 18vw, 6rem);
+    overflow: visible;
+  }
+
+  .project-flight__track,
+  html:not(.atlas-js) .project-flight:not([data-project-flight-enhanced]) .project-flight__track {
+    display: grid;
+    width: 100%;
+    height: auto;
+    padding: 0;
     gap: 0.9rem;
-    grid-auto-columns: min(82vw, 23rem);
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    overflow-x: auto;
-    scroll-padding-inline: 14px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
+    grid-template-columns: 1fr;
+    transform: none !important;
   }
 
-  .project-panel-list::-webkit-scrollbar {
-    display: none;
+  .project-flight__item,
+  html:not(.atlas-js) .project-flight:not([data-project-flight-enhanced]) .project-flight__item {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 0.78;
   }
 
-  .project-panel {
-    aspect-ratio: 0.69;
+  .project-flight__ghost {
+    top: 0.02em;
+    font-size: clamp(9rem, 46vw, 13rem);
   }
 
   .project-panel__name {
@@ -679,6 +757,10 @@ html.atlas-js .chapter-wipe__layer {
   .project-panel__action {
     opacity: 1;
     transform: rotate(0) scale(1);
+  }
+
+  .project-flight__webgl {
+    display: none;
   }
 
   .project-page__footer {

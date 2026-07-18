@@ -14,6 +14,12 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 })
 
+Object.defineProperty(window, 'scrollTo', {
+  configurable: true,
+  writable: true,
+  value: () => undefined,
+})
+
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root = null
   readonly rootMargin = '0px'

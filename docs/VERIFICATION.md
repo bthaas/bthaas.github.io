@@ -1,5 +1,66 @@
 # Awwwards portfolio verification
 
+Verified on 2026-07-18 from `codex/phase-4-project-flight-path`. Phase 4 turns
+the three accepted field-study plates into a native-scroll horizontal flight
+path on desktop, keeps mobile in normal vertical flow, replaces rectangular
+chapter curtains with halftone print dissolves, and adds bounded dossier tilt.
+
+## Phase 4 project-flight gates
+
+| Gate | Result |
+| --- | --- |
+| `npm run verify` | Passed: 41 files / 169 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 89.83% statements, 80.02% branches, 81.69% functions, 93.43% lines |
+| `npm run test:e2e` | Passed: 19 journeys and 9 intentional project skips across Chromium, Firefox, desktop WebKit, and iPhone WebKit |
+| Horizontal navigation | Native wheel/touch scroll drives one GSAP pin; focused cards and `#project-*` fragments map to exact normal-document positions in Chromium, Firefox, and WebKit |
+| Static and mobile paths | No pin or project canvas under 768 px, reduced motion, no WebGL, or no JavaScript; all three case-study links remain in vertical/three-column normal flow |
+| Animation ownership | React owns only the homepage flight-path track, image wrappers, shared canvas, and dedicated flight-log tilt surfaces; Atlas project effects remain on case-study pages |
+
+Desktop uses measured track overflow as its pin distance, without wheel or touch
+handlers. One lazily mounted R3F canvas travels inside the track and draws three
+40×28 image planes with the Phase 3 liquid shader family. Velocity is bounded to
+5° skew and 0.008 UV/bend response; the three DOM pictures stay rendered below
+the canvas until all textures, layout measurements, and the first WebGL frame are
+ready. A scene error returns immediately to those fallbacks. Mobile deliberately
+uses the image plates with bounded velocity skew and no pin or project WebGL.
+Mesh refs, material refs, cover vectors, and choreography targets are allocated
+once; the R3F frame loop mutates those objects without per-frame allocations.
+
+Each panel has a stable `#project-{slug}` id. Keyboard focus scrolls its matching
+pinned progress while preserving the link's Enter behavior, and hash navigation
+does the same after initial load or `hashchange`. E2E verifies the focused middle
+card is centered, the final fragment is visible, mobile top positions remain
+strictly vertical, and document width never exceeds the viewport.
+
+The chapter layer now uses a reversible 12 px radial mask grid instead of a
+clip-path edge. Both standard and WebKit mask declarations were exercised in
+Firefox, Chromium, desktop Safari/WebKit, and iPhone WebKit. The source-vendored
+React Bits `TiltedCard` adaptation owns a dedicated inner flight-log surface and
+caps both axes at 6°, leaving Atlas DrawSVG, SplitText, and Flip dossier geometry
+unchanged.
+
+Production JavaScript is 245,862 bytes gzip for the initial Next chunks and
+328,738 bytes including lazy Atlas, 132,062 bytes below the 450 KiB initial soft
+ceiling. The shared Three/R3F scene chunk is 259,579 bytes gzip and the fluid
+cursor chunk is 5,791 bytes, producing 594,108 bytes after every showpiece has
+mounted. Phase 4 adds the gallery scene to the existing shared deferred chunk
+rather than loading another Three runtime.
+
+Final page-level frame pacing through 0/25/50/75/100% scroll:
+
+| Project | Renderer / tier | 0% | 25% | 50% | 75% | 100% |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Chromium desktop automation | SwiftShader, software WebGL | 29.6 | 25.6 | 22.2 | 24.9 | 21.7 |
+| Firefox desktop automation | Apple GPU | 61.0 | 54.0 | 21.8 | 25.3 | 34.0 |
+| WebKit desktop automation | Apple GPU | 61.6 | 61.2 | 60.1 | 60.0 | 59.5 |
+| WebKit iPhone automation | Apple GPU, mobile-40 | 60.1 | 60.0 | 60.0 | 60.0 | 60.0 |
+
+SwiftShader is the documented CPU-rendered tier. The new gallery uses DPR 1 and
+demand rendering; hardware-backed WebKit remains at display rate, while iPhone
+does not mount the project canvas. Phase 4 captures are in
+`docs/awwwards/screenshots/step-18/`; the inspected source/before/after montage
+is `design-refs/comparison-phase4.png` and the current `comparison.png`.
+
 Verified on 2026-07-18 from `codex/phase-3-hero-kinetic-type`. Phase 3 turns
 the accepted hero plate into an interaction-driven liquid WebGL surface, moves
 masthead ownership from Atlas DOM code to React/GSAP, and introduces four

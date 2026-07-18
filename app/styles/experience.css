@@ -126,12 +126,23 @@
 
 .flight-entry {
   position: relative;
+  min-height: 146px;
+  perspective: 900px;
+}
+
+.flight-entry__tilt {
+  position: relative;
   display: grid;
   min-height: 146px;
   align-items: start;
   padding: 1.4rem 0 1.8rem;
   column-gap: clamp(0.75rem, 1.45vw, 1.5rem);
   grid-template-columns: repeat(12, minmax(0, 1fr));
+  transform-style: preserve-3d;
+}
+
+.flight-entry__tilt[data-tilted-card-ready] {
+  will-change: transform;
 }
 
 .flight-rule {
@@ -318,6 +329,25 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .flight-entry__tilt {
+    transform: none !important;
+    transform-style: flat;
+  }
+}
+
+html:not(.atlas-js) .flight-dossier__panel {
+  display: block;
+}
+
+html:not(.atlas-js) .flight-dossier__inner {
+  overflow: visible;
+}
+
+html:not(.atlas-js) .flight-entry__tilt {
+  transform-style: flat;
+}
+
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     html.atlas-js .experience-section::before {
@@ -426,7 +456,7 @@
   }
 
   .flight-dossier {
-    grid-column: 2;
+    grid-column: 2 / -1;
   }
 
   .flight-highlights {

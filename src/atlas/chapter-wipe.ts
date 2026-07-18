@@ -1,4 +1,5 @@
 import { getViewportEntryRange } from '../../lib/atlas-motion/scroll-trigger-range'
+import { getChapterDissolveFrame } from '../../lib/atlas-motion/project-flight-path'
 
 import { getAtlasEngine, type AtlasEngine } from './engine'
 
@@ -13,6 +14,9 @@ export function setupChapterWipes(
   const layers = chapters.map((chapter, index) => {
     const layer = root.createElement('span')
     const direction = chapter.dataset.wipeDirection ?? (index % 2 === 0 ? 'ltr' : 'rtl')
+    const directionSign = direction === 'rtl' ? -1 : 1
+    const from = getChapterDissolveFrame(0, directionSign)
+    const to = getChapterDissolveFrame(1, directionSign)
     layer.className = 'chapter-wipe__layer'
     layer.setAttribute('aria-hidden', 'true')
     chapter.append(layer)
@@ -34,12 +38,15 @@ export function setupChapterWipes(
     })
     timeline.fromTo(
       layer,
-      direction === 'rtl'
-        ? { clipPath: 'inset(0 0 0 100%)' }
-        : { clipPath: 'inset(0 100% 0 0)' },
-      direction === 'rtl'
-        ? { clipPath: 'inset(0 0 0 0%)', ease: 'none' }
-        : { clipPath: 'inset(0 0% 0 0)', ease: 'none' },
+      {
+        '--chapter-dot-radius': `${from.dotRadius}px`,
+        '--chapter-dot-x': `${from.offsetX}px`,
+      },
+      {
+        '--chapter-dot-radius': `${to.dotRadius}px`,
+        '--chapter-dot-x': `${to.offsetX}px`,
+        ease: 'none',
+      },
       0,
     )
     return { layer, timeline }

@@ -181,6 +181,91 @@ test('reverses the feather-like masthead scatter and keeps kinetic type alive', 
   expect(errors).toEqual([])
 })
 
+test('flies through projects with native scroll, fragments, keyboard, and print dissolves', async ({
+  isMobile,
+  page,
+}) => {
+  const errors = observeApplicationErrors(page)
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  const stage = page.locator('[data-project-flight-stage]')
+  const track = page.locator('[data-project-flight-track]')
+  const panels = page.locator('[data-testid="project-panel-trigger"]')
+  await expect(panels).toHaveCount(3)
+  await stage.scrollIntoViewIfNeeded()
+
+  if (isMobile) {
+    await expect(stage).not.toHaveAttribute('data-project-flight-enhanced', '')
+    await expect(stage.locator('.project-flight-canvas')).toHaveCount(0)
+    const panelTops = await panels.evaluateAll((nodes) => nodes.map((node) => (
+      node.getBoundingClientRect().top
+    )))
+    expect(panelTops).toEqual([...panelTops].sort((a, b) => a - b))
+    expect(await track.evaluate((node) => getComputedStyle(node).transform)).toBe('none')
+  } else {
+    await expect(stage).toHaveAttribute('data-project-flight-enhanced', '')
+    await expect(stage).toHaveAttribute('data-project-flight-ready', '')
+    await expect(stage.locator('.project-flight-canvas')).toHaveCount(1)
+
+    await page.evaluate(() => {
+      const flightStage = document.querySelector<HTMLElement>('[data-project-flight-stage]')!
+      const flightTrack = document.querySelector<HTMLElement>('[data-project-flight-track]')!
+      const pinDistance = flightTrack.scrollWidth - flightStage.clientWidth
+      const pinStart = flightStage.getBoundingClientRect().top + scrollY - 58
+      scrollTo({
+        behavior: 'instant',
+        top: pinStart + pinDistance * 0.5,
+      })
+    })
+    await expect.poll(async () => track.evaluate((node) => (
+      getComputedStyle(node).transform
+    ))).not.toBe('matrix(1, 0, 0, 1, 0, 0)')
+
+    const beatStream = page.locator('#project-beatstream')
+    await beatStream.focus()
+    await expect(beatStream).toBeFocused()
+    await expect.poll(async () => {
+      const bounds = await beatStream.boundingBox()
+      return bounds ? Math.abs(bounds.x + bounds.width / 2 - 800) : Number.POSITIVE_INFINITY
+    }).toBeLessThan(180)
+
+    const firstTilt = page.locator('.flight-entry__tilt').first()
+    await firstTilt.scrollIntoViewIfNeeded()
+    const tiltBounds = await firstTilt.boundingBox()
+    if (tiltBounds) {
+      await page.mouse.move(tiltBounds.x + tiltBounds.width - 4, tiltBounds.y + 4)
+      await expect.poll(async () => firstTilt.evaluate((node) => (
+        getComputedStyle(node).transform
+      ))).not.toBe('none')
+    }
+  }
+
+  await page.evaluate(() => {
+    location.hash = 'project-vision-bias-steering'
+  })
+  await expect.poll(() => page.locator('#project-vision-bias-steering').evaluate((node) => {
+    const bounds = node.getBoundingClientRect()
+    return bounds.right > 0 && bounds.left < innerWidth
+  })).toBe(true)
+
+  const dissolve = page.locator('.chapter-wipe__layer')
+  await expect(dissolve).toHaveCount(1)
+  expect(await dissolve.evaluate((node) => {
+    const style = getComputedStyle(node)
+    return style.maskImage || style.webkitMaskImage
+  })).toContain('radial-gradient')
+  await page.locator('#craft').scrollIntoViewIfNeeded()
+  await expect.poll(async () => dissolve.evaluate((node) => Number.parseFloat(
+    getComputedStyle(node).getPropertyValue('--chapter-dot-radius'),
+  ))).toBeGreaterThan(0)
+  await expectNoHorizontalOverflow(page)
+  expect(errors).toEqual([])
+})
+
 test('preserves the complete no-JS document', async ({ browser, isMobile }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,

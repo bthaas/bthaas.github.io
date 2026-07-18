@@ -26,3 +26,9 @@ Before committing a vendored component:
 Once customized, vendored files are source-owned by this repository. Do not use
 `jsrepo update` over local changes; review upstream changes and port them
 intentionally.
+
+Phase 4 vendors a strict, GSAP-owned `TiltedCard` adaptation with only the
+bounded pointer tilt used by flight-log dossiers. Its PixelTransition reference
+is deliberately translated into the existing Atlas chapter-wipe owner as a CSS
+dot-screen mask; adding a second React owner for those chapter nodes would break
+the one-owner rule.
