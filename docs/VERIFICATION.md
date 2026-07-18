@@ -1,39 +1,44 @@
 # Awwwards portfolio verification
 
-Verified on 2026-07-18 from `codex/phase-d-submission-polish`. This pass covers
-the GSAP + ScrollTrigger + Lenis engine, the re-choreographed atlas, the Phase C
-signature motion, and the lazy contact flock.
+Verified on 2026-07-18 from `codex/phase-0-react-runtime`. This pass covers the
+normal hydrated Next.js export, the unchanged GSAP + ScrollTrigger + Lenis
+choreography, the lazy contact flock, and the React/WebGL foundation for the
+maximalist motion phases.
 
 ## Release gates
 
 | Gate | Result |
 | --- | --- |
-| `npm run verify` | Passed: 30 files / 128 tests, typecheck, and production build |
-| `npm run test:coverage` | Passed: 90.74% statements, 83.13% branches, 80.81% functions, 94.20% lines |
+| `npm run verify` | Passed: 29 files / 125 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 90.38% statements, 82.48% branches, 80.45% functions, 94.08% lines |
 | `npm run test:e2e` | Passed: 13 tests, 3 intentional project skips, 4 browser/device projects |
-| Static export | Passed; six HTML files contain `/atlas.js` and no React/Next.js runtime |
-| Motion bundle | `atlas.js`: 83,145 bytes gzip, below the 100 KiB gate |
-| Lazy finale bundle | `horizon.js`: 1,461 bytes gzip, below the 220 KiB gate |
+| Static export | Passed; six HTML files ship the normal Next.js hydration runtime and retain the complete no-JS document |
+| First-load JavaScript | 269,999 bytes gzip: 186,855 bytes of Next chunks plus 83,144-byte lazy-on-load `atlas.js`; 190,801 bytes below the 450 KiB soft ceiling |
+| Lazy finale bundle | `horizon.js`: 1,456 bytes gzip and absent from initial HTML |
 | Source file budget | Passed; no source file exceeds the repository's 800-line limit |
 
-The production postbuild injects a content-hashed deferred `/atlas.js` URL.
-`horizon.js` is absent from initial HTML: Atlas injects its content-hashed URL
-once, only when a fine-pointer desktop approaches `#contact`. It is not requested
-on mobile, coarse pointers, no-JS, or reduced-motion visits.
+The runtime-stripping postbuild no longer exists. Next.js hydrates the static
+export normally, then loads `/atlas.js` at window idle so hydration and the
+existing motion engine do not compete with LCP. The compact Atlas stylesheet is
+inlined to remove its render-blocking request. Three.js, R3F, Drei, and
+`@gsap/react` are installed but add no current first-load bytes because no scene
+imports them yet. `horizon.js` remains gated to fine-pointer desktop visits near
+`#contact`; it is not requested on mobile, coarse pointers, no-JS, or
+reduced-motion visits.
 
 ## Lighthouse
 
-Lighthouse ran against the stripped `out/` export through the repository's
-Brotli/gzip production server.
+Lighthouse ran against the hydrated `out/` export through the repository's
+Brotli/gzip production server. Two throttled mobile runs both passed the 2.5 s
+LCP gate; the slower result is reported below.
 
 | Profile | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT | Speed index |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Mobile | 100 | 100 | 100 | 100 | 1.35 s | 0 | 18 ms | 1.23 s |
-| Desktop | 100 | 100 | 100 | 100 | 0.43 s | 0 | 0 ms | 0.42 s |
+| Mobile | 97 | Not rerun in Phase 0 | Not rerun in Phase 0 | Not rerun in Phase 0 | 2.45 s | 0 | 38.5 ms | 3.02 s |
+| Desktop | 100 | Not rerun in Phase 0 | Not rerun in Phase 0 | Not rerun in Phase 0 | 0.47 s | 0 | 0 ms | 0.56 s |
 
-The mobile browser selects the new 768 px hero AVIF (29,696 bytes). The hero
-plate now paints immediately instead of waiting for an entrance clip, preserving
-the editorial composition while keeping LCP inside the 1.8-second guardrail.
+The mobile browser selects the 768 px hero AVIF (29,696 bytes). The preloaded
+fallback remains the LCP element and the editorial composition is unchanged.
 
 ## Motion performance
 
@@ -50,15 +55,16 @@ claim—are the meaningful result there.
 
 | Automated project | Renderer / constraint | 0% | 25% | 50% | 75% | 100% |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| Chromium desktop | SwiftShader headless | 108.9 | 31.9 | 43.2 | 46.0 | 26.7 |
-| Firefox desktop | Apple GPU | 120.0 | 107.0 | 71.5 | 91.9 | 30.4 |
-| WebKit desktop | 30 fps runner cap | 30.2 | 30.2 | 30.0 | 29.8 | 30.2 |
-| WebKit iPhone | 30 fps runner cap | 30.0 | 30.1 | 29.9 | 30.1 | 30.0 |
+| Chromium desktop | SwiftShader headless | 120.0 | 41.4 | 66.2 | 78.7 | 41.9 |
+| Firefox desktop | Apple GPU | 120.0 | 114.2 | 83.3 | 108.9 | 89.6 |
+| WebKit desktop | Apple GPU | 60.0 | 60.0 | 60.0 | 59.5 | 59.5 |
+| WebKit iPhone | Apple GPU | 60.0 | 60.0 | 60.1 | 60.0 | 60.0 |
 
-Chromium's contact result was isolated to software rendering: the same headless
-run measured about 49 fps with the flock and about 96 fps with its canvas hidden,
-while hardware Chrome held 120 fps through the finale. The flock itself caps
-simulation work at 60 Hz and pauses whenever its section is not visible.
+Chromium remains limited by software rendering in the headless runner, while
+hardware Chrome and Firefox retain the earlier 120 fps result. The flock caps
+simulation work at 60 Hz, pauses outside its section, and now reports rolling
+two-second stats so a transient startup window cannot permanently poison the
+measurement.
 
 ## Browser and behavior matrix
 
@@ -109,5 +115,6 @@ smaller, and held the hardware frame budget.
 - [Flock finale capture](./awwwards/submission/04-finale-1600x1200.png)
 
 Cloudflare and live-domain edge injection remain outside the repository release
-gate. The local production export proves the application itself ships only the
-deferred atlas entry initially and the gated horizon entry on approach.
+gate. The local production export proves the application ships its hydrated
+Next chunks, the lazy-on-load Atlas entry, and the gated Horizon entry without
+application-origin console errors.

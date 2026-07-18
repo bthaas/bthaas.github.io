@@ -30,6 +30,7 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   const errors = observeApplicationErrors(page)
   await page.goto('/', { waitUntil: 'networkidle' })
 
+  await expect(page.locator('script[src*="/_next/static/"]')).not.toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-atlas', 'ready')
   await expect(page.locator('html')).toHaveClass(/atlas-js/)
   await expect(page.locator('#hero, #experience, #projects, #craft, #contact')).toHaveCount(5)

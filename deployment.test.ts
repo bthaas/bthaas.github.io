@@ -6,6 +6,43 @@ import { describe, expect, it } from 'vitest'
 import nextConfig from './next.config'
 
 describe('GitHub Pages export', () => {
+  it('ships the hydrated Next.js runtime instead of stripping it after build', () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'),
+    ) as {
+      dependencies: Record<string, string>
+      scripts: Record<string, string>
+    }
+
+    expect(packageJson.scripts).not.toHaveProperty('postbuild')
+    expect(existsSync(resolve(process.cwd(), 'scripts/strip-static-runtime.mjs'))).toBe(false)
+    expect(existsSync(resolve(process.cwd(), 'scripts/strip-static-runtime.test.ts'))).toBe(false)
+  })
+
+  it('installs the React motion and WebGL foundation for hydrated showpieces', () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'),
+    ) as { dependencies: Record<string, string> }
+
+    expect(packageJson.dependencies).toMatchObject({
+      '@gsap/react': expect.any(String),
+      '@react-three/drei': expect.any(String),
+      '@react-three/fiber': expect.any(String),
+      three: expect.any(String),
+    })
+  })
+
+  it('reserves a local source-owned home for vendored React Bits components', () => {
+    const guide = readFileSync(
+      resolve(process.cwd(), 'components/bits/README.md'),
+      'utf8',
+    )
+
+    expect(guide).toContain('jsrepo')
+    expect(guide).toContain('components/bits')
+    expect(guide).toContain('TypeScript + CSS')
+  })
+
   it('disables Jekyll processing so Next.js _next assets are served', () => {
     expect(existsSync(resolve(process.cwd(), 'public/.nojekyll'))).toBe(true)
   })
@@ -14,17 +51,21 @@ describe('GitHub Pages export', () => {
     expect(nextConfig.assetPrefix).toBe('/static-v1')
   })
 
+  it('inlines the compact Atlas stylesheet to protect hydrated first paint', () => {
+    expect(nextConfig.experimental?.inlineCss).toBe(true)
+  })
+
   it('copies generated Next.js assets into the prefixed deployment path', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy.yml'), 'utf8')
 
     expect(workflow).toContain('cp -R out/_next out/static-v1/_next')
   })
 
-  it('starts the Atlas enhancement only after React hydration', () => {
+  it('starts the Atlas enhancement after hydration without competing with LCP', () => {
     const layout = readFileSync(resolve(process.cwd(), 'app/layout.tsx'), 'utf8')
 
     expect(layout).toContain("import Script from 'next/script'")
-    expect(layout).toContain('strategy="afterInteractive"')
+    expect(layout).toContain('strategy="lazyOnload"')
     expect(layout).not.toContain('<script src="/atlas.js"')
   })
 

@@ -66,6 +66,17 @@ scroll progress and active-section indicator.
 
 ## 4. Architecture decision: motion stack
 
+> **Superseded again — July 18, 2026.** The owner-approved **“Maximalist
+> Showpiece Animation” brief** supersedes the remaining zero-framework-runtime
+> constraint. The site now ships as a normally hydrated Next.js static export;
+> the runtime-stripping postbuild step is removed so source-owned React motion
+> and WebGL components can mount in dedicated elements. `atlas.js` and
+> `horizon.js` remain the existing framework-agnostic motion layer until a
+> feature explicitly transfers ownership of a DOM node to React in the same PR.
+> `prefers-reduced-motion` remains the global kill switch, and the former
+> 100 KiB Atlas-only budget is replaced by a soft 450 KB gzip ceiling for total
+> first-load JavaScript with heavy scenes dynamically loaded.
+
 > **Superseded — July 17, 2026.** The owner-approved **“GSAP + ScrollTrigger +
 > Lenis Motion System Upgrade” brief** supersedes this section's original
 > no-GSAP/no-Lenis recommendation. The shipped CSS/vanilla phase remains the

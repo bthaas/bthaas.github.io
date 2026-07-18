@@ -68,8 +68,10 @@ if (target) {
         if (statsStart === 0) statsStart = time
         statsFrames += 1
         const elapsed = time - statsStart
-        if (elapsed >= 2000 && !target.dataset.horizonFps) {
+        if (elapsed >= 2000) {
           target.dataset.horizonFps = (statsFrames * 1000 / elapsed).toFixed(1)
+          statsStart = time
+          statsFrames = 0
         }
       }
     }

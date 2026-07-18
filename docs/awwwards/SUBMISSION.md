@@ -60,30 +60,30 @@ then lazy-loads a separate 1.5 KB gzip canvas bundle. Its sparse,
 deterministic flock drifts behind the contact copy in dusk and cobalt—the Icarus
 flight completing its story without introducing a stock WebGL template.
 
-The site is progressive enhancement rather than a JavaScript application
-disguised as a portfolio. Next.js exports static HTML, the framework runtime is
-removed after build, and an 83.1 KB gzip atlas bundle owns GSAP, ScrollTrigger,
-and Lenis. Touch scrolling remains native;
+The site remains progressive enhancement even as it becomes a hydrated canvas
+for the next motion phases. Next.js exports complete static HTML and ships its
+normal React runtime, while an 83.1 KB gzip Atlas bundle loads at window idle to
+own the existing GSAP, ScrollTrigger, and Lenis choreography. Touch scrolling remains native;
 anchor links and keyboard scrolling remain intact. Reduced motion exits before
 any engine or DOM preparation, and the journey remains available with
 JavaScript disabled.
 
-Performance and access are part of the visual idea. Lighthouse is 100 across
-performance, accessibility, best practices, and SEO. Mobile LCP is 1.35 seconds,
-desktop LCP is 0.43 seconds, CLS is zero, and hardware Chrome and Firefox hold
-roughly 120 fps. Chromium, Firefox, desktop WebKit, and iPhone WebKit journeys cover
+Performance and access are part of the visual idea. The hydrated production
+export scores 97 on throttled mobile Lighthouse and 100 on desktop; conservative
+LCP is 2.45 seconds mobile and 0.47 seconds desktop, with zero CLS. Hardware
+Chrome and Firefox hold roughly 120 fps. Chromium, Firefox, desktop WebKit, and iPhone WebKit journeys cover
 console health, overflow, keyboard dossiers, reduced motion, no-JS, lazy loading,
 and frame pacing.
 
 ## Technical notes
 
-- Next.js 16 static export with React 19 and TypeScript; no React/Next.js client runtime ships.
-- `/atlas.js` is deferred and 83,145 bytes gzip, below its 100 KiB release budget.
-- `/horizon.js` is 1,461 bytes gzip and is injected only near Contact on fine-pointer desktop visits.
+- Next.js 16 static export with normal React 19 hydration and TypeScript.
+- First-load JavaScript is 269,999 bytes gzip, including the 83,144-byte lazy-on-load `/atlas.js`, below the 450 KiB soft ceiling.
+- `/horizon.js` is 1,456 bytes gzip and is injected only near Contact on fine-pointer desktop visits.
 - GSAP 3.15 powers ScrollTrigger, SplitText, ScrambleText, Flip, DrawSVG, and MotionPath; Lenis 1.3.25 is synchronized through the GSAP ticker.
 - Native touch is preserved, while programmatic, keyboard, and anchor scrolling synchronize the same progress bus.
 - Scroll-linked work is limited to transforms, opacity, clip paths, filters, and CSS custom properties; pointer work uses GSAP quick setters.
 - Responsive AVIF/WebP artwork, explicit dimensions, and the immediate hero plate keep LCP and CLS controlled.
 - The authoritative reduced-motion kill switch creates no motion engine or decorative enhancement; the no-JS document remains complete.
-- Production Lighthouse: 100 in all four categories; mobile LCP 1.35 s, desktop LCP 0.43 s, CLS 0.
+- Phase 0 performance Lighthouse: 97 mobile and 100 desktop; mobile LCP 2.45 s, desktop LCP 0.47 s, CLS 0.
 - Verified with Chromium, Firefox, desktop WebKit, and iPhone WebKit production journeys; hardware Chrome and Firefox sustain approximately 120 fps.

@@ -86,7 +86,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         {children}
-        <Script src="/atlas.js" strategy="afterInteractive" />
+        <Script src="/atlas.js" strategy="lazyOnload" />
       </body>
     </html>
   )
