@@ -399,6 +399,7 @@ export function Portfolio() {
                 reveal
                 sizes="(max-width: 720px) 100vw, 50vw"
               />
+              <div className="contact-flock" data-horizon-flock aria-hidden="true" />
               <span className="contact-sunrise" data-contact-sunrise aria-hidden="true" />
             </div>
             <div className="contact-panel">

@@ -38,6 +38,20 @@
   object-position: 50% center;
 }
 
+.contact-flock {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.contact-flock canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .contact-sunrise {
   position: absolute;
   z-index: 2;

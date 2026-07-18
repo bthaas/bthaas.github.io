@@ -5,6 +5,7 @@ import { setupCursor } from './cursor'
 import { initializeAtlasEngine, type AtlasEngine } from './engine'
 import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
+import { setupHorizonLoader } from './horizon-loader'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
 import { setupMarquee } from './marquee'
@@ -26,6 +27,7 @@ interface AtlasRuntimeOptions {
   readonly prepareCursor?: (document: Document) => () => void
   readonly prepareDossiers?: (document: Document) => () => void
   readonly prepareHero?: (document: Document, window: Window) => () => void
+  readonly prepareHorizon?: (document: Document) => () => void
   readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareMagnetic?: (document: Document) => () => void
@@ -53,6 +55,7 @@ export function initializeAtlas({
   prepareCursor = setupCursor,
   prepareDossiers = setupDossiers,
   prepareHero = setupHeroParallax,
+  prepareHorizon = setupHorizonLoader,
   prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
   prepareMagnetic = setupMagnetic,
@@ -100,6 +103,7 @@ export function initializeAtlas({
   const cleanupDossiers = prepareDossiers(runtimeDocument)
   const cleanupExperience = prepareExperience(runtimeDocument, runtimeWindow)
   const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
+  const cleanupHorizon = prepareHorizon(runtimeDocument)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupMagnetic = prepareMagnetic(runtimeDocument)
   const cleanupMarquee = prepareMarquee(runtimeDocument)
@@ -158,6 +162,7 @@ export function initializeAtlas({
     cleanupDossiers()
     cleanupExperience()
     cleanupHero()
+    cleanupHorizon()
     cleanupMetrics()
     cleanupMagnetic()
     cleanupMarquee()
