@@ -1,0 +1,30 @@
+.feather-fall-layer {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.feather-fall-layer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0.92;
+  pointer-events: none !important;
+}
+
+.hero-section > *,
+.experience-section > *,
+.projects-section > *,
+.craft-section > *,
+.contact-section > * {
+  position: relative;
+  z-index: 50;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feather-fall-layer {
+    display: none !important;
+  }
+}
