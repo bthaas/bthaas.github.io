@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 
+import { TitleWink } from '@/components/motion/TitleWink'
+
 import './globals.css'
 
 const noScriptHeroStyles = `
@@ -86,6 +88,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         {children}
+        <TitleWink />
         <Script src="/atlas.js" strategy="lazyOnload" />
       </body>
     </html>

@@ -11,6 +11,10 @@ const badgeText = 'EX ALIS — BELLEVUE — 47.61° N — '
 export function SunBadge() {
   const orbitRef = useRef<HTMLDivElement>(null)
 
+  const releaseSunHit = () => {
+    window.dispatchEvent(new CustomEvent('atlas:sun-hit'))
+  }
+
   useGSAP(() => {
     const orbit = orbitRef.current
     if (!orbit || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -31,8 +35,8 @@ export function SunBadge() {
   }, { scope: orbitRef })
 
   return (
-    <div className="sun-arc sun-badge" aria-hidden="true">
-      <svg focusable="false" viewBox="0 0 240 32">
+    <div className="sun-arc sun-badge">
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 240 32">
         <path
           className="sun-arc__track"
           data-atlas-sun-path
@@ -43,8 +47,15 @@ export function SunBadge() {
           <circle className="sun-arc__disc" cx="8" cy="23" r="6" />
         </g>
       </svg>
-      <div ref={orbitRef} className="sun-badge__orbit" aria-hidden="true">
+      <div ref={orbitRef} className="sun-badge__orbit">
         <CircularText text={badgeText} />
+        <button
+          className="sun-badge__trigger"
+          type="button"
+          aria-label="Release the sun spectacle"
+          data-atlas-sun-trigger
+          onClick={releaseSunHit}
+        />
       </div>
     </div>
   )

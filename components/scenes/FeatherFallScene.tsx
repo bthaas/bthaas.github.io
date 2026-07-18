@@ -16,6 +16,11 @@ import {
   type FeatherSeed,
   writeFeatherFrame,
 } from '@/lib/atlas-motion/feather-fall'
+import {
+  createSunSpectacleFrame,
+  writeSunSpectacleFrame,
+  type SunSpectacleFrame,
+} from '@/lib/atlas-motion/sun-spectacle'
 
 interface FeatherFallSceneProps {
   readonly isConstrained: boolean
@@ -33,6 +38,12 @@ interface GustState {
   strength: number
   x: number
   y: number
+}
+
+interface SpectacleState {
+  active: boolean
+  frame: SunSpectacleFrame
+  startedAt: number
 }
 
 interface FeatherInstancesProps {
@@ -183,6 +194,11 @@ function FeatherField({ isConstrained, isMobile }: Pick<
   const frameRef = useRef(createFeatherFrame())
   const scrollRef = useRef<ScrollState>({ documentProgress: 0, velocity: 0 })
   const gustRef = useRef<GustState>({ serial: 0, strength: 0, x: 0, y: 0 })
+  const spectacleRef = useRef<SpectacleState>({
+    active: false,
+    frame: createSunSpectacleFrame(),
+    startedAt: Number.POSITIVE_INFINITY,
+  })
   const nearMaterial = useMemo(() => createFeatherMaterial(0), [])
   const farMaterial = useMemo(() => createFeatherMaterial(1), [])
   const geometries = useMemo(
@@ -220,6 +236,23 @@ function FeatherField({ isConstrained, isMobile }: Pick<
     }
     window.addEventListener('atlas:scroll', handleScroll)
     return () => window.removeEventListener('atlas:scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const storedStart = Number(document.documentElement.dataset.atlasSpectacleStart)
+    if (Number.isFinite(storedStart)) {
+      spectacleRef.current.active = true
+      spectacleRef.current.startedAt = storedStart
+    }
+    const handleSpectacle = (event: Event) => {
+      const startedAt = (event as CustomEvent<{ startedAt?: number }>).detail?.startedAt
+      spectacleRef.current.active = true
+      spectacleRef.current.startedAt = typeof startedAt === 'number'
+        ? startedAt
+        : performance.now()
+    }
+    window.addEventListener('atlas:sun-spectacle', handleSpectacle)
+    return () => window.removeEventListener('atlas:sun-spectacle', handleSpectacle)
   }, [])
 
   useEffect(() => {
@@ -261,6 +294,20 @@ function FeatherField({ isConstrained, isMobile }: Pick<
       scrollRef.current.velocity,
       frameRef.current,
     )
+    const spectacle = spectacleRef.current
+    if (spectacle.active) {
+      const elapsed = performance.now() - spectacle.startedAt
+      writeSunSpectacleFrame(elapsed, spectacle.frame)
+      const burst = spectacle.frame.blizzard
+      frameRef.current.density = Math.max(frameRef.current.density, burst)
+      frameRef.current.fallSpeed = Math.max(frameRef.current.fallSpeed, burst * 1.9)
+      frameRef.current.opacity = Math.max(frameRef.current.opacity, burst)
+      frameRef.current.scatter = Math.max(frameRef.current.scatter, burst * 1.35)
+      frameRef.current.streak = Math.max(frameRef.current.streak, burst * 0.82)
+      frameRef.current.tumble = Math.max(frameRef.current.tumble, burst * 1.8)
+      frameRef.current.wind += Math.sin(elapsed * 0.012) * burst * 0.7
+      if (spectacle.frame.complete) spectacle.active = false
+    }
     nearMaterial.opacity = frameRef.current.opacity * 0.34
     farMaterial.opacity = frameRef.current.opacity * 0.14
   }, -1)

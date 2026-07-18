@@ -1,5 +1,60 @@
 # Awwwards portfolio verification
 
+Verified on 2026-07-18 from `codex/phase-5-micro-insanity`. Phase 5 adds one
+session-gated “too close to the sun” spectacle, an ink-on-paper missing plate,
+iridescent print varnish, and the tab-title wink without changing copy, artwork,
+palette, typography, or section order.
+
+## Phase 5 micro-insanity gates
+
+| Gate | Result |
+| --- | --- |
+| `npm run verify` | Passed: 45 files / 179 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 89.76% statements, 80.27% branches, 82.29% functions, 93.12% lines |
+| `npm run test:e2e` | Passed: 21 journeys and 15 intentional single-engine skips across Chromium, Firefox, desktop WebKit, and iPhone WebKit |
+| Sun spectacle | Five native-button activations or the Konami sequence release one session-gated 3.81 s flare/blizzard/landing timeline |
+| Reduced motion | No flare, blizzard, golden feather, sheen, glitch canvas, or decorative WebGL canvas runs; the title wink remains available |
+| 404 fallback | Semantic copy and return link server-render; the React Bits ink field and low-density Phase 2 feather scene are decoration only |
+
+The existing travelling sun remains Atlas-owned. React adds a dedicated native
+button centered over the sun badge and dispatches a hit event; the spectacle
+controller owns only its fixed flare and the dedicated golden-feather node beside
+the email action. The feather scene receives the same one-shot event through a
+mutable ref. Its frame loop performs no spectacle clock read while inactive and
+reuses the existing frame record when active. Pure choreography maps the first
+flash, peak blizzard, and final landing over 3,800 ms and unit tests cover its
+Konami recovery, clamping, and ordered beats.
+
+The source-vendored React Bits `LetterGlitch` keeps one strict TypeScript canvas
+variant, derives its glyph set from the missing-plate sentence, and uses the
+shared GSAP ticker. The 404 reuses the Phase 2 feather GLB at the hero keyframe,
+which exposes roughly 17 of 120 desktop records rather than creating another
+scene or asset. Reduced motion never creates either canvas. Plate sheen is a
+CSS gradient/mask pseudo-element; removing permanent `will-change` promotion
+restored Firefox project-flight pacing while retaining promotion only during
+hover/focus.
+
+Production JavaScript is 250,223 bytes gzip for the initial Next chunks and
+332,852 bytes including lazy Atlas, 127,948 bytes below the 450 KiB initial soft
+ceiling. The shared Three/R3F scene is 258,925 bytes gzip and the fluid chunk is
+5,747 bytes, producing 597,524 bytes after every homepage showpiece mounts.
+`/horizon.js` remains an independent 1,504-byte gzip finale. The 404 shares the
+same deferred scene runtime instead of duplicating Three.
+
+Final page-level frame pacing through 0/25/50/75/100% scroll:
+
+| Project | Renderer / tier | 0% | 25% | 50% | 75% | 100% |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Chromium desktop automation | SwiftShader, software WebGL | 29.7 | 25.6 | 22.3 | 22.4 | 24.9 |
+| Firefox desktop automation | Apple GPU | 62.2 | 54.9 | 22.1 | 25.8 | 34.7 |
+| WebKit desktop automation | Apple GPU | 60.5 | 60.9 | 60.8 | 60.8 | 59.3 |
+| WebKit iPhone automation | Apple GPU, mobile-40 | 60.0 | 60.0 | 60.0 | 60.0 | 60.0 |
+
+Phase 5 desktop and 390 px mobile captures are in
+`docs/awwwards/screenshots/step-19/`. The inspected varnish, blizzard, golden
+landing, and missing-plate montage is
+`design-refs/comparison-phase5.png` and the current `comparison.png`.
+
 Verified on 2026-07-18 from `codex/phase-4-project-flight-path`. Phase 4 turns
 the three accepted field-study plates into a native-scroll horizontal flight
 path on desktop, keeps mobile in normal vertical flow, replaces rectangular

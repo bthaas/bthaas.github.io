@@ -130,7 +130,11 @@ export function HeroLiquidPlate() {
       data-hero-liquid-active={isActive ? '' : undefined}
       data-hero-liquid-ready={canvasReady ? '' : undefined}
     >
-      <div className="hero-liquid__visual" data-hero-liquid-visual>
+      <div
+        className="hero-liquid__visual"
+        data-hero-liquid-visual
+        data-atlas-plate-sheen
+      >
         <AtlasPicture
           visual={atlasVisuals.hero}
           alt="A geometric Aegean city aligned with a rising sun"

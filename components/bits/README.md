@@ -32,3 +32,10 @@ bounded pointer tilt used by flight-log dossiers. Its PixelTransition reference
 is deliberately translated into the existing Atlas chapter-wipe owner as a CSS
 dot-screen mask; adding a second React owner for those chapter nodes would break
 the one-owner rule.
+
+Phase 5 installed `LetterGlitch-TS-CSS` through the same registry, then reduced
+it to one ink-on-cream canvas with a strict `message` interface. It derives its
+glyphs from the missing-plate sentence, runs on the shared GSAP ticker, and
+never creates a canvas under reduced motion. The browser-only drawing body is
+verified by Playwright and excluded from V8 coverage like `SplashCursor`; its
+mount gate and semantic 404 fallback remain unit-tested.

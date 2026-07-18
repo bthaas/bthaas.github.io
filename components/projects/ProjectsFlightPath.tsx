@@ -286,6 +286,7 @@ export function ProjectsFlightPath({ projects }: ProjectsFlightPathProps) {
                 aria-label={`Open ${project.name} case study`}
                 data-testid="project-panel-trigger"
                 data-cursor="read"
+                data-atlas-plate-sheen
                 onFocus={() => scrollToPanel(index)}
               >
                 <span

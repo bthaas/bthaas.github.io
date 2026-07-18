@@ -93,6 +93,20 @@ describe('React-owned hero overdrive', () => {
 
     expect(track.style.transform).not.toBe('')
     expect(container.querySelector('.sun-badge__orbit')).toHaveStyle({ left: '50%', top: '28.125%' })
+    expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
+      'Release the sun spectacle',
+    )
     expect(() => unmount()).not.toThrow()
+  })
+
+  it('dispatches one sun hit from mouse, Enter, or Space through the native button', () => {
+    const hit = vi.fn()
+    window.addEventListener('atlas:sun-hit', hit)
+    render(<SunBadge />)
+
+    fireEvent.click(document.querySelector('[data-atlas-sun-trigger]')!)
+
+    expect(hit).toHaveBeenCalledTimes(1)
+    window.removeEventListener('atlas:sun-hit', hit)
   })
 })

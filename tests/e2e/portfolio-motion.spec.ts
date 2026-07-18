@@ -130,9 +130,97 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     .toHaveAttribute('aria-expanded', 'true')
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
   await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
+  await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveCSS('display', 'none')
+  await expect(page.locator('[data-atlas-sun-trigger]')).toHaveCSS('display', 'none')
+  await expect(page.locator('[data-golden-feather-target]')).toHaveCSS('display', 'none')
+  expect(await page.locator('[data-atlas-plate-sheen]').first().evaluate((node) => (
+    getComputedStyle(node, '::before').display
+  ))).toBe('none')
   await expect.poll(() => page.evaluate(() => document.getAnimations().filter(
     (animation) => animation.playState === 'running',
   ).length)).toBe(0)
+  await expectNoHorizontalOverflow(page)
+  expect(errors).toEqual([])
+})
+
+test('releases one four-second sun spectacle and leaves the golden feather at contact', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(browserName !== 'chromium' || isMobile, 'One fine-pointer engine verifies Phase 5.')
+  const errors = observeApplicationErrors(page)
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem('atlas-phase-five-e2e')) {
+      sessionStorage.clear()
+      sessionStorage.setItem('atlas-preloader-entered', '1')
+      sessionStorage.setItem('atlas-entered', '1')
+      sessionStorage.setItem('atlas-phase-five-e2e', '1')
+    }
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+  await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
+
+  const heroPlate = page.locator('.hero-liquid__visual')
+  await heroPlate.hover()
+  await expect.poll(() => heroPlate.evaluate((node) => Number.parseFloat(
+    getComputedStyle(node, '::before').opacity,
+  ))).toBeGreaterThan(0)
+
+  const sun = page.getByRole('button', { name: 'Release the sun spectacle' })
+  await expect(sun).toBeVisible()
+  for (let index = 0; index < 4; index += 1) await sun.click()
+  await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
+    'data-state',
+    'idle',
+  )
+
+  await sun.click()
+  await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
+    'data-state',
+    'active',
+  )
+  await expect(page.locator('html')).toHaveAttribute('data-atlas-spectacle-start')
+  await expect.poll(() => page.locator('[data-atlas-sun-flare]').evaluate((node) => (
+    Number.parseFloat(getComputedStyle(node).opacity)
+  ))).toBeGreaterThan(0)
+  await expect.poll(() => page.locator('[data-golden-feather-target]').evaluate((node) => (
+    Number.parseFloat(getComputedStyle(node).opacity)
+  ))).toBeGreaterThan(0)
+  await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
+    'data-state',
+    'settled',
+    { timeout: 4_800 },
+  )
+  expect(Number(await page.locator('[data-testid="atlas-spectacle"]')
+    .getAttribute('data-duration'))).toBeLessThanOrEqual(4_000)
+  await expect(page.locator('html')).not.toHaveAttribute('data-atlas-spectacle-start')
+  await page.locator('#contact').scrollIntoViewIfNeeded()
+  await expect(page.locator('[data-golden-feather-target]')).toHaveCSS('opacity', '1')
+
+  await page.reload({ waitUntil: 'networkidle' })
+  for (let index = 0; index < 5; index += 1) await sun.click()
+  await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
+    'data-state',
+    'idle',
+  )
+  expect(errors).toEqual([])
+})
+
+test('prints the missing plate in glitching ink with sparse feathers', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(browserName !== 'chromium' || isMobile, 'One WebGL engine verifies the 404 scene.')
+  const errors = observeApplicationErrors(page)
+  await page.goto('/404.html', { waitUntil: 'networkidle' })
+
+  await expect(page.getByRole('heading', {
+    name: 'This plate is missing from the atlas.',
+  })).toBeVisible()
+  await expect(page.locator('[data-letter-glitch] canvas')).toHaveCount(1)
+  await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
   await expectNoHorizontalOverflow(page)
   expect(errors).toEqual([])
 })

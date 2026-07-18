@@ -8,7 +8,10 @@ Phase 1 verification adds the DrawSVG entrance and active citron/dusk ink trail
 in [step 15](./screenshots/step-15/); Phase 2 adds the scroll-narrated feather
 field in [step 16](./screenshots/step-16/); and Phase 3 adds the liquid hero,
 reversible masthead scatter, kinetic band, and mobile tier in
-[step 17](./screenshots/step-17/). The four final submission frames remain the
+[step 17](./screenshots/step-17/). Phase 4's horizontal flight and halftone
+printing are in [step 18](./screenshots/step-18/); Phase 5's varnish, sun
+blizzard, golden landing, and missing plate are in
+[step 19](./screenshots/step-19/). The four final submission frames remain the
 Phase 0 set until the complete maximalist sequence is assembled in Phase 6.
 
 | Frame | File | Purpose |
@@ -87,6 +90,12 @@ and frame pacing.
 ## Technical notes
 
 - Next.js 16 static export with normal React 19 hydration and TypeScript.
+- Phase 5 keeps initial Next + Atlas JavaScript at 332,852 bytes gzip and reuses
+  the existing deferred feather scene for both the one-shot blizzard and sparse
+  404 drift. The complete post-mount homepage is 597,524 bytes gzip.
+- Five native-button activations or the Konami sequence trigger one 3.81-second
+  session spectacle. Reduced motion arms none of it; only the tab-title wink is
+  retained.
 - Phase 3 preserves the preloaded responsive hero `<img>` as LCP while a shared,
   deferred Three/R3F chunk supplies both the liquid plane and feather field.
 - Hero parallax and masthead SplitText now have one React/GSAP owner; the old
