@@ -1,4 +1,7 @@
 import { getExperienceLighting } from '../../lib/descent-choreography'
+import { getViewportEntryRange } from '../../lib/atlas-motion/scroll-trigger-range'
+
+import { getAtlasEngine, type AtlasEngine } from './engine'
 
 type ObserverFactory = (
   callback: IntersectionObserverCallback,
@@ -16,9 +19,67 @@ function setDossierState(dossier: HTMLElement, expanded: boolean) {
   else panel.setAttribute('aria-hidden', 'true')
 }
 
-export function setupDossiers(root: Document = document): () => void {
+export function setupDossiers(
+  root: Document = document,
+  engine: AtlasEngine | null = getAtlasEngine(),
+): () => void {
   const cleanups: Array<() => void> = []
+  const animations: Array<{ kill: () => void }> = []
+  const splits: Array<{ revert: () => void }> = []
+  const triggers: Array<{ kill: () => void }> = []
   const enhanced = root.documentElement.classList.contains('atlas-js')
+  const entries = Array.from(root.querySelectorAll<HTMLElement>('.flight-entry'))
+  const runtimeWindow = root.defaultView ?? window
+
+  if (engine) {
+    entries.forEach((entry) => {
+      const rule = entry.querySelector<SVGLineElement>('[data-flight-rule]')
+      const index = entry.querySelector<HTMLElement>('.flight-index')
+      if (!rule || !index) return
+
+      const split = engine.plugins.SplitText.create(index, { aria: 'auto', type: 'chars' })
+      splits.push(split)
+      engine.gsap.set(rule, { drawSVG: '0%' })
+      engine.gsap.set(split.chars, { opacity: 0, rotationX: -80, yPercent: 105 })
+      const measureStart = () => getViewportEntryRange({
+        elementTop: entry.getBoundingClientRect().top + runtimeWindow.scrollY,
+        endViewportRatio: 0.78,
+        startViewportRatio: 0.8,
+        viewportHeight: runtimeWindow.innerHeight,
+      }).start
+      triggers.push(engine.ScrollTrigger.create({
+        trigger: entry,
+        start: measureStart,
+        once: true,
+        onEnter: () => {
+          animations.push(engine.gsap.fromTo(
+            rule,
+            { drawSVG: '0%' },
+            { drawSVG: '100%', duration: 0.62, ease: 'power2.out' },
+          ))
+        },
+      }))
+      triggers.push(engine.ScrollTrigger.create({
+        trigger: index,
+        start: measureStart,
+        once: true,
+        onEnter: () => {
+          animations.push(engine.gsap.fromTo(
+            split.chars,
+            { opacity: 0, rotationX: -80, yPercent: 105 },
+            {
+              duration: 0.46,
+              ease: 'power3.out',
+              opacity: 1,
+              rotationX: 0,
+              stagger: 0.06,
+              yPercent: 0,
+            },
+          ))
+        },
+      }))
+    })
+  }
 
   root.querySelectorAll<HTMLElement>('[data-dossier]').forEach((dossier) => {
     const toggle = dossier.querySelector<HTMLButtonElement>('.flight-dossier__toggle')
@@ -26,28 +87,41 @@ export function setupDossiers(root: Document = document): () => void {
 
     setDossierState(dossier, !enhanced)
     dossier.dataset.dossierReady = ''
-    dossier.dataset.dossierAnimate = ''
+    let flipAnimation: { kill: () => void } | null = null
 
     const handleClick = () => {
-      setDossierState(dossier, toggle.getAttribute('aria-expanded') !== 'true')
-    }
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleClick()
+      const expanded = toggle.getAttribute('aria-expanded') !== 'true'
+      if (!engine) {
+        setDossierState(dossier, expanded)
+        return
+      }
+
+      const state = engine.plugins.Flip.getState(entries)
+      setDossierState(dossier, expanded)
+      flipAnimation?.kill()
+      flipAnimation = engine.plugins.Flip.from(state, {
+        absolute: false,
+        duration: 0.48,
+        ease: 'power3.inOut',
+        nested: true,
+        onComplete: () => engine.ScrollTrigger.refresh(),
+      })
+      animations.push(flipAnimation)
     }
     toggle.addEventListener('click', handleClick)
-    toggle.addEventListener('keydown', handleKeyDown)
     cleanups.push(() => {
       toggle.removeEventListener('click', handleClick)
-      toggle.removeEventListener('keydown', handleKeyDown)
       delete dossier.dataset.dossierReady
-      delete dossier.dataset.dossierAnimate
       setDossierState(dossier, true)
     })
   })
 
-  return () => cleanups.forEach((cleanup) => cleanup())
+  return () => {
+    cleanups.forEach((cleanup) => cleanup())
+    triggers.forEach((trigger) => trigger.kill())
+    animations.forEach((animation) => animation.kill())
+    splits.forEach((split) => split.revert())
+  }
 }
 
 export function setupExperienceChapter(

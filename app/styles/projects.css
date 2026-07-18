@@ -449,7 +449,6 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transform: translate3d(var(--atlas-magnet-x, 0), var(--atlas-magnet-y, 0), 0);
   transition:
     background-color 180ms var(--ease-out),
     color 180ms var(--ease-out);
@@ -632,13 +631,17 @@ html.atlas-js .chapter-wipe__layer {
 @keyframes atlas-project-panel-rise {
   from {
     opacity: 0.18;
-    transform: translate3d(0, var(--project-panel-entry-y), 0);
+    transform: translate3d(0, var(--project-panel-entry-y), 0)
+      skewY(calc(var(--atlas-plate-skew, 0) * 1deg))
+      scale(var(--atlas-plate-scale, 1));
     clip-path: inset(14% 0 0 round clamp(1rem, 1.8vw, 1.6rem));
   }
 
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0)
+      skewY(calc(var(--atlas-plate-skew, 0) * 1deg))
+      scale(var(--atlas-plate-scale, 1));
     clip-path: inset(0 round clamp(1rem, 1.8vw, 1.6rem));
   }
 }

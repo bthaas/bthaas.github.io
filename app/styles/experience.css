@@ -134,20 +134,32 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
-.flight-entry::after {
+.flight-rule {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
+  width: 100%;
   height: 1px;
-  background: rgb(255 253 245 / 25%);
-  content: "";
-  transform-origin: left;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.flight-rule line {
+  stroke: rgb(255 253 245 / 25%);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
 
 .flight-index {
+  overflow: hidden;
   grid-column: 1 / span 1;
   color: var(--coral);
+  perspective: 400px;
+}
+
+.flight-index > .char {
+  display: inline-block;
 }
 
 .flight-heading {
@@ -286,24 +298,6 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .flight-dossier[data-dossier-animate] .flight-dossier__panel {
-    transition: grid-template-rows 360ms var(--ease-out);
-  }
-
-  html.atlas-js.atlas-reveal-ready .flight-entry::after {
-    transform: scaleX(0);
-    transition: transform 520ms var(--ease-out) var(--atlas-reveal-delay, 0ms);
-  }
-
-  html.atlas-js.atlas-reveal-ready .flight-index {
-    opacity: 0;
-    transform: translateY(85%) rotateX(-78deg);
-    transform-origin: bottom;
-    transition:
-      opacity 420ms var(--ease-out) calc(var(--atlas-reveal-delay, 0ms) + 100ms),
-      transform 420ms var(--ease-out) calc(var(--atlas-reveal-delay, 0ms) + 100ms);
-  }
-
   html.atlas-js.atlas-reveal-ready .flight-heading,
   html.atlas-js.atlas-reveal-ready .flight-summary,
   html.atlas-js.atlas-reveal-ready .flight-period,
@@ -315,11 +309,6 @@
       transform 520ms var(--ease-out) calc(var(--atlas-reveal-delay, 0ms) + 180ms);
   }
 
-  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed::after {
-    transform: scaleX(1);
-  }
-
-  html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-index,
   html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-heading,
   html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-summary,
   html.atlas-js.atlas-reveal-ready .flight-entry.is-revealed .flight-period,

@@ -7,6 +7,7 @@ import {
 
 import { setupContactFinale } from './contact'
 import { setupCursor } from './cursor'
+import type { AtlasEngine } from './engine'
 import { setupLocalTime } from './local-time'
 
 describe('Step 7 capability branches', () => {
@@ -69,13 +70,24 @@ describe('Step 7 capability branches', () => {
 
   it('settles the cursor trail, resets its mode, and hides on pointer leave', () => {
     document.body.innerHTML = '<span id="plain">Plain</span>'
-    const frames: FrameRequestCallback[] = []
-    const requestFrame = vi.fn((callback: FrameRequestCallback) => {
-      frames.push(callback)
-      return frames.length
+    const quickTargets: Array<{
+      property: string
+      setter: ReturnType<typeof vi.fn> & { tween?: { kill: () => void } }
+    }> = []
+    const quickTo = vi.fn((_target: unknown, property: string) => {
+      const setter = vi.fn() as ReturnType<typeof vi.fn> & { tween?: { kill: () => void } }
+      setter.tween = { kill: vi.fn() }
+      quickTargets.push({ property, setter })
+      return setter
     })
-    const cancelFrame = vi.fn()
-    const cleanup = setupCursor(document, () => true, requestFrame, cancelFrame)
+    const engine = {
+      gsap: {
+        quickSetter: vi.fn(() => vi.fn()),
+        quickTo,
+        set: vi.fn(),
+      },
+    } as unknown as AtlasEngine
+    const cleanup = setupCursor(document, () => true, engine)
     const plain = document.getElementById('plain')!
     const cursor = document.querySelector<HTMLElement>('[data-atlas-cursor]')!
 
@@ -84,18 +96,13 @@ describe('Step 7 capability branches', () => {
       clientX: 120,
       clientY: 80,
     }))
-    for (let index = 0; index < 60 && frames.length > 0; index += 1) {
-      frames.shift()?.(index)
-    }
-
     expect(cursor).toHaveClass('is-visible')
     expect(cursor).toHaveAttribute('data-cursor-mode', 'default')
-    expect(
-      Number.parseFloat(cursor.style.getPropertyValue('--atlas-cursor-ring-x')),
-    ).toBeGreaterThan(119.8)
+    expect(quickTargets.find(({ property }) => property === 'x')?.setter).toHaveBeenCalledWith(120)
+    expect(quickTargets.find(({ property }) => property === 'y')?.setter).toHaveBeenCalledWith(80)
     document.documentElement.dispatchEvent(new Event('pointerleave'))
     expect(cursor).not.toHaveClass('is-visible')
     cleanup()
-    expect(cancelFrame).toHaveBeenCalled()
+    expect(quickTargets.every(({ setter }) => setter.tween?.kill)).toBe(true)
   })
 })
