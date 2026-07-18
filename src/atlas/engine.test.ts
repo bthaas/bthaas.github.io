@@ -88,6 +88,7 @@ describe('Atlas motion engine', () => {
 
     expect(engine).not.toBeNull()
     expect(getAtlasEngine()).toBe(engine)
+    expect(engine?.plugins.SplitText).toBe(mocks.splitText)
     expect(mocks.registerPlugin).toHaveBeenCalledWith(
       mocks.scrollTrigger,
       mocks.splitText,

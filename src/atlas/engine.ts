@@ -15,6 +15,13 @@ export interface AtlasEngine {
   readonly gsap: typeof gsap
   readonly isCoarsePointer: boolean
   readonly lenis: Lenis
+  readonly plugins: {
+    readonly DrawSVGPlugin: typeof DrawSVGPlugin
+    readonly Flip: typeof Flip
+    readonly MotionPathPlugin: typeof MotionPathPlugin
+    readonly ScrambleTextPlugin: typeof ScrambleTextPlugin
+    readonly SplitText: typeof SplitText
+  }
 }
 
 interface AtlasEngineOptions {
@@ -62,6 +69,13 @@ export function initializeAtlasEngine({
     gsap,
     isCoarsePointer,
     lenis,
+    plugins: {
+      DrawSVGPlugin,
+      Flip,
+      MotionPathPlugin,
+      ScrambleTextPlugin,
+      SplitText,
+    },
     destroy: () => {
       if (!isActive) return
       isActive = false

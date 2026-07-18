@@ -1,26 +1,10 @@
-import {
-  getEntranceTimeline,
-  getHeroExitProgress,
-  getHeroParallax,
-} from '../../lib/atlas-motion/hero-choreography'
+import { formatCountUpFrame } from '../../lib/atlas-motion/count-up'
 
-import { countUp, type CountUpOptions } from './count-up'
-import { splitText } from './split-text'
+import { getAtlasEngine, type AtlasEngine } from './engine'
 
 const ENTRANCE_STORAGE_KEY = 'atlas-entered'
-const METRIC_DURATION_MS = 900
-const SOURCE_STAGGER_MS = 70
 
 type EntranceStorage = Pick<Storage, 'getItem' | 'setItem'>
-type MetricAnimator = (
-  element: HTMLElement,
-  target: string,
-  options?: CountUpOptions,
-) => () => void
-type ObserverFactory = (
-  callback: IntersectionObserverCallback,
-  options: IntersectionObserverInit,
-) => IntersectionObserver
 
 function readEntered(storage: EntranceStorage): boolean {
   try {
@@ -41,130 +25,153 @@ function rememberEntrance(storage: EntranceStorage): void {
 export function setupEntrance(
   root: Document = document,
   storage: EntranceStorage = sessionStorage,
+  engine: AtlasEngine | null = getAtlasEngine(),
 ): () => void {
   const html = root.documentElement
-  if (readEntered(storage)) {
+  if (readEntered(storage) || !engine) {
     html.classList.add('atlas-entered')
     return () => undefined
   }
 
   const masthead = root.querySelector<HTMLElement>('[data-atlas-masthead]')
-  if (masthead) splitText(masthead, 'character')
-  const characterCount = masthead?.querySelectorAll('.atlas-split-token').length ?? 0
-  const timeline = getEntranceTimeline(characterCount)
+  if (!masthead) {
+    html.classList.add('atlas-entered')
+    return () => undefined
+  }
 
-  html.style.setProperty('--atlas-entrance-plate-duration', `${timeline.plate.durationMs}ms`)
-  html.style.setProperty('--atlas-entrance-grain-delay', `${timeline.grain.startMs}ms`)
-  html.style.setProperty('--atlas-entrance-grain-duration', `${timeline.grain.durationMs}ms`)
-  html.style.setProperty('--atlas-entrance-masthead-start', `${timeline.mastheadStartMs}ms`)
-  html.style.setProperty('--atlas-entrance-character-duration', `${timeline.characterDurationMs}ms`)
-  html.style.setProperty('--atlas-entrance-character-stagger', `${timeline.characterStaggerMs}ms`)
-  html.style.setProperty('--atlas-entrance-chrome-start', `${timeline.chrome.startMs}ms`)
-  html.style.setProperty('--atlas-entrance-chrome-duration', `${timeline.chrome.durationMs}ms`)
+  const split = engine.plugins.SplitText.create(masthead, {
+    aria: 'auto',
+    mask: 'lines',
+    type: 'chars',
+  })
+  const heroArt = root.querySelector<HTMLElement>('.hero-art')
+  const chrome = Array.from(root.querySelectorAll<HTMLElement>('.site-nav, .hero-meta'))
   html.classList.remove('atlas-entered')
   html.classList.add('atlas-entering')
   rememberEntrance(storage)
 
-  const timer = window.setTimeout(() => {
-    html.classList.remove('atlas-entering')
-    html.classList.add('atlas-entered')
-  }, timeline.totalMs)
+  const timeline = engine.gsap.timeline({
+    onComplete: () => {
+      html.classList.remove('atlas-entering')
+      html.classList.add('atlas-entered')
+    },
+  })
+  if (heroArt) {
+    timeline.fromTo(
+      heroArt,
+      { clipPath: 'inset(0 100% 0 0)' },
+      { clipPath: 'inset(0 0% 0 0)', duration: 0.46, ease: 'power3.out' },
+      0,
+    )
+  }
+  timeline.fromTo(
+    split.chars,
+    { opacity: 0, yPercent: 110 },
+    { duration: 0.36, ease: 'power3.out', opacity: 1, stagger: 0.06, yPercent: 0 },
+    0.36,
+  )
+  if (chrome.length > 0) {
+    timeline.fromTo(
+      chrome,
+      { opacity: 0, y: 8 },
+      { duration: 0.38, ease: 'power2.out', opacity: 1, stagger: 0.05, y: 0 },
+      0.62,
+    )
+  }
 
   return () => {
-    window.clearTimeout(timer)
+    timeline.kill()
+    split.revert()
     html.classList.remove('atlas-entering')
   }
 }
 
 export function setupMetricCountUps(
   root: Document = document,
-  createObserver: ObserverFactory | undefined =
-    typeof IntersectionObserver === 'undefined'
-      ? undefined
-      : (callback, options) => new IntersectionObserver(callback, options),
-  animate: MetricAnimator = countUp,
+  engine: AtlasEngine | null = getAtlasEngine(),
 ): () => void {
   const strip = root.querySelector<HTMLElement>('.signal-strip')
   const metrics = Array.from(root.querySelectorAll<HTMLElement>('[data-atlas-count]'))
-  if (!strip || metrics.length === 0 || !createObserver) return () => undefined
+  if (!strip || metrics.length === 0 || !engine) return () => undefined
 
   strip.dataset.atlasCountReady = ''
-  strip.querySelectorAll<HTMLElement>('small').forEach((source, index) => {
-    source.style.setProperty('--atlas-source-delay', `${index * SOURCE_STAGGER_MS}ms`)
+  const sources = Array.from(strip.querySelectorAll<HTMLElement>('small'))
+  engine.gsap.set(sources, { opacity: 0, y: 5 })
+  const tweens: Array<{ kill: () => void }> = []
+  let completed = 0
+  const trigger = engine.ScrollTrigger.create({
+    trigger: strip,
+    start: 'top 72%',
+    once: true,
+    onEnter: () => {
+      strip.classList.add('is-counting')
+      metrics.forEach((metric) => {
+        const target = metric.textContent?.trim() ?? ''
+        const counter = { progress: 0 }
+        engine.gsap.set(metric, { filter: 'blur(0.75px)' })
+        const tween = engine.gsap.to(counter, {
+          duration: 0.9,
+          ease: 'power2.out',
+          progress: 1,
+          snap: { progress: 1 / 30 },
+          onUpdate: () => {
+            metric.textContent = formatCountUpFrame(target, counter.progress)
+          },
+          onComplete: () => {
+            metric.textContent = target
+            tweens.push(engine.gsap.to(metric, {
+              duration: 0.08,
+              ease: 'power1.out',
+              filter: 'blur(0px)',
+            }))
+            completed += 1
+            if (completed !== metrics.length) return
+            strip.classList.remove('is-counting')
+            strip.classList.add('is-counted')
+            tweens.push(engine.gsap.to(sources, {
+              duration: 0.32,
+              ease: 'power2.out',
+              opacity: 1,
+              stagger: 0.07,
+              y: 0,
+            }))
+          },
+        })
+        tweens.push(tween)
+      })
+    },
   })
 
-  let completionTimer = 0
-  let cancelAnimations: Array<() => void> = []
-  const observer = createObserver(
-    (entries) => {
-      const entry = entries.find(({ target }) => target === strip)
-      if (!entry?.isIntersecting) return
-
-      observer.unobserve(strip)
-      strip.classList.add('is-counting')
-      cancelAnimations = metrics.map((metric) => {
-        const target = metric.textContent?.trim() ?? ''
-        return animate(metric, target, { durationMs: METRIC_DURATION_MS, steps: 30 })
-      })
-      completionTimer = window.setTimeout(() => {
-        strip.classList.remove('is-counting')
-        strip.classList.add('is-counted')
-      }, METRIC_DURATION_MS)
-    },
-    { rootMargin: '0px 0px -6% 0px', threshold: 0.28 },
-  )
-
-  observer.observe(strip)
   return () => {
-    observer.disconnect()
-    window.clearTimeout(completionTimer)
-    cancelAnimations.forEach((cancel) => cancel())
+    trigger.kill()
+    tweens.forEach((tween) => tween.kill())
   }
 }
 
 export function setupHeroParallax(
   root: Document = document,
-  runtimeWindow: Window = window,
-  supportsScrollDriven = typeof CSS !== 'undefined' && CSS.supports('animation-timeline: view()'),
+  _runtimeWindow: Window = window,
+  engine: AtlasEngine | null = getAtlasEngine(),
 ): () => void {
   const hero = root.querySelector<HTMLElement>('.hero-art')
-  if (!hero || supportsScrollDriven) return () => undefined
+  const picture = hero?.querySelector<HTMLElement>('.atlas-picture--hero')
+  const image = picture?.querySelector<HTMLImageElement>('img')
+  const caption = hero?.querySelector<HTMLElement>('.art-caption')
+  if (!hero || !picture || !image || !caption || !engine) return () => undefined
 
-  let elementHeight = 0
-  let elementTop = 0
-  const measure = () => {
-    const bounds = hero.getBoundingClientRect()
-    elementHeight = bounds.height
-    elementTop = bounds.top + runtimeWindow.scrollY
-  }
-  const render = (scrollY: number) => {
-    const progress = getHeroExitProgress({ elementHeight, elementTop, scrollY })
-    const frame = getHeroParallax(progress)
-    hero.style.setProperty('--atlas-hero-image-y', `${frame.imageTranslatePercent}%`)
-    hero.style.setProperty('--atlas-hero-caption-y', `${frame.captionTranslateVh}vh`)
-    hero.style.setProperty('--atlas-hero-scale', String(frame.plateScale))
-  }
-  const handleScroll = (event: Event) => {
-    const { detail } = event as CustomEvent<{ scrollY?: number }>
-    render(detail?.scrollY ?? runtimeWindow.scrollY)
-  }
-  const handleResize = () => {
-    measure()
-    render(runtimeWindow.scrollY)
-  }
-
-  root.documentElement.classList.add('atlas-hero-fallback')
-  measure()
-  render(runtimeWindow.scrollY)
-  runtimeWindow.addEventListener('atlas:scroll', handleScroll)
-  runtimeWindow.addEventListener('resize', handleResize, { passive: true })
+  const timeline = engine.gsap.timeline({
+    scrollTrigger: {
+      trigger: hero,
+      start: 'top top+=58',
+      end: 'bottom top',
+      scrub: 0.65,
+    },
+  })
+  timeline.fromTo(picture, { scale: 1.05 }, { ease: 'none', scale: 1 }, 0)
+  timeline.fromTo(image, { yPercent: 0 }, { ease: 'none', yPercent: 10.7 }, 0)
+  timeline.fromTo(caption, { y: '0vh' }, { ease: 'none', y: '-2.5vh' }, 0)
 
   return () => {
-    runtimeWindow.removeEventListener('atlas:scroll', handleScroll)
-    runtimeWindow.removeEventListener('resize', handleResize)
-    root.documentElement.classList.remove('atlas-hero-fallback')
-    hero.style.removeProperty('--atlas-hero-image-y')
-    hero.style.removeProperty('--atlas-hero-caption-y')
-    hero.style.removeProperty('--atlas-hero-scale')
+    timeline.kill()
   }
 }
