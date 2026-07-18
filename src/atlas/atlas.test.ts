@@ -5,6 +5,7 @@ import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
 import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
+import type { AtlasEngine } from './engine'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupExperienceChapter } from './experience'
 import { setupLocalTime } from './local-time'
@@ -569,6 +570,7 @@ describe('atlas DOM capabilities', () => {
 
   it('does no enhancement work when reduced motion is requested', () => {
     const createBus = vi.fn()
+    const createEngine = vi.fn()
     const prepareEntrance = vi.fn()
     const prepareHero = vi.fn()
     const prepareCraft = vi.fn()
@@ -591,6 +593,7 @@ describe('atlas DOM capabilities', () => {
 
     const cleanup = initializeAtlas({
       createBus,
+      createEngine,
       document,
       matchMedia,
       prepareEntrance,
@@ -614,6 +617,7 @@ describe('atlas DOM capabilities', () => {
     expect(document.documentElement).not.toHaveClass('atlas-js')
     expect(document.documentElement).not.toHaveAttribute('data-atlas')
     expect(createBus).not.toHaveBeenCalled()
+    expect(createEngine).not.toHaveBeenCalled()
     expect(prepareEntrance).not.toHaveBeenCalled()
     expect(prepareHero).not.toHaveBeenCalled()
     expect(prepareCraft).not.toHaveBeenCalled()
@@ -639,6 +643,9 @@ describe('atlas DOM capabilities', () => {
     let subscriber: ((snapshot: ScrollSnapshot) => void) | undefined
     const unsubscribe = vi.fn()
     const destroyBus = vi.fn()
+    const destroyEngine = vi.fn()
+    const engine = { destroy: destroyEngine } as unknown as AtlasEngine
+    const createEngine = vi.fn(() => engine)
     const cleanupReveals = vi.fn()
     const cleanupEntrance = vi.fn()
     const cleanupHero = vi.fn()
@@ -665,6 +672,7 @@ describe('atlas DOM capabilities', () => {
 
     const destroy = initializeAtlas({
       createBus,
+      createEngine,
       document,
       matchMedia: () => ({ matches: false }),
       prepareEntrance: () => cleanupEntrance,
@@ -690,6 +698,7 @@ describe('atlas DOM capabilities', () => {
 
     expect(document.documentElement).toHaveClass('atlas-js')
     expect(document.documentElement).toHaveAttribute('data-atlas', 'ready')
+    expect(createBus).toHaveBeenCalledWith(engine)
     expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'atlas:scroll' }))
     expect(unsubscribe).toHaveBeenCalledOnce()
     expect(cleanupEntrance).toHaveBeenCalledOnce()
@@ -708,6 +717,7 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupWayfinding).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()
     expect(destroyBus).toHaveBeenCalledOnce()
+    expect(destroyEngine).toHaveBeenCalledOnce()
   })
 
   it('reveals direct and staggered targets through one observer', () => {
@@ -761,7 +771,7 @@ describe('atlas DOM capabilities', () => {
     expect(cleanup()).toBeUndefined()
   })
 
-  it('publishes one bounded snapshot per queued scroll frame', () => {
+  it('publishes bounded snapshots from the shared ScrollTrigger', () => {
     Object.defineProperties(document.documentElement, {
       scrollHeight: { configurable: true, value: 3000 },
     })
@@ -769,29 +779,35 @@ describe('atlas DOM capabilities', () => {
       innerHeight: { configurable: true, value: 1000 },
       scrollY: { configurable: true, value: 1000 },
     })
-    const callbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => {
-      callbacks.push(callback)
-      return callbacks.length
-    }))
-    const cancelFrame = vi.fn()
-    vi.stubGlobal('cancelAnimationFrame', cancelFrame)
-    const listenerSpy = vi.spyOn(window, 'addEventListener')
+    let onUpdate: (() => void) | undefined
+    const kill = vi.fn()
+    const create = vi.fn((options: { onUpdate: () => void }) => {
+      onUpdate = options.onUpdate
+      return { kill }
+    })
+    const engine = {
+      ScrollTrigger: { create },
+      lenis: { scroll: 1000 },
+    }
     const subscriber = vi.fn()
 
-    const bus = createScrollBus()
+    const bus = createScrollBus({
+      document,
+      engine: engine as never,
+      window,
+    })
     const unsubscribe = bus.subscribe(subscriber)
-    window.dispatchEvent(new Event('scroll'))
-    expect(callbacks).toHaveLength(1)
-    callbacks[0](0)
-    window.dispatchEvent(new Event('scroll'))
-    callbacks[1](16)
+    onUpdate?.()
     unsubscribe()
     bus.destroy()
 
-    expect(listenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function), { passive: true })
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({
+      end: 'max',
+      start: 0,
+      trigger: document.documentElement,
+    }))
     expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.5, scrollY: 1000 })
-    expect(cancelFrame).toHaveBeenCalledWith(2)
+    expect(kill).toHaveBeenCalledOnce()
   })
 
   it('does not split the same element twice', () => {

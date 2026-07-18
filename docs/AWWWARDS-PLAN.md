@@ -66,8 +66,18 @@ scroll progress and active-section indicator.
 
 ## 4. Architecture decision: motion stack
 
-**Recommendation: no framework runtime, no GSAP, no Lenis. CSS scroll-driven
-animations first, plus one hand-authored vanilla module (~8–10 KB gz).**
+> **Superseded — July 17, 2026.** The owner-approved **“GSAP + ScrollTrigger +
+> Lenis Motion System Upgrade” brief** supersedes this section's original
+> no-GSAP/no-Lenis recommendation. The shipped CSS/vanilla phase remains the
+> static and reduced-motion baseline, while `gsap`, the approved GSAP plugins,
+> ScrollTrigger, and Lenis now form the progressive-enhancement motion core in
+> `atlas.js`. The static export still ships no React runtime, Lenis is driven by
+> the GSAP ticker with native touch behavior, and the global reduced-motion
+> kill switch remains authoritative.
+
+**Historical recommendation (completed and shipped): no framework runtime, no
+GSAP, no Lenis. CSS scroll-driven animations first, plus one hand-authored
+vanilla module (~8–10 KB gz).**
 
 Rationale:
 
@@ -185,15 +195,17 @@ feature/motion checks — never a prerequisite for content.
 ## 6. Performance & accessibility budget (release gates)
 
 - LCP ≤ 1.8 s (hero AVIF already preloaded), CLS ≤ 0.02, INP ≤ 200 ms.
-- Total JS ≤ 12 KB gz (`atlas.js` only). No layout thrash: transforms/opacity/
-  clip-path only; all scrub work compositor-side or rAF-batched.
+- Total JS ≤ 100 KiB gz (`atlas.js` only through Phase B/C6; the separately
+  budgeted, lazy contact-finale bundle is governed by its own Phase C7 gate).
+  No layout thrash: transforms/opacity/clip-path/filter/custom properties only;
+  all scrub work compositor-side or GSAP-ticker-batched.
 - 60 fps desktop / stable mobile; no effect may block first paint.
 - `prefers-reduced-motion`: every effect above degrades to the current static
   site (the existing global kill switch stays the source of truth).
 - Keyboard: all new interactive elements (expanders, toggles) fully operable,
   visible focus, correct ARIA; cursor/marquee/parallax are decoration only.
-- Firefox/no-support path: static layout identical to today (scroll-driven CSS
-  simply doesn't run) + IO-based reveals from atlas.js still work.
+- Firefox receives the full ScrollTrigger choreography. Unsupported-JS and
+  no-JS paths retain the current static layout.
 - Tests: pure choreography math in `lib/*` unit-tested (existing pattern);
   media contract tests stay green; add DOM tests for expander ARIA states.
 
