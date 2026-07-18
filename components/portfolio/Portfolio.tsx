@@ -189,7 +189,11 @@ export function Portfolio() {
             />
           ))}
           <div className="experience-board">
-            <div className="experience-plate experience-plate--inset frame-reveal" data-reveal>
+            <div
+              className="experience-plate experience-plate--inset frame-reveal"
+              data-atlas-plate-sheen
+              data-reveal
+            >
               <AtlasPicture
                 visual={atlasVisuals.experience}
                 alt="A rising coastal city and lighthouse at dusk"
@@ -295,7 +299,11 @@ export function Portfolio() {
           data-wipe-direction="ltr"
         >
           <div className="craft-board">
-            <div className="craft-plate craft-plate--inset" data-atlas-velocity-plate>
+            <div
+              className="craft-plate craft-plate--inset"
+              data-atlas-plate-sheen
+              data-atlas-velocity-plate
+            >
               <AtlasPicture
                 visual={atlasVisuals.craft}
                 alt="A cliffside workshop with sculptural wings"
@@ -352,7 +360,7 @@ export function Portfolio() {
           data-contact-finale
         >
           <div className="contact-board">
-            <div className="contact-plate contact-plate--inset">
+            <div className="contact-plate contact-plate--inset" data-atlas-plate-sheen>
               <AtlasPicture
                 visual={atlasVisuals.ending}
                 alt="A calm sunrise horizon between distant mountain ridges"
@@ -373,6 +381,16 @@ export function Portfolio() {
                   the systems that make them work.
                 </p>
                 <nav className="contact-links" aria-label="Contact links">
+                  <span
+                    className="contact-golden-feather"
+                    data-golden-feather-target
+                    aria-hidden="true"
+                  >
+                    <svg focusable="false" viewBox="0 0 24 64">
+                      <path d="M12 62C10 47 5 32 7 17 8 9 12 3 18 2c2 15-2 29-12 39" />
+                      <path d="M12 62c0-18 1-34 5-51M10 24l7-7M9 33l7-6M10 42l4-3" />
+                    </svg>
+                  </span>
                   <a
                     className="contact-link"
                     href={`mailto:${contact.email}`}

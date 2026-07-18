@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import NotFound from './not-found'
 
 describe('not found page', () => {
-  it('renders a themed static atlas recovery page', () => {
+  it('renders a themed atlas recovery page with decorative glitch and feather layers', () => {
     const { container } = render(<NotFound />)
 
     expect(screen.getByRole('heading', {
@@ -15,5 +15,6 @@ describe('not found page', () => {
       'aria-hidden',
       'true',
     )
+    expect(container.querySelector('[data-letter-glitch]')).toHaveAttribute('aria-hidden', 'true')
   })
 })

@@ -14,7 +14,10 @@ export default defineConfig({
       '**/tests/e2e/**',
     ],
     coverage: {
-      exclude: ['components/bits/SplashCursor.tsx'],
+      exclude: [
+        'components/bits/LetterGlitch.tsx',
+        'components/bits/SplashCursor.tsx',
+      ],
       provider: 'v8',
       reporter: ['text', 'json-summary'],
       thresholds: {

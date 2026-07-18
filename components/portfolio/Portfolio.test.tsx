@@ -42,7 +42,13 @@ describe('Portfolio', () => {
       expect.stringContaining('/icarus-atlas/hero-flight-768.avif 768w'),
     )
     expect(container.querySelector('.hero-art')).not.toHaveAttribute('data-atlas-velocity-plate')
-    expect(container.querySelector('.sun-badge__orbit')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.sun-badge__orbit .circular-text')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    )
+    expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
+      'Release the sun spectacle',
+    )
 
     const bands = Array.from(container.querySelectorAll<HTMLElement>('.kinetic-type-band'))
     expect(bands).toHaveLength(4)
@@ -291,9 +297,9 @@ describe('Portfolio', () => {
     )
     expect(github).toHaveAttribute('data-magnetic')
     expect(linkedin).toHaveAttribute('data-magnetic')
-    expect(contactLinks.querySelectorAll('svg')).toHaveLength(3)
+    expect(contactLinks.querySelectorAll('.contact-link svg')).toHaveLength(3)
     expect(
-      Array.from(contactLinks.querySelectorAll('svg')).every(
+      Array.from(contactLinks.querySelectorAll('.contact-link svg')).every(
         (icon) => icon.getAttribute('aria-hidden') === 'true',
       ),
     ).toBe(true)

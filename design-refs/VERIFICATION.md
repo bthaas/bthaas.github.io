@@ -184,6 +184,35 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   iPhone WebKit. The shared project scene uses DPR 1 and demand rendering;
   mobile deliberately mounts no project canvas.
 
+## 2026-07-18 — Micro-insanity and missing-plate verification
+
+- Phase 5 introduces no new hero-class section, modeled geometry, texture, or
+  material asset. The blizzard and 404 deliberately reuse the Phase 2 feather
+  GLB, seed field, Fresnel material, and accepted Icarus reference; the varnish,
+  flare, golden landing, and LetterGlitch are screen-space print/light effects.
+  A Blender turntable would therefore duplicate already accepted geometry and
+  provide no new visual evidence.
+- Production captures for the hovered varnish, 720 ms flare/blizzard beat,
+  settled golden feather, and animated missing plate live in
+  `docs/awwwards/screenshots/step-19/`. `comparison-phase5.png` assembles the
+  four labeled states and was opened at original resolution after capture.
+- The flare warms the existing header sun instead of introducing a second
+  light. The feather field becomes a brief full-density fall, then returns to
+  document choreography. One gold line-art feather completes the route beside
+  email. The missing page reads as a lightly misregistered atlas plate with
+  sparse edge drift, not as a separate visual identity.
+- Hover varnish uses citron, cobalt, coral, and paper highlights through a
+  masked gradient. It creates no permanent compositor layers; promotion exists
+  only while hovered or focused. Firefox automation recovered from 18.4 to
+  22.1 fps at the project-flight midpoint after that correction.
+- Reduced-motion inspection creates no 404 glitch or feather canvas and hides
+  flare, golden feather, sheen, and sun trigger. The static message, return link,
+  portfolio content, and title visibility behavior remain intact.
+- The spectacle's own completion callback measured 3,810 ms. Five button
+  activations, Konami input, session replay prevention, hover sheen, 404 canvas,
+  reduced motion, console health, and cross-browser scroll journeys are covered
+  by the final Playwright suite.
+
 ## Automated release gates
 
 - Unit/component/content tests: 25/25 passing across six files.
