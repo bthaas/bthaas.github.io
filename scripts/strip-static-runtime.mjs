@@ -7,23 +7,43 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
 const scriptPreloadPattern = /<link\b(?=[^>]*\brel="preload")(?=[^>]*\bas="script")[^>]*\/?>(?:<\/link>)?/gi
 const atlasScriptSourcePattern = /\bsrc=(['"])\/atlas\.js(?:\?v=[^'"]+)?\1/i
+const horizonScriptSourcePattern = /\bsrc=(['"])\/horizon\.js(?:\?v=[^'"]+)?\1/i
 const atlasBudgetBytes = 100 * 1024
+const horizonBudgetBytes = 220 * 1024
 
 export function getAtlasScriptSource(source) {
   const version = createHash('sha256').update(source).digest('hex').slice(0, 12)
   return `/atlas.js?v=${version}`
 }
 
+export function getHorizonScriptSource(source) {
+  const version = createHash('sha256').update(source).digest('hex').slice(0, 12)
+  return `/horizon.js?v=${version}`
+}
+
 const createAtlasScriptTag = (source) => `<script src="${source}" defer></script>`
 
-export function stripStaticRuntime(source, atlasScriptSource = '/atlas.js') {
+export function stripStaticRuntime(
+  source,
+  atlasScriptSource = '/atlas.js',
+  horizonScriptSource,
+) {
   let atlasScriptKept = false
+  let horizonScriptKept = false
   const stripped = source.replace(scriptPreloadPattern, '').replace(scriptPattern, (script) => {
     if (!atlasScriptKept && atlasScriptSourcePattern.test(script)) {
       atlasScriptKept = true
       return script.replace(
         atlasScriptSourcePattern,
         (_source, quote) => `src=${quote}${atlasScriptSource}${quote}`,
+      )
+    }
+    if (!horizonScriptKept && horizonScriptSourcePattern.test(script)) {
+      horizonScriptKept = true
+      if (!horizonScriptSource) return script
+      return script.replace(
+        horizonScriptSourcePattern,
+        (_source, quote) => `src=${quote}${horizonScriptSource}${quote}`,
       )
     }
     return ''
@@ -43,6 +63,12 @@ export function assertAtlasBudget(gzipBytes) {
   }
 }
 
+export function assertHorizonBudget(gzipBytes) {
+  if (gzipBytes > horizonBudgetBytes) {
+    throw new Error(`horizon.js is ${gzipBytes} bytes gzip; the limit is 220 KiB`)
+  }
+}
+
 async function collectHtmlFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true })
   const files = []
@@ -56,32 +82,50 @@ async function collectHtmlFiles(directory) {
   return files
 }
 
-export async function processStaticExport(exportDirectory, atlasPath) {
+export async function processStaticExport(exportDirectory, atlasPath, horizonPath) {
   const atlasSource = await readFile(atlasPath)
+  const horizonSource = await readFile(horizonPath)
   const gzipBytes = gzipSync(atlasSource).byteLength
+  const horizonGzipBytes = gzipSync(horizonSource).byteLength
   const atlasScriptSource = getAtlasScriptSource(atlasSource)
+  const horizonScriptSource = getHorizonScriptSource(horizonSource)
   assertAtlasBudget(gzipBytes)
+  assertHorizonBudget(horizonGzipBytes)
 
   const htmlFiles = await collectHtmlFiles(exportDirectory)
   for (const file of htmlFiles) {
     const source = await readFile(file, 'utf8')
-    await writeFile(file, stripStaticRuntime(source, atlasScriptSource))
+    await writeFile(file, stripStaticRuntime(source, atlasScriptSource, horizonScriptSource))
   }
 
-  return { atlasScriptSource, gzipBytes, htmlFiles }
+  return {
+    atlasScriptSource,
+    gzipBytes,
+    horizonGzipBytes,
+    horizonScriptSource,
+    htmlFiles,
+  }
 }
 
 /* v8 ignore start -- the CLI wrapper is exercised by every production build. */
 async function main() {
   const exportDirectory = fileURLToPath(new URL('../out/', import.meta.url))
   const atlasPath = fileURLToPath(new URL('../public/atlas.js', import.meta.url))
-  const { atlasScriptSource, gzipBytes, htmlFiles } = await processStaticExport(
+  const horizonPath = fileURLToPath(new URL('../public/horizon.js', import.meta.url))
+  const {
+    atlasScriptSource,
+    gzipBytes,
+    horizonGzipBytes,
+    horizonScriptSource,
+    htmlFiles,
+  } = await processStaticExport(
     exportDirectory,
     atlasPath,
+    horizonPath,
   )
 
   console.log(
-    `Ensured ${atlasScriptSource} (${gzipBytes} bytes gzip) and removed the framework runtime from ${htmlFiles.length} static HTML files.`,
+    `Ensured ${atlasScriptSource} (${gzipBytes} bytes gzip) and lazy ${horizonScriptSource} (${horizonGzipBytes} bytes gzip); removed the framework runtime from ${htmlFiles.length} static HTML files.`,
   )
 }
 

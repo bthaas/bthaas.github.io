@@ -352,6 +352,7 @@ describe('atlas DOM capabilities', () => {
     const createEngine = vi.fn()
     const prepareEntrance = vi.fn()
     const prepareHero = vi.fn()
+    const prepareHorizon = vi.fn()
     const prepareCraft = vi.fn()
     const prepareContact = vi.fn()
     const prepareCursor = vi.fn()
@@ -381,6 +382,7 @@ describe('atlas DOM capabilities', () => {
       matchMedia,
       prepareEntrance,
       prepareHero,
+      prepareHorizon,
       prepareCraft,
       prepareContact,
       prepareCursor,
@@ -407,6 +409,7 @@ describe('atlas DOM capabilities', () => {
     expect(createEngine).not.toHaveBeenCalled()
     expect(prepareEntrance).not.toHaveBeenCalled()
     expect(prepareHero).not.toHaveBeenCalled()
+    expect(prepareHorizon).not.toHaveBeenCalled()
     expect(prepareCraft).not.toHaveBeenCalled()
     expect(prepareContact).not.toHaveBeenCalled()
     expect(prepareCursor).not.toHaveBeenCalled()
@@ -446,6 +449,7 @@ describe('atlas DOM capabilities', () => {
     const cleanupReveals = vi.fn()
     const cleanupEntrance = vi.fn()
     const cleanupHero = vi.fn()
+    const cleanupHorizon = vi.fn()
     const cleanupCraft = vi.fn()
     const cleanupContact = vi.fn()
     const cleanupCursor = vi.fn()
@@ -478,6 +482,7 @@ describe('atlas DOM capabilities', () => {
       matchMedia: () => ({ matches: false }),
       prepareEntrance: () => cleanupEntrance,
       prepareHero: () => cleanupHero,
+      prepareHorizon: () => cleanupHorizon,
       prepareCraft: () => cleanupCraft,
       prepareContact: () => cleanupContact,
       prepareCursor: () => cleanupCursor,
@@ -510,6 +515,7 @@ describe('atlas DOM capabilities', () => {
     expect(unsubscribe).toHaveBeenCalledOnce()
     expect(cleanupEntrance).toHaveBeenCalledOnce()
     expect(cleanupHero).toHaveBeenCalledOnce()
+    expect(cleanupHorizon).toHaveBeenCalledOnce()
     expect(cleanupCraft).toHaveBeenCalledOnce()
     expect(cleanupContact).toHaveBeenCalledOnce()
     expect(cleanupCursor).toHaveBeenCalledOnce()

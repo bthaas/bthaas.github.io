@@ -27,4 +27,12 @@ describe('GitHub Pages export', () => {
     expect(layout).toContain('strategy="afterInteractive"')
     expect(layout).not.toContain('<script src="/atlas.js"')
   })
+
+  it('builds the contact horizon as an independent lazy asset', () => {
+    const builder = readFileSync(resolve(process.cwd(), 'scripts/build-atlas.mjs'), 'utf8')
+
+    expect(builder).toContain("entryPoints: ['src/horizon/index.ts']")
+    expect(builder).toContain("outfile: 'public/horizon.js'")
+    expect(builder).toContain('__ATLAS_HORIZON_SOURCE__')
+  })
 })
