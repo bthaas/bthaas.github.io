@@ -1,4 +1,5 @@
 import { getDocumentProgress } from '../../lib/atlas-motion/progress'
+import { getAtlasEngine, type AtlasEngine } from './engine'
 
 export interface ScrollSnapshot {
   readonly documentProgress: number
@@ -12,43 +13,54 @@ export interface ScrollBus {
   readonly subscribe: (subscriber: ScrollSubscriber) => () => void
 }
 
-export function createScrollBus(): ScrollBus {
+interface ScrollBusOptions {
+  readonly document?: Document
+  readonly engine?: AtlasEngine | null
+  readonly window?: Window
+}
+
+export function createScrollBus({
+  document: runtimeDocument = document,
+  engine = getAtlasEngine(),
+  window: runtimeWindow = window,
+}: ScrollBusOptions = {}): ScrollBus {
   const subscribers = new Set<ScrollSubscriber>()
-  let animationFrame = 0
-  let isQueued = false
+
+  const readSnapshot = (): ScrollSnapshot => {
+    const scrollY = engine?.lenis.scroll ?? runtimeWindow.scrollY
+    return {
+      documentProgress: getDocumentProgress({
+        scrollHeight: runtimeDocument.documentElement.scrollHeight,
+        scrollY,
+        viewportHeight: runtimeWindow.innerHeight,
+      }),
+      scrollY,
+    }
+  }
 
   const publish = () => {
-    isQueued = false
     const snapshot = {
-      documentProgress: getDocumentProgress({
-        scrollHeight: document.documentElement.scrollHeight,
-        scrollY: window.scrollY,
-        viewportHeight: window.innerHeight,
-      }),
-      scrollY: window.scrollY,
+      ...readSnapshot(),
     }
     subscribers.forEach((subscriber) => subscriber(snapshot))
   }
 
-  const queuePublish = () => {
-    if (isQueued) return
-    isQueued = true
-    animationFrame = requestAnimationFrame(publish)
-  }
-
-  window.addEventListener('scroll', queuePublish, { passive: true })
-  window.addEventListener('resize', queuePublish, { passive: true })
-  queuePublish()
+  const trigger = engine?.ScrollTrigger.create({
+    end: 'max',
+    onRefresh: publish,
+    onUpdate: publish,
+    start: 0,
+    trigger: runtimeDocument.documentElement,
+  })
 
   return {
     destroy: () => {
-      window.removeEventListener('scroll', queuePublish)
-      window.removeEventListener('resize', queuePublish)
-      cancelAnimationFrame(animationFrame)
+      trigger?.kill()
       subscribers.clear()
     },
     subscribe: (subscriber) => {
       subscribers.add(subscriber)
+      subscriber(readSnapshot())
       return () => subscribers.delete(subscriber)
     },
   }

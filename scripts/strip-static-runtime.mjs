@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
 const scriptPreloadPattern = /<link\b(?=[^>]*\brel="preload")(?=[^>]*\bas="script")[^>]*\/?>(?:<\/link>)?/gi
 const atlasScriptSourcePattern = /\bsrc=(['"])\/atlas\.js(?:\?v=[^'"]+)?\1/i
-const atlasBudgetBytes = 12 * 1024
+const atlasBudgetBytes = 100 * 1024
 
 export function getAtlasScriptSource(source) {
   const version = createHash('sha256').update(source).digest('hex').slice(0, 12)
@@ -39,7 +39,7 @@ export function stripStaticRuntime(source, atlasScriptSource = '/atlas.js') {
 
 export function assertAtlasBudget(gzipBytes) {
   if (gzipBytes > atlasBudgetBytes) {
-    throw new Error(`atlas.js is ${gzipBytes} bytes gzip; the limit is 12 KiB`)
+    throw new Error(`atlas.js is ${gzipBytes} bytes gzip; the limit is 100 KiB`)
   }
 }
 

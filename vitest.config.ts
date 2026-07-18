@@ -8,6 +8,7 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/.git/**',
+      '**/.claude/worktrees/**',
       '**/.next/**',
       '**/out/**',
     ],

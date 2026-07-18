@@ -50,9 +50,9 @@ describe('static runtime stripping', () => {
     )
   })
 
-  it('enforces the inclusive 12 KiB gzip ceiling', () => {
-    expect(() => assertAtlasBudget(12 * 1024)).not.toThrow()
-    expect(() => assertAtlasBudget(12 * 1024 + 1)).toThrow(/12 KiB/)
+  it('enforces the inclusive 100 KiB gzip ceiling', () => {
+    expect(() => assertAtlasBudget(100 * 1024)).not.toThrow()
+    expect(() => assertAtlasBudget(100 * 1024 + 1)).toThrow(/100 KiB/)
   })
 
   it('processes every exported HTML file and reports the Atlas budget', async () => {

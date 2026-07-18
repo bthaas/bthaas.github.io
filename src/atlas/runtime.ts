@@ -2,6 +2,7 @@ import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
 import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
+import { initializeAtlasEngine, type AtlasEngine } from './engine'
 import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupLocalTime } from './local-time'
@@ -12,7 +13,8 @@ import { createScrollBus, type ScrollBus } from './scroll-bus'
 import { setupSectionWayfinding, setupSunArc } from './sun-arc'
 
 interface AtlasRuntimeOptions {
-  readonly createBus?: () => ScrollBus
+  readonly createBus?: (engine: AtlasEngine) => ScrollBus
+  readonly createEngine?: () => AtlasEngine | null
   readonly document?: Document
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
   readonly prepareEntrance?: (document: Document) => () => void
@@ -34,7 +36,8 @@ interface AtlasRuntimeOptions {
 }
 
 export function initializeAtlas({
-  createBus = createScrollBus,
+  createBus,
+  createEngine,
   document: runtimeDocument = document,
   matchMedia = (query) => window.matchMedia(query),
   prepareEntrance = setupEntrance,
@@ -65,6 +68,16 @@ export function initializeAtlas({
     }
   }
 
+  const engine = (createEngine ?? (() => initializeAtlasEngine({ matchMedia })))()
+  if (!engine) {
+    const cleanupDossiers = prepareDossiers(runtimeDocument)
+    return () => {
+      cleanupDossiers()
+      cleanupLocalTime()
+      cleanupWayfinding()
+    }
+  }
+
   const html = runtimeDocument.documentElement
   html.classList.add('atlas-js')
   html.dataset.atlas = 'ready'
@@ -81,7 +94,11 @@ export function initializeAtlas({
   const cleanupProjects = prepareProjects(runtimeDocument, runtimeWindow)
   const cleanupSun = prepareSun(runtimeDocument, runtimeWindow)
   const cleanupWipes = prepareWipes(runtimeDocument)
-  const scrollBus = createBus()
+  const scrollBus = (createBus ?? ((activeEngine) => createScrollBus({
+    document: runtimeDocument,
+    engine: activeEngine,
+    window: runtimeWindow,
+  })))(engine)
   const unsubscribe = scrollBus.subscribe((snapshot) => {
     runtimeWindow.dispatchEvent(new CustomEvent('atlas:scroll', { detail: snapshot }))
   })
@@ -108,6 +125,7 @@ export function initializeAtlas({
     cleanupWayfinding()
     cleanupReveals()
     scrollBus.destroy()
+    engine.destroy()
     runtimeWindow.removeEventListener('pagehide', destroy)
   }
 
