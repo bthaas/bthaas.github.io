@@ -1,8 +1,10 @@
 import { atlasVisuals } from '@/content/editorial-visuals'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
+import { FlightTiltSurface } from '@/components/motion/FlightTiltSurface'
 import { HeroMasthead } from '@/components/motion/HeroMasthead'
 import { KineticTypeBand } from '@/components/motion/KineticTypeBand'
 import { SunBadge } from '@/components/motion/SunBadge'
+import { ProjectsFlightPath } from '@/components/projects/ProjectsFlightPath'
 import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
 import {
   siteContent,
@@ -10,7 +12,6 @@ import {
 } from '@/content/site-content'
 
 import { AtlasPicture } from './AtlasPicture'
-import { projectVisualAlts } from './ProjectCaseStudy'
 import {
   getSkillLogos,
   SkillLogoGrid,
@@ -221,41 +222,45 @@ export function Portfolio() {
             >
               {experience.map((entry, index) => (
                 <li className="flight-entry" key={entry.id}>
-                  <FlightRule />
-                  <p className="flight-index" aria-hidden="true">
-                    {String(index + 1).padStart(2, '0')}
-                  </p>
-                  <div className="flight-heading">
-                    <h3>{entry.organization}</h3>
-                    <p className="flight-role">
-                      {entry.role}
-                      {entry.team ? ` · ${entry.team}` : ''}
+                  <FlightTiltSurface>
+                    <FlightRule />
+                    <p className="flight-index" aria-hidden="true">
+                      {String(index + 1).padStart(2, '0')}
                     </p>
-                  </div>
-                  <p className="flight-summary">{entry.summary}</p>
-                  <p className="flight-period">
-                    {entry.period}
-                    <span>{entry.location}</span>
-                  </p>
-                  <FlightDossier entry={entry} />
+                    <div className="flight-heading">
+                      <h3>{entry.organization}</h3>
+                      <p className="flight-role">
+                        {entry.role}
+                        {entry.team ? ` · ${entry.team}` : ''}
+                      </p>
+                    </div>
+                    <p className="flight-summary">{entry.summary}</p>
+                    <p className="flight-period">
+                      {entry.period}
+                      <span>{entry.location}</span>
+                    </p>
+                    <FlightDossier entry={entry} />
+                  </FlightTiltSurface>
                 </li>
               ))}
               {education.map((entry) => (
                 <li className="flight-entry flight-entry--education" key={entry.degree}>
-                  <FlightRule />
-                  <p className="flight-index" aria-hidden="true">04</p>
-                  <div className="flight-heading">
-                    <h3>{entry.institution}</h3>
-                    <p className="flight-role">{entry.degree}</p>
-                  </div>
-                  <p className="flight-summary flight-summary--education">
-                    <span>GPA: {entry.gpa}</span>
-                    <span>Relevant coursework: {entry.coursework.join(', ')}</span>
-                  </p>
-                  <p className="flight-period">
-                    {entry.graduation}
-                    <span>{entry.location}</span>
-                  </p>
+                  <FlightTiltSurface>
+                    <FlightRule />
+                    <p className="flight-index" aria-hidden="true">04</p>
+                    <div className="flight-heading">
+                      <h3>{entry.institution}</h3>
+                      <p className="flight-role">{entry.degree}</p>
+                    </div>
+                    <p className="flight-summary flight-summary--education">
+                      <span>GPA: {entry.gpa}</span>
+                      <span>Relevant coursework: {entry.coursework.join(', ')}</span>
+                    </p>
+                    <p className="flight-period">
+                      {entry.graduation}
+                      <span>{entry.location}</span>
+                    </p>
+                  </FlightTiltSurface>
                 </li>
               ))}
             </ol>
@@ -276,43 +281,7 @@ export function Portfolio() {
             </p>
           </div>
 
-          <nav
-            className="atlas-shell project-panel-list"
-            aria-label="Select a project"
-            data-project-panel-list
-            data-reveal-stagger
-          >
-            {projects.map((project, index) => (
-              <a
-                className={`project-panel project-panel--${index + 1}`}
-                href={`/projects/${project.id}`}
-                aria-label={`Open ${project.name} case study`}
-                data-testid="project-panel-trigger"
-                data-atlas-velocity-plate
-                data-cursor="read"
-                key={project.id}
-              >
-                <AtlasPicture
-                  visual={atlasVisuals.projects[project.visualKey]}
-                  alt={projectVisualAlts[project.visualKey]}
-                  className="atlas-picture project-panel__art"
-                  cursor="read"
-                  printReveal
-                  projectPan
-                  projectPanIndex={index}
-                  sizes="(max-width: 720px) 82vw, 32vw"
-                />
-                <span className="project-panel__shade" aria-hidden="true" />
-                <span className="project-panel__copy">
-                  <span className="project-panel__name">{project.name}</span>
-                  <span className="project-panel__description">{project.description}</span>
-                </span>
-                <span className="project-panel__action" aria-hidden="true">
-                  <span>↗</span>
-                </span>
-              </a>
-            ))}
-          </nav>
+          <ProjectsFlightPath projects={projects} />
 
         </section>
 

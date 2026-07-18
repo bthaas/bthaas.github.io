@@ -148,6 +148,42 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   E2E assertions for canvas readiness, velocity-driven type, scatter progress,
   top reversal, reduced motion, no-JS fallback, and application-console health.
 
+## 2026-07-18 — Horizontal flight path and print-dissolve verification
+
+- The three accepted 1200 px project plates and the pre-Phase-4 desktop grid are
+  curated in `frames/phase4-*` and were opened before choreography or component
+  work. This phase adds no modeled subject: each R3F object is a subdivided flat
+  carrier for an accepted AVIF, so Blender/GLB/turntable work would add no visual
+  evidence and is explicitly inapplicable in `ANALYSIS.md`.
+- The accepted start, midpoint, mobile flow, 50% dot-screen dissolve, and dossier
+  tilt captures live in `docs/awwwards/screenshots/step-18/`.
+  `comparison-phase4.png` places all three source plates, the old grid, and those
+  five final states together. The same inspected montage is the current
+  `comparison.png` required by the section pipeline.
+- The lateral composition preserves the landmarks documented in analysis: both
+  Court Vision hoops and gold arc, Beat Stream's near ribbons and bell tower,
+  and Vision Bias's observatory/fork. Rounded shader corners align with the DOM
+  plate radius, copy stays above the decorative canvas, and one dominant plate
+  plus the next edge remains visible throughout the pin.
+- The remaining intentional crop difference is the desktop card ratio. The
+  source paintings are wider or taller than the common 72vw×72svh flight plate,
+  so each uses the previously accepted cover focus rather than squeezing the
+  art. The required narrative landmarks remain visible at every stop.
+- The gallery has one ScrollTrigger pin and no wheel/touch listener. Keyboard
+  focus and `#project-*` hashes translate to normal document scroll, while
+  mobile, reduced motion, no WebGL, and no JavaScript retain complete unpinned
+  reading order. Chromium, Firefox, desktop WebKit, and iPhone WebKit pass the
+  same anchor, focus, overflow, mask, and application-console assertions.
+- The chapter midpoint reports a 4.5 px dot radius and 6 px grid offset, then
+  completes at 9 px / 0 px. Standard and WebKit radial masks give browser parity
+  without a rectangular edge. Flight-log tilt is bounded to 6° on its dedicated
+  inner surface, so Atlas's Flip dossier state remains unchanged.
+- Page-level final automation is 29.6/25.6/22.2/24.9/21.7 fps on Chromium
+  SwiftShader, 61.0/54.0/21.8/25.3/34.0 on Firefox Apple GPU,
+  61.6/61.2/60.1/60.0/59.5 on desktop WebKit, and approximately 60 throughout
+  iPhone WebKit. The shared project scene uses DPR 1 and demand rendering;
+  mobile deliberately mounts no project canvas.
+
 ## Automated release gates
 
 - Unit/component/content tests: 25/25 passing across six files.

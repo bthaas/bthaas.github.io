@@ -566,3 +566,102 @@ Verified source files:
   existing sun glyph. It is decorative, tiny uppercase, slow at rest, and speeds
   on hover. Atlas continues to own the existing sun path/group; React owns only
   the new circular text element.
+
+# 2026-07-18 — Horizontal Flight Path and Print Dissolves
+
+Phase 4 converts the accepted three-card Projects board into a desktop pinned
+lateral passage. It keeps the same three project images, names, evidence, order,
+links, cream paper, and cobalt/citron/dusk palette. The motion is the flight-path
+beat: vertical descent becomes a left-to-right traverse across three printed
+field-study plates. Mobile retains the existing vertical reading order and adds
+only a restrained velocity bend.
+
+This phase introduces no modeled subject or new visual asset. Its WebGL objects
+are subdivided rectangles carrying the already accepted AVIF textures, sharing
+the Phase 3 image-plane shader family. Blender geometry, GLB export, turntables,
+Draco validation, and named animation nodes therefore do not apply; exporting a
+flat rectangle would add no ground truth and would make the required DOM image
+fallback less direct.
+
+Verified and inspected sources:
+
+- `frames/phase4-project-courtvision.webp` — 1200×848 Court Vision plate;
+- `frames/phase4-project-beatstream.webp` — 1200×686 Beat Stream plate;
+- `frames/phase4-project-vision-bias-steering.webp` — 1200×916 Vision Bias
+  Steering plate;
+- `frames/phase4-projects-grid-before.jpg` — accepted pre-Phase-4 desktop card
+  layout and crop reference.
+
+## Plate composition and crop targets
+
+- Court Vision is a level, slightly elevated 35–42° establishing view. The sea
+  horizon sits near 43% height, the court ellipse fills the lower third, and the
+  gold trajectory arcs bridge the center. The desktop flight card may use a
+  shallow cover crop, but both hoops, the court center, and at least one complete
+  gold arc must remain visible.
+- Beat Stream is the strongest lateral composition: warm and blue signal ribbons
+  enter from the lower-left and converge toward the coastal horizon at about 55%
+  x / 42% y. Preserve the near ribbons and the right-hand bell tower so the
+  gallery's travel direction stays legible.
+- Vision Bias is nearly axial. The round labyrinth occupies the lower 68%, its
+  observatory is centered, and two light paths diverge upward. Preserve the full
+  fork, observatory dome, and enough of the circular boundary to read the choice
+  metaphor; lateral bend may not make the split appear to choose one side.
+- Desktop cards target about 68–74vw by 68–74svh with 5–7vw gaps. One plate is
+  dominant at a time while the next edge remains visible as an invitation to
+  travel. The first and last cards receive enough track padding to align their
+  readable image-and-copy centers within the viewport.
+- Mobile cards remain full-width in normal flow. Their original aspect ratios
+  and accepted `object-fit: cover` crops remain the fallback and accessibility
+  source. No canvas may replace or remove the semantic project link.
+
+## Light, color, and shader response
+
+- The textures already contain their narrative light: Court Vision's warm gold
+  arcs over cobalt, Beat Stream's coral/citron ribbons, and Vision Bias's paired
+  gold/cool beams. The shader only refracts those pixels; it adds no highlight,
+  bloom, color split, or second light source.
+- Travel velocity produces a shallow horizontal bow and skew, capped at 5° and
+  below 0.008 UV displacement. The leading edge may compress while the trailing
+  edge relaxes, like a large paper plate flexing in flight. It must settle flat
+  within roughly 450 ms after scrolling stops.
+- A 40×28-or-denser plane gives the curve enough segments without increasing
+  draw calls. All three plates share one R3F canvas, one material program, and
+  three texture-backed meshes; uniforms and measurement arrays are reused.
+- The canvas is decorative, `aria-hidden`, and pointer-transparent. DOM images
+  stay rendered underneath and are hidden only after textures and the first
+  WebGL frame are ready. Reduced motion, no-WebGL, loading, and failure states
+  show the complete static gallery.
+
+## Horizontal choreography and navigation
+
+- Desktop vertical progress maps linearly to track travel. The pinned distance
+  equals measured overflow, with no synthetic wheel handler and no nested
+  scroller. Lenis and native wheel/touch input therefore remain authoritative.
+- Giant serif numerals `01`, `02`, and `03` sit behind their matching plates at
+  8% ink opacity and move at a slower parallax rate. They duplicate existing case
+  indices and are hidden from assistive technology.
+- Each project panel is a real focusable link with a stable fragment id. Focusing
+  an offscreen panel or targeting its fragment scrolls the normal document to
+  the corresponding pinned progress; Enter still opens the case study. The
+  section's `#projects` anchor lands at the beginning of the flight path.
+- Desktop transforms belong only to the React flight-path component. The legacy
+  Atlas project pan, print reveal, and velocity-plate owners no longer target
+  homepage project panels. Project-detail artwork retains those Atlas effects.
+- Mobile has no pin and no horizontal track transform. Pointer/touch scrolling
+  remains normal vertical flow; the card image may receive only the bounded
+  velocity skew. Reduced motion removes pinning, transforms, and canvases.
+
+## Halftone dissolve and flight-log tilt
+
+- Chapter color prints in through a 12px dot-screen grid. Circular mask dots grow
+  from zero to overlap while the grid drifts no more than one cell in the wipe
+  direction. There is no rectangular curtain edge. Both unprefixed and WebKit
+  mask declarations provide Chromium, Firefox, and Safari parity.
+- The dissolve layer remains decorative and behind chapter content. Scrubbing is
+  reversible; reduced motion leaves the chapter in its final readable color with
+  no generated layer.
+- Flight-log hover tilt behaves like a held dossier: pointer position maps to at
+  most 6° on either axis, with a short damped return. The transform belongs to a
+  dedicated inner surface so Atlas's rule drawing, SplitText index entrance, and
+  Flip dossier expansion keep their existing owners and geometry.

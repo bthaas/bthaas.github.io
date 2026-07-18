@@ -115,14 +115,22 @@ describe('GSAP Atlas choreography', () => {
     })
     expect(harness.timelines[0].fromTo).toHaveBeenCalledWith(
       layers[0],
-      { clipPath: 'inset(0 100% 0 0)' },
-      expect.objectContaining({ clipPath: 'inset(0 0% 0 0)', ease: 'none' }),
+      { '--chapter-dot-radius': '0px', '--chapter-dot-x': '12px' },
+      expect.objectContaining({
+        '--chapter-dot-radius': '9px',
+        '--chapter-dot-x': '0px',
+        ease: 'none',
+      }),
       0,
     )
     expect(harness.timelines[1].fromTo).toHaveBeenCalledWith(
       layers[1],
-      { clipPath: 'inset(0 0 0 100%)' },
-      expect.objectContaining({ clipPath: 'inset(0 0 0 0%)', ease: 'none' }),
+      { '--chapter-dot-radius': '0px', '--chapter-dot-x': '-12px' },
+      expect.objectContaining({
+        '--chapter-dot-radius': '9px',
+        '--chapter-dot-x': '0px',
+        ease: 'none',
+      }),
       0,
     )
     cleanup()

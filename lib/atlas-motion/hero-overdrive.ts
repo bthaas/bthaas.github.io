@@ -23,23 +23,33 @@ export interface KineticBandFrame {
 const clamp = (value: number, minimum: number, maximum: number) =>
   Math.min(Math.max(value, minimum), maximum)
 
-const round = (value: number) => Number(value.toFixed(3))
+const round = (value: number) => Math.round(value * 1000) / 1000
 
-export function getTextureCoverScale(sourceAspect: number, viewportAspect: number): AxisScale {
+export function getTextureCoverScale(
+  sourceAspect: number,
+  viewportAspect: number,
+  target: AxisScale = { x: 1, y: 1 },
+): AxisScale {
   if (viewportAspect > sourceAspect) {
-    return { x: 1, y: round(sourceAspect / viewportAspect) }
+    target.x = 1
+    target.y = round(sourceAspect / viewportAspect)
+    return target
   }
 
-  return { x: round(viewportAspect / sourceAspect), y: 1 }
+  target.x = round(viewportAspect / sourceAspect)
+  target.y = 1
+  return target
 }
 
-export function getHeroLiquidFrame(velocity: number): HeroLiquidFrame {
+export function getHeroLiquidFrame(
+  velocity: number,
+  target: HeroLiquidFrame = { bulge: 0, uvShift: 0 },
+): HeroLiquidFrame {
   const displacement = round(clamp(velocity / 120, -1, 1) * 0.006)
 
-  return {
-    bulge: displacement,
-    uvShift: displacement,
-  }
+  target.bulge = displacement
+  target.uvShift = displacement
+  return target
 }
 
 function seededOffset(index: number) {

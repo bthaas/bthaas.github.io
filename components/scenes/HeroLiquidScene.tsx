@@ -9,6 +9,11 @@ import {
   getTextureCoverScale,
 } from '@/lib/atlas-motion/hero-overdrive'
 
+import {
+  liquidPlaneFragmentShader,
+  liquidPlaneVertexShader,
+} from './liquid-plane-shader'
+
 interface HeroLiquidSceneProps {
   readonly active: boolean
   readonly isConstrained: boolean
@@ -19,50 +24,6 @@ interface ScrollDetail {
   readonly velocity?: number
 }
 
-const vertexShader = /* glsl */ `
-  varying vec2 vUv;
-  uniform float uBulge;
-  uniform float uPointerStrength;
-  uniform float uTime;
-  uniform vec2 uPointer;
-
-  void main() {
-    vUv = uv;
-    float pointerDistance = distance(uv, uPointer);
-    float ripple = sin(pointerDistance * 28.0 - uTime * 2.8)
-      * exp(-pointerDistance * 8.5)
-      * uPointerStrength;
-    float centerLift = sin(uv.x * 3.14159265) * sin(uv.y * 3.14159265);
-    vec3 transformed = position;
-    transformed.z += ripple * 0.018 + centerLift * uBulge * 2.4;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
-  }
-`
-
-const fragmentShader = /* glsl */ `
-  varying vec2 vUv;
-  uniform float uPointerStrength;
-  uniform float uTime;
-  uniform float uUvShift;
-  uniform sampler2D uTexture;
-  uniform vec2 uCover;
-  uniform vec2 uPointer;
-
-  void main() {
-    vec2 uv = (vUv - 0.5) * uCover + 0.5;
-    float pointerDistance = distance(vUv, uPointer);
-    float ring = sin(pointerDistance * 30.0 - uTime * 2.8)
-      * exp(-pointerDistance * 8.0)
-      * uPointerStrength
-      * 0.009;
-    vec2 direction = normalize(vUv - uPointer + vec2(0.0001));
-    uv += direction * ring;
-    uv.x += uUvShift * (0.5 - abs(vUv.y - 0.5));
-    vec4 color = texture2D(uTexture, uv);
-    gl_FragColor = color;
-  }
-`
-
 function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' | 'onReady'>) {
   const materialRef = useRef<THREE.ShaderMaterial>(null)
   const texture = useLoader(THREE.TextureLoader, '/icarus-atlas/hero-flight-1600.avif')
@@ -72,12 +33,16 @@ function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' 
   const pointerCurrent = useMemo(() => new THREE.Vector2(0.5, 0.5), [])
   const pointerInside = useRef(false)
   const interactionUntil = useRef(0)
+  const liquidFrame = useMemo(() => ({ bulge: 0, uvShift: 0 }), [])
   const cover = useMemo(() => new THREE.Vector2(1, 1), [])
   const uniforms = useMemo(() => ({
+    uAspect: { value: 1 },
     uBulge: { value: 0 },
+    uCornerRadius: { value: 0 },
     uCover: { value: cover },
     uPointer: { value: pointerCurrent },
     uPointerStrength: { value: 0 },
+    uSkew: { value: 0 },
     uTexture: { value: texture },
     uTime: { value: 0 },
     uUvShift: { value: 0 },
@@ -94,6 +59,11 @@ function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' 
   useEffect(() => {
     invalidate()
   }, [active, invalidate])
+
+  useEffect(() => {
+    getTextureCoverScale(1600 / 1130, viewport.width / viewport.height, cover)
+    invalidate()
+  }, [cover, invalidate, viewport.height, viewport.width])
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -125,9 +95,8 @@ function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' 
   useFrame(({ clock }, delta) => {
     const material = materialRef.current
     if (!material) return
-    const frame = getHeroLiquidFrame(velocityRef.current)
-    const coverFrame = getTextureCoverScale(1600 / 1130, viewport.width / viewport.height)
-    cover.set(coverFrame.x, coverFrame.y)
+    const frame = getHeroLiquidFrame(velocityRef.current, liquidFrame)
+    material.uniforms.uAspect.value = viewport.width / viewport.height
     pointerCurrent.lerp(pointerTarget, 1 - Math.exp(-8 * delta))
     material.uniforms.uTime.value = clock.elapsedTime
     material.uniforms.uBulge.value = THREE.MathUtils.damp(
@@ -161,9 +130,10 @@ function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' 
       <planeGeometry args={[1, 1, 48, 32]} />
       <shaderMaterial
         ref={materialRef}
-        fragmentShader={fragmentShader}
+        fragmentShader={liquidPlaneFragmentShader}
+        transparent
         uniforms={uniforms}
-        vertexShader={vertexShader}
+        vertexShader={liquidPlaneVertexShader}
       />
     </mesh>
   )

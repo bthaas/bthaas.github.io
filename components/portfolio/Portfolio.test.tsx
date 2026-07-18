@@ -241,18 +241,18 @@ describe('Portfolio', () => {
     expect(screen.queryByRole('link', { name: /repository/i })).not.toBeInTheDocument()
   })
 
-  it('marks project panels for staggered reveals and scroll-linked image pans', () => {
+  it('gives React sole ownership of the project flight-path wrappers', () => {
     render(<Portfolio />)
 
     const panelList = screen.getByRole('navigation', { name: 'Select a project' })
     const panels = screen.getAllByTestId('project-panel-trigger')
 
-    expect(panelList).toHaveAttribute('data-reveal-stagger')
+    expect(panelList).toHaveAttribute('data-project-flight-track')
     panels.forEach((panel, index) => {
-      expect(panel.querySelector('[data-project-pan]')).toHaveAttribute(
-        'data-project-pan-index',
-        String(index),
-      )
+      expect(panel).toHaveAttribute('id', `project-${siteContent.projects[index].id}`)
+      expect(panel).not.toHaveAttribute('data-atlas-velocity-plate')
+      expect(panel.querySelector('[data-project-pan]')).not.toBeInTheDocument()
+      expect(panel.querySelector('[data-atlas-print-plate]')).not.toBeInTheDocument()
     })
   })
 
