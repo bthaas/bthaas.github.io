@@ -107,6 +107,30 @@ describe('GSAP Atlas choreography', () => {
     expect(harness.splitCreate).toHaveBeenCalledOnce()
   })
 
+  it('waits for the preloader curtain before releasing the masthead entrance', () => {
+    document.body.innerHTML = `
+      <nav class="site-nav"></nav>
+      <div class="hero-meta"></div>
+      <h1 data-atlas-masthead>Brett Haas</h1>
+    `
+    document.documentElement.classList.add('atlas-preloader-active')
+    const harness = createMotionHarness()
+    const chars = Array.from({ length: 9 }, () => document.createElement('span'))
+    harness.splitCreate.mockReturnValue({ chars, revert: vi.fn() })
+    const storage = { getItem: () => null, setItem: vi.fn() }
+
+    const cleanup = setupEntrance(document, storage, harness.engine)
+
+    expect(harness.splitCreate).not.toHaveBeenCalled()
+    window.dispatchEvent(new CustomEvent('atlas:preloader-complete'))
+    expect(harness.splitCreate).toHaveBeenCalledOnce()
+    expect(harness.timelines).toHaveLength(1)
+
+    cleanup()
+    window.dispatchEvent(new CustomEvent('atlas:preloader-complete'))
+    expect(harness.splitCreate).toHaveBeenCalledOnce()
+  })
+
   it('scrubs hero overscan, settle, and caption drift in one timeline', () => {
     document.body.innerHTML = `
       <div class="hero-art">

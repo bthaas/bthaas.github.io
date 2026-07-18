@@ -1,8 +1,10 @@
 import { atlasVisuals } from '@/content/editorial-visuals'
+import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import {
   siteContent,
   type ExperienceEntry,
 } from '@/content/site-content'
+
 import { AtlasPicture } from './AtlasPicture'
 import { projectVisualAlts } from './ProjectCaseStudy'
 import {
@@ -114,6 +116,7 @@ export function Portfolio() {
 
   return (
     <>
+      <AtlasMotionEffects />
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>

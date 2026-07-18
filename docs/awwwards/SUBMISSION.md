@@ -4,6 +4,11 @@
 
 All submission captures are PNG at exactly 1600 × 1200.
 
+Phase 1 verification adds 1600 × 1000 working captures for the DrawSVG entrance
+and the active citron/dusk ink trail in
+[step 15](./screenshots/step-15/); the four final submission frames remain the
+Phase 0 set until the complete maximalist sequence is assembled in Phase 6.
+
 | Frame | File | Purpose |
 | --- | --- | --- |
 | 01 | [Hero](./submission/01-hero-1600x1200.png) | Establishes the sunlit atlas, responsive hero plate, masthead, and editorial grid. |
@@ -15,7 +20,7 @@ All submission captures are PNG at exactly 1600 × 1200.
 
 | Time | Direction | Voiceover / caption |
 | --- | --- | --- |
-| 0–7 s | Hold on the hero, then begin a deliberate scroll. | “An editorial atlas for engineering, applied AI, and product craft.” |
+| 0–7 s | Hold through the fast wing/sun draw and curtain lift, move the pointer once through the ink, then begin a deliberate scroll. | “An editorial atlas for engineering, applied AI, and product craft.” |
 | 7–16 s | Let the masthead release, metrics count, and sun begin its route. | “Verified outcomes lead; motion gives the evidence pace and direction.” |
 | 16–25 s | Enter Experience, open the first Field notes dossier, then close it. | “The flight log expands from concise experience into keyboard-accessible technical detail.” |
 | 25–34 s | Move through Projects and hold as a plate comes off the halftone press. | “Each case study keeps its full narrative in the page while the plates behave like living print.” |
@@ -33,8 +38,10 @@ applied AI, and product craft. A travelling sun connects five chapters while
 monumental serif typography, cinematic Mediterranean plates, page-turn wipes,
 expandable flight logs, and print-inspired reveals turn a concise résumé into a
 paced story. GSAP, ScrollTrigger, and Lenis make the motion fluid across
-modern browsers; a tiny, separately loaded canvas flock completes the Icarus
-arc at contact. Every project remains readable without JavaScript, every dossier
+modern browsers; a fast drawn-glyph curtain opens the flight and a lazy fluid
+cursor bleeds citron and dusk ink into the paper before a tiny, separately
+loaded canvas flock completes the Icarus arc at contact. Every project remains
+readable without JavaScript, every dossier
 works from the keyboard, and reduced-motion visitors receive the complete static
 composition. The result pairs measurable engineering outcomes with a calm,
 optimistic visual identity.
@@ -78,7 +85,8 @@ and frame pacing.
 ## Technical notes
 
 - Next.js 16 static export with normal React 19 hydration and TypeScript.
-- First-load JavaScript is 269,999 bytes gzip, including the 83,144-byte lazy-on-load `/atlas.js`, below the 450 KiB soft ceiling.
+- Phase 1 first-load JavaScript after the lazy cursor mount is 268,732 bytes gzip, including a 5,685-byte fluid chunk and 83,209-byte `/atlas.js`.
+- Phase 1 Lighthouse Performance is 100 with 1.40 s LCP, 0.00018 CLS, and 7 ms TBT.
 - `/horizon.js` is 1,456 bytes gzip and is injected only near Contact on fine-pointer desktop visits.
 - GSAP 3.15 powers ScrollTrigger, SplitText, ScrambleText, Flip, DrawSVG, and MotionPath; Lenis 1.3.25 is synchronized through the GSAP ticker.
 - Native touch is preserved, while programmatic, keyboard, and anchor scrolling synchronize the same progress bus.
