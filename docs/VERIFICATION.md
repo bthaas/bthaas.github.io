@@ -1,5 +1,60 @@
 # Awwwards portfolio verification
 
+Verified on 2026-07-18 from `codex/phase-3-hero-kinetic-type`. Phase 3 turns
+the accepted hero plate into an interaction-driven liquid WebGL surface, moves
+masthead ownership from Atlas DOM code to React/GSAP, and introduces four
+full-bleed kinetic chapter bands plus the travelling circular sun label.
+
+## Phase 3 hero and kinetic-type gates
+
+| Gate | Result |
+| --- | --- |
+| `npm run verify` | Passed: 38 files / 157 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 90.61% statements, 81.53% branches, 82.22% functions, 94.02% lines |
+| `npm run test:e2e` | Passed: 15 journeys and 9 intentional project skips across Chromium, Firefox, desktop WebKit, and iPhone WebKit |
+| Hero fallback | The responsive `<picture>` remains server-rendered, preloaded, and `fetchpriority="high"`; no-JS, reduced-motion, and failed-WebGL paths never require the canvas |
+| Animation ownership | React exclusively owns hero parallax and masthead SplitText/scatter; the corresponding Atlas setup functions and runtime hooks were deleted in the same change |
+| Reduced motion | No hero, feather, fluid, or horizon canvas mounts; type and sun decoration remain static and the complete editorial document is readable |
+
+The liquid plane reuses the accepted hero AVIF and exact 16:8.7 / 4:4.5 layout
+box. Pointer rings are bounded to 0.009 UV displacement; Lenis velocity is
+bounded to 0.006 UV shift/bulge. The plane renders on demand while pointer or
+scroll energy is present, sleeps glass-flat at idle, and unmounts after the hero
+leaves its observer margin. The 9 masthead characters scatter deterministically
+to at most 18 degrees and return to identity transforms and full opacity at the
+top. `FLIGHT LOG`, `FIELD STUDIES`, `SKILLS`, and `NEXT HORIZON` are duplicate,
+`aria-hidden` outline bands using the vendored React Bits ScrollVelocity pattern.
+
+The two R3F experiences import one shared deferred scene module. Production
+JavaScript is 243,463 bytes gzip for the initial Next chunks and 326,246 bytes
+including the lazy Atlas runtime, 124,554 bytes below the 450 KiB soft ceiling
+before WebGL mounts. The shared Three/R3F/scene line is 259,069 bytes gzip and
+the fluid chunk is 5,774 bytes, producing 591,089 bytes after every showpiece
+has mounted. This is 54,317 bytes above Phase 2's already documented post-mount
+exception, but avoids the 236 KB duplicate Three runtime emitted by separate
+dynamic boundaries. `/horizon.js` remains an independent 1,501-byte gzip finale.
+
+Local production paint instrumentation confirms the preloaded hero AVIF remains
+the LCP element: desktop LCP 456 ms / CLS 0.00011 and mobile LCP 304 ms / CLS
+0.00025. These local values are regression checks rather than throttled
+Lighthouse replacements; the Phase 1 throttled 1.40 s mobile gate remains the
+release baseline.
+
+Final page-level frame pacing through 0/25/50/75/100% scroll:
+
+| Project | Renderer / tier | 0% | 25% | 50% | 75% | 100% |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Chromium desktop automation | SwiftShader, software WebGL | 28.3 | 20.6 | 21.9 | 24.1 | 18.4 |
+| Firefox desktop automation | Apple GPU | 54.5 | 38.5 | 23.4 | 37.9 | 29.9 |
+| WebKit desktop automation | Apple GPU | 60.0 | 59.8 | 60.0 | 60.5 | 59.4 |
+| WebKit iPhone automation | Apple GPU, mobile-40 | 60.0 | 59.9 | 59.9 | 60.0 | 60.0 |
+
+The software tier uses 40 feathers/DPR 1, a 32 px fluid solve with a 128 px dye
+buffer, and a 12-bird/DPR 1 finale. Fluid and liquid loops sleep after input;
+the hardware WebKit tiers remain at display rate. Phase 3 captures are in
+`docs/awwwards/screenshots/step-17/`; the inspected reference/load/scatter/band
+montage is `design-refs/comparison.png`.
+
 Verified on 2026-07-18 from `codex/phase-2-feather-fall`. This pass adds the
 fixed R3F feather narrative to the hydrated export while retaining the Phase 1
 entrance, React Bits fluid cursor, GSAP + ScrollTrigger + Lenis choreography,

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { setupChapterWipes } from './chapter-wipe'
 import { setupCraftChapter } from './craft'
 import type { AtlasEngine } from './engine'
-import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
+import { setupMetricCountUps } from './hero'
 import { setupSunArc, SUN_PROGRESS_EVENT } from './sun-arc'
 
 interface RecordedTween {
@@ -59,122 +59,6 @@ describe('GSAP Atlas choreography', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
-  })
-
-  it('uses accessible masked SplitText characters for the once-per-session entrance', () => {
-    document.body.innerHTML = `
-      <nav class="site-nav"></nav>
-      <div class="hero-meta"></div>
-      <div class="hero-art"></div>
-      <h1 data-atlas-masthead>Brett Haas</h1>
-    `
-    const harness = createMotionHarness()
-    const chars = Array.from({ length: 9 }, () => document.createElement('span'))
-    const revert = vi.fn()
-    harness.splitCreate.mockReturnValue({ chars, revert })
-    const values = new Map<string, string>()
-    const storage = {
-      getItem: (key: string) => values.get(key) ?? null,
-      setItem: (key: string, value: string) => values.set(key, value),
-    }
-
-    const cleanup = setupEntrance(document, storage, harness.engine)
-    const entrance = harness.timelines[0]
-    const entranceFromTo = entrance.fromTo as ReturnType<typeof vi.fn>
-
-    expect(harness.splitCreate).toHaveBeenCalledWith(
-      document.querySelector('[data-atlas-masthead]'),
-      expect.objectContaining({ aria: 'auto', mask: 'lines', type: 'chars' }),
-    )
-    expect(entrance.fromTo).toHaveBeenCalledWith(
-      chars,
-      expect.objectContaining({ opacity: 0, yPercent: 110 }),
-      expect.objectContaining({ duration: 0.36, opacity: 1, stagger: 0.06, yPercent: 0 }),
-      0.36,
-    )
-    expect(entranceFromTo.mock.calls.some(
-      (call: unknown[]) => call[0] === document.querySelector('.hero-art'),
-    )).toBe(false)
-    expect(values.get('atlas-entered')).toBe('1')
-
-    ;(entrance.vars as { onComplete: () => void }).onComplete()
-    expect(document.documentElement).toHaveClass('atlas-entered')
-    cleanup()
-    expect(entrance.kill).toHaveBeenCalledOnce()
-    expect(revert).toHaveBeenCalledOnce()
-
-    setupEntrance(document, storage, harness.engine)
-    expect(harness.splitCreate).toHaveBeenCalledOnce()
-  })
-
-  it('waits for the preloader curtain before releasing the masthead entrance', () => {
-    document.body.innerHTML = `
-      <nav class="site-nav"></nav>
-      <div class="hero-meta"></div>
-      <h1 data-atlas-masthead>Brett Haas</h1>
-    `
-    document.documentElement.classList.add('atlas-preloader-active')
-    const harness = createMotionHarness()
-    const chars = Array.from({ length: 9 }, () => document.createElement('span'))
-    harness.splitCreate.mockReturnValue({ chars, revert: vi.fn() })
-    const storage = { getItem: () => null, setItem: vi.fn() }
-
-    const cleanup = setupEntrance(document, storage, harness.engine)
-
-    expect(harness.splitCreate).not.toHaveBeenCalled()
-    window.dispatchEvent(new CustomEvent('atlas:preloader-complete'))
-    expect(harness.splitCreate).toHaveBeenCalledOnce()
-    expect(harness.timelines).toHaveLength(1)
-
-    cleanup()
-    window.dispatchEvent(new CustomEvent('atlas:preloader-complete'))
-    expect(harness.splitCreate).toHaveBeenCalledOnce()
-  })
-
-  it('scrubs hero overscan, settle, and caption drift in one timeline', () => {
-    document.body.innerHTML = `
-      <div class="hero-art">
-        <picture class="atlas-picture--hero"><img /></picture>
-        <p class="art-caption"></p>
-      </div>
-    `
-    const harness = createMotionHarness()
-    const hero = document.querySelector('.hero-art')
-    const picture = document.querySelector('.atlas-picture--hero')
-    const image = document.querySelector('.atlas-picture--hero img')
-    const caption = document.querySelector('.art-caption')
-
-    const cleanup = setupHeroParallax(document, window, harness.engine)
-    const motion = harness.timelines[0]
-
-    expect(motion.vars).toMatchObject({
-      scrollTrigger: expect.objectContaining({
-        end: 'bottom top',
-        scrub: 0.65,
-        start: 'top top+=58',
-        trigger: hero,
-      }),
-    })
-    expect(motion.fromTo).toHaveBeenCalledWith(
-      picture,
-      { scale: 1.05 },
-      expect.objectContaining({ ease: 'none', scale: 1 }),
-      0,
-    )
-    expect(motion.fromTo).toHaveBeenCalledWith(
-      image,
-      { yPercent: 0 },
-      expect.objectContaining({ ease: 'none', yPercent: 10.7 }),
-      0,
-    )
-    expect(motion.fromTo).toHaveBeenCalledWith(
-      caption,
-      { y: '0vh' },
-      expect.objectContaining({ ease: 'none', y: '-2.5vh' }),
-      0,
-    )
-    cleanup()
-    expect(motion.kill).toHaveBeenCalledOnce()
   })
 
   it('counts rendered metrics with snap before settling ink and sources', () => {

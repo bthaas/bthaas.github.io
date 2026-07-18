@@ -15,4 +15,11 @@ describe('Atlas SplashCursor vendor', () => {
 
     expect(() => unmount()).not.toThrow()
   })
+
+  it('accepts the software-renderer tier without changing its decorative contract', () => {
+    const { container } = render(<SplashCursor constrained />)
+
+    expect(container.querySelector('[data-fluid-cursor]')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('[data-fluid-cursor-canvas]')).toBeInTheDocument()
+  })
 })

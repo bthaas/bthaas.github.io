@@ -480,3 +480,89 @@ as a 30-frame sequence. Stable Phase 2 ground truth is curated as:
 - Desktop targets 60 fps with 120 instance records; mobile targets stable 30 fps
   with 40. Matrices, colors, vectors, and dummy transforms are allocated once and
   reused. The scene is absent for reduced motion and no-WebGL clients.
+
+# 2026-07-18 — Liquid Hero and Kinetic Type Supersession
+
+Phase 3 keeps the accepted editorial hero artwork and layout exactly as shipped;
+the enhancement is a subdivided WebGL image plane that makes the existing light
+and sky feel glassy under pointer and scroll velocity. This phase introduces no
+new modeled subject or visual asset. The Blender/GLB build and turntable gates do
+not apply to a texture-backed plane: exporting the same rectangle as a GLB would
+add no visual ground truth and would conflict with the brief's required preloaded
+`<img>` fallback. The existing Phase 2 asset library and local Three/R3F runtime
+remain the shared 3D infrastructure.
+
+Verified source files:
+
+- `public/icarus-atlas/hero-flight-1600.webp` — WebP, 1600×1130, 98,138 bytes;
+- `public/icarus-atlas/hero-flight-1600.avif` — AV1 still, 1600×1130,
+  63,395 bytes;
+- `frames/phase3-hero-liquid-source.png` — stable full-art source frame;
+- `frames/phase3-hero-layout-desktop.png` — accepted 1600 px composition;
+- `frames/phase3-hero-layout-mobile.png` — accepted 390 px crop.
+
+## Composition, crop, and readable structure
+
+- Desktop retains the current 16:8.7 plate inside the 12-column shell. The city
+  fills the lower 44%, its sun sits at roughly 69% x / 45% y, and the upper blue
+  field preserves broad negative space. The shader may not shift the sun, central
+  tower, horizon, caption, or rounded plate boundary by more than a few pixels.
+- Mobile retains the 4:4.5 crop with `object-position: 55% center`; the sun/city
+  remain in the lower-right half and the left tower stays visible. The shader
+  plane must reproduce CSS `cover` cropping rather than squeeze the 1600×1130
+  source into the portrait viewport.
+- The existing `<picture>` remains the first-painted LCP element and visual
+  fallback. Canvas opacity rises only after the texture and first WebGL frame are
+  ready; no-JS, no-WebGL, loading, error, and reduced-motion states never hide it.
+- The art caption remains a DOM element above the canvas. The scene is decorative
+  and carries no accessible image role; the fallback image retains the original
+  descriptive alt text.
+
+## Light, color, and material response
+
+- The dominant source is the oversized solar disc behind the right-hand city.
+  Warm yellow-white spreads through nearby architecture while the upper/left sky
+  stays cobalt and powder blue. Displacement must refract the existing color; it
+  may not add a second highlight, new palette color, bloom, or chromatic split.
+- Pointer ripples behave like pressure on museum glass: one broad damped bulge
+  with two low-amplitude rings, a radius around 12–18% of plate width, and a peak
+  UV displacement below 0.009. The city remains readable at maximum input.
+- Scroll velocity adds a centered shallow bow and no more than 0.006 UV offset.
+  It decays toward a glass-flat plane within about 450 ms after scrolling stops.
+- Idle motion is nearly still: a sub-pixel low-frequency wave may keep reflected
+  light alive, but the painting must never resemble liquid lava or a flag.
+
+## Geometry, camera, and shader targets
+
+- Use one 48×32 subdivided plane sized to the actual hero layout box. An
+  orthographic R3F camera faces it squarely; there is no 3D environment, fog,
+  postprocessing, or additional draw call.
+- Vertex displacement supplies restrained z bulge for light response; fragment
+  UV displacement supplies the visible ripple. `uTextureCover` reproduces cover
+  scaling from source and viewport aspect. Uniform vectors and material are
+  allocated once and updated through refs.
+- Pointer position is normalized within the plate, spring-damped, and ignored on
+  coarse pointers. Leaving the plate returns the target to center/zero without a
+  snap. Existing Lenis velocity arrives through `atlas:scroll` and never causes a
+  React render.
+- The old Atlas picture/image/caption parallax transfers to the React hero
+  component in the same PR. Its scale 1.05→1, internal 0→10.7% travel, and caption
+  0→−2.5vh timing remain the baseline, now coordinated with shader velocity.
+
+## Masthead, bands, and sun-badge choreography
+
+- `Brett Haas` keeps its accessible DOM text and the existing once-per-session
+  masked character entrance. Ownership transfers from `src/atlas/hero.ts` to a
+  React component using `useGSAP`; Atlas removes both entrance and hero parallax.
+- Leaving Hero scatters the nine characters like shed feathers. Outer characters
+  travel farther than inner characters, alternating vertical direction and
+  rotating at most 18°. The final spread remains visually connected to the name,
+  and scrolling to the top restores every transform exactly.
+- Four 20vh outline-serif bands reuse only visible wayfinding phrases: `FLIGHT
+  LOG`, `FIELD STUDIES`, `SKILLS`, and `NEXT HORIZON`. They translate horizontally
+  at alternating base directions; Lenis velocity raises time scale and adds at
+  most 8° skew. Reduced motion leaves a quiet static outline band.
+- The circular header label reads `EX ALIS — BELLEVUE — 47.61° N —` around the
+  existing sun glyph. It is decorative, tiny uppercase, slow at rest, and speeds
+  on hover. Atlas continues to own the existing sun path/group; React owns only
+  the new circular text element.

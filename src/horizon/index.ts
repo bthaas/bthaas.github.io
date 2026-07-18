@@ -9,14 +9,17 @@ interface HorizonWindow extends Window {
   __atlasHorizon?: { destroy: () => void }
 }
 
-const BIRD_COUNT = 24
 const COLORS = ['57 49 82', '13 78 184'] as const
 const target = document.querySelector<HTMLElement>('[data-horizon-flock]')
+const constrained = Boolean(document.querySelector(
+  '[data-feather-tier="desktop-software-40"]',
+))
+const birdCount = constrained ? 12 : 24
 
 if (target) {
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d', { alpha: true })
-  let birds = createFlock(BIRD_COUNT, 73)
+  let birds = createFlock(birdCount, 73)
   let frame = 0
   let height = 1
   let width = 1
@@ -28,7 +31,7 @@ if (target) {
 
   const resize = () => {
     const bounds = target.getBoundingClientRect()
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+    const dpr = constrained ? 1 : Math.min(window.devicePixelRatio || 1, 1.5)
     width = Math.max(1, bounds.width)
     height = Math.max(1, bounds.height)
     canvas.width = Math.round(width * dpr)
@@ -58,7 +61,7 @@ if (target) {
     context.restore()
   }
   const render = (time: number) => {
-    const delta = getFlockFrameDelta(lastRenderTime, time)
+    const delta = getFlockFrameDelta(lastRenderTime, time, 120)
     if (isVisible && context && delta !== null) {
       lastRenderTime = time
       birds = stepFlock(birds, delta)

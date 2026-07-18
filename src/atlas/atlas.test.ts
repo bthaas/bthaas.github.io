@@ -350,8 +350,6 @@ describe('atlas DOM capabilities', () => {
   it('does no enhancement work when reduced motion is requested', () => {
     const createBus = vi.fn()
     const createEngine = vi.fn()
-    const prepareEntrance = vi.fn()
-    const prepareHero = vi.fn()
     const prepareHorizon = vi.fn()
     const prepareCraft = vi.fn()
     const prepareContact = vi.fn()
@@ -377,8 +375,6 @@ describe('atlas DOM capabilities', () => {
       createEngine,
       document,
       matchMedia,
-      prepareEntrance,
-      prepareHero,
       prepareHorizon,
       prepareCraft,
       prepareContact,
@@ -404,8 +400,6 @@ describe('atlas DOM capabilities', () => {
     expect(document.documentElement).not.toHaveAttribute('data-atlas')
     expect(createBus).not.toHaveBeenCalled()
     expect(createEngine).not.toHaveBeenCalled()
-    expect(prepareEntrance).not.toHaveBeenCalled()
-    expect(prepareHero).not.toHaveBeenCalled()
     expect(prepareHorizon).not.toHaveBeenCalled()
     expect(prepareCraft).not.toHaveBeenCalled()
     expect(prepareContact).not.toHaveBeenCalled()
@@ -441,8 +435,6 @@ describe('atlas DOM capabilities', () => {
     } as unknown as AtlasEngine
     const createEngine = vi.fn(() => engine)
     const cleanupReveals = vi.fn()
-    const cleanupEntrance = vi.fn()
-    const cleanupHero = vi.fn()
     const cleanupHorizon = vi.fn()
     const cleanupCraft = vi.fn()
     const cleanupContact = vi.fn()
@@ -474,8 +466,6 @@ describe('atlas DOM capabilities', () => {
       createEngine,
       document,
       matchMedia: () => ({ matches: false }),
-      prepareEntrance: () => cleanupEntrance,
-      prepareHero: () => cleanupHero,
       prepareHorizon: () => cleanupHorizon,
       prepareCraft: () => cleanupCraft,
       prepareContact: () => cleanupContact,
@@ -507,8 +497,6 @@ describe('atlas DOM capabilities', () => {
     expect(observeLayout).toHaveBeenCalledWith(document.documentElement)
     expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'atlas:scroll' }))
     expect(unsubscribe).toHaveBeenCalledOnce()
-    expect(cleanupEntrance).toHaveBeenCalledOnce()
-    expect(cleanupHero).toHaveBeenCalledOnce()
     expect(cleanupHorizon).toHaveBeenCalledOnce()
     expect(cleanupCraft).toHaveBeenCalledOnce()
     expect(cleanupContact).toHaveBeenCalledOnce()

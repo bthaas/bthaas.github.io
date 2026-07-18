@@ -14,6 +14,7 @@ interface ColorRGB {
 
 export interface SplashCursorProps {
   readonly className?: string
+  readonly constrained?: boolean
 }
 
 const ATLAS_DYE_COLORS = ['#d8ef4b', '#393152'] as const
@@ -51,7 +52,10 @@ function pointerPrototype(): Pointer {
   };
 }
 
-export default function SplashCursor({ className = '' }: SplashCursorProps) {
+export default function SplashCursor({
+  className = '',
+  constrained = false,
+}: SplashCursorProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -71,16 +75,16 @@ export default function SplashCursor({ className = '' }: SplashCursorProps) {
     const pointers: Pointer[] = [pointerPrototype()]
 
     const config = {
-      SIM_RESOLUTION: 64,
-      DYE_RESOLUTION: 256,
+      SIM_RESOLUTION: constrained ? 32 : 64,
+      DYE_RESOLUTION: constrained ? 128 : 256,
       DENSITY_DISSIPATION: 3.2,
       VELOCITY_DISSIPATION: 2.4,
       PRESSURE: 0.12,
-      PRESSURE_ITERATIONS: 8,
+      PRESSURE_ITERATIONS: constrained ? 4 : 8,
       CURL: 2.2,
       SPLAT_RADIUS: 0.24,
       SPLAT_FORCE: 4200,
-      SHADING: true,
+      SHADING: !constrained,
       BACK_COLOR: { r: 0, g: 0, b: 0 },
       TRANSPARENT: true,
     }
@@ -857,10 +861,26 @@ export default function SplashCursor({ className = '' }: SplashCursorProps) {
     let sampleStarted = performance.now()
     let lastUpdateTime = sampleStarted
     let lastRenderTime = 0
+    let lastPointerMove = 0
+    let running = false
+
+    function startAnimation() {
+      if (running || disposed) return
+      running = true
+      frameCount = 0
+      sampleStarted = performance.now()
+      lastUpdateTime = sampleStarted
+      lastRenderTime = 0
+      animationFrame = requestAnimationFrame(updateFrame)
+    }
 
     function updateFrame(timestamp: number) {
       if (disposed) return
-      if (timestamp - lastRenderTime < 15) {
+      if (timestamp - lastPointerMove > 2200) {
+        running = false
+        return
+      }
+      if (timestamp - lastRenderTime < (constrained ? 30 : 15)) {
         animationFrame = requestAnimationFrame(updateFrame)
         return
       }
@@ -1150,6 +1170,8 @@ export default function SplashCursor({ className = '' }: SplashCursorProps) {
         hasPointerPosition = true
         updatePointerDownData(pointer, event.pointerId, posX, posY)
         pointer.color = pointerColor
+        lastPointerMove = performance.now()
+        startAnimation()
         return
       }
       if (event.timeStamp - lastColorChange >= 720) {
@@ -1157,21 +1179,23 @@ export default function SplashCursor({ className = '' }: SplashCursorProps) {
         lastColorChange = event.timeStamp
       }
       updatePointerMoveData(pointer, posX, posY, pointerColor)
+      lastPointerMove = performance.now()
+      startAnimation()
       splatCount += 1
       canvas!.dataset.fluidSplats = String(splatCount)
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
-    animationFrame = requestAnimationFrame(updateFrame)
 
     return () => {
       disposed = true
+      running = false
       cancelAnimationFrame(animationFrame)
       window.removeEventListener('pointermove', handlePointerMove)
       gl.getExtension('WEBGL_lose_context')?.loseContext()
       pointers.length = 0
     }
-  }, [])
+  }, [constrained])
 
   return (
     <div

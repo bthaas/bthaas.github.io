@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
 
 import { getFluidCursorEligibility } from '@/lib/atlas-motion/entrance'
+import { detectWebGLProfile } from '@/lib/client-capabilities'
 
 gsap.registerPlugin(useGSAP)
 
@@ -13,17 +14,10 @@ const SplashCursor = dynamic(() => import('@/components/bits/SplashCursor'), {
   ssr: false,
 })
 
-function supportsWebGL(): boolean {
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('webgl2') ?? canvas.getContext('webgl')
-  if (!context) return false
-  context.getExtension('WEBGL_lose_context')?.loseContext()
-  return true
-}
-
 export function FluidCursorLayer() {
   const rootRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
+  const [constrained, setConstrained] = useState(false)
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -44,12 +38,14 @@ export function FluidCursorLayer() {
 
     const updateEligibility = () => {
       cancelSchedule()
+      const profile = detectWebGLProfile()
       const eligible = getFluidCursorEligibility({
         finePointer: finePointer.matches,
         hover: hover.matches,
         reducedMotion: reducedMotion.matches,
-        webgl: supportsWebGL(),
+        webgl: profile.available,
       })
+      setConstrained(profile.constrained)
       if (!eligible) {
         setMounted(false)
         return
@@ -94,7 +90,7 @@ export function FluidCursorLayer() {
 
   return (
     <div ref={rootRef} className="fluid-cursor-layer" data-fluid-cursor-layer aria-hidden="true">
-      <SplashCursor />
+      <SplashCursor constrained={constrained} />
     </div>
   )
 }

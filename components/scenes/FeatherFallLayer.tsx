@@ -10,7 +10,7 @@ import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities
 gsap.registerPlugin(useGSAP)
 
 const FeatherFallScene = dynamic(
-  () => import('./FeatherFallScene').then((module) => module.FeatherFallScene),
+  () => import('./AtlasWebGLScenes').then((module) => module.FeatherFallScene),
   { ssr: false },
 )
 

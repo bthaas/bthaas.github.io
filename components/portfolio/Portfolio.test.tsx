@@ -41,6 +41,18 @@ describe('Portfolio', () => {
       'srcset',
       expect.stringContaining('/icarus-atlas/hero-flight-768.avif 768w'),
     )
+    expect(container.querySelector('.hero-art')).not.toHaveAttribute('data-atlas-velocity-plate')
+    expect(container.querySelector('.sun-badge__orbit')).toHaveAttribute('aria-hidden', 'true')
+
+    const bands = Array.from(container.querySelectorAll<HTMLElement>('.kinetic-type-band'))
+    expect(bands).toHaveLength(4)
+    expect(bands.map((band) => band.textContent)).toEqual([
+      expect.stringContaining('FLIGHT LOG'),
+      expect.stringContaining('FIELD STUDIES'),
+      expect.stringContaining('SKILLS'),
+      expect.stringContaining('NEXT HORIZON'),
+    ])
+    bands.forEach((band) => expect(band).toHaveAttribute('aria-hidden', 'true'))
 
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
