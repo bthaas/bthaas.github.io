@@ -39,41 +39,62 @@ export function setupEntrance(
     return () => undefined
   }
 
-  const split = engine.plugins.SplitText.create(masthead, {
-    aria: 'auto',
-    mask: 'lines',
-    type: 'chars',
-  })
-  const chrome = Array.from(root.querySelectorAll<HTMLElement>('.site-nav, .hero-meta'))
-  html.classList.remove('atlas-entered')
-  html.classList.add('atlas-entering')
-  rememberEntrance(storage)
+  let cleanupEntrance = () => undefined
+  let disposed = false
 
-  const timeline = engine.gsap.timeline({
-    onComplete: () => {
-      html.classList.remove('atlas-entering')
-      html.classList.add('atlas-entered')
-    },
-  })
-  timeline.fromTo(
-    split.chars,
-    { opacity: 0, yPercent: 110 },
-    { duration: 0.36, ease: 'power3.out', opacity: 1, stagger: 0.06, yPercent: 0 },
-    0.36,
-  )
-  if (chrome.length > 0) {
+  const startEntrance = () => {
+    if (disposed) return
+
+    const split = engine.plugins.SplitText.create(masthead, {
+      aria: 'auto',
+      mask: 'lines',
+      type: 'chars',
+    })
+    const chrome = Array.from(root.querySelectorAll<HTMLElement>('.site-nav, .hero-meta'))
+    html.classList.remove('atlas-entered')
+    html.classList.add('atlas-entering')
+    rememberEntrance(storage)
+
+    const timeline = engine.gsap.timeline({
+      onComplete: () => {
+        html.classList.remove('atlas-entering')
+        html.classList.add('atlas-entered')
+      },
+    })
     timeline.fromTo(
-      chrome,
-      { opacity: 0, y: 8 },
-      { duration: 0.38, ease: 'power2.out', opacity: 1, stagger: 0.05, y: 0 },
-      0.62,
+      split.chars,
+      { opacity: 0, yPercent: 110 },
+      { duration: 0.36, ease: 'power3.out', opacity: 1, stagger: 0.06, yPercent: 0 },
+      0.36,
     )
+    if (chrome.length > 0) {
+      timeline.fromTo(
+        chrome,
+        { opacity: 0, y: 8 },
+        { duration: 0.38, ease: 'power2.out', opacity: 1, stagger: 0.05, y: 0 },
+        0.62,
+      )
+    }
+
+    cleanupEntrance = () => {
+      timeline.kill()
+      split.revert()
+      html.classList.remove('atlas-entering')
+    }
+  }
+
+  const runtimeWindow = root.defaultView ?? window
+  const waitForPreloader = html.classList.contains('atlas-preloader-active')
+  if (waitForPreloader) {
+    runtimeWindow.addEventListener('atlas:preloader-complete', startEntrance, { once: true })
+  } else {
+    startEntrance()
   }
 
   return () => {
-    timeline.kill()
-    split.revert()
-    html.classList.remove('atlas-entering')
+    disposed = true
+    runtimeWindow.removeEventListener('atlas:preloader-complete', startEntrance)
+    cleanupEntrance()
   }
 }
 

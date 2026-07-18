@@ -1,0 +1,99 @@
+.atlas-preloader {
+  position: fixed;
+  z-index: 2400;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.atlas-preloader__dusk,
+.atlas-preloader__paper {
+  position: absolute;
+  inset: 0;
+  will-change: clip-path;
+}
+
+.atlas-preloader__dusk {
+  border-bottom: 4px solid var(--citron);
+  background: var(--dusk);
+}
+
+.atlas-preloader__paper {
+  display: grid;
+  background: rgb(243 239 227 / 99.5%);
+  color: var(--ink);
+  grid-template-rows: 1fr auto 1fr;
+  place-items: center;
+}
+
+.atlas-preloader__counter,
+.atlas-preloader__label {
+  position: absolute;
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.atlas-preloader__counter {
+  top: clamp(1.5rem, 5vw, 4rem);
+  right: clamp(1.5rem, 5vw, 4rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.atlas-preloader__counter::after {
+  content: "%";
+}
+
+.atlas-preloader__label {
+  bottom: clamp(1.5rem, 5vw, 4rem);
+  left: clamp(1.5rem, 5vw, 4rem);
+}
+
+.atlas-preloader__glyph {
+  width: clamp(9rem, 18vw, 15rem);
+  fill: none;
+  overflow: visible;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.3;
+}
+
+.atlas-preloader__glyph circle {
+  stroke: var(--solar);
+  stroke-width: 2;
+}
+
+.fluid-cursor-layer,
+.splash-cursor {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.fluid-cursor-layer {
+  z-index: 1050;
+  contain: strict;
+}
+
+.splash-cursor {
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+
+.splash-cursor__canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse), (hover: none) {
+  .atlas-preloader,
+  .fluid-cursor-layer {
+    display: none !important;
+  }
+}

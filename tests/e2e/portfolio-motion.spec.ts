@@ -62,6 +62,42 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   expect(errors).toEqual([])
 })
 
+test('hands a sub-1.8s session entrance into the lazy Atlas ink simulation', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(browserName !== 'chromium' || isMobile, 'One fine-pointer engine measures Phase 1.')
+  const errors = observeApplicationErrors(page)
+  await page.addInitScript(() => sessionStorage.clear())
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+  const preloader = page.locator('[data-atlas-preloader]')
+  await expect(preloader).toBeVisible()
+  await expect(preloader.locator('[data-atlas-preloader-counter]')).toHaveText(/^(?:\d{2}|100)$/)
+  await expect(preloader).toHaveCount(0, { timeout: 2200 })
+
+  const entranceDuration = await page.evaluate(() => performance
+    .getEntriesByName('atlas-preloader-duration')
+    .at(-1)?.duration ?? Number.POSITIVE_INFINITY)
+  expect(entranceDuration).toBeLessThanOrEqual(1800)
+
+  const fluid = page.locator('[data-fluid-cursor]')
+  await expect(fluid).toHaveCount(1)
+  await page.mouse.move(140, 180)
+  await page.mouse.move(520, 360, { steps: 12 })
+  await expect.poll(async () => Number(
+    await fluid.locator('canvas').getAttribute('data-fluid-splats'),
+  )).toBeGreaterThanOrEqual(8)
+  await expect.poll(async () => Number(
+    await fluid.locator('canvas').getAttribute('data-fluid-fps'),
+  )).toBeGreaterThanOrEqual(20)
+
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
 test('keeps reduced motion identical to the static render', async ({ browserName, page }) => {
   test.skip(browserName !== 'chromium', 'One engine exercises the shared reduced-motion kill switch.')
   const errors = observeApplicationErrors(page)
@@ -70,7 +106,13 @@ test('keeps reduced motion identical to the static render', async ({ browserName
 
   await expect(page.locator('html')).not.toHaveClass(/atlas-js/)
   await expect(page.locator('html')).not.toHaveAttribute('data-atlas')
-  await expect(page.locator('.chapter-wipe__layer, [data-atlas-cursor], script[data-atlas-horizon]'))
+  await expect(page.locator([
+    '.chapter-wipe__layer',
+    '[data-atlas-cursor]',
+    '[data-atlas-preloader]',
+    '[data-fluid-cursor]',
+    'script[data-atlas-horizon]',
+  ].join(', ')))
     .toHaveCount(0)
   await expect(page.locator('.flight-dossier__toggle').first())
     .toHaveAttribute('aria-expanded', 'true')

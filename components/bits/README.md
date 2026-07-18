@@ -5,11 +5,12 @@ not consumed as a runtime package. Use the upstream `jsrepo` registry and choose
 the **TypeScript + CSS** variant so the result matches this repository's strict
 TypeScript setup and existing authored CSS architecture.
 
-For example, Phase 1 installs Splash Cursor with:
+React Bits now publishes its generated jsrepo manifest from the repository's
+`public/r` directory. Phase 1 initialized that registry in `jsrepo.config.ts`
+and installed Splash Cursor with:
 
 ```sh
-npx jsrepo@latest add SplashCursor-TS-CSS \
-  --registry https://reactbits.dev/r/registry.json
+npx jsrepo add SplashCursor-TS-CSS --yes
 ```
 
 Before committing a vendored component:
