@@ -109,6 +109,45 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   holds 59.5–61 fps; mobile intentionally renders 40 records at 30 Hz. The
   detected software-WebGL tier also uses 40 records/DPR 1/30 Hz.
 
+## 2026-07-18 — Liquid hero and kinetic type verification
+
+- Phase 3 intentionally reuses the accepted 1600×1130 hero painting as a
+  subdivided shader plane. Because no new mesh silhouette, fracture, or material
+  asset is introduced, exporting a flat Blender rectangle and rendering two
+  turntable iterations would add no visual evidence; the documented exception
+  in `ANALYSIS.md` keeps the source painting and browser crop as ground truth.
+- The accepted source, desktop layout, and mobile layout are curated as
+  `frames/phase3-hero-liquid-source.png`, `phase3-hero-layout-desktop.png`, and
+  `phase3-hero-layout-mobile.png`. They were opened before the component and
+  shader implementation.
+- Production captures at load and 25/50/75/100% of the masthead release live in
+  `site-screenshots/phase3-*.png`. `comparison.png` places the source and five
+  labeled states together; the montage was opened and inspected after capture.
+- The composition remains faithful at rest: the sun, city, Aegean horizon, crop,
+  caption, masthead, copy grid, palette, and section order are unchanged. The
+  maximum pointer ring is 0.009 UV and the maximum velocity shift/bulge is 0.006,
+  so motion bends the light without turning the painting into a lava surface.
+- At 25/50/75%, the masthead releases outward like nine large shed feathers;
+  outer characters travel farther, alternating characters rise and fall, and
+  rotation stays within 18 degrees. At 100% the outlined `FLIGHT LOG` band
+  carries the fall into the dusk chapter. Returning to the top restores every
+  character to identity transform and opacity 1.
+- The four kinetic labels repeat existing wayfinding only. The circular
+  `EX ALIS — BELLEVUE — 47.61° N —` label follows the same Atlas sun-progress
+  event while React owns only its dedicated overlay; Atlas retains sole
+  ownership of the SVG path and sun group.
+- Static and reduced-motion verification retains the responsive hero `<picture>`
+  as the LCP element and mounts no liquid canvas. The existing fallback did not
+  require replacement because the accepted composition did not change.
+- The shared deferred scene chunk prevents a second Three/R3F runtime. The
+  liquid plane renders only while pointer/scroll energy is active and unmounts
+  away from the hero. Software WebGL deliberately lowers the fluid and finale
+  tiers; WebKit desktop and iPhone remain at display rate through the full page.
+- The remaining intentional difference is that a still capture can only show
+  displaced light at one instant. The interaction is therefore also covered by
+  E2E assertions for canvas readiness, velocity-driven type, scatter progress,
+  top reversal, reduced motion, no-JS fallback, and application-console health.
+
 ## Automated release gates
 
 - Unit/component/content tests: 25/25 passing across six files.

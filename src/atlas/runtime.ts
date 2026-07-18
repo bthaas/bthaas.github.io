@@ -4,7 +4,7 @@ import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
 import { initializeAtlasEngine, type AtlasEngine } from './engine'
 import { setupDossiers, setupExperienceChapter } from './experience'
-import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
+import { setupMetricCountUps } from './hero'
 import { setupHorizonLoader } from './horizon-loader'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
@@ -21,12 +21,10 @@ interface AtlasRuntimeOptions {
   readonly createEngine?: () => AtlasEngine | null
   readonly document?: Document
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
-  readonly prepareEntrance?: (document: Document) => () => void
   readonly prepareCraft?: (document: Document, window: Window) => () => void
   readonly prepareContact?: (document: Document, window: Window) => () => void
   readonly prepareCursor?: (document: Document) => () => void
   readonly prepareDossiers?: (document: Document) => () => void
-  readonly prepareHero?: (document: Document, window: Window) => () => void
   readonly prepareHorizon?: (document: Document) => () => void
   readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
@@ -49,12 +47,10 @@ export function initializeAtlas({
   createEngine,
   document: runtimeDocument = document,
   matchMedia = (query) => window.matchMedia(query),
-  prepareEntrance = setupEntrance,
   prepareCraft = setupCraftChapter,
   prepareContact = setupContactFinale,
   prepareCursor = setupCursor,
   prepareDossiers = setupDossiers,
-  prepareHero = setupHeroParallax,
   prepareHorizon = setupHorizonLoader,
   prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
@@ -86,13 +82,11 @@ export function initializeAtlas({
 
   const cleanupWayfinding = prepareWayfinding(runtimeDocument)
   const cleanupLocalTime = prepareLocalTime(runtimeDocument)
-  const cleanupEntrance = prepareEntrance(runtimeDocument)
   const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
   const cleanupCursor = prepareCursor(runtimeDocument)
   const cleanupDossiers = prepareDossiers(runtimeDocument)
   const cleanupExperience = prepareExperience(runtimeDocument, runtimeWindow)
-  const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
   const cleanupHorizon = prepareHorizon(runtimeDocument)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupMagnetic = prepareMagnetic(runtimeDocument)
@@ -145,13 +139,11 @@ export function initializeAtlas({
     runtimeWindow.removeEventListener('load', handleLoad)
     layoutObserver?.disconnect()
     unsubscribe()
-    cleanupEntrance()
     cleanupCraft()
     cleanupContact()
     cleanupCursor()
     cleanupDossiers()
     cleanupExperience()
-    cleanupHero()
     cleanupHorizon()
     cleanupMetrics()
     cleanupMagnetic()

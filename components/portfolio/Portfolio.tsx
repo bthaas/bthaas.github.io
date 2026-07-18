@@ -1,5 +1,9 @@
 import { atlasVisuals } from '@/content/editorial-visuals'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
+import { HeroMasthead } from '@/components/motion/HeroMasthead'
+import { KineticTypeBand } from '@/components/motion/KineticTypeBand'
+import { SunBadge } from '@/components/motion/SunBadge'
+import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
 import {
   siteContent,
   type ExperienceEntry,
@@ -134,19 +138,7 @@ export function Portfolio() {
             />
             Brett Haas
           </a>
-          <div className="sun-arc" aria-hidden="true">
-            <svg focusable="false" viewBox="0 0 240 32">
-              <path
-                className="sun-arc__track"
-                data-atlas-sun-path
-                d="M8 23 Q120 -5 232 23"
-              />
-              <g data-atlas-sun>
-                <circle className="sun-arc__halo" cx="8" cy="23" r="9" />
-                <circle className="sun-arc__disc" cx="8" cy="23" r="6" />
-              </g>
-            </svg>
-          </div>
+          <SunBadge />
           <div className="nav-links">
             <a href="#experience">Experience</a>
             <a href="#projects">Projects</a>
@@ -164,23 +156,13 @@ export function Portfolio() {
             <p>{identity.location}</p>
           </div>
 
-          <div className="hero-art" data-atlas-velocity-plate>
-            <AtlasPicture
-              visual={atlasVisuals.hero}
-              alt="A geometric Aegean city aligned with a rising sun"
-              className="atlas-picture atlas-picture--hero"
-              cursor="read"
-              sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
-              priority
-            />
-            <p className="art-caption art-caption--light">Plate 01 / Ambition needs systems</p>
-          </div>
+          <HeroLiquidPlate />
 
           <div className="hero-copy-release">
             <div className="hero-copy editorial-grid">
               <div className="hero-identity">
                 <p className="eyebrow">Engineer · Researcher · Builder</p>
-                <h1 data-atlas-masthead id="hero-name">{identity.name}</h1>
+                <HeroMasthead name={identity.name} />
               </div>
               <div className="hero-statement">
                 <h2>I build intelligent systems that hold up in the real world.</h2>
@@ -193,6 +175,8 @@ export function Portfolio() {
           </div>
 
         </section>
+
+        <KineticTypeBand text="FLIGHT LOG" />
 
         <section className="experience-section" id="experience" aria-labelledby="experience-title">
           {[1, 2, 3].map((step) => (
@@ -278,6 +262,8 @@ export function Portfolio() {
           </div>
         </section>
 
+        <KineticTypeBand direction={-1} text="FIELD STUDIES" />
+
         <section className="projects-section" id="projects" aria-labelledby="projects-title">
           <div className="atlas-shell projects-intro editorial-grid">
             <div className="section-heading">
@@ -329,6 +315,8 @@ export function Portfolio() {
           </nav>
 
         </section>
+
+        <KineticTypeBand text="SKILLS" />
 
         <section
           className="craft-section chapter-wipe chapter-wipe--ltr"
@@ -385,6 +373,8 @@ export function Portfolio() {
             </div>
           </div>
         </section>
+
+        <KineticTypeBand direction={-1} text="NEXT HORIZON" />
 
         <section
           className="contact-section"

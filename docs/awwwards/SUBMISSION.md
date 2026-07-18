@@ -4,9 +4,11 @@
 
 All submission captures are PNG at exactly 1600 × 1200.
 
-Phase 1 verification adds 1600 × 1000 working captures for the DrawSVG entrance
-and the active citron/dusk ink trail in
-[step 15](./screenshots/step-15/); the four final submission frames remain the
+Phase 1 verification adds the DrawSVG entrance and active citron/dusk ink trail
+in [step 15](./screenshots/step-15/); Phase 2 adds the scroll-narrated feather
+field in [step 16](./screenshots/step-16/); and Phase 3 adds the liquid hero,
+reversible masthead scatter, kinetic band, and mobile tier in
+[step 17](./screenshots/step-17/). The four final submission frames remain the
 Phase 0 set until the complete maximalist sequence is assembled in Phase 6.
 
 | Frame | File | Purpose |
@@ -85,6 +87,14 @@ and frame pacing.
 ## Technical notes
 
 - Next.js 16 static export with normal React 19 hydration and TypeScript.
+- Phase 3 preserves the preloaded responsive hero `<img>` as LCP while a shared,
+  deferred Three/R3F chunk supplies both the liquid plane and feather field.
+- Hero parallax and masthead SplitText now have one React/GSAP owner; the old
+  Atlas choreography was removed. Four outline-serif bands reuse existing
+  chapter labels and remain `aria-hidden` decoration.
+- Initial Next + Atlas JavaScript is 326,246 bytes gzip. Every deferred canvas
+  showpiece totals 591,089 bytes gzip after mount; the documented post-mount
+  exception reuses one Three runtime and adds 54,317 bytes over Phase 2.
 - Phase 1 first-load JavaScript after the lazy cursor mount is 268,732 bytes gzip, including a 5,685-byte fluid chunk and 83,209-byte `/atlas.js`.
 - Phase 1 Lighthouse Performance is 100 with 1.40 s LCP, 0.00018 CLS, and 7 ms TBT.
 - `/horizon.js` is 1,456 bytes gzip and is injected only near Contact on fine-pointer desktop visits.

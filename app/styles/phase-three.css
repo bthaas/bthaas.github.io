@@ -1,0 +1,112 @@
+.hero-liquid__visual {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.hero-liquid__visual > .atlas-picture--hero {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-liquid__canvas {
+  position: absolute;
+  z-index: 1;
+  top: -6%;
+  left: 0;
+  width: 100%;
+  height: 112%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 360ms var(--ease-out);
+  will-change: opacity, transform;
+}
+
+.hero-liquid[data-hero-liquid-ready] .hero-liquid__canvas {
+  opacity: 1;
+}
+
+.hero-liquid-canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+}
+
+.hero-liquid .art-caption {
+  z-index: 3;
+}
+
+.hero-masthead__line {
+  overflow: clip;
+}
+
+.kinetic-type-band {
+  position: relative;
+  z-index: 50;
+  display: flex;
+  height: clamp(7.5rem, 20vh, 13rem);
+  overflow: hidden;
+  align-items: center;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: var(--cream);
+  color: transparent;
+  contain: paint;
+  font-family: var(--serif);
+  font-size: clamp(7.5rem, 15.5vw, 14rem);
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  line-height: 0.72;
+  pointer-events: none;
+  -webkit-text-stroke: 1px var(--ink);
+  text-transform: uppercase;
+}
+
+.sun-badge {
+  overflow: visible;
+}
+
+.sun-badge__orbit {
+  position: absolute;
+  z-index: 2;
+  top: 71.875%;
+  left: 3.333%;
+  width: clamp(3.6rem, 5vw, 4.5rem);
+  height: clamp(3.6rem, 5vw, 4.5rem);
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 720px) {
+  .kinetic-type-band {
+    height: 7.5rem;
+    font-size: 7.8rem;
+  }
+
+  .sun-badge__orbit {
+    width: 3.2rem;
+    height: 3.2rem;
+  }
+
+  .sun-badge {
+    right: 1.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-liquid__canvas {
+    display: none !important;
+  }
+
+  .hero-liquid__visual,
+  .atlas-picture--hero img,
+  .hero-liquid .art-caption,
+  .kinetic-type-band .scroll-velocity__track {
+    transform: none !important;
+  }
+}

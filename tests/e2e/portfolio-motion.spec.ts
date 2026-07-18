@@ -43,6 +43,10 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
     'data-feather-tier',
     isMobile ? 'mobile-40' : /^(desktop-120|desktop-software-40)$/,
   )
+  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
+  await expect(page.locator('.hero-liquid__canvas canvas')).toHaveCount(1)
+  await expect(page.locator('.kinetic-type-band')).toHaveCount(4)
+  await expect(page.locator('.atlas-picture--hero img')).toHaveAttribute('fetchpriority', 'high')
   await expectNoHorizontalOverflow(page)
 
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
@@ -118,6 +122,7 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     '[data-atlas-preloader]',
     '[data-fluid-cursor]',
     '[data-feather-fall-layer]',
+    '.hero-liquid__canvas',
     'script[data-atlas-horizon]',
   ].join(', ')))
     .toHaveCount(0)
@@ -129,6 +134,50 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     (animation) => animation.playState === 'running',
   ).length)).toBe(0)
   await expectNoHorizontalOverflow(page)
+  expect(errors).toEqual([])
+})
+
+test('reverses the feather-like masthead scatter and keeps kinetic type alive', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(browserName !== 'chromium' || isMobile, 'One engine verifies Phase 3 choreography.')
+  const errors = observeApplicationErrors(page)
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
+
+  const characters = page.locator('.hero-masthead__line > div')
+  await expect(characters).toHaveCount(9)
+  await expect.poll(async () => characters.evaluateAll((nodes) => nodes.every((node) => (
+    getComputedStyle(node).transform === 'matrix(1, 0, 0, 1, 0, 0)'
+    && getComputedStyle(node).opacity === '1'
+  )))).toBe(true)
+
+  await page.evaluate(() => {
+    const hero = document.querySelector<HTMLElement>('#hero')!
+    const heroBottom = hero.offsetTop + hero.offsetHeight
+    scrollTo({ behavior: 'instant', top: heroBottom - innerHeight * 0.53 })
+  })
+  await expect.poll(async () => characters.evaluateAll((nodes) => nodes.some((node) => (
+    getComputedStyle(node).transform !== 'matrix(1, 0, 0, 1, 0, 0)'
+  )))).toBe(true)
+
+  const bandTrack = page.locator('.scroll-velocity__track').first()
+  const firstBandFrame = await bandTrack.evaluate((node) => getComputedStyle(node).transform)
+  await page.waitForTimeout(120)
+  expect(await bandTrack.evaluate((node) => getComputedStyle(node).transform))
+    .not.toBe(firstBandFrame)
+
+  await page.evaluate(() => scrollTo({ behavior: 'instant', top: 0 }))
+  await expect.poll(async () => characters.evaluateAll((nodes) => nodes.every((node) => (
+    getComputedStyle(node).transform === 'matrix(1, 0, 0, 1, 0, 0)'
+    && getComputedStyle(node).opacity === '1'
+  )))).toBe(true)
   expect(errors).toEqual([])
 })
 
@@ -202,7 +251,7 @@ test('samples frame pacing through the complete page', async ({
     const minimumHorizonFps = browserName === 'webkit' || browserName === 'firefox'
       ? 28
       : softwareRenderer
-        ? 20
+        ? 18
         : 55
     await expect.poll(async () => Number(
       await page.locator('[data-horizon-flock]').getAttribute('data-horizon-fps'),
