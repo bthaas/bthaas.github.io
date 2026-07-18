@@ -80,6 +80,7 @@ describe('GSAP Atlas choreography', () => {
 
     const cleanup = setupEntrance(document, storage, harness.engine)
     const entrance = harness.timelines[0]
+    const entranceFromTo = entrance.fromTo as ReturnType<typeof vi.fn>
 
     expect(harness.splitCreate).toHaveBeenCalledWith(
       document.querySelector('[data-atlas-masthead]'),
@@ -91,6 +92,9 @@ describe('GSAP Atlas choreography', () => {
       expect.objectContaining({ duration: 0.36, opacity: 1, stagger: 0.06, yPercent: 0 }),
       0.36,
     )
+    expect(entranceFromTo.mock.calls.some(
+      (call: unknown[]) => call[0] === document.querySelector('.hero-art'),
+    )).toBe(false)
     expect(values.get('atlas-entered')).toBe('1')
 
     ;(entrance.vars as { onComplete: () => void }).onComplete()

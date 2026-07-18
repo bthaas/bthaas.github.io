@@ -24,8 +24,23 @@ describe('Portfolio', () => {
       '#projects',
     )
     expect(screen.getByText('03 / Skills')).toBeInTheDocument()
+    const craftGhost = container.querySelector<HTMLElement>('[data-craft-ghost]')
+    expect(craftGhost).toHaveAttribute('data-craft-ghost', '03')
+    expect(craftGhost).toBeEmptyDOMElement()
     expect(screen.getByRole('heading', { name: 'The skills behind the flight.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connect with me.' })).toBeInTheDocument()
+    expect(
+      container.querySelector('.atlas-picture--hero source[type="image/avif"]'),
+    ).toHaveAttribute(
+      'srcset',
+      expect.stringContaining('/icarus-atlas/hero-flight-640.avif 640w'),
+    )
+    expect(
+      container.querySelector('.atlas-picture--hero source[type="image/avif"]'),
+    ).toHaveAttribute(
+      'srcset',
+      expect.stringContaining('/icarus-atlas/hero-flight-768.avif 768w'),
+    )
 
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
@@ -128,8 +143,11 @@ describe('Portfolio', () => {
   it('server-renders every professional dossier from content and skips education', () => {
     const { container } = render(<Portfolio />)
     const entries = Array.from(container.querySelectorAll<HTMLElement>('.flight-entry'))
+    const flightIndices = Array.from(container.querySelectorAll<HTMLElement>('.flight-index'))
 
     expect(entries).toHaveLength(4)
+    expect(flightIndices).toHaveLength(4)
+    flightIndices.forEach((index) => expect(index).toHaveAttribute('aria-hidden', 'true'))
     siteContent.experience.forEach((experience, index) => {
       const entry = entries[index]
       const toggle = within(entry).getByRole('button', { name: 'Field notes +' })

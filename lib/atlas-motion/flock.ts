@@ -20,6 +20,16 @@ function createRandom(seed: number) {
   }
 }
 
+export function getFlockFrameDelta(
+  previousTime: number,
+  currentTime: number,
+  targetFps = 60,
+): number | null {
+  const elapsed = Math.max(0, currentTime - previousTime)
+  if (elapsed < 1_000 / targetFps) return null
+  return Math.min(elapsed / 1_000, 0.05)
+}
+
 export function createFlock(count: number, seed: number): FlockBird[] {
   const random = createRandom(seed)
   return Array.from({ length: count }, (_, index) => ({

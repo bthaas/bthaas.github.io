@@ -152,14 +152,18 @@
     top: -0.46em;
     left: -0.08em;
     display: block;
-    color: var(--ink);
+    color: transparent;
     font-family: var(--serif);
     font-size: clamp(9rem, 20vw, 20rem);
     font-weight: 500;
     letter-spacing: -0.08em;
     line-height: 0.8;
-    opacity: 0.08;
     pointer-events: none;
+  }
+
+  .craft-ghost::before {
+    color: rgb(17 19 15 / 8%);
+    content: attr(data-craft-ghost);
   }
 
   html.atlas-js .craft-art img {

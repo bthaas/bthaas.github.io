@@ -109,8 +109,11 @@ feature/motion checks — never a prerequisite for content.
 
 ### 5.0 Entrance — "the plate is pressed" (first 1.2 s, once per session)
 - Cream page is visible immediately (no fake loader, no blank wall).
-- Hero plate reveals with a `clip-path` inset wipe upward (a print coming off
-  the press); grain flickers one step.
+- **Phase D performance override — July 18, 2026:** the hero plate paints
+  immediately instead of running the originally planned entrance `clip-path`.
+  This protects the owner-approved LCP ≤ 1.8 s gate; the masthead still rises
+  from masked baselines, and the below-fold project/craft plates retain the
+  halftone “coming off the press” reveal.
 - "Brett Haas" masthead: per-character baseline rise with masked overflow,
   60 ms stagger; meta row and nav fade in last.
 - Total ≤ 1.2 s, runs once (sessionStorage), fully skipped under

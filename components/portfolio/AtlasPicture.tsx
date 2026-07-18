@@ -14,6 +14,23 @@ interface AtlasPictureProps {
   readonly velocityPlate?: boolean
 }
 
+function getSourceSet(visual: AtlasVisual, format: 'avif' | 'webp') {
+  const sources: string[] = []
+  if (visual.tinyWidth) {
+    const tinySource = format === 'avif' ? visual.tinySrc : visual.tinyFallback
+    if (tinySource) sources.push(`${tinySource} ${visual.tinyWidth}w`)
+  }
+  if (visual.mediumWidth) {
+    const mediumSource = format === 'avif' ? visual.mediumSrc : visual.mediumFallback
+    if (mediumSource) sources.push(`${mediumSource} ${visual.mediumWidth}w`)
+  }
+  sources.push(
+    `${format === 'avif' ? visual.smallSrc : visual.smallFallback} ${visual.smallWidth}w`,
+    `${format === 'avif' ? visual.src : visual.fallback} ${visual.width}w`,
+  )
+  return sources.join(', ')
+}
+
 export function AtlasPicture({
   visual,
   alt,
@@ -39,17 +56,17 @@ export function AtlasPicture({
     >
       <source
         type="image/avif"
-        srcSet={`${visual.smallSrc} ${visual.smallWidth}w, ${visual.src} ${visual.width}w`}
+        srcSet={getSourceSet(visual, 'avif')}
         sizes={sizes}
       />
       <source
         type="image/webp"
-        srcSet={`${visual.smallFallback} ${visual.smallWidth}w, ${visual.fallback} ${visual.width}w`}
+        srcSet={getSourceSet(visual, 'webp')}
         sizes={sizes}
       />
       <img
         src={visual.fallback}
-        srcSet={`${visual.smallFallback} ${visual.smallWidth}w, ${visual.fallback} ${visual.width}w`}
+        srcSet={getSourceSet(visual, 'webp')}
         sizes={sizes}
         alt={alt}
         width={visual.width}

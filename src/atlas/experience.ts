@@ -37,7 +37,7 @@ export function setupDossiers(
       const index = entry.querySelector<HTMLElement>('.flight-index')
       if (!rule || !index) return
 
-      const split = engine.plugins.SplitText.create(index, { aria: 'auto', type: 'chars' })
+      const split = engine.plugins.SplitText.create(index, { aria: 'none', type: 'chars' })
       splits.push(split)
       engine.gsap.set(rule, { drawSVG: '0%' })
       engine.gsap.set(split.chars, { opacity: 0, rotationX: -80, yPercent: 105 })
