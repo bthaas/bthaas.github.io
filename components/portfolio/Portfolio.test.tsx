@@ -179,9 +179,9 @@ describe('Portfolio', () => {
     expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
     expect(firstDossier).toHaveAttribute('data-state', 'closed')
 
-    fireEvent.keyDown(firstToggle, { key: ' ' })
+    firstToggle.click()
     expect(firstToggle).toHaveAttribute('aria-expanded', 'true')
-    fireEvent.keyDown(firstToggle, { key: 'Enter' })
+    firstToggle.click()
     expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
     fireEvent.keyDown(firstToggle, { key: 'Escape' })
     expect(firstToggle).toHaveAttribute('aria-expanded', 'false')

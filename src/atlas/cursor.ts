@@ -1,30 +1,30 @@
 import { hasFinePointer } from './capabilities'
+import { getAtlasEngine, type AtlasEngine } from './engine'
 
-type CursorMode = 'default' | 'expand' | 'external'
+type CursorMode = 'default' | 'expand' | 'external' | 'read'
 type FinePointerCheck = () => boolean
-type RequestFrame = (callback: FrameRequestCallback) => number
-type CancelFrame = (handle: number) => void
 
 const labels: Record<CursorMode, string> = {
   default: '',
   expand: '+',
   external: '↗',
+  read: 'read',
 }
 
 function getCursorMode(target: EventTarget | null): CursorMode {
   if (!(target instanceof Element)) return 'default'
   if (target.closest('[data-cursor="expand"]')) return 'expand'
   if (target.closest('a[target="_blank"]')) return 'external'
+  if (target.closest('[data-cursor="read"]')) return 'read'
   return 'default'
 }
 
 export function setupCursor(
   root: Document = document,
   finePointer: FinePointerCheck = hasFinePointer,
-  requestFrame: RequestFrame = requestAnimationFrame,
-  cancelFrame: CancelFrame = cancelAnimationFrame,
+  engine: AtlasEngine | null = getAtlasEngine(),
 ): () => void {
-  if (!finePointer() || !root.body) return () => undefined
+  if (!finePointer() || !root.body || !engine) return () => undefined
 
   const cursor = root.createElement('div')
   const dot = root.createElement('span')
@@ -42,39 +42,23 @@ export function setupCursor(
   cursor.append(dot, ring)
   root.body.append(cursor)
 
-  let animationFrame = 0
-  let ringX = 0
-  let ringY = 0
-  let targetX = 0
-  let targetY = 0
-
-  const render = () => {
-    ringX += (targetX - ringX) * 0.22
-    ringY += (targetY - ringY) * 0.22
-    cursor.style.setProperty('--atlas-cursor-ring-x', `${Number(ringX.toFixed(2))}px`)
-    cursor.style.setProperty('--atlas-cursor-ring-y', `${Number(ringY.toFixed(2))}px`)
-    if (Math.abs(targetX - ringX) > 0.1 || Math.abs(targetY - ringY) > 0.1) {
-      animationFrame = requestFrame(render)
-    } else {
-      animationFrame = 0
-    }
-  }
-  const queueRender = () => {
-    if (animationFrame === 0) animationFrame = requestFrame(render)
-  }
+  engine.gsap.set([dot, ring], { x: -20, xPercent: -50, y: -20, yPercent: -50 })
+  const setDotX = engine.gsap.quickSetter(dot, 'x', 'px')
+  const setDotY = engine.gsap.quickSetter(dot, 'y', 'px')
+  const ringXTo = engine.gsap.quickTo(ring, 'x', { duration: 0.2, ease: 'power3.out' })
+  const ringYTo = engine.gsap.quickTo(ring, 'y', { duration: 0.2, ease: 'power3.out' })
   const updateMode = (target: EventTarget | null) => {
     const mode = getCursorMode(target)
     cursor.dataset.cursorMode = mode
     label.textContent = labels[mode]
   }
   const handleMove = (event: PointerEvent) => {
-    targetX = event.clientX
-    targetY = event.clientY
-    cursor.style.setProperty('--atlas-cursor-dot-x', `${targetX}px`)
-    cursor.style.setProperty('--atlas-cursor-dot-y', `${targetY}px`)
+    setDotX(event.clientX)
+    setDotY(event.clientY)
+    ringXTo(event.clientX)
+    ringYTo(event.clientY)
     cursor.classList.add('is-visible')
     updateMode(event.target)
-    queueRender()
   }
   const handleOver = (event: PointerEvent) => updateMode(event.target)
   const handleLeave = () => cursor.classList.remove('is-visible')
@@ -84,10 +68,11 @@ export function setupCursor(
   root.documentElement.addEventListener('pointerleave', handleLeave)
 
   return () => {
-    cancelFrame(animationFrame)
     root.removeEventListener('pointermove', handleMove)
     root.removeEventListener('pointerover', handleOver)
     root.documentElement.removeEventListener('pointerleave', handleLeave)
+    ringXTo.tween.kill()
+    ringYTo.tween.kill()
     cursor.remove()
   }
 }

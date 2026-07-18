@@ -94,6 +94,20 @@ function FlightDossier({ entry }: { readonly entry: ExperienceEntry }) {
   )
 }
 
+function FlightRule() {
+  return (
+    <svg
+      className="flight-rule"
+      aria-hidden="true"
+      focusable="false"
+      preserveAspectRatio="none"
+      viewBox="0 0 100 1"
+    >
+      <line data-flight-rule x1="0" y1="0.5" x2="100" y2="0.5" />
+    </svg>
+  )
+}
+
 export function Portfolio() {
   const { identity, contact, experience, education, projects, skills } = siteContent
   const skillLogos = getSkillLogos(skills)
@@ -147,11 +161,12 @@ export function Portfolio() {
             <p>{identity.location}</p>
           </div>
 
-          <div className="hero-art">
+          <div className="hero-art" data-atlas-velocity-plate>
             <AtlasPicture
               visual={atlasVisuals.hero}
               alt="A geometric Aegean city aligned with a rising sun"
               className="atlas-picture atlas-picture--hero"
+              cursor="read"
               sizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
               priority
             />
@@ -191,7 +206,9 @@ export function Portfolio() {
                 visual={atlasVisuals.experience}
                 alt="A rising coastal city and lighthouse at dusk"
                 className="atlas-picture experience-art"
+                cursor="read"
                 sizes="(max-width: 720px) 100vw, 50vw"
+                velocityPlate
               />
               <span className="experience-plate__warmth" aria-hidden="true" />
             </div>
@@ -217,6 +234,7 @@ export function Portfolio() {
             >
               {experience.map((entry, index) => (
                 <li className="flight-entry" key={entry.id}>
+                  <FlightRule />
                   <p className="flight-index">{String(index + 1).padStart(2, '0')}</p>
                   <div className="flight-heading">
                     <h3>{entry.organization}</h3>
@@ -235,6 +253,7 @@ export function Portfolio() {
               ))}
               {education.map((entry) => (
                 <li className="flight-entry flight-entry--education" key={entry.degree}>
+                  <FlightRule />
                   <p className="flight-index">04</p>
                   <div className="flight-heading">
                     <h3>{entry.institution}</h3>
@@ -278,14 +297,16 @@ export function Portfolio() {
                 href={`/projects/${project.id}`}
                 aria-label={`Open ${project.name} case study`}
                 data-testid="project-panel-trigger"
-                data-cursor="expand"
+                data-atlas-velocity-plate
+                data-cursor="read"
                 key={project.id}
               >
                 <AtlasPicture
                   visual={atlasVisuals.projects[project.visualKey]}
                   alt={projectVisualAlts[project.visualKey]}
                   className="atlas-picture project-panel__art"
-                  cursor="expand"
+                  cursor="read"
+                  printReveal
                   projectPan
                   projectPanIndex={index}
                   sizes="(max-width: 720px) 82vw, 32vw"
@@ -312,11 +333,13 @@ export function Portfolio() {
           data-wipe-direction="ltr"
         >
           <div className="craft-board">
-            <div className="craft-plate craft-plate--inset">
+            <div className="craft-plate craft-plate--inset" data-atlas-velocity-plate>
               <AtlasPicture
                 visual={atlasVisuals.craft}
                 alt="A cliffside workshop with sculptural wings"
                 className="atlas-picture craft-art"
+                cursor="read"
+                printReveal
                 sizes="(max-width: 720px) 100vw, 50vw"
               />
             </div>
@@ -372,6 +395,7 @@ export function Portfolio() {
                 visual={atlasVisuals.ending}
                 alt="A calm sunrise horizon between distant mountain ridges"
                 className="atlas-picture contact-art frame-reveal"
+                cursor="read"
                 reveal
                 sizes="(max-width: 720px) 100vw, 50vw"
               />

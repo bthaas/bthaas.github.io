@@ -14,6 +14,7 @@ export function setupCraftChapter(
   const plate = root.querySelector<HTMLElement>('.craft-art')
   const panel = section?.querySelector<HTMLElement>('.craft-panel')
   const heading = section?.querySelector<HTMLElement>('.craft-heading')
+  const copy = section?.querySelector<HTMLElement>('.craft-copy')
   const ghost = section?.querySelector<HTMLElement>('.craft-ghost')
   const image = plate?.querySelector<HTMLImageElement>('img')
   if (!section || !plate || !panel || !heading || !ghost || !image || !engine) {
@@ -67,7 +68,12 @@ export function setupCraftChapter(
     : engine.ScrollTrigger.create({
         trigger: panel,
         start: 'top top+=88',
-        end: () => `+=${Math.max(1, panel.offsetHeight - heading.offsetHeight - 120)}`,
+        end: () => `+=${Math.max(
+          1,
+          copy
+            ? copy.offsetTop - heading.offsetTop - heading.offsetHeight - 24
+            : panel.offsetHeight - heading.offsetHeight - 120,
+        )}`,
         invalidateOnRefresh: true,
         pin: heading,
         pinSpacing: false,

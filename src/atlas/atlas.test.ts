@@ -13,6 +13,30 @@ import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
 import { splitText } from './split-text'
 import { setupSectionWayfinding, SUN_PROGRESS_EVENT } from './sun-arc'
 
+function createPointerEngine() {
+  const quickTargets: Array<{
+    property: string
+    setter: ReturnType<typeof vi.fn>
+    target: unknown
+  }> = []
+  const quickTo = vi.fn((target: unknown, property: string) => {
+    const setter = vi.fn() as ReturnType<typeof vi.fn> & { tween?: { kill: () => void } }
+    setter.tween = { kill: vi.fn() }
+    quickTargets.push({ property, setter, target })
+    return setter
+  })
+  const engine = {
+    gsap: {
+      quickSetter: vi.fn(() => vi.fn()),
+      quickTo,
+      set: vi.fn(),
+      to: vi.fn(() => ({ kill: vi.fn() })),
+    },
+  } as unknown as AtlasEngine
+
+  return { engine, quickTargets }
+}
+
 describe('atlas DOM capabilities', () => {
   beforeEach(() => {
     document.documentElement.className = ''
@@ -135,12 +159,8 @@ describe('atlas DOM capabilities', () => {
       <button id="dossier" data-cursor="expand">Field notes</button>
       <picture id="plate"></picture>
     `
-    const frames: FrameRequestCallback[] = []
-    const requestFrame = vi.fn((callback: FrameRequestCallback) => {
-      frames.push(callback)
-      return frames.length
-    })
-    const cleanup = setupCursor(document, () => true, requestFrame, vi.fn())
+    const { engine } = createPointerEngine()
+    const cleanup = setupCursor(document, () => true, engine)
     const cursor = document.querySelector<HTMLElement>('[data-atlas-cursor]')!
 
     document.getElementById('external')?.dispatchEvent(new MouseEvent('pointerover', {
@@ -163,7 +183,7 @@ describe('atlas DOM capabilities', () => {
     cleanup()
     expect(document.querySelector('[data-atlas-cursor]')).not.toBeInTheDocument()
 
-    const touchCleanup = setupCursor(document, () => false, requestFrame, vi.fn())
+    const touchCleanup = setupCursor(document, () => false, engine)
     expect(document.querySelector('[data-atlas-cursor]')).not.toBeInTheDocument()
     touchCleanup()
   })
@@ -222,25 +242,18 @@ describe('atlas DOM capabilities', () => {
       y: 0,
       toJSON: () => undefined,
     })
-    const frames: FrameRequestCallback[] = []
-    const requestFrame = vi.fn((callback: FrameRequestCallback) => {
-      frames.push(callback)
-      return frames.length
-    })
-    const cancelFrame = vi.fn()
-    const cleanup = setupMagnetic(document, () => true, requestFrame, cancelFrame)
+    const { engine, quickTargets } = createPointerEngine()
+    const cleanup = setupMagnetic(document, () => true, engine)
 
     link.dispatchEvent(new MouseEvent('pointerenter', { clientX: 50, clientY: 50 }))
     link.dispatchEvent(new MouseEvent('pointermove', { clientX: 500, clientY: -500 }))
-    for (let index = 0; index < 30 && frames.length > 0; index += 1) frames.shift()?.(index)
-
-    expect(Number.parseFloat(link.style.getPropertyValue('--atlas-magnet-x'))).toBeLessThanOrEqual(6)
-    expect(Number.parseFloat(link.style.getPropertyValue('--atlas-magnet-y'))).toBeGreaterThanOrEqual(-6)
+    expect(quickTargets.find(({ property }) => property === 'x')?.setter).toHaveBeenCalledWith(6)
+    expect(quickTargets.find(({ property }) => property === 'y')?.setter).toHaveBeenCalledWith(-6)
     expect(link).toHaveAttribute('data-magnetic-ready')
     cleanup()
     expect(link).not.toHaveAttribute('data-magnetic-ready')
 
-    const touchCleanup = setupMagnetic(document, () => false, requestFrame, cancelFrame)
+    const touchCleanup = setupMagnetic(document, () => false, engine)
     expect(link).not.toHaveAttribute('data-magnetic-ready')
     touchCleanup()
   })
@@ -344,9 +357,13 @@ describe('atlas DOM capabilities', () => {
     const prepareCursor = vi.fn()
     const prepareMetrics = vi.fn()
     const prepareMagnetic = vi.fn()
+    const prepareMarquee = vi.fn()
     const cleanupLocalTime = vi.fn()
     const prepareLocalTime = vi.fn(() => cleanupLocalTime)
     const prepareProjects = vi.fn()
+    const preparePrintReveals = vi.fn()
+    const prepareScramble = vi.fn()
+    const prepareVelocityPlates = vi.fn()
     const prepareWipes = vi.fn()
     const cleanupDossiers = vi.fn()
     const prepareDossiers = vi.fn(() => cleanupDossiers)
@@ -370,11 +387,15 @@ describe('atlas DOM capabilities', () => {
       prepareDossiers,
       prepareMetrics,
       prepareMagnetic,
+      prepareMarquee,
       prepareLocalTime,
       prepareProjects,
+      preparePrintReveals,
       prepareExperience,
       prepareReveals,
       prepareSun,
+      prepareScramble,
+      prepareVelocityPlates,
       prepareWipes,
       prepareWayfinding,
       window,
@@ -391,8 +412,12 @@ describe('atlas DOM capabilities', () => {
     expect(prepareCursor).not.toHaveBeenCalled()
     expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareMagnetic).not.toHaveBeenCalled()
+    expect(prepareMarquee).not.toHaveBeenCalled()
     expect(prepareLocalTime).toHaveBeenCalledOnce()
     expect(prepareProjects).not.toHaveBeenCalled()
+    expect(preparePrintReveals).not.toHaveBeenCalled()
+    expect(prepareScramble).not.toHaveBeenCalled()
+    expect(prepareVelocityPlates).not.toHaveBeenCalled()
     expect(prepareWipes).not.toHaveBeenCalled()
     expect(prepareDossiers).toHaveBeenCalledOnce()
     expect(prepareExperience).not.toHaveBeenCalled()
@@ -429,8 +454,12 @@ describe('atlas DOM capabilities', () => {
     const cleanupExperience = vi.fn()
     const cleanupSun = vi.fn()
     const cleanupMagnetic = vi.fn()
+    const cleanupMarquee = vi.fn()
     const cleanupLocalTime = vi.fn()
     const cleanupProjects = vi.fn()
+    const cleanupPrintReveals = vi.fn()
+    const cleanupScramble = vi.fn()
+    const cleanupVelocityPlates = vi.fn()
     const cleanupWipes = vi.fn()
     const cleanupWayfinding = vi.fn()
     const createBus = vi.fn(() => ({
@@ -455,11 +484,15 @@ describe('atlas DOM capabilities', () => {
       prepareDossiers: () => cleanupDossiers,
       prepareMetrics: () => cleanupMetrics,
       prepareMagnetic: () => cleanupMagnetic,
+      prepareMarquee: () => cleanupMarquee,
       prepareLocalTime: () => cleanupLocalTime,
       prepareProjects: () => cleanupProjects,
+      preparePrintReveals: () => cleanupPrintReveals,
       prepareExperience: () => cleanupExperience,
       prepareReveals: () => cleanupReveals,
       prepareSun: () => cleanupSun,
+      prepareScramble: () => cleanupScramble,
+      prepareVelocityPlates: () => cleanupVelocityPlates,
       prepareWipes: () => cleanupWipes,
       prepareWayfinding: () => cleanupWayfinding,
       window,
@@ -485,8 +518,12 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupExperience).toHaveBeenCalledOnce()
     expect(cleanupSun).toHaveBeenCalledOnce()
     expect(cleanupMagnetic).toHaveBeenCalledOnce()
+    expect(cleanupMarquee).toHaveBeenCalledOnce()
     expect(cleanupLocalTime).toHaveBeenCalledOnce()
     expect(cleanupProjects).toHaveBeenCalledOnce()
+    expect(cleanupPrintReveals).toHaveBeenCalledOnce()
+    expect(cleanupScramble).toHaveBeenCalledOnce()
+    expect(cleanupVelocityPlates).toHaveBeenCalledOnce()
     expect(cleanupWipes).toHaveBeenCalledOnce()
     expect(cleanupWayfinding).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()

@@ -222,17 +222,21 @@ describe('GSAP Atlas choreography', () => {
       <section class="craft-section">
         <div class="craft-panel"><div class="craft-narrative">
           <div class="craft-heading"><span class="craft-ghost"></span></div>
+          <div class="craft-copy"></div>
         </div></div>
         <picture class="craft-art"><img /></picture>
       </section>
     `
     const harness = createMotionHarness()
     const panel = document.querySelector<HTMLElement>('.craft-panel')!
-    Object.defineProperty(panel, 'offsetHeight', { configurable: true, value: 800 })
-    Object.defineProperty(document.querySelector('.craft-heading'), 'offsetHeight', {
+    const headingElement = document.querySelector<HTMLElement>('.craft-heading')!
+    const copyElement = document.querySelector<HTMLElement>('.craft-copy')!
+    Object.defineProperty(headingElement, 'offsetHeight', {
       configurable: true,
       value: 300,
     })
+    Object.defineProperty(headingElement, 'offsetTop', { configurable: true, value: 100 })
+    Object.defineProperty(copyElement, 'offsetTop', { configurable: true, value: 448 })
     const cleanup = setupCraftChapter(document, window, harness.engine)
     const heading = document.querySelector('.craft-heading')
     const plate = document.querySelector('.craft-art')
@@ -251,7 +255,7 @@ describe('GSAP Atlas choreography', () => {
       trigger: panel,
     }))
     const pinVars = harness.create.mock.calls[0][0]
-    expect((pinVars.end as () => string)()).toBe('+=380')
+    expect((pinVars.end as () => string)()).toBe('+=24')
     expect(plateTimeline.fromTo).toHaveBeenCalledWith(
       plate,
       { clipPath: 'inset(0 0 100%)' },

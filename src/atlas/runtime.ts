@@ -7,10 +7,13 @@ import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupEntrance, setupHeroParallax, setupMetricCountUps } from './hero'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
+import { setupMarquee } from './marquee'
+import { setupPrintReveals, setupVelocityPlates } from './plates'
 import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
 import { setupSectionWayfinding, setupSunArc } from './sun-arc'
+import { setupScrambleWayfinding } from './wayfinding'
 
 interface AtlasRuntimeOptions {
   readonly createBus?: (engine: AtlasEngine) => ScrollBus
@@ -26,10 +29,14 @@ interface AtlasRuntimeOptions {
   readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareMagnetic?: (document: Document) => () => void
+  readonly prepareMarquee?: (document: Document) => () => void
   readonly prepareLocalTime?: (document: Document) => () => void
   readonly prepareProjects?: (document: Document, window: Window) => () => void
+  readonly preparePrintReveals?: (document: Document, window: Window) => () => void
   readonly prepareReveals?: () => () => void
   readonly prepareSun?: (document: Document, window: Window) => () => void
+  readonly prepareScramble?: (document: Document) => () => void
+  readonly prepareVelocityPlates?: (document: Document) => () => void
   readonly prepareWayfinding?: (document: Document) => () => void
   readonly prepareWipes?: (document: Document) => () => void
   readonly window?: Window
@@ -49,10 +56,14 @@ export function initializeAtlas({
   prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
   prepareMagnetic = setupMagnetic,
+  prepareMarquee = setupMarquee,
   prepareLocalTime = setupLocalTime,
   prepareProjects = setupProjectPans,
+  preparePrintReveals = setupPrintReveals,
   prepareReveals = setupReveals,
   prepareSun = setupSunArc,
+  prepareScramble = setupScrambleWayfinding,
+  prepareVelocityPlates = setupVelocityPlates,
   prepareWayfinding = setupSectionWayfinding,
   prepareWipes = setupChapterWipes,
   window: runtimeWindow = window,
@@ -91,8 +102,12 @@ export function initializeAtlas({
   const cleanupHero = prepareHero(runtimeDocument, runtimeWindow)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupMagnetic = prepareMagnetic(runtimeDocument)
+  const cleanupMarquee = prepareMarquee(runtimeDocument)
   const cleanupProjects = prepareProjects(runtimeDocument, runtimeWindow)
+  const cleanupPrintReveals = preparePrintReveals(runtimeDocument, runtimeWindow)
+  const cleanupScramble = prepareScramble(runtimeDocument)
   const cleanupSun = prepareSun(runtimeDocument, runtimeWindow)
+  const cleanupVelocityPlates = prepareVelocityPlates(runtimeDocument)
   const cleanupWipes = prepareWipes(runtimeDocument)
   const scrollBus = (createBus ?? ((activeEngine) => createScrollBus({
     document: runtimeDocument,
@@ -145,8 +160,12 @@ export function initializeAtlas({
     cleanupHero()
     cleanupMetrics()
     cleanupMagnetic()
+    cleanupMarquee()
     cleanupProjects()
+    cleanupPrintReveals()
+    cleanupScramble()
     cleanupSun()
+    cleanupVelocityPlates()
     cleanupWipes()
     cleanupLocalTime()
     cleanupWayfinding()
