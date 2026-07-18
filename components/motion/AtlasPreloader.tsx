@@ -117,19 +117,19 @@ export function AtlasPreloader() {
     timeline.fromTo(
       glyph,
       { drawSVG: '0%' },
-      { drawSVG: '100%', duration: 0.72, ease: 'power2.out', stagger: 0.04 },
-      0.06,
+      { drawSVG: '100%', duration: 0.5, ease: 'power2.out', stagger: 0.025 },
+      0.04,
     )
     timeline.to(paper, {
       clipPath: 'inset(0 0 100% 0)',
-      duration: 0.18,
+      duration: 0.13,
       ease: 'power3.inOut',
-    }, 0.72)
+    }, 0.5)
     timeline.to(dusk, {
       clipPath: 'inset(0 0 100% 0)',
-      duration: 0.32,
+      duration: 0.23,
       ease: 'power4.inOut',
-    }, 0.86)
+    }, 0.61)
 
     return () => timeline.kill()
   }, { dependencies: [active, finish], scope: rootRef })

@@ -9,8 +9,8 @@ import {
 
 describe('maximalist entrance choreography', () => {
   it('keeps the complete curtain entrance below the 1.8 second ceiling', () => {
-    expect(PRELOADER_DURATION_SECONDS).toBeLessThanOrEqual(1.8)
-    expect(PRELOADER_DURATION_SECONDS).toBeGreaterThanOrEqual(1)
+    expect(PRELOADER_DURATION_SECONDS).toBeLessThanOrEqual(0.9)
+    expect(PRELOADER_DURATION_SECONDS).toBeGreaterThanOrEqual(0.75)
   })
 
   it('snaps the counter while overlapping glyph draw and two curtain stages', () => {

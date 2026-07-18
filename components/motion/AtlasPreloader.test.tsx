@@ -98,7 +98,7 @@ describe('AtlasPreloader', () => {
       expect.any(Array),
       { drawSVG: '0%' },
       expect.objectContaining({ drawSVG: '100%' }),
-      0.06,
+      0.04,
     )
 
     act(() => motion.complete?.())
