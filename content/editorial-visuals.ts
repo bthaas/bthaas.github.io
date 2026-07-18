@@ -3,6 +3,12 @@ export interface AtlasVisual {
   readonly fallback: `/icarus-atlas/${string}.webp`
   readonly smallSrc: `/icarus-atlas/${string}.avif`
   readonly smallFallback: `/icarus-atlas/${string}.webp`
+  readonly tinySrc?: `/icarus-atlas/${string}.avif`
+  readonly tinyFallback?: `/icarus-atlas/${string}.webp`
+  readonly tinyWidth?: number
+  readonly mediumSrc?: `/icarus-atlas/${string}.avif`
+  readonly mediumFallback?: `/icarus-atlas/${string}.webp`
+  readonly mediumWidth?: number
   readonly width: number
   readonly height: number
   readonly smallWidth: number
@@ -14,9 +20,15 @@ export const atlasVisuals = {
     fallback: '/icarus-atlas/hero-flight-1600.webp',
     smallSrc: '/icarus-atlas/hero-flight-960.avif',
     smallFallback: '/icarus-atlas/hero-flight-960.webp',
+    tinySrc: '/icarus-atlas/hero-flight-640.avif',
+    tinyFallback: '/icarus-atlas/hero-flight-640.webp',
+    mediumSrc: '/icarus-atlas/hero-flight-768.avif',
+    mediumFallback: '/icarus-atlas/hero-flight-768.webp',
     width: 1600,
     height: 1130,
     smallWidth: 960,
+    tinyWidth: 640,
+    mediumWidth: 768,
   },
   craft: {
     src: '/icarus-atlas/craft-workshop-1600.avif',

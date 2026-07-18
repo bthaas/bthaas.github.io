@@ -76,7 +76,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           as="image"
           type="image/avif"
           href="/icarus-atlas/hero-flight-1600.avif"
-          imageSrcSet="/icarus-atlas/hero-flight-960.avif 960w, /icarus-atlas/hero-flight-1600.avif 1600w"
+          imageSrcSet="/icarus-atlas/hero-flight-640.avif 640w, /icarus-atlas/hero-flight-768.avif 768w, /icarus-atlas/hero-flight-960.avif 960w, /icarus-atlas/hero-flight-1600.avif 1600w"
           imageSizes="(max-width: 720px) 100vw, calc(100vw - 64px)"
           fetchPriority="high"
         />

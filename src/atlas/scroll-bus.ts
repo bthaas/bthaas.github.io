@@ -25,9 +25,10 @@ export function createScrollBus({
   window: runtimeWindow = window,
 }: ScrollBusOptions = {}): ScrollBus {
   const subscribers = new Set<ScrollSubscriber>()
+  let lastPublished: ScrollSnapshot | null = null
 
-  const readSnapshot = (): ScrollSnapshot => {
-    const scrollY = engine?.lenis.scroll ?? runtimeWindow.scrollY
+  const readSnapshot = (scrollYOverride?: number): ScrollSnapshot => {
+    const scrollY = scrollYOverride ?? engine?.lenis.scroll ?? runtimeWindow.scrollY
     return {
       documentProgress: getDocumentProgress({
         scrollHeight: runtimeDocument.documentElement.scrollHeight,
@@ -38,25 +39,34 @@ export function createScrollBus({
     }
   }
 
-  const publish = () => {
-    const snapshot = {
-      ...readSnapshot(),
-    }
+  const publish = (scrollYOverride?: number) => {
+    const snapshot = readSnapshot(scrollYOverride)
+    if (
+      lastPublished?.scrollY === snapshot.scrollY &&
+      lastPublished.documentProgress === snapshot.documentProgress
+    ) return
+    lastPublished = snapshot
     subscribers.forEach((subscriber) => subscriber(snapshot))
+  }
+  const handleNativeScroll = () => {
+    publish(runtimeWindow.scrollY)
   }
 
   const trigger = engine?.ScrollTrigger.create({
     end: 'max',
-    onRefresh: publish,
-    onUpdate: publish,
+    onRefresh: () => publish(),
+    onUpdate: () => publish(),
     start: 0,
     trigger: runtimeDocument.documentElement,
   })
+  runtimeWindow.addEventListener('scroll', handleNativeScroll, { passive: true })
 
   return {
     destroy: () => {
       trigger?.kill()
+      runtimeWindow.removeEventListener('scroll', handleNativeScroll)
       subscribers.clear()
+      lastPublished = null
     },
     subscribe: (subscriber) => {
       subscribers.add(subscriber)

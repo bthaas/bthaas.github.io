@@ -1,89 +1,113 @@
 # Awwwards portfolio verification
 
-Verified on 2026-07-15 from `codex/step-8-qa-submission-kit`, based on the Step 7 merge commit `436f1ac` on `source`.
+Verified on 2026-07-18 from `codex/phase-d-submission-polish`. This pass covers
+the GSAP + ScrollTrigger + Lenis engine, the re-choreographed atlas, the Phase C
+signature motion, and the lazy contact flock.
 
-## Step 8 findings and fixes
-
-The browser and performance baseline was visually correct. Full axe-core testing found one markup defect that Lighthouse's accessibility subset did not report: four `<article role="listitem">` elements used a role that axe considers invalid for that element. The flight log now uses a native `<ol>`/`<li>` structure. Four generic elements with accessible names also received appropriate `group`, `list`, `region`, and `timer` roles.
-
-A contrast probe found that the tiny project case and technology labels dipped below 4.5:1 at the first frame of their scroll-linked entrance. Their starting opacity increased from `0.35` to `0.72`; the transform choreography and final appearance are unchanged. The follow-up probe reports zero contrast violations.
-
-## Automated gates
+## Release gates
 
 | Gate | Result |
 | --- | --- |
-| `npm run verify` | Passed: 18 files / 91 tests, typecheck, and production build |
-| `npm run test:coverage` | Passed: 92.71% statements, 81.76% branches, 85.45% functions, 95.61% lines |
-| Production export | Passed; `/`, `/404.html`, robots, and sitemap generated |
-| Source file budget | Passed; largest source file is 763 lines, below 800 |
-| Static script audit | Passed; `/atlas.js` is the only script in every exported HTML file |
-| Atlas bundle | 21,793 bytes raw; 6,864 bytes gzip |
+| `npm run verify` | Passed: 30 files / 128 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 90.74% statements, 83.13% branches, 80.81% functions, 94.20% lines |
+| `npm run test:e2e` | Passed: 13 tests, 3 intentional project skips, 4 browser/device projects |
+| Static export | Passed; six HTML files contain `/atlas.js` and no React/Next.js runtime |
+| Motion bundle | `atlas.js`: 83,145 bytes gzip, below the 100 KiB gate |
+| Lazy finale bundle | `horizon.js`: 1,461 bytes gzip, below the 220 KiB gate |
+| Source file budget | Passed; no source file exceeds the repository's 800-line limit |
 
-## Performance
+The production postbuild injects a content-hashed deferred `/atlas.js` URL.
+`horizon.js` is absent from initial HTML: Atlas injects its content-hashed URL
+once, only when a fine-pointer desktop approaches `#contact`. It is not requested
+on mobile, coarse pointers, no-JS, or reduced-motion visits.
 
-Lighthouse 13.4.0 ran against the local `out/` export through a compression-capable production static server. A non-compressing Python server was rejected as unrepresentative after it inflated the simulated mobile LCP to about 1.88 seconds while the observed LCP was only 118 milliseconds.
+## Lighthouse
 
-| Profile | Runs | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT |
+Lighthouse ran against the stripped `out/` export through the repository's
+Brotli/gzip production server.
+
+| Profile | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT | Speed index |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Mobile | 3 | 100 / 100 / 100 | 100 / 100 / 100 | 100 / 100 / 100 | 100 / 100 / 100 | 1.503 s median | 0 | 0 ms |
-| Desktop | 1 | 100 | 100 | 100 | 100 | 408 ms | 0 | 0 ms |
+| Mobile | 100 | 100 | 100 | 100 | 1.35 s | 0 | 18 ms | 1.23 s |
+| Desktop | 100 | 100 | 100 | 100 | 0.43 s | 0 | 0 ms | 0.42 s |
 
-Event Timing traces were captured after the target chapter had settled, matching real interaction conditions:
+The mobile browser selects the new 768 px hero AVIF (29,696 bytes). The hero
+plate now paints immediately instead of waiting for an entrance clip, preserving
+the editorial composition while keeping LCP inside the 1.8-second guardrail.
 
-| Interaction | Worst event duration | Long tasks | State check |
-| --- | ---: | ---: | --- |
-| Flight-log expander | 56 ms | 0 | `aria-expanded` changed to `true` |
-| Magnetic repository link | 24 ms | 0 | magnetic enhancement initialized |
+## Motion performance
 
-Both traces are below the 200 ms INP budget. A deliberately invalid trace that clicked during programmatic smooth scrolling was discarded because it measured the scripted scroll's presentation delay, not a settled user interaction.
+Frame pacing was sampled after each scroll position had settled. Hardware-backed
+headed runs establish the desktop result; the Playwright table records the
+repeatable cross-browser release gate. Automated WebKit is intentionally capped
+near 30 fps by its runner, so stability and frame variance—not a synthetic 60 fps
+claim—are the meaningful result there.
 
-## Accessibility
+| Hardware browser | Renderer | 0% | 25% | 50% | 75% | 100% |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Chrome, macOS | Apple M3 Pro / Metal | 120 | 120 | 120 | 120 | 120 |
+| Firefox, macOS | Apple GPU | 118.7 | 120.1 | 120.0 | 118.7 | 120.0 |
 
-- axe-core 4.12.1: zero violations and 42 passing rules.
-- Contrast follow-up with pseudo-elements disabled: zero violations. The remaining incomplete result contains image-backed/decorative text that axe cannot resolve automatically and was reviewed visually.
-- Keyboard journey: the skip link is first, lands at `#main-content`, then continues through the hero call to action, the focusable craft ticker, all three field-note toggles, project links, contact, and footer links.
-- Expander keyboard behavior: Enter opens and Space closes while focus remains on the button.
-- Reduced motion at 390 × 844: media query matched, zero running animations, no horizontal overflow, and all unsplit headings retained their native text.
-- Screen-reader spot checks: the split masthead and finale expose intact heading names; the native flight-log list contains four direct items; current navigation uses `aria-current="true"`; dossiers expose button state and controlled content.
+| Automated project | Renderer / constraint | 0% | 25% | 50% | 75% | 100% |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Chromium desktop | SwiftShader headless | 108.9 | 31.9 | 43.2 | 46.0 | 26.7 |
+| Firefox desktop | Apple GPU | 120.0 | 107.0 | 71.5 | 91.9 | 30.4 |
+| WebKit desktop | 30 fps runner cap | 30.2 | 30.2 | 30.0 | 29.8 | 30.2 |
+| WebKit iPhone | 30 fps runner cap | 30.0 | 30.1 | 29.9 | 30.1 | 30.0 |
 
-## Browser matrix
+Chromium's contact result was isolated to software rendering: the same headless
+run measured about 49 fps with the flock and about 96 fps with its canvas hidden,
+while hardware Chrome held 120 fps through the finale. The flock itself caps
+simulation work at 60 Hz and pauses whenever its section is not visible.
 
-| Browser / device | Viewport | Result and notes |
+## Browser and behavior matrix
+
+| Browser / device | Viewport | Result |
 | --- | --- | --- |
-| Chrome 150 / Chromium desktop | 1440 × 1000 and 1600 × 1200 | Hero entrance, sticky hero copy, lime chapter wipe, trajectory panels, sun arc, project pans, cursor, magnetic links, and finale passed. |
-| Chrome 150 / Android DevTools-size profile | 390 × 844 | No horizontal overflow; responsive navigation, portrait art, chapter anchors, sun arc, expanders, and contact stack passed. |
-| Safari 26.5 on macOS | Desktop app window | Hero, chapter wipe, sticky trajectory state, sun navigation, and field-note expansion passed visually and through the accessibility tree. |
-| Firefox 137.0.2 on macOS | Desktop app window | Hero, craft plate/ticker, project transition, sticky states, keyboard scroll, and navigation passed. |
-| iOS Safari, iOS 18.5 Simulator, iPhone 16 Pro | Device viewport | Hero portrait crop, responsive navigation, sun arc, craft anchor/wipe, and trajectory sticky composition passed. |
+| Chromium desktop | 1600 × 1200 | Full GSAP/ScrollTrigger choreography, Lenis, dossiers, cursor, flock, and programmatic scroll passed. |
+| Firefox desktop | 1600 × 1200 | Full choreography passed; no CSS scroll-timeline fallback or static downgrade. |
+| WebKit desktop | 1600 × 1200 | Choreography, keyboard scrolling, dossiers, lazy finale, and overflow checks passed. |
+| WebKit iPhone | iPhone 13 profile | Native touch scroll, responsive composition, stable 30 fps, and no premature finale bundle passed. |
 
-Application-origin console errors: none observed. No dependency warning affected runtime behavior.
+Every project checks application-origin console errors, failed same-origin
+requests, horizontal overflow, dossier keyboard/ARIA state, and the contact
+finale. None failed. Anchor and programmatic scrolling use a passive native
+scroll signal in addition to Lenis/ScrollTrigger, preventing stale progress when
+a browser jumps directly to a chapter.
 
-## Content and metadata
+## Accessibility and static paths
 
-- Title: `Brett Haas`.
-- Description: `Brett Haas is a software engineer building ambitious products across AI, web, mobile, and intelligent systems.`
-- Canonical URL: `https://bthaas.github.io`.
-- Open Graph image: `/icarus-atlas/hero-social-1600.webp` at 1600 × 900.
-- `robots.txt` allows crawling and points to the sitemap.
-- `sitemap.xml` contains the canonical homepage.
-- Project, GitHub, LinkedIn, email, and in-page destinations are present and keyboard reachable.
+- `prefers-reduced-motion` exits before engine or DOM preparation: no Lenis,
+  GSAP timeline, split text, cursor, marquee, or flock is created.
+- The reduced-motion DOM matches the static export, with zero running animations
+  and intact native heading text.
+- JavaScript-disabled runs retain every section, project link, contact action,
+  semantic landmark, and dossier body.
+- Flip dossiers keep `aria-expanded`, `aria-controls`, Enter/Space operation,
+  visible focus, and settled neighboring layout.
+- SplitText uses its built-in heading ARIA support. Decorative index and craft
+  ghost numerals are removed from the accessibility tree.
+- Lighthouse accessibility is 100 on desktop and mobile; application-origin
+  console errors are zero.
 
-## Script and deployment boundary
+## Contact-flourish decision gate
 
-The local production export contains exactly one script tag in each HTML file, all pointing to `/atlas.js`. The Next.js framework runtime is removed by the postbuild step.
-
-Cloudflare remains explicitly out of scope. No Cloudflare page, setting, or live-domain script audit was opened or changed. Confirming the live domain's edge-injected scripts remains a deferred, manually handled follow-up; it is not a blocker for the local production gate.
+The required Vanta first attempt was evaluated and rejected. `vanta@0.5.24`
+does not pin a compatible Three.js version; the current Three release failed its
+runtime assumptions, while a compatible r134 test rendered but still read as a
+stock Vanta preset. The shipped alternative is a deterministic, palette-aware
+2D canvas flock with sparse silhouette birds. It is more bespoke, substantially
+smaller, and held the hardware frame budget.
 
 ## Submission artifacts
 
 - [Submission kit](./awwwards/SUBMISSION.md)
-- [Desktop PR screenshot](./awwwards/screenshots/step-8/portfolio-1440.png)
-- [Mobile PR screenshot](./awwwards/screenshots/step-8/portfolio-390.png)
+- [Step 13 desktop/mobile captures](./awwwards/screenshots/step-13/)
 - [Hero capture](./awwwards/submission/01-hero-1600x1200.png)
-- [Craft wipe capture](./awwwards/submission/02-craft-wipe-mid-1600x1200.png)
-- [Project pan capture](./awwwards/submission/03-project-pan-1600x1200.png)
-- [Finale capture](./awwwards/submission/04-finale-1600x1200.png)
+- [Projects-to-craft capture](./awwwards/submission/02-craft-wipe-mid-1600x1200.png)
+- [Project print-reveal capture](./awwwards/submission/03-project-pan-1600x1200.png)
+- [Flock finale capture](./awwwards/submission/04-finale-1600x1200.png)
 
-## Issue triage
-
-No nonblocking product findings remain from this pass. The repository had zero open issues immediately before the pull request handoff.
+Cloudflare and live-domain edge injection remain outside the repository release
+gate. The local production export proves the application itself ships only the
+deferred atlas entry initially and the gated horizon entry on approach.

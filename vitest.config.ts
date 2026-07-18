@@ -11,6 +11,7 @@ export default defineConfig({
       '**/.claude/worktrees/**',
       '**/.next/**',
       '**/out/**',
+      '**/tests/e2e/**',
     ],
     coverage: {
       provider: 'v8',

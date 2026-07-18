@@ -235,7 +235,9 @@ export function Portfolio() {
               {experience.map((entry, index) => (
                 <li className="flight-entry" key={entry.id}>
                   <FlightRule />
-                  <p className="flight-index">{String(index + 1).padStart(2, '0')}</p>
+                  <p className="flight-index" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </p>
                   <div className="flight-heading">
                     <h3>{entry.organization}</h3>
                     <p className="flight-role">
@@ -254,7 +256,7 @@ export function Portfolio() {
               {education.map((entry) => (
                 <li className="flight-entry flight-entry--education" key={entry.degree}>
                   <FlightRule />
-                  <p className="flight-index">04</p>
+                  <p className="flight-index" aria-hidden="true">04</p>
                   <div className="flight-heading">
                     <h3>{entry.institution}</h3>
                     <p className="flight-role">{entry.degree}</p>
@@ -346,9 +348,7 @@ export function Portfolio() {
             <div className="craft-panel">
               <div className="craft-narrative">
                 <div className="section-heading craft-heading">
-                  <span className="craft-ghost" data-craft-ghost aria-hidden="true">
-                    03
-                  </span>
+                  <span className="craft-ghost" data-craft-ghost="03" aria-hidden="true" />
                   <p className="eyebrow">03 / Skills</p>
                   <h2 id="craft-title">The skills behind the flight.</h2>
                 </div>

@@ -144,4 +144,6 @@ coverage/
 
 # Local audit output and temporary generated assets
 artifacts/
+playwright-report/
+test-results/
 tmp/

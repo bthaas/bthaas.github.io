@@ -9,10 +9,13 @@
     "build": "next build",
     "build:atlas": "node scripts/build-atlas.mjs",
     "postbuild": "node scripts/strip-static-runtime.mjs",
+    "prepare:deployment": "node scripts/prepare-deployment-assets.mjs",
+    "serve:deployment": "node scripts/serve-deployment.mjs",
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "npm run build && npm run prepare:deployment && playwright test",
     "typecheck": "tsc --noEmit",
     "verify": "npm run test && npm run typecheck && npm run build"
   },
@@ -20,6 +23,7 @@
     "postcss": "$postcss"
   },
   "devDependencies": {
+    "@playwright/test": "1.61.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.1.1",

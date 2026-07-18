@@ -44,7 +44,6 @@ export function setupEntrance(
     mask: 'lines',
     type: 'chars',
   })
-  const heroArt = root.querySelector<HTMLElement>('.hero-art')
   const chrome = Array.from(root.querySelectorAll<HTMLElement>('.site-nav, .hero-meta'))
   html.classList.remove('atlas-entered')
   html.classList.add('atlas-entering')
@@ -56,14 +55,6 @@ export function setupEntrance(
       html.classList.add('atlas-entered')
     },
   })
-  if (heroArt) {
-    timeline.fromTo(
-      heroArt,
-      { clipPath: 'inset(0 100% 0 0)' },
-      { clipPath: 'inset(0 0% 0 0)', duration: 0.46, ease: 'power3.out' },
-      0,
-    )
-  }
   timeline.fromTo(
     split.chars,
     { opacity: 0, yPercent: 110 },

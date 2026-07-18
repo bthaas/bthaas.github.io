@@ -239,7 +239,7 @@ describe('Phase C signature motion', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
     expect(harness.splitCreate).toHaveBeenCalledWith(
       document.querySelector('.flight-index'),
-      expect.objectContaining({ aria: 'auto', type: 'chars' }),
+      expect.objectContaining({ aria: 'none', type: 'chars' }),
     )
     expect(harness.triggers).toHaveLength(2)
     ;(harness.triggers[0].vars.onEnter as () => void)()

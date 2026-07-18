@@ -71,31 +71,21 @@ export function initializeAtlas({
   prepareWipes = setupChapterWipes,
   window: runtimeWindow = window,
 }: AtlasRuntimeOptions = {}): () => void {
-  const cleanupWayfinding = prepareWayfinding(runtimeDocument)
-  const cleanupLocalTime = prepareLocalTime(runtimeDocument)
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const cleanupDossiers = prepareDossiers(runtimeDocument)
-    return () => {
-      cleanupDossiers()
-      cleanupLocalTime()
-      cleanupWayfinding()
-    }
+    return () => {}
   }
 
   const engine = (createEngine ?? (() => initializeAtlasEngine({ matchMedia })))()
   if (!engine) {
-    const cleanupDossiers = prepareDossiers(runtimeDocument)
-    return () => {
-      cleanupDossiers()
-      cleanupLocalTime()
-      cleanupWayfinding()
-    }
+    return () => {}
   }
 
   const html = runtimeDocument.documentElement
   html.classList.add('atlas-js')
   html.dataset.atlas = 'ready'
 
+  const cleanupWayfinding = prepareWayfinding(runtimeDocument)
+  const cleanupLocalTime = prepareLocalTime(runtimeDocument)
   const cleanupEntrance = prepareEntrance(runtimeDocument)
   const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)

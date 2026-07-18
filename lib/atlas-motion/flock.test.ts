@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createFlock, stepFlock } from './flock'
+import { createFlock, getFlockFrameDelta, stepFlock } from './flock'
 
 describe('contact flock choreography', () => {
   it('creates a deterministic sparse flock inside the horizon band', () => {
@@ -31,5 +31,11 @@ describe('contact flock choreography', () => {
 
     expect(wrapped[0].x).toBeLessThan(0)
     expect(wrapped[0].phase - bird.phase).toBeLessThanOrEqual(0.09)
+  })
+
+  it('caps canvas work at 60 Hz and clamps long frame gaps', () => {
+    expect(getFlockFrameDelta(0, 8)).toBeNull()
+    expect(getFlockFrameDelta(0, 17)).toBeCloseTo(0.017)
+    expect(getFlockFrameDelta(0, 1_000)).toBe(0.05)
   })
 })

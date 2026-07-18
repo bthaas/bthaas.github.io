@@ -1,4 +1,9 @@
-import { createFlock, stepFlock, type FlockBird } from '../../lib/atlas-motion/flock'
+import {
+  createFlock,
+  getFlockFrameDelta,
+  stepFlock,
+  type FlockBird,
+} from '../../lib/atlas-motion/flock'
 
 interface HorizonWindow extends Window {
   __atlasHorizon?: { destroy: () => void }
@@ -15,7 +20,7 @@ if (target) {
   let frame = 0
   let height = 1
   let width = 1
-  let lastTime = performance.now()
+  let lastRenderTime = performance.now()
   let isVisible = typeof IntersectionObserver === 'undefined'
   let statsStart = 0
   let statsFrames = 0
@@ -53,8 +58,10 @@ if (target) {
     context.restore()
   }
   const render = (time: number) => {
-    if (isVisible && context) {
-      birds = stepFlock(birds, (time - lastTime) / 1000)
+    const delta = getFlockFrameDelta(lastRenderTime, time)
+    if (isVisible && context && delta !== null) {
+      lastRenderTime = time
+      birds = stepFlock(birds, delta)
       context.clearRect(0, 0, width, height)
       birds.forEach(drawBird)
       if (collectStats) {
@@ -66,7 +73,6 @@ if (target) {
         }
       }
     }
-    lastTime = time
     frame = window.requestAnimationFrame(render)
   }
 
@@ -78,8 +84,14 @@ if (target) {
   const visibilityObserver = typeof IntersectionObserver === 'undefined'
     ? null
     : new IntersectionObserver(([entry]) => {
-        isVisible = entry?.isIntersecting ?? false
-        lastTime = performance.now()
+        const nextVisible = entry?.isIntersecting ?? false
+        if (nextVisible !== isVisible) {
+          statsStart = 0
+          statsFrames = 0
+          delete target.dataset.horizonFps
+        }
+        isVisible = nextVisible
+        lastRenderTime = performance.now()
       }, { rootMargin: '15% 0px' })
   resizeObserver?.observe(target)
   visibilityObserver?.observe(target)

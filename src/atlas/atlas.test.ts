@@ -359,20 +359,17 @@ describe('atlas DOM capabilities', () => {
     const prepareMetrics = vi.fn()
     const prepareMagnetic = vi.fn()
     const prepareMarquee = vi.fn()
-    const cleanupLocalTime = vi.fn()
-    const prepareLocalTime = vi.fn(() => cleanupLocalTime)
+    const prepareLocalTime = vi.fn()
     const prepareProjects = vi.fn()
     const preparePrintReveals = vi.fn()
     const prepareScramble = vi.fn()
     const prepareVelocityPlates = vi.fn()
     const prepareWipes = vi.fn()
-    const cleanupDossiers = vi.fn()
-    const prepareDossiers = vi.fn(() => cleanupDossiers)
+    const prepareDossiers = vi.fn()
     const prepareExperience = vi.fn()
     const prepareReveals = vi.fn()
-    const cleanupWayfinding = vi.fn()
     const prepareSun = vi.fn()
-    const prepareWayfinding = vi.fn(() => cleanupWayfinding)
+    const prepareWayfinding = vi.fn()
     const matchMedia = vi.fn(() => ({ matches: true }))
 
     const cleanup = initializeAtlas({
@@ -416,21 +413,18 @@ describe('atlas DOM capabilities', () => {
     expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareMagnetic).not.toHaveBeenCalled()
     expect(prepareMarquee).not.toHaveBeenCalled()
-    expect(prepareLocalTime).toHaveBeenCalledOnce()
+    expect(prepareLocalTime).not.toHaveBeenCalled()
     expect(prepareProjects).not.toHaveBeenCalled()
     expect(preparePrintReveals).not.toHaveBeenCalled()
     expect(prepareScramble).not.toHaveBeenCalled()
     expect(prepareVelocityPlates).not.toHaveBeenCalled()
     expect(prepareWipes).not.toHaveBeenCalled()
-    expect(prepareDossiers).toHaveBeenCalledOnce()
+    expect(prepareDossiers).not.toHaveBeenCalled()
     expect(prepareExperience).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
     expect(prepareSun).not.toHaveBeenCalled()
-    expect(prepareWayfinding).toHaveBeenCalledOnce()
+    expect(prepareWayfinding).not.toHaveBeenCalled()
     cleanup()
-    expect(cleanupDossiers).toHaveBeenCalledOnce()
-    expect(cleanupLocalTime).toHaveBeenCalledOnce()
-    expect(cleanupWayfinding).toHaveBeenCalledOnce()
   })
 
   it('marks, publishes, and cleans up the enhanced runtime', () => {
@@ -615,16 +609,34 @@ describe('atlas DOM capabilities', () => {
       window,
     })
     const unsubscribe = bus.subscribe(subscriber)
+    subscriber.mockClear()
+    engine.lenis.scroll = 1000
+    window.dispatchEvent(new Event('scroll'))
+
+    expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.5, scrollY: 1000 })
+
+    subscriber.mockClear()
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 1500 })
+    engine.lenis.scroll = 0
+    window.dispatchEvent(new Event('scroll'))
+    expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.75, scrollY: 1500 })
+
+    subscriber.mockClear()
+    engine.lenis.scroll = 1000
     onUpdate?.()
+    expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.5, scrollY: 1000 })
+
+    subscriber.mockClear()
     unsubscribe()
     bus.destroy()
+    window.dispatchEvent(new Event('scroll'))
 
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
       end: 'max',
       start: 0,
       trigger: document.documentElement,
     }))
-    expect(subscriber).toHaveBeenLastCalledWith({ documentProgress: 0.5, scrollY: 1000 })
+    expect(subscriber).not.toHaveBeenCalled()
     expect(kill).toHaveBeenCalledOnce()
   })
 
