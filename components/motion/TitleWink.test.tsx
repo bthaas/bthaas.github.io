@@ -20,6 +20,8 @@ describe('TitleWink', () => {
     state = 'hidden'
     act(() => document.dispatchEvent(new Event('visibilitychange')))
     expect(document.title).toBe('Come back — the atlas is still open.')
+    act(() => document.dispatchEvent(new Event('visibilitychange')))
+    expect(document.title).toBe('Come back — the atlas is still open.')
 
     state = 'visible'
     act(() => document.dispatchEvent(new Event('visibilitychange')))

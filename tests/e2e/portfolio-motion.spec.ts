@@ -297,7 +297,7 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
   expect(errors).toEqual([])
 })
 
-test('flies through projects with native scroll, fragments, keyboard, and print dissolves', async ({
+test('keeps projects as three vertical cards with keyboard links and print dissolves', async ({
   isMobile,
   page,
 }) => {
@@ -308,65 +308,30 @@ test('flies through projects with native scroll, fragments, keyboard, and print 
   })
   await page.goto('/', { waitUntil: 'networkidle' })
 
-  const stage = page.locator('[data-project-flight-stage]')
-  const track = page.locator('[data-project-flight-track]')
+  const panelList = page.getByRole('navigation', { name: 'Select a project' })
   const panels = page.locator('[data-testid="project-panel-trigger"]')
   await expect(panels).toHaveCount(3)
-  await stage.scrollIntoViewIfNeeded()
+  await panelList.scrollIntoViewIfNeeded()
+  await expect(page.locator('[data-project-flight-stage], .project-flight-canvas')).toHaveCount(0)
+  await expect(panels.first().locator('[data-project-pan]')).toHaveCount(1)
 
-  if (isMobile) {
-    await expect(stage).not.toHaveAttribute('data-project-flight-enhanced', '')
-    await expect(stage.locator('.project-flight-canvas')).toHaveCount(0)
-    const panelTops = await panels.evaluateAll((nodes) => nodes.map((node) => (
-      node.getBoundingClientRect().top
-    )))
-    expect(panelTops).toEqual([...panelTops].sort((a, b) => a - b))
-    expect(await track.evaluate((node) => getComputedStyle(node).transform)).toBe('none')
-  } else {
-    await expect(stage).toHaveAttribute('data-project-flight-enhanced', '')
-    await expect(stage).toHaveAttribute('data-project-flight-ready', '')
-    await expect(stage.locator('.project-flight-canvas')).toHaveCount(1)
-
-    await page.evaluate(() => {
-      const flightStage = document.querySelector<HTMLElement>('[data-project-flight-stage]')!
-      const flightTrack = document.querySelector<HTMLElement>('[data-project-flight-track]')!
-      const pinDistance = flightTrack.scrollWidth - flightStage.clientWidth
-      const pinStart = flightStage.getBoundingClientRect().top + scrollY - 58
-      scrollTo({
-        behavior: 'instant',
-        top: pinStart + pinDistance * 0.5,
-      })
-    })
-    await expect.poll(async () => track.evaluate((node) => (
-      getComputedStyle(node).transform
-    ))).not.toBe('matrix(1, 0, 0, 1, 0, 0)')
-
-    const beatStream = page.locator('#project-beatstream')
-    await beatStream.focus()
-    await expect(beatStream).toBeFocused()
-    await expect.poll(async () => {
-      const bounds = await beatStream.boundingBox()
-      return bounds ? Math.abs(bounds.x + bounds.width / 2 - 800) : Number.POSITIVE_INFINITY
-    }).toBeLessThan(180)
-
-    const firstTilt = page.locator('.flight-entry__tilt').first()
-    await firstTilt.scrollIntoViewIfNeeded()
-    const tiltBounds = await firstTilt.boundingBox()
-    if (tiltBounds) {
-      await page.mouse.move(tiltBounds.x + tiltBounds.width - 4, tiltBounds.y + 4)
-      await expect.poll(async () => firstTilt.evaluate((node) => (
-        getComputedStyle(node).transform
-      ))).not.toBe('none')
-    }
+  const panelBounds = await panels.evaluateAll((nodes) => nodes.map((node) => {
+    const bounds = node.getBoundingClientRect()
+    return { height: bounds.height, layoutTop: (node as HTMLElement).offsetTop, width: bounds.width }
+  }))
+  expect(panelBounds.every(({ height, width }) => height > width)).toBe(true)
+  if (!isMobile) {
+    expect(Math.max(...panelBounds.map(({ layoutTop }) => layoutTop))
+      - Math.min(...panelBounds.map(({ layoutTop }) => layoutTop))).toBeLessThanOrEqual(1)
+    const viewportWidth = page.viewportSize()?.width ?? 1600
+    expect(panelBounds.every(({ width }) => width < viewportWidth / 2)).toBe(true)
   }
 
-  await page.evaluate(() => {
-    location.hash = 'project-vision-bias-steering'
-  })
-  await expect.poll(() => page.locator('#project-vision-bias-steering').evaluate((node) => {
-    const bounds = node.getBoundingClientRect()
-    return bounds.right > 0 && bounds.left < innerWidth
-  })).toBe(true)
+  const beatStream = page.getByRole('link', { name: /Open Beat Stream/i })
+  await beatStream.focus()
+  await expect(beatStream).toBeFocused()
+  await expect(page.getByRole('link', { name: 'Open Vision Bias Steering case study' }))
+    .toHaveAttribute('href', '/projects/vision-bias-steering')
 
   const dissolve = page.locator('.chapter-wipe__layer')
   await expect(dissolve).toHaveCount(1)

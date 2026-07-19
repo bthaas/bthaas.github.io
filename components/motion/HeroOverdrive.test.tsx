@@ -69,18 +69,27 @@ describe('React-owned hero overdrive', () => {
     expect(document.documentElement).toHaveClass('atlas-entered')
   })
 
-  it('animates and cleans the circular sun label', () => {
+  it('moves the sun trigger without rendering a circular location label', () => {
     const { container, unmount } = render(<SunBadge />)
-    const circle = container.querySelector<HTMLElement>('.circular-text')!
 
-    fireEvent.pointerEnter(circle)
-    fireEvent.pointerLeave(circle)
+    act(() => {
+      window.dispatchEvent(new CustomEvent('atlas:sun-progress'))
+      window.dispatchEvent(new CustomEvent('atlas:sun-progress', {
+        detail: { position: { x: 'invalid', y: 0 } },
+      }))
+      window.dispatchEvent(new CustomEvent('atlas:sun-progress', {
+        detail: { position: { x: 0, y: 'invalid' } },
+      }))
+    })
+    expect(container.querySelector('.sun-badge__orbit')).not.toHaveAttribute('style')
+
     act(() => {
       window.dispatchEvent(new CustomEvent('atlas:sun-progress', {
         detail: { position: { x: 112, y: -14 } },
       }))
     })
     expect(container.querySelector('.sun-badge__orbit')).toHaveStyle({ left: '50%', top: '28.125%' })
+    expect(container.querySelector('.circular-text')).not.toBeInTheDocument()
     expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
       'Release the sun spectacle',
     )
@@ -96,5 +105,18 @@ describe('React-owned hero overdrive', () => {
 
     expect(hit).toHaveBeenCalledTimes(1)
     window.removeEventListener('atlas:sun-hit', hit)
+  })
+
+  it('keeps the sun trigger static when reduced motion is requested', () => {
+    setReducedMotion(true)
+    const { container } = render(<SunBadge />)
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('atlas:sun-progress', {
+        detail: { position: { x: 112, y: -14 } },
+      }))
+    })
+
+    expect(container.querySelector('.sun-badge__orbit')).not.toHaveAttribute('style')
   })
 })

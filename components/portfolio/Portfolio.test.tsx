@@ -42,10 +42,7 @@ describe('Portfolio', () => {
       expect.stringContaining('/icarus-atlas/hero-flight-768.avif 768w'),
     )
     expect(container.querySelector('.hero-art')).not.toHaveAttribute('data-atlas-velocity-plate')
-    expect(container.querySelector('.sun-badge__orbit .circular-text')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    )
+    expect(container.querySelector('.sun-badge__orbit .circular-text')).not.toBeInTheDocument()
     expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
       'Release the sun spectacle',
     )
@@ -239,19 +236,24 @@ describe('Portfolio', () => {
     expect(screen.queryByRole('link', { name: /repository/i })).not.toBeInTheDocument()
   })
 
-  it('gives React sole ownership of the project flight-path wrappers', () => {
+  it('renders projects as the original three-card gallery with scroll-linked image pans', () => {
     render(<Portfolio />)
 
     const panelList = screen.getByRole('navigation', { name: 'Select a project' })
     const panels = screen.getAllByTestId('project-panel-trigger')
 
-    expect(panelList).toHaveAttribute('data-project-flight-track')
+    expect(panelList).toHaveClass('atlas-shell', 'project-panel-list')
+    expect(panelList).toHaveAttribute('data-reveal-stagger')
+    expect(panelList).not.toHaveAttribute('data-project-flight-track')
     panels.forEach((panel, index) => {
       expect(panel).toHaveAttribute('id', `project-${siteContent.projects[index].id}`)
-      expect(panel).not.toHaveAttribute('data-atlas-velocity-plate')
-      expect(panel.querySelector('[data-project-pan]')).not.toBeInTheDocument()
-      expect(panel.querySelector('[data-atlas-print-plate]')).not.toBeInTheDocument()
+      expect(panel).toHaveAttribute('data-atlas-velocity-plate')
+      expect(panel.querySelector('[data-project-pan]')).toHaveAttribute(
+        'data-project-pan-index',
+        String(index),
+      )
     })
+    expect(document.querySelector('[data-project-flight-stage]')).not.toBeInTheDocument()
   })
 
   it('contains no legacy cinematic or modal presentation surfaces', () => {
