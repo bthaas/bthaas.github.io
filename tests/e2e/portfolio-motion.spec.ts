@@ -252,6 +252,21 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
   await activateDecorativeWebGL(page, isMobile)
   await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
 
+  const expectMatchingHeroBounds = async () => expect.poll(async () => page.evaluate(() => {
+    const image = document.querySelector<HTMLElement>('.atlas-picture--hero img')!
+    const canvasShell = document.querySelector<HTMLElement>('[data-hero-liquid-canvas]')!
+    const canvas = canvasShell.querySelector<HTMLCanvasElement>('canvas')!
+    const imageBounds = image.getBoundingClientRect()
+    const bounds = [canvasShell.getBoundingClientRect(), canvas.getBoundingClientRect()]
+    return Math.max(...bounds.flatMap((candidate) => [
+      Math.abs(imageBounds.top - candidate.top),
+      Math.abs(imageBounds.left - candidate.left),
+      Math.abs(imageBounds.width - candidate.width),
+      Math.abs(imageBounds.height - candidate.height),
+    ]))
+  })).toBeLessThanOrEqual(1)
+  await expectMatchingHeroBounds()
+
   const characters = page.locator('.hero-masthead__line > div')
   await expect(characters).toHaveCount(9)
   await expect.poll(async () => characters.evaluateAll((nodes) => nodes.every((node) => (
@@ -268,7 +283,13 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
     getComputedStyle(node).transform !== 'matrix(1, 0, 0, 1, 0, 0)'
   )))).toBe(true)
 
+  await page.locator('#projects').scrollIntoViewIfNeeded()
+  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(0)
+  await expect(page.locator('.hero-liquid')).not.toHaveAttribute('data-hero-liquid-ready', '')
   await page.evaluate(() => scrollTo({ behavior: 'instant', top: 0 }))
+  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(1)
+  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
+  await expectMatchingHeroBounds()
   await expect.poll(async () => characters.evaluateAll((nodes) => nodes.every((node) => (
     getComputedStyle(node).transform === 'matrix(1, 0, 0, 1, 0, 0)'
     && getComputedStyle(node).opacity === '1'

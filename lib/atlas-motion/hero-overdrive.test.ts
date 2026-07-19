@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getHeroLiquidFrame,
   getMastheadScatter,
+  getTextureCoverOffset,
   getTextureCoverScale,
 } from './hero-overdrive'
 
@@ -13,6 +14,17 @@ describe('hero overdrive choreography', () => {
     const reusable = { x: 0, y: 0 }
     expect(getTextureCoverScale(1600 / 1130, 16 / 8.7, reusable)).toBe(reusable)
     expect(reusable).toEqual({ x: 1, y: 0.77 })
+  })
+
+  it('matches the fallback image focal point instead of recentering on remount', () => {
+    expect(getTextureCoverOffset(
+      { x: 1, y: 0.77 },
+      { x: 0.5, y: 0.88 },
+    )).toEqual({ x: 0, y: -0.087 })
+    expect(getTextureCoverOffset(
+      { x: 0.628, y: 1 },
+      { x: 0.55, y: 0.5 },
+    )).toEqual({ x: 0.019, y: 0 })
   })
 
   it('bounds liquid displacement and returns to a glass-flat idle', () => {

@@ -6,6 +6,7 @@ import * as THREE from 'three'
 
 import {
   getHeroLiquidFrame,
+  getTextureCoverOffset,
   getTextureCoverScale,
 } from '@/lib/atlas-motion/hero-overdrive'
 
@@ -27,7 +28,7 @@ interface ScrollDetail {
 function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' | 'onReady'>) {
   const materialRef = useRef<THREE.ShaderMaterial>(null)
   const texture = useLoader(THREE.TextureLoader, '/icarus-atlas/hero-flight-1600.avif')
-  const { gl, invalidate, viewport } = useThree()
+  const { gl, invalidate, size, viewport } = useThree()
   const velocityRef = useRef(0)
   const pointerTarget = useMemo(() => new THREE.Vector2(0.5, 0.5), [])
   const pointerCurrent = useMemo(() => new THREE.Vector2(0.5, 0.5), [])
@@ -35,18 +36,21 @@ function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' 
   const interactionUntil = useRef(0)
   const liquidFrame = useMemo(() => ({ bulge: 0, uvShift: 0 }), [])
   const cover = useMemo(() => new THREE.Vector2(1, 1), [])
+  const coverOffset = useMemo(() => new THREE.Vector2(0, 0), [])
+  const objectPosition = useMemo(() => new THREE.Vector2(0.5, 0.88), [])
   const uniforms = useMemo(() => ({
     uAspect: { value: 1 },
     uBulge: { value: 0 },
     uCornerRadius: { value: 0 },
     uCover: { value: cover },
+    uCoverOffset: { value: coverOffset },
     uPointer: { value: pointerCurrent },
     uPointerStrength: { value: 0 },
     uSkew: { value: 0 },
     uTexture: { value: texture },
     uTime: { value: 0 },
     uUvShift: { value: 0 },
-  }), [cover, pointerCurrent, texture])
+  }), [cover, coverOffset, pointerCurrent, texture])
 
   useEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace
@@ -62,8 +66,10 @@ function LiquidSurface({ active, onReady }: Pick<HeroLiquidSceneProps, 'active' 
 
   useEffect(() => {
     getTextureCoverScale(1600 / 1130, viewport.width / viewport.height, cover)
+    objectPosition.set(size.width <= 720 ? 0.55 : 0.5, size.width <= 720 ? 0.5 : 0.88)
+    getTextureCoverOffset(cover, objectPosition, coverOffset)
     invalidate()
-  }, [cover, invalidate, viewport.height, viewport.width])
+  }, [cover, coverOffset, invalidate, objectPosition, size.width, viewport.height, viewport.width])
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -148,6 +154,7 @@ export function HeroLiquidScene({ active, isConstrained, onReady }: HeroLiquidSc
       gl={{ alpha: true, antialias: !isConstrained, powerPreference: 'high-performance' }}
       orthographic
       className="hero-liquid-canvas"
+      resize={{ offsetSize: true }}
     >
       <LiquidSurface active={active} onReady={onReady} />
     </Canvas>

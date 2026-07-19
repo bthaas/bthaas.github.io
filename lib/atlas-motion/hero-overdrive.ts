@@ -17,7 +17,20 @@ export interface MastheadScatter {
 const clamp = (value: number, minimum: number, maximum: number) =>
   Math.min(Math.max(value, minimum), maximum)
 
-const round = (value: number) => Math.round(value * 1000) / 1000
+const round = (value: number) => {
+  const rounded = Math.round(value * 1000) / 1000
+  return Object.is(rounded, -0) ? 0 : rounded
+}
+
+export function getTextureCoverOffset(
+  cover: AxisScale,
+  objectPosition: AxisScale,
+  target: AxisScale = { x: 0, y: 0 },
+): AxisScale {
+  target.x = round((clamp(objectPosition.x, 0, 1) - 0.5) * (1 - cover.x))
+  target.y = round((0.5 - clamp(objectPosition.y, 0, 1)) * (1 - cover.y))
+  return target
+}
 
 export function getTextureCoverScale(
   sourceAspect: number,
