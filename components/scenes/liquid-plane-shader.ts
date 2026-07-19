@@ -31,10 +31,12 @@ export const liquidPlaneFragmentShader = /* glsl */ `
   uniform float uUvShift;
   uniform sampler2D uTexture;
   uniform vec2 uCover;
+  uniform vec2 uCoverOffset;
   uniform vec2 uPointer;
 
   void main() {
     vec2 uv = (vUv - 0.5) * uCover + 0.5;
+    uv += uCoverOffset;
     float pointerDistance = distance(vUv, uPointer);
     float ring = sin(pointerDistance * 30.0 - uTime * 2.8)
       * exp(-pointerDistance * 8.0)
@@ -52,5 +54,6 @@ export const liquidPlaneFragmentShader = /* glsl */ `
       - uCornerRadius;
     float roundedMask = 1.0 - smoothstep(-0.002, 0.002, roundedDistance);
     gl_FragColor = vec4(color.rgb, color.a * roundedMask);
+    #include <colorspace_fragment>
   }
 `

@@ -109,6 +109,10 @@ export function HeroLiquidPlate() {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!isActive) setCanvasReady(false)
+  }, [isActive])
+
   useGSAP(() => {
     const root = rootRef.current
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return

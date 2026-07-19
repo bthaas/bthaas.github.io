@@ -45,6 +45,10 @@ function ProjectSurfaces({
     () => textureSources.map(() => new THREE.Vector2(1, 1)),
     [],
   )
+  const coverOffsets = useMemo(
+    () => textureSources.map(() => new THREE.Vector2(0, 0)),
+    [],
+  )
   const pointer = useMemo(() => new THREE.Vector2(0.5, 0.5), [])
   const uniforms = useMemo(
     () => textures.map((texture, index) => ({
@@ -52,6 +56,7 @@ function ProjectSurfaces({
       uBulge: { value: 0 },
       uCornerRadius: { value: 0 },
       uCover: { value: covers[index] },
+      uCoverOffset: { value: coverOffsets[index] },
       uPointer: { value: pointer },
       uPointerStrength: { value: 0 },
       uSkew: { value: 0 },
@@ -59,7 +64,7 @@ function ProjectSurfaces({
       uTime: { value: 0 },
       uUvShift: { value: 0 },
     })),
-    [covers, pointer, textures],
+    [coverOffsets, covers, pointer, textures],
   )
 
   useEffect(() => {
