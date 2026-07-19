@@ -4,10 +4,6 @@ import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
 import { useRef } from 'react'
 
-import { CircularText } from '@/components/bits/CircularText'
-
-const badgeText = 'EX ALIS — BELLEVUE — 47.61° N — '
-
 export function SunBadge() {
   const orbitRef = useRef<HTMLDivElement>(null)
 
@@ -48,7 +44,6 @@ export function SunBadge() {
         </g>
       </svg>
       <div ref={orbitRef} className="sun-badge__orbit">
-        <CircularText text={badgeText} />
         <button
           className="sun-badge__trigger"
           type="button"
