@@ -22,10 +22,10 @@ gallery, finale, and a separately verified reduced-motion atlas with no canvas.
 | Time | Direction | Voiceover / caption |
 | --- | --- | --- |
 | 0–6 s | Hold through the 0.84 s drawn-glyph curtain. Move the pointer across the hero once so the plate ripples and citron/dusk ink blooms. | “An editorial flight atlas for engineering, applied AI, and product craft.” |
-| 6–14 s | Scroll out of Hero. Let “Brett Haas” scatter like shed feathers while the first outline type band crosses the fold. | “Icarus is the motion system: ascent, release, fall, and a measured landing.” |
+| 6–14 s | Scroll out of Hero. Let “Brett Haas” scatter like shed feathers as the experience chapter crosses the fold. | “Icarus is the motion system: ascent, release, fall, and a measured landing.” |
 | 14–23 s | Enter Experience at peak feather density. Open and close one keyboard-accessible Field notes dossier. | “The flight log expands from concise evidence into the technical work behind it.” |
 | 23–34 s | Follow the pinned Projects route through all three WebGL plates; pause on Beat Stream, then continue into the halftone chapter dissolve. | “Field studies bend with velocity while native scroll, links, focus, and reading order stay intact.” |
-| 34–42 s | Cross Craft, showing the print-in dissolve, restrained dossier tilt, varnish sweep, and kinetic `SKILLS` band. | “Every material response belongs to the atlas: ink, paper, light, and flight.” |
+| 34–42 s | Cross Craft, showing the print-in dissolve, restrained dossier tilt, varnish sweep, and technology-logo ticker. | “Every material response belongs to the atlas: ink, paper, light, and flight.” |
 | 42–50 s | Click the header sun five times, follow the brief blizzard, then land at Contact as the golden feather settles by email. | “The spectacle ends where the story must: ambition brought safely back to earth.” |
 
 Record at 1440 px or wider and 60 fps on hardware-backed Safari or Chromium.
@@ -39,7 +39,7 @@ applied AI, and product craft. Icarus supplies its motion grammar: a drawn-glyph
 curtain opens the ascent; a liquid Aegean plate and scattered masthead release
 the hero; 120 gold-edged feathers build into the fall; and a pinned horizontal
 gallery bends field-study plates with velocity. Halftone chapter dissolves,
-kinetic serif bands, fluid ink, and a secret sun-triggered blizzard make print
+fluid ink, a technology-logo ticker, and a secret sun-triggered blizzard make print
 feel physical without changing the writing, artwork, or reading order. The sun
 finally lands beside a golden feather at contact. No-JavaScript and
 reduced-motion visitors retain the complete, calm atlas with zero decorative

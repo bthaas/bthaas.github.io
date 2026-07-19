@@ -50,15 +50,7 @@ describe('Portfolio', () => {
       'Release the sun spectacle',
     )
 
-    const bands = Array.from(container.querySelectorAll<HTMLElement>('.kinetic-type-band'))
-    expect(bands).toHaveLength(4)
-    expect(bands.map((band) => band.textContent)).toEqual([
-      expect.stringContaining('FLIGHT LOG'),
-      expect.stringContaining('FIELD STUDIES'),
-      expect.stringContaining('SKILLS'),
-      expect.stringContaining('NEXT HORIZON'),
-    ])
-    bands.forEach((band) => expect(band).toHaveAttribute('aria-hidden', 'true'))
+    expect(container.querySelector('.kinetic-type-band')).not.toBeInTheDocument()
 
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,

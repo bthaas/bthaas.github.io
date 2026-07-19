@@ -14,12 +14,6 @@ export interface MastheadScatter {
   rotation: number
 }
 
-export interface KineticBandFrame {
-  direction: 1 | -1
-  skew: number
-  timeScale: number
-}
-
 const clamp = (value: number, minimum: number, maximum: number) =>
   Math.min(Math.max(value, minimum), maximum)
 
@@ -65,19 +59,5 @@ export function getMastheadScatter(index: number, total: number): MastheadScatte
     x: round(normalized * 140 + offset * 18),
     y: round(side * (48 + Math.abs(normalized) * 54 + Math.abs(offset) * 10)),
     rotation: round(clamp(normalized * 14 + offset * 5, -18, 18)),
-  }
-}
-
-export function getKineticBandFrame(
-  velocity: number,
-  baseDirection: 1 | -1,
-): KineticBandFrame {
-  const velocityDirection = velocity === 0 ? 1 : velocity > 0 ? 1 : -1
-  const strength = clamp(Math.abs(velocity) / 120, 0, 1)
-
-  return {
-    direction: (baseDirection * velocityDirection) as 1 | -1,
-    skew: round(clamp(velocity / 15, -8, 8)),
-    timeScale: round(1 + strength * 2.4),
   }
 }

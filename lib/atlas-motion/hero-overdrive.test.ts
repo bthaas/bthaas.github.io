@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getHeroLiquidFrame,
-  getKineticBandFrame,
   getMastheadScatter,
   getTextureCoverScale,
 } from './hero-overdrive'
@@ -34,12 +33,5 @@ describe('hero overdrive choreography', () => {
     expect(Math.abs(frames[8].x)).toBeGreaterThan(Math.abs(frames[4].x))
     expect(frames.every(({ rotation }) => Math.abs(rotation) <= 18)).toBe(true)
     expect(new Set(frames.map(({ y }) => Math.sign(y))).size).toBe(2)
-  })
-
-  it('maps Lenis velocity to alternating bounded band speed and skew', () => {
-    expect(getKineticBandFrame(0, 1)).toEqual({ direction: 1, skew: 0, timeScale: 1 })
-    expect(getKineticBandFrame(120, 1)).toEqual({ direction: 1, skew: 8, timeScale: 3.4 })
-    expect(getKineticBandFrame(-120, 1)).toEqual({ direction: -1, skew: -8, timeScale: 3.4 })
-    expect(getKineticBandFrame(120, -1).direction).toBe(-1)
   })
 })
