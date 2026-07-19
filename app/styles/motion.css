@@ -290,7 +290,7 @@
     grid-column: 1 / span 6;
   }
 
-  .hero-statement {
+  .hero-actions {
     grid-column: 7 / -1;
   }
 
@@ -412,7 +412,7 @@
   }
 
   .hero-identity {
-    margin-bottom: 2.4rem;
+    margin-bottom: 2rem;
   }
 
   .hero-identity h1 {
@@ -420,8 +420,15 @@
     line-height: 0.78;
   }
 
-  .hero-statement h2 {
-    font-size: clamp(2.5rem, 12vw, 4rem);
+  .hero-actions {
+    width: min(100%, 22rem);
+    align-items: stretch;
+    margin-left: auto;
+    padding-bottom: 0;
+  }
+
+  .hero-actions .eyebrow {
+    margin-bottom: 1rem;
   }
 
   .craft-copy,

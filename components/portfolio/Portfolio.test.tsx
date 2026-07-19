@@ -13,13 +13,14 @@ describe('Portfolio', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Brett Haas' })).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', {
-        name: 'I build intelligent systems that hold up in the real world.',
-      }),
-    ).toBeInTheDocument()
+      screen.queryByText('I build intelligent systems that hold up in the real world.'),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText(siteContent.identity.descriptor)).not.toBeInTheDocument()
+    const heroActions = screen.getByRole('group', { name: 'Portfolio roles and projects' })
+    expect(within(heroActions).getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Experience' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Explore projects' })).toHaveAttribute(
+    expect(within(heroActions).getByRole('link', { name: 'Explore projects' })).toHaveAttribute(
       'href',
       '#projects',
     )

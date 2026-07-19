@@ -161,14 +161,17 @@ export function Portfolio() {
           <div className="hero-copy-release">
             <div className="hero-copy editorial-grid">
               <div className="hero-identity">
-                <p className="eyebrow">Engineer · Researcher · Builder</p>
                 <HeroMasthead name={identity.name} />
               </div>
-              <div className="hero-statement">
-                <h2>I build intelligent systems that hold up in the real world.</h2>
-                <p>{identity.descriptor}</p>
-                <a className="text-link" href="#projects">
-                  Explore projects <span aria-hidden="true">↓</span>
+              <div
+                className="hero-actions"
+                role="group"
+                aria-label="Portfolio roles and projects"
+              >
+                <p className="eyebrow">Engineer · Researcher · Builder</p>
+                <a className="hero-projects-link" href="#projects">
+                  <span>Explore projects</span>
+                  <span className="hero-projects-link__arrow" aria-hidden="true">↓</span>
                 </a>
               </div>
             </div>
