@@ -2,7 +2,6 @@ import { atlasVisuals } from '@/content/editorial-visuals'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { FlightTiltSurface } from '@/components/motion/FlightTiltSurface'
 import { HeroMasthead } from '@/components/motion/HeroMasthead'
-import { KineticTypeBand } from '@/components/motion/KineticTypeBand'
 import { SunBadge } from '@/components/motion/SunBadge'
 import { ProjectsFlightPath } from '@/components/projects/ProjectsFlightPath'
 import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
@@ -177,8 +176,6 @@ export function Portfolio() {
 
         </section>
 
-        <KineticTypeBand text="FLIGHT LOG" />
-
         <section className="experience-section" id="experience" aria-labelledby="experience-title">
           {[1, 2, 3].map((step) => (
             <span
@@ -271,8 +268,6 @@ export function Portfolio() {
           </div>
         </section>
 
-        <KineticTypeBand direction={-1} text="FIELD STUDIES" />
-
         <section className="projects-section" id="projects" aria-labelledby="projects-title">
           <div className="atlas-shell projects-intro editorial-grid">
             <div className="section-heading">
@@ -288,8 +283,6 @@ export function Portfolio() {
           <ProjectsFlightPath projects={projects} />
 
         </section>
-
-        <KineticTypeBand text="SKILLS" />
 
         <section
           className="craft-section chapter-wipe chapter-wipe--ltr"
@@ -350,8 +343,6 @@ export function Portfolio() {
             </div>
           </div>
         </section>
-
-        <KineticTypeBand direction={-1} text="NEXT HORIZON" />
 
         <section
           className="contact-section"

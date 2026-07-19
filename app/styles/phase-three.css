@@ -45,28 +45,6 @@
   overflow: clip;
 }
 
-.kinetic-type-band {
-  position: relative;
-  z-index: 50;
-  display: flex;
-  height: clamp(7.5rem, 20vh, 13rem);
-  overflow: hidden;
-  align-items: center;
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
-  background: var(--cream);
-  color: transparent;
-  contain: paint;
-  font-family: var(--serif);
-  font-size: clamp(7.5rem, 15.5vw, 14rem);
-  font-weight: 500;
-  letter-spacing: -0.065em;
-  line-height: 0.72;
-  pointer-events: none;
-  -webkit-text-stroke: 1px var(--ink);
-  text-transform: uppercase;
-}
-
 .sun-badge {
   overflow: visible;
 }
@@ -83,11 +61,6 @@
 }
 
 @media (max-width: 720px) {
-  .kinetic-type-band {
-    height: 7.5rem;
-    font-size: 7.8rem;
-  }
-
   .sun-badge__orbit {
     width: 3.2rem;
     height: 3.2rem;
@@ -105,8 +78,7 @@
 
   .hero-liquid__visual,
   .atlas-picture--hero img,
-  .hero-liquid .art-caption,
-  .kinetic-type-band .scroll-velocity__track {
+  .hero-liquid .art-caption {
     transform: none !important;
   }
 }

@@ -54,7 +54,7 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   )
   await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
   await expect(page.locator('.hero-liquid__canvas canvas')).toHaveCount(1)
-  await expect(page.locator('.kinetic-type-band')).toHaveCount(4)
+  await expect(page.locator('.kinetic-type-band')).toHaveCount(0)
   await expect(page.locator('.atlas-picture--hero img')).toHaveAttribute('fetchpriority', 'high')
   await expectNoHorizontalOverflow(page)
 
@@ -237,7 +237,7 @@ test('prints the missing plate in glitching ink with sparse feathers', async ({
   expect(errors).toEqual([])
 })
 
-test('reverses the feather-like masthead scatter and keeps kinetic type alive', async ({
+test('reverses the feather-like masthead scatter and restores the hero at the top', async ({
   browserName,
   isMobile,
   page,
@@ -267,12 +267,6 @@ test('reverses the feather-like masthead scatter and keeps kinetic type alive', 
   await expect.poll(async () => characters.evaluateAll((nodes) => nodes.some((node) => (
     getComputedStyle(node).transform !== 'matrix(1, 0, 0, 1, 0, 0)'
   )))).toBe(true)
-
-  const bandTrack = page.locator('.scroll-velocity__track').first()
-  const firstBandFrame = await bandTrack.evaluate((node) => getComputedStyle(node).transform)
-  await page.waitForTimeout(120)
-  expect(await bandTrack.evaluate((node) => getComputedStyle(node).transform))
-    .not.toBe(firstBandFrame)
 
   await page.evaluate(() => scrollTo({ behavior: 'instant', top: 0 }))
   await expect.poll(async () => characters.evaluateAll((nodes) => nodes.every((node) => (

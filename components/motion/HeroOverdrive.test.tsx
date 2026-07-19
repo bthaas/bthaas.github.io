@@ -1,8 +1,6 @@
 import { act, fireEvent, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ScrollVelocity } from '@/components/bits/ScrollVelocity'
-
 import { HeroMasthead } from './HeroMasthead'
 import { SunBadge } from './SunBadge'
 
@@ -71,27 +69,17 @@ describe('React-owned hero overdrive', () => {
     expect(document.documentElement).toHaveClass('atlas-entered')
   })
 
-  it('animates and cleans the circular sun label and velocity band', () => {
-    const { container, unmount } = render(
-      <>
-        <SunBadge />
-        <ScrollVelocity direction={-1} text="FLIGHT LOG" />
-      </>,
-    )
+  it('animates and cleans the circular sun label', () => {
+    const { container, unmount } = render(<SunBadge />)
     const circle = container.querySelector<HTMLElement>('.circular-text')!
-    const track = container.querySelector<HTMLElement>('.scroll-velocity__track')!
 
     fireEvent.pointerEnter(circle)
     fireEvent.pointerLeave(circle)
     act(() => {
-      window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { velocity: 120 } }))
-      window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { velocity: -120 } }))
       window.dispatchEvent(new CustomEvent('atlas:sun-progress', {
         detail: { position: { x: 112, y: -14 } },
       }))
     })
-
-    expect(track.style.transform).not.toBe('')
     expect(container.querySelector('.sun-badge__orbit')).toHaveStyle({ left: '50%', top: '28.125%' })
     expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
       'Release the sun spectacle',

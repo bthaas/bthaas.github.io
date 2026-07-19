@@ -189,9 +189,10 @@ does not mount the project canvas. Phase 4 captures are in
 is `design-refs/comparison-phase4.png` and the current `comparison.png`.
 
 Verified on 2026-07-18 from `codex/phase-3-hero-kinetic-type`. Phase 3 turns
-the accepted hero plate into an interaction-driven liquid WebGL surface, moves
-masthead ownership from Atlas DOM code to React/GSAP, and introduces four
-full-bleed kinetic chapter bands plus the travelling circular sun label.
+the accepted hero plate into an interaction-driven liquid WebGL surface and
+moves masthead ownership from Atlas DOM code to React/GSAP. The travelling
+circular sun label remains; the four full-bleed chapter bands were later
+removed so the five primary sections meet directly.
 
 ## Phase 3 hero and kinetic-type gates
 
@@ -210,8 +211,8 @@ bounded to 0.006 UV shift/bulge. The plane renders on demand while pointer or
 scroll energy is present, sleeps glass-flat at idle, and unmounts after the hero
 leaves its observer margin. The 9 masthead characters scatter deterministically
 to at most 18 degrees and return to identity transforms and full opacity at the
-top. `FLIGHT LOG`, `FIELD STUDIES`, `SKILLS`, and `NEXT HORIZON` are duplicate,
-`aria-hidden` outline bands using the vendored React Bits ScrollVelocity pattern.
+top. The former `FLIGHT LOG`, `FIELD STUDIES`, `SKILLS`, and `NEXT HORIZON`
+outline bands and their ScrollVelocity implementation have been removed.
 
 The two R3F experiences import one shared deferred scene module. Production
 JavaScript is 243,463 bytes gzip for the initial Next chunks and 326,246 bytes
