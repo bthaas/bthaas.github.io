@@ -140,6 +140,11 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     .toHaveAttribute('aria-expanded', 'true')
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
   await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
+  await page.locator('[data-wing-chart]').scrollIntoViewIfNeeded()
+  await expect(page.locator('[data-wing-chart]')).toHaveAttribute('data-motion', 'reduced')
+  await expect(page.locator('[data-wing-edge]')).toHaveCount(24)
+  await expect(page.locator('[data-wing-star]')).toHaveCount(28)
+  await expect(page.locator('[data-wing-shooting-star]')).toHaveCSS('display', 'none')
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveCSS('display', 'none')
   await expect(page.locator('[data-atlas-sun-trigger]')).toHaveCSS('display', 'none')
   await expect(page.locator('[data-golden-feather-target]')).toHaveCSS('display', 'none')
@@ -149,6 +154,45 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect.poll(() => page.evaluate(() => document.getAnimations().filter(
     (animation) => animation.playState === 'running',
   ).length)).toBe(0)
+  await expectNoHorizontalOverflow(page)
+  expect(errors).toEqual([])
+})
+
+test('decodes the accessible Wing of Stars chart on keyboard and touch', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(browserName !== 'chromium' && !isMobile, 'Chromium and the touch project cover the chart.')
+  const errors = observeApplicationErrors(page)
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  const chart = page.getByRole('region', { name: 'Wing of Stars skill chart' })
+  await chart.scrollIntoViewIfNeeded()
+  await expect(chart.getByRole('button')).toHaveCount(28)
+  const typeScript = chart.getByRole('button', { name: 'TypeScript' })
+
+  if (isMobile) {
+    await typeScript.tap()
+  } else {
+    await typeScript.focus()
+  }
+  await expect(typeScript).toHaveAttribute('data-active', 'true')
+  await expect(typeScript.locator('[data-wing-star-label]')).toContainText('TypeScript')
+  await expect(chart.locator('[data-wing-edge][data-active="true"]')).not.toHaveCount(0)
+
+  if (isMobile) {
+    const chartBox = await chart.boundingBox()
+    expect(chartBox).not.toBeNull()
+    await page.touchscreen.tap(chartBox!.x + 8, chartBox!.y + 8)
+  } else {
+    await typeScript.press('Escape')
+  }
+  await expect(chart).not.toHaveAttribute('data-active-skill')
   await expectNoHorizontalOverflow(page)
   expect(errors).toEqual([])
 })

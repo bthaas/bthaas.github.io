@@ -111,21 +111,21 @@ describe('Portfolio', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders resume technologies as labeled logos with a decorative marquee duplicate', () => {
+  it('renders resume technologies as an accessible star chart with an unchanged marquee', () => {
     const { container } = render(<Portfolio />)
     const logos = getSkillLogos(siteContent.skills)
-    const grid = screen.getByRole('list', {
-      name: 'Technologies and programming languages Brett Haas works with',
+    const chart = screen.getByRole('region', { name: 'Wing of Stars skill chart' })
+    const starList = within(chart).getByRole('list', {
+      name: 'Skills mapped as stars',
     })
     const marquee = container.querySelector<HTMLElement>('[data-craft-marquee]')
     const sequences = marquee?.querySelectorAll('.craft-marquee__sequence')
 
-    expect(within(grid).getAllByRole('listitem')).toHaveLength(logos.length)
-    expect(within(grid).getAllByRole('listitem').map((item) => item.textContent)).toEqual(
-      logos.map(({ label }) => label),
-    )
-    within(grid).getAllByRole('listitem').forEach((item) => {
-      expect(item).toHaveAttribute('tabindex', '0')
+    expect(within(starList).getAllByRole('listitem')).toHaveLength(logos.length)
+    expect(within(starList).getAllByRole('button').map((item) => item.getAttribute('aria-label')))
+      .toEqual(expect.arrayContaining(logos.map(({ label }) => label)))
+    within(starList).getAllByRole('button').forEach((item) => {
+      expect(item).toHaveAttribute('type', 'button')
     })
     expect(logos.map(({ label }) => label)).toEqual(
       expect.arrayContaining([
@@ -146,6 +146,12 @@ describe('Portfolio', () => {
     expect(sequences?.[1]).toHaveAttribute('aria-hidden', 'true')
     expect(sequences?.[0].querySelectorAll('svg')).toHaveLength(logos.length)
     expect(sequences?.[1].querySelectorAll('svg')).toHaveLength(logos.length)
+    expect(container.querySelector('noscript')).toBeInTheDocument()
+    expect(container.querySelector('.craft-notes .craft-logo-grid')).not.toBeInTheDocument()
+    const board = container.querySelector('.craft-board')
+    expect(board?.nextElementSibling).toBe(chart)
+    expect(chart.compareDocumentPosition(marquee as Node) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy()
   })
 
   it('server-renders every professional dossier from content and skips education', () => {

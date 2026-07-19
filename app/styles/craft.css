@@ -193,6 +193,290 @@
   overflow-wrap: anywhere;
 }
 
+.wing-chart {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 0;
+  padding: clamp(1rem, 2.4vw, 2.5rem);
+  border-bottom: 1px solid var(--ink);
+  background: var(--citron);
+}
+
+.wing-chart__caption {
+  display: flex;
+  padding: 0.72rem clamp(0.8rem, 1.5vw, 1.35rem);
+  border: 1px solid var(--ink);
+  border-bottom: 0;
+  align-items: center;
+  font-size: clamp(0.58rem, 0.72vw, 0.7rem);
+  font-weight: 700;
+  gap: 1rem;
+  justify-content: space-between;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.wing-chart__caption span:last-child {
+  color: rgb(17 19 15 / 68%);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+.wing-chart .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.wing-chart__sky {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 2 / 1;
+  border: 1px solid rgb(17 19 15 / 88%);
+  background: var(--dusk-deep);
+  color: var(--paper);
+  isolation: isolate;
+}
+
+.wing-chart__sky::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+  content: "";
+  mix-blend-mode: soft-light;
+  opacity: 0.11;
+  pointer-events: none;
+}
+
+.wing-chart__lines,
+.wing-chart__stars {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+}
+
+.wing-chart__lines {
+  overflow: visible;
+}
+
+.wing-chart__outline {
+  fill: rgb(216 239 75 / 1.8%);
+  stroke: rgb(255 253 245 / 24%);
+  stroke-dasharray: 5 10;
+  stroke-linecap: round;
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.wing-chart__edge {
+  opacity: 0.58;
+  stroke: rgb(255 253 245 / 48%);
+  stroke-linecap: round;
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+}
+
+.wing-chart__shooting-path {
+  fill: none;
+  stroke: none;
+}
+
+.wing-chart__shooting-star {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wing-chart__shooting-star line {
+  stroke: rgb(255 253 245 / 68%);
+  stroke-linecap: round;
+  stroke-width: 1.4;
+}
+
+.wing-chart__shooting-star circle {
+  fill: var(--paper);
+}
+
+.wing-chart__stars {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wing-chart__stars > li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wing-star {
+  position: absolute;
+  z-index: 2;
+  top: var(--star-y);
+  left: var(--star-x);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  margin: -22px 0 0 -22px;
+  appearance: none;
+  background: transparent;
+  color: var(--skill-color);
+  cursor: pointer;
+  font: inherit;
+  transform-origin: center;
+}
+
+.wing-star:focus-visible {
+  outline: 2px solid var(--citron);
+  outline-offset: 2px;
+}
+
+.wing-star__flare,
+.wing-star__twinkle,
+.wing-star__halo,
+.wing-star__core,
+.wing-star__glyph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.wing-star__flare,
+.wing-star__twinkle,
+.wing-star__core {
+  width: var(--star-size);
+  height: var(--star-size);
+}
+
+.wing-star__flare,
+.wing-star__twinkle {
+  transform-origin: center;
+}
+
+.wing-star__halo--outer {
+  width: calc(var(--star-size) * 4.2);
+  height: calc(var(--star-size) * 4.2);
+  border: 1px solid color-mix(in srgb, var(--skill-color) 28%, transparent);
+  background: color-mix(in srgb, var(--skill-color) 7%, transparent);
+  opacity: 0.72;
+}
+
+.wing-star__halo--inner {
+  width: calc(var(--star-size) * 2.4);
+  height: calc(var(--star-size) * 2.4);
+  background: color-mix(in srgb, var(--skill-color) 17%, transparent);
+  opacity: 0.82;
+}
+
+.wing-star__core {
+  background: var(--skill-color);
+  box-shadow: 0 0 0 1px rgb(255 253 245 / 20%);
+}
+
+.wing-star__glyph {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  background: rgb(255 253 245 / 94%);
+  box-shadow: 0 0 0 1px rgb(255 253 245 / 42%);
+  opacity: 0;
+  place-items: center;
+  transform: translate(-50%, -50%) scale(0.58);
+  transform-origin: center;
+}
+
+.wing-star__glyph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.wing-star__label {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 25px);
+  width: max-content;
+  max-width: 11rem;
+  color: var(--paper);
+  font-size: clamp(0.58rem, 0.72vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  text-align: left;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 60%);
+  text-transform: uppercase;
+  transform: translate(5px, -50%);
+  white-space: nowrap;
+}
+
+.wing-star[data-label-side="left"] .wing-star__label {
+  right: calc(50% + 25px);
+  left: auto;
+  text-align: right;
+  transform: translate(-5px, -50%);
+}
+
+.wing-star:is(:hover, :focus-visible) .wing-star__flare,
+.wing-star[data-active="true"] .wing-star__flare {
+  transform: translate(-50%, -50%) scale(2.15);
+}
+
+.wing-star:is(:hover, :focus-visible) .wing-star__glyph,
+.wing-star[data-active="true"] .wing-star__glyph {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.wing-star:is(:hover, :focus-visible) .wing-star__label,
+.wing-star[data-active="true"] .wing-star__label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.wing-chart[data-motion="static"] .wing-star[data-dimmed="true"],
+.wing-chart[data-motion="reduced"] .wing-star[data-dimmed="true"],
+.wing-chart[data-motion="static"] .wing-chart__edge[data-dimmed="true"],
+.wing-chart[data-motion="reduced"] .wing-chart__edge[data-dimmed="true"] {
+  opacity: 0.35;
+}
+
+.wing-chart[data-motion="static"] .wing-chart__edge[data-active="true"],
+.wing-chart[data-motion="reduced"] .wing-chart__edge[data-active="true"] {
+  opacity: 1;
+  stroke: rgb(255 253 245 / 92%);
+}
+
+.wing-chart[data-motion="static"] .wing-star[data-active="true"] .wing-star__halo,
+.wing-chart[data-motion="reduced"] .wing-star[data-active="true"] .wing-star__halo {
+  opacity: 1;
+}
+
+.wing-chart-noscript {
+  padding: 0 clamp(1rem, 2.4vw, 2.5rem) clamp(1rem, 2.4vw, 2.5rem);
+}
+
 .craft-marquee {
   display: none;
 }
@@ -231,5 +515,53 @@
 
   .skill-logo__glyph {
     width: clamp(1.35rem, 7vw, 1.8rem);
+  }
+
+  .wing-chart {
+    padding: 0.8rem;
+  }
+
+  .wing-chart__caption {
+    padding: 0.65rem 0.7rem;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .wing-chart__caption span:last-child {
+    text-align: left;
+  }
+
+  .wing-chart__sky {
+    aspect-ratio: 4 / 5;
+  }
+
+  .wing-chart__lines,
+  .wing-chart__stars {
+    top: 22%;
+    bottom: auto;
+    height: auto;
+    aspect-ratio: 2 / 1;
+  }
+
+  .wing-star__label {
+    font-size: 0.58rem;
+  }
+
+  .wing-chart__shooting-star {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wing-chart *,
+  .wing-chart *::before,
+  .wing-chart *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+
+  .wing-chart__shooting-star {
+    display: none;
   }
 }
