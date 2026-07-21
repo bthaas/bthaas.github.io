@@ -14,6 +14,10 @@
   pointer-events: none !important;
 }
 
+.feather-fall-layer * {
+  pointer-events: none !important;
+}
+
 .hero-section > *,
 .experience-section > *,
 .projects-section > *,
