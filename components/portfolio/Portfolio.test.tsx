@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
+import { spreadSkillSphereOrder } from '@/lib/atlas-motion/skill-sphere'
 import { setupDossiers } from '@/src/atlas/experience'
 
 import { Portfolio } from './Portfolio'
@@ -125,7 +126,7 @@ describe('Portfolio', () => {
 
     expect(within(skillList).getAllByRole('listitem')).toHaveLength(logos.length)
     expect(within(skillList).getAllByRole('button').map((item) => item.getAttribute('aria-label')))
-      .toEqual(logos.map(({ label }) => label))
+      .toEqual(spreadSkillSphereOrder(logos.length).map((index) => logos[index].label))
     within(skillList).getAllByRole('button').forEach((item) => {
       expect(item).toHaveAttribute('type', 'button')
     })

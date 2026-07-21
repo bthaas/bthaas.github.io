@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
+import { spreadSkillSphereOrder } from '@/lib/atlas-motion/skill-sphere'
 
 import { getSkillLogos } from './SkillLogos'
 import { SkillSphere } from './SkillSphere'
@@ -36,11 +37,28 @@ describe('SkillSphere', () => {
 
     expect(chips).toHaveLength(logos.length)
     expect(chips.map((chip) => chip.getAttribute('aria-label'))).toEqual(
-      logos.map(({ label }) => label),
+      spreadSkillSphereOrder(logos.length).map((index) => logos[index].label),
     )
     expect(container.querySelectorAll('.skill-sphere__glyph path')).toHaveLength(logos.length)
     expect(container.querySelector('canvas')).not.toBeInTheDocument()
     expect(container.querySelector('[data-skill-sphere-scene]')).toBeInTheDocument()
+    expect(container.querySelector('[data-skill-sphere-mesh]')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    )
+    expect(container.querySelectorAll('[data-skill-sphere-edge]')).toHaveLength(77)
+    expect(container.querySelectorAll('[data-sphere-row][data-sphere-meridian]'))
+      .toHaveLength(logos.length)
+
+    const react = screen.getByRole('button', { name: 'React' }).closest('li')!
+    const reactNative = screen.getByRole('button', { name: 'React Native' }).closest('li')!
+    const rowDistance = Math.abs(
+      Number(react.dataset.sphereRow) - Number(reactNative.dataset.sphereRow),
+    )
+    const columnDistance = Math.abs(
+      Number(react.dataset.sphereMeridian) - Number(reactNative.dataset.sphereMeridian),
+    )
+    expect(rowDistance + columnDistance).toBeGreaterThanOrEqual(3)
   })
 
   it('uses the approved Fig. 5 wayfinding and keeps decorative copy out of the tree', () => {
@@ -87,10 +105,14 @@ describe('SkillSphere', () => {
     expect(sphere).toHaveAttribute('data-paused', 'true')
     expect(chip).toHaveAttribute('aria-pressed', 'true')
     expect(within(chip).getByText('TypeScript')).toBeVisible()
+    expect(document.querySelectorAll('[data-skill-sphere-edge][data-active="true"]'))
+      .toHaveLength(12)
 
     fireEvent.keyDown(chip, { key: 'Escape' })
     expect(sphere).not.toHaveAttribute('data-active-skill')
     expect(sphere).toHaveAttribute('data-paused', 'false')
+    expect(document.querySelectorAll('[data-skill-sphere-edge][data-active="true"]'))
+      .toHaveLength(0)
   })
 
   it('captures free-direction pointer drags and releases into inertia', () => {
@@ -119,6 +141,21 @@ describe('SkillSphere', () => {
 
   it('runs the mobile idle frame and reports its measured frame rate', () => {
     vi.stubGlobal('innerWidth', 390)
+    class VisibleObserver {
+      private readonly callback: IntersectionObserverCallback
+
+      constructor(callback: IntersectionObserverCallback) {
+        this.callback = callback
+      }
+
+      disconnect = vi.fn()
+      observe = vi.fn((target: Element) => this.callback([
+        { isIntersecting: true, target } as IntersectionObserverEntry,
+      ], this as unknown as IntersectionObserver))
+      takeRecords = vi.fn(() => [])
+      unobserve = vi.fn()
+    }
+    globalThis.IntersectionObserver = VisibleObserver as unknown as typeof IntersectionObserver
     vi.spyOn(window, 'matchMedia').mockImplementation((query) => mediaQuery(
       query.includes('pointer: coarse'),
     ))
@@ -138,15 +175,17 @@ describe('SkillSphere', () => {
     expect(sphere).toHaveAttribute('data-auto-rotate', 'true')
   })
 
-  it('stops projection writes while the sphere is outside the viewport', () => {
+  it('stops the animation frame loop outside the viewport and restarts it on return', () => {
     vi.spyOn(window, 'matchMedia').mockImplementation(() => mediaQuery(false))
     let animate: FrameRequestCallback | undefined
     let updateVisibility: IntersectionObserverCallback | undefined
-    vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => {
-      animate ??= callback
+    const requestFrame = vi.fn((callback: FrameRequestCallback) => {
+      animate = callback
       return 1
-    }))
-    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+    })
+    const cancelFrame = vi.fn()
+    vi.stubGlobal('requestAnimationFrame', requestFrame)
+    vi.stubGlobal('cancelAnimationFrame', cancelFrame)
     class VisibilityObserver {
       constructor(callback: IntersectionObserverCallback) {
         updateVisibility = callback
@@ -161,16 +200,23 @@ describe('SkillSphere', () => {
     const { container } = render(<SkillSphere logos={logos} />)
     const item = container.querySelector<HTMLElement>('.skill-sphere__item')!
     const before = item.style.getPropertyValue('--sphere-transform')
+    expect(requestFrame).not.toHaveBeenCalled()
+
+    act(() => updateVisibility?.([
+      { isIntersecting: true } as IntersectionObserverEntry,
+    ], {} as IntersectionObserver))
+    expect(requestFrame).toHaveBeenCalledTimes(1)
 
     act(() => updateVisibility?.([
       { isIntersecting: false } as IntersectionObserverEntry,
     ], {} as IntersectionObserver))
-    act(() => animate?.(performance.now() + 1_100))
+    expect(cancelFrame).toHaveBeenCalledWith(1)
     expect(item.style.getPropertyValue('--sphere-transform')).toBe(before)
 
     act(() => updateVisibility?.([
       { isIntersecting: true } as IntersectionObserverEntry,
     ], {} as IntersectionObserver))
+    expect(requestFrame).toHaveBeenCalledTimes(2)
     act(() => animate?.(performance.now() + 1_200))
     expect(item.style.getPropertyValue('--sphere-transform')).not.toBe(before)
   })

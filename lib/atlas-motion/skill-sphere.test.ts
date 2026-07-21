@@ -2,13 +2,96 @@ import { describe, expect, it } from 'vitest'
 
 import {
   clampPitch,
+  createSkillSphereWireframe,
   decayVelocity,
   fibonacciSphere,
   projectPoint,
   rotatePoint,
+  spreadSkillSphereOrder,
 } from './skill-sphere'
 
 describe('skill sphere geometry', () => {
+  it('builds 28 unique skill intersections from four rings and seven meridians', () => {
+    const wireframe = createSkillSphereWireframe(7, 4)
+    const positions = new Set(wireframe.points.map(({ x, y, z }) => (
+      `${x.toFixed(9)}:${y.toFixed(9)}:${z.toFixed(9)}`
+    )))
+
+    expect(wireframe.points).toHaveLength(28)
+    expect(wireframe.nodes).toHaveLength(42)
+    expect(wireframe.edges).toHaveLength(77)
+    expect(positions.size).toBe(28)
+    expect(wireframe.topCapStartIndex).toBe(28)
+    expect(wireframe.bottomCapStartIndex).toBe(35)
+
+    for (const point of [...wireframe.nodes, ...wireframe.edges.map(({ control }) => control)]) {
+      expect(Math.hypot(point.x, point.y, point.z)).toBeCloseTo(1, 9)
+    }
+
+    const topCap = wireframe.nodes.slice(28, 35)
+    const bottomCap = wireframe.nodes.slice(35, 42)
+    const skillY = wireframe.points.map(({ y }) => y)
+    expect(Math.min(...topCap.map(({ y }) => y))).toBeGreaterThan(Math.max(...skillY))
+    expect(Math.max(...bottomCap.map(({ y }) => y))).toBeLessThan(Math.min(...skillY))
+    expect(new Set(topCap.map(({ x, z }) => `${x.toFixed(9)}:${z.toFixed(9)}`)).size).toBe(7)
+    expect(new Set(bottomCap.map(({ x, z }) => `${x.toFixed(9)}:${z.toFixed(9)}`)).size).toBe(7)
+  })
+
+  it('connects every skill to one latitude ring and one complete meridian strand', () => {
+    const wireframe = createSkillSphereWireframe(7, 4)
+
+    wireframe.edges.forEach((edge) => {
+      expect(edge.from).toBeGreaterThanOrEqual(0)
+      expect(edge.from).toBeLessThan(wireframe.nodes.length)
+      expect(edge.to).toBeGreaterThanOrEqual(0)
+      expect(edge.to).toBeLessThan(wireframe.nodes.length)
+      if (edge.kind === 'latitude') {
+        expect(edge.row).toBeGreaterThanOrEqual(0)
+        expect(edge.row).toBeLessThan(4)
+        expect(edge.column).toBeNull()
+      } else if (edge.kind === 'meridian') {
+        expect(edge.column).toBeGreaterThanOrEqual(0)
+        expect(edge.column).toBeLessThan(7)
+        expect(edge.row).toBeNull()
+      } else {
+        expect(edge.column).toBeNull()
+        expect(edge.row).toBeNull()
+      }
+    })
+
+    for (let index = 0; index < wireframe.points.length; index += 1) {
+      const incident = wireframe.edges.filter(({ from, to }) => from === index || to === index)
+      expect(incident.filter(({ kind }) => kind === 'latitude')).toHaveLength(2)
+      expect(incident.filter(({ kind }) => kind === 'meridian')).toHaveLength(2)
+    }
+
+    for (let row = 0; row < 4; row += 1) {
+      expect(wireframe.edges.filter((edge) => edge.row === row)).toHaveLength(7)
+    }
+    for (let column = 0; column < 7; column += 1) {
+      expect(wireframe.edges.filter((edge) => edge.column === column)).toHaveLength(5)
+    }
+    expect(wireframe.edges.filter(({ kind }) => kind === 'cap')).toHaveLength(14)
+  })
+
+  it('spreads catalog neighbors into a stable, complete row-major order', () => {
+    const order = spreadSkillSphereOrder(28)
+
+    expect(order).toHaveLength(28)
+    expect(new Set(order).size).toBe(28)
+    expect([...order].sort((a, b) => a - b)).toEqual(
+      Array.from({ length: 28 }, (_, index) => index),
+    )
+    expect(order).not.toEqual(Array.from({ length: 28 }, (_, index) => index))
+    expect(spreadSkillSphereOrder(0)).toEqual([])
+
+    const reactSlot = order.indexOf(10)
+    const reactNativeSlot = order.indexOf(13)
+    const rowDistance = Math.abs(Math.floor(reactSlot / 7) - Math.floor(reactNativeSlot / 7))
+    const columnDistance = Math.abs((reactSlot % 7) - (reactNativeSlot % 7))
+    expect(rowDistance + columnDistance).toBeGreaterThanOrEqual(3)
+  })
+
   it('distributes any positive count as unique unit vectors', () => {
     const points = fibonacciSphere(28)
     const positions = new Set(points.map(({ x, y, z }) => (

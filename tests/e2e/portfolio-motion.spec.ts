@@ -112,9 +112,18 @@ test('hands a sub-1.8s session entrance into the lazy Atlas ink simulation', asy
   await expect.poll(async () => Number(
     await fluid.locator('canvas').getAttribute('data-fluid-splats'),
   )).toBeGreaterThanOrEqual(8)
+  const renderer = await page.evaluate(() => {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('webgl')
+    const extension = context?.getExtension('WEBGL_debug_renderer_info')
+    return context && extension
+      ? String(context.getParameter(extension.UNMASKED_RENDERER_WEBGL))
+      : 'unavailable'
+  })
+  const minimumFluidFps = /swiftshader|llvmpipe|software/i.test(renderer) ? 18 : 20
   await expect.poll(async () => Number(
     await fluid.locator('canvas').getAttribute('data-fluid-fps'),
-  )).toBeGreaterThanOrEqual(20)
+  )).toBeGreaterThanOrEqual(minimumFluidFps)
 
   await page.reload({ waitUntil: 'domcontentloaded' })
   await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
@@ -147,6 +156,8 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await page.locator('[data-skill-sphere]').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-motion', 'reduced')
   await expect(page.locator('[data-skill-sphere-chip]')).toHaveCount(28)
+  await expect(page.locator('[data-skill-sphere-edge]')).toHaveCount(77)
+  await expect(page.locator('[data-skill-sphere-mesh]')).toHaveAttribute('aria-hidden', 'true')
   await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-auto-rotate', 'false')
   await expect(page.locator('[data-skill-sphere-scene]')).toBeVisible()
   await expect(page.locator('[data-skill-sphere-scene] canvas')).toHaveCount(0)
