@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 
-import { TitleWink } from '@/components/motion/TitleWink'
 import { WebGLActivationGate } from '@/components/motion/WebGLActivationGate'
 
 import './globals.css'
@@ -90,7 +89,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <WebGLActivationGate />
-        <TitleWink />
         <Script src="/atlas.js" strategy="lazyOnload" />
       </body>
     </html>

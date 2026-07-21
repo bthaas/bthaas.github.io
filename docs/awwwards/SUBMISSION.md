@@ -67,8 +67,8 @@ and restrained six-degree tilt plus varnish sheen give the paper physical mass.
 Five activations of the header sun—or the Konami sequence—release one brief
 flare and feather blizzard. A single golden feather completes the route beside
 the contact email. The missing-page experience turns the same ink system into a
-source-vendored React Bits letter glitch with sparse Phase 2 feathers. Even the
-tab title keeps the atlas open when focus leaves.
+source-vendored React Bits letter glitch with sparse Phase 2 feathers. The tab
+title remains the Brett Haas brand when focus leaves.
 
 The implementation is a hydrated Next.js 16 static export using React 19,
 GSAP, ScrollTrigger, Lenis, React Three Fiber, Three.js, local Draco decoders,

@@ -69,6 +69,13 @@ describe('GitHub Pages export', () => {
     expect(layout).not.toContain('<script src="/atlas.js"')
   })
 
+  it('keeps the Brett Haas page title unchanged when the tab loses visibility', () => {
+    const layout = readFileSync(resolve(process.cwd(), 'app/layout.tsx'), 'utf8')
+
+    expect(layout).not.toContain('TitleWink')
+    expect(existsSync(resolve(process.cwd(), 'components/motion/TitleWink.tsx'))).toBe(false)
+  })
+
   it('builds the contact horizon as an independent lazy asset', () => {
     const builder = readFileSync(resolve(process.cwd(), 'scripts/build-atlas.mjs'), 'utf8')
 
