@@ -181,14 +181,6 @@ export function Portfolio() {
         </section>
 
         <section className="experience-section" id="experience" aria-labelledby="experience-title">
-          {[1, 2, 3].map((step) => (
-            <span
-              className="experience-light-step"
-              data-experience-light-step={step}
-              aria-hidden="true"
-              key={step}
-            />
-          ))}
           <div className="experience-board">
             <div
               className="experience-plate experience-plate--inset frame-reveal"
@@ -327,11 +319,9 @@ export function Portfolio() {
         </section>
 
         <section
-          className="craft-section chapter-wipe chapter-wipe--ltr"
+          className="craft-section"
           id="craft"
           aria-labelledby="craft-title"
-          data-chapter-wipe
-          data-wipe-direction="ltr"
         >
           <div className="craft-board">
             <div

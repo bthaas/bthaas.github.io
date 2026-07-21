@@ -43,7 +43,11 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(page.locator('html')).toHaveAttribute('data-atlas', 'ready')
   await expect(page.locator('html')).toHaveClass(/atlas-js/)
   await expect(page.locator('#hero, #experience, #projects, #craft, #contact')).toHaveCount(5)
-  await expect(page.locator('.chapter-wipe__layer')).toHaveCount(1)
+  await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
+  const sectionBackgrounds = await page
+    .locator('#hero, #experience, #projects, #craft, #contact')
+    .evaluateAll((sections) => sections.map((section) => getComputedStyle(section).backgroundColor))
+  expect(new Set(sectionBackgrounds)).toEqual(new Set(['rgb(243, 239, 227)']))
   await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
   await expect(page.locator('script[data-atlas-horizon]')).toHaveCount(0)
   await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
@@ -366,7 +370,7 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
   expect(errors).toEqual([])
 })
 
-test('keeps projects as three vertical cards with keyboard links and print dissolves', async ({
+test('keeps projects as three vertical cards with a continuous chapter transition', async ({
   isMobile,
   page,
 }) => {
@@ -402,16 +406,12 @@ test('keeps projects as three vertical cards with keyboard links and print disso
   await expect(page.getByRole('link', { name: 'Open Vision Bias Steering case study' }))
     .toHaveAttribute('href', '/projects/vision-bias-steering')
 
-  const dissolve = page.locator('.chapter-wipe__layer')
-  await expect(dissolve).toHaveCount(1)
-  expect(await dissolve.evaluate((node) => {
-    const style = getComputedStyle(node)
-    return style.maskImage || style.webkitMaskImage
-  })).toContain('radial-gradient')
+  await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
   await page.locator('#craft').scrollIntoViewIfNeeded()
-  await expect.poll(async () => dissolve.evaluate((node) => Number.parseFloat(
-    getComputedStyle(node).getPropertyValue('--chapter-dot-radius'),
-  ))).toBeGreaterThan(0)
+  const chapterBackgrounds = await page.locator('#projects, #craft').evaluateAll(
+    (chapters) => chapters.map((chapter) => getComputedStyle(chapter).backgroundColor),
+  )
+  expect(new Set(chapterBackgrounds)).toEqual(new Set(['rgb(243, 239, 227)']))
   await expectNoHorizontalOverflow(page)
   expect(errors).toEqual([])
 })

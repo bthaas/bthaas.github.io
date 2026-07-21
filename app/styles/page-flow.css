@@ -1,0 +1,131 @@
+:root {
+  --page-accent: #8e6810;
+  --page-rule: rgb(17 19 15 / 14%);
+  --page-surface: var(--cream);
+}
+
+main {
+  background: var(--page-surface);
+}
+
+.hero-section,
+.experience-section,
+.projects-section,
+.craft-section,
+.contact-section {
+  --page-flow-line-x: 50%;
+  background-color: var(--page-surface);
+  background-image: linear-gradient(
+    to right,
+    transparent calc(var(--page-flow-line-x) - 0.5px),
+    var(--page-rule) calc(var(--page-flow-line-x) - 0.5px),
+    var(--page-rule) calc(var(--page-flow-line-x) + 0.5px),
+    transparent calc(var(--page-flow-line-x) + 0.5px)
+  );
+  background-repeat: no-repeat;
+  color: var(--ink);
+}
+
+main > section + section {
+  border-top: 1px solid var(--page-rule);
+}
+
+.hero-copy,
+.experience-board,
+.craft-board {
+  border-bottom-color: var(--page-rule);
+}
+
+.experience-section::before {
+  content: none;
+}
+
+.experience-intro .section-heading h2 {
+  color: var(--ink);
+}
+
+.experience-kicker,
+.flight-role,
+.flight-period,
+.flight-summary,
+.flight-highlights,
+.flight-technologies li {
+  color: var(--muted);
+}
+
+.experience-plate--inset,
+.craft-plate--inset {
+  border-color: var(--page-rule);
+}
+
+.experience-panel,
+.craft-panel,
+.contact-panel {
+  border-inline-color: transparent;
+}
+
+.flight-log {
+  border-top-color: var(--page-rule);
+}
+
+.flight-rule line {
+  stroke: var(--page-rule);
+}
+
+.flight-index,
+.flight-dossier__toggle,
+.flight-highlights li::marker {
+  color: var(--page-accent);
+}
+
+.flight-technologies li {
+  border-color: var(--page-rule);
+}
+
+.craft-section {
+  --chapter-wipe-base: var(--page-surface);
+  --chapter-wipe-color: var(--page-surface);
+}
+
+.skill-sphere {
+  border-bottom-color: var(--page-rule);
+  background-color: var(--page-surface);
+}
+
+.skill-sphere__scene {
+  border-color: var(--page-rule);
+}
+
+.skill-sphere__scene::after {
+  background:
+    radial-gradient(circle at 50% 48%, rgb(17 19 15 / 4%), transparent 36%),
+    linear-gradient(135deg, rgb(255 255 255 / 28%), transparent 42%);
+}
+
+html.atlas-js .craft-marquee {
+  border-color: var(--page-rule);
+}
+
+.contact-board {
+  border-top-color: var(--page-rule);
+}
+
+.site-footer {
+  border-top-color: var(--page-rule);
+}
+
+@media (max-width: 720px) {
+  .hero-section,
+  .experience-section,
+  .projects-section,
+  .craft-section,
+  .contact-section {
+    --page-flow-line-x: 14px;
+  }
+
+  .experience-panel,
+  .craft-panel,
+  .contact-panel {
+    border-top-color: var(--page-rule);
+  }
+}

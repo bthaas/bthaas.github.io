@@ -54,6 +54,8 @@ describe('Portfolio', () => {
       (section) => section.id,
     )
     expect(ids).toEqual(['hero', 'experience', 'projects', 'craft', 'contact'])
+    expect(container.querySelector('[data-chapter-wipe]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-experience-light-step]')).not.toBeInTheDocument()
   })
 
   it('keeps navigation visible, concise, and anchored to the editorial sections', () => {
