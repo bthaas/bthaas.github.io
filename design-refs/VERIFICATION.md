@@ -251,14 +251,43 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   404, spectacle, reduced-motion, cross-browser, and frame-pacing journeys all
   run against the production export.
 
+## 2026-07-20 — Skill Sphere verification
+
+- The approved light `Fig. 5` plate replaces the rejected dark constellation.
+  The craft board, copy, artwork, and marquee remain unchanged. All 28 catalog
+  skills render as server-owned, ordered buttons; the no-JavaScript export also
+  retains the existing logo grid.
+- The pure Fibonacci distribution, rotation, projection, pitch clamp, and
+  velocity helpers have dedicated Vitest coverage. The React owner performs no
+  frame-time layout reads or allocations: a ResizeObserver caches geometry,
+  preallocated records receive projection output, and an IntersectionObserver
+  stops transform writes while the plate is offscreen.
+- Dragging works in both axes with pointer capture and bounded pitch. Desktop
+  hover, keyboard focus, Escape, touch toggles, inertia, and idle rotation were
+  exercised in Chromium, Firefox, desktop WebKit, and iPhone WebKit. Focus rings
+  remain visible and every chip keeps at least a 44 px target.
+- Reduced motion starts no requestAnimationFrame loop and keeps the fixed sphere
+  fully readable and draggable. A hydrated capture pass reported zero console
+  errors after initial projection values were normalized to stable SSR precision.
+- Six inspected captures live in `docs/awwwards/screenshots/step-22/`: rest,
+  mid-spin, and focused TypeScript states at 1440×1000 and 390×844. The full-color
+  cream/citron plate reads harmoniously between the craft board and unchanged
+  marquee at both widths.
+- Hydrated Chromium telemetry reported 78 fps for the visible sphere. Mobile
+  WebKit held 29.9–30 fps through the complete-page pacing journey. The feature
+  uses no canvas, WebGL, blur animation, GSAP loop, or new dependency.
+- A clean build of `origin/source` measured 250,564 bytes gzip across the 11
+  initial homepage JavaScript chunks. The Skill Sphere build measures 252,901
+  bytes gzip: a +2,337 byte gzip delta with zero dependency delta.
+
 ## Automated release gates
 
-- Unit/component/content tests: 183/183 passing across 46 files.
-- Coverage: 89.91% statements, 80.45% branches, 82.47% functions, and 93.27% lines.
+- Unit/component/content tests: 204/204 passing across 50 files.
+- Coverage: 90.39% statements, 81.08% branches, 82.97% functions, and 93.69% lines.
 - TypeScript: `tsc --noEmit` passing.
 - Production build: all eight routes are statically generated with the normal
   hydrated Next.js runtime and versioned deployment assets.
-- Cross-browser Playwright: 21 passing journeys and 15 intentional project/device
+- Cross-browser Playwright: 23 passing journeys and 17 intentional project/device
   skips across Chromium, Firefox, desktop WebKit, and iPhone WebKit.
 - `git diff --check`, dependency audit, credential/debug scan, and production
   console scan are release gates for the final branch.

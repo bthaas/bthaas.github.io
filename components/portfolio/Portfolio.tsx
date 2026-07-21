@@ -16,6 +16,7 @@ import {
   SkillLogoGrid,
   SkillLogoSequence,
 } from './SkillLogos'
+import { SkillSphere } from './SkillSphere'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
 
@@ -365,12 +366,15 @@ export function Portfolio() {
                     measured—not merely described.
                   </p>
                 </div>
-                <div className="craft-notes">
-                  <SkillLogoGrid logos={skillLogos} />
-                </div>
               </div>
             </div>
           </div>
+          <SkillSphere logos={skillLogos} />
+          <noscript>
+            <div className="skill-sphere-noscript">
+              <SkillLogoGrid logos={skillLogos} />
+            </div>
+          </noscript>
           <div
             className="craft-marquee"
             data-craft-marquee

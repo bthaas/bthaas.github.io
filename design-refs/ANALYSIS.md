@@ -139,6 +139,61 @@ may lift that state another 8–12% toward white while retaining faint texture.
   one soft radial veil, and a background exposure lift. Swap scene mounts only
   while opacity is above 0.96 and the canvas is visually hidden.
 
+## Phase 7 — The Skill Sphere / Craft
+
+Source: the approved “Fig. 5” product brief supplied on July 20, 2026. It
+supersedes the earlier dark constellation concept and explicitly specifies a
+light, hand-rolled DOM projection with evenly distributed brand-logo chips.
+
+### Composition and projection
+
+- Preserve the citron Craft board, artwork, copy, and marquee without edits.
+  Insert one cream, hairline-framed plate between the board and marquee.
+- Center a circular cloud of all 28 catalog skills. A Fibonacci lattice supplies
+  an even unit-sphere distribution; a fixed yaw/pitch creates the initial view.
+  Desktop uses a 2:1 plate and a 31% short-axis radius. Mobile uses a 4:5 plate
+  with a 36% radius ratio so touch targets remain distinct while both read as a
+  compact, graspable object.
+- Perspective is communicated only through projected position, scale, opacity,
+  and z-order. Near-side chips render at full scale/opacity; the far side reaches
+  0.55 scale and 0.3 opacity. There is no Earth texture, geography, canvas, WebGL,
+  or connecting-line decoration.
+
+### Materials and typography
+
+- The plate stays on the site’s `--paper` cream with the established subtle
+  grain, citron reflected at the center, and a restrained ghost sphere outline.
+- Each chip is cream with a hairline ink border, a 44–52 px circular hit target,
+  and the existing Simple Icons glyph in its catalog brand color.
+- Use existing tiny uppercase wayfinding for `Fig. 5 — The skill sphere` at the
+  top left and `drag to navigate` at bottom right. An active chip lifts, adopts
+  its brand-color border, and reveals an ink pill with cream label text.
+
+### Interaction and motion
+
+- Pointer Events rotate yaw and pitch in any direction. Pointer capture retains
+  control outside the plate, pitch clamps at ±1.5 radians, and velocity decays
+  into a 0.006-radian desktop idle rotation (0.0038 on coarse pointers).
+- Hover and keyboard focus pause autonomous rotation and reveal the label. Escape
+  and blur clear it. Touch taps toggle a persistent label while drag-spin and
+  inertia remain available. Catalog order is also DOM/tab order.
+- Cache the plate size in a ResizeObserver. The requestAnimationFrame loop writes
+  only transform, opacity, and z-index; it performs no per-frame DOM reads and
+  uses preallocated projection records.
+- Reduced motion retains the fixed projected sphere and direct manipulation but
+  starts no animation frame loop, inertia, or idle spin. The server-rendered
+  chips plus noscript grid ensure all skills remain present without JavaScript.
+
+### Asset and verification exception
+
+- This section intentionally has no modeled asset. Its visual subject is the DOM
+  itself and the accepted implementation technique forbids Three.js/canvas and
+  new dependencies, so Blender, GLB compression, Draco, and turntables do not
+  apply.
+- Verification uses the real hydrated page at 1440 px and 390 px. Rest, mid-spin,
+  and focused-chip captures must confirm density, depth attenuation, readable
+  labels, the cream-on-citron relationship, and an unchanged marquee.
+
 # Scene 03 — Ruins Ring / About
 
 Source: `video/03-ruins-ring.mp4` (1280×720, 10.005 seconds). Curated references:

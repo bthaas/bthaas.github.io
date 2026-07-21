@@ -193,6 +193,225 @@
   overflow-wrap: anywhere;
 }
 
+.skill-sphere {
+  position: relative;
+  z-index: 1;
+  --skill-chip-size: clamp(2.75rem, 4.1vw, 3.25rem);
+  width: 100%;
+  margin: 0;
+  padding: clamp(1rem, 2.4vw, 2.5rem);
+  border-bottom: 1px solid var(--ink);
+  background: var(--citron);
+}
+
+.skill-sphere .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skill-sphere__scene {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 2 / 1;
+  border: 1px solid rgb(17 19 15 / 76%);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: grab;
+  isolation: isolate;
+  touch-action: none;
+  user-select: none;
+}
+
+.skill-sphere[data-dragging="true"] .skill-sphere__scene {
+  cursor: grabbing;
+}
+
+.skill-sphere__scene::before {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+  content: "";
+  mix-blend-mode: multiply;
+  opacity: 0.075;
+  pointer-events: none;
+}
+
+.skill-sphere__scene::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 48%, rgb(216 239 75 / 10%), transparent 36%),
+    linear-gradient(135deg, rgb(255 255 255 / 28%), transparent 42%);
+  content: "";
+  pointer-events: none;
+}
+
+.skill-sphere__caption,
+.skill-sphere__hint {
+  position: absolute;
+  z-index: 6;
+  margin: 0;
+  color: rgb(17 19 15 / 58%);
+  font-size: clamp(0.58rem, 0.72vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.35;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.skill-sphere__caption {
+  top: clamp(0.9rem, 2vw, 1.5rem);
+  left: clamp(0.9rem, 2vw, 1.5rem);
+}
+
+.skill-sphere__hint {
+  right: clamp(0.9rem, 2vw, 1.5rem);
+  bottom: clamp(0.9rem, 2vw, 1.5rem);
+}
+
+.skill-sphere__halo {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: min(34vw, 29rem);
+  max-width: 76%;
+  aspect-ratio: 1;
+  border: 1px solid rgb(17 19 15 / 7%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, rgb(255 255 255 / 48%), transparent 58%);
+  box-shadow: inset -2rem -1.4rem 4rem rgb(17 19 15 / 3.5%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.skill-sphere__list {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.skill-sphere__item {
+  position: absolute;
+  z-index: var(--sphere-z, var(--sphere-initial-z));
+  top: var(--sphere-top, var(--sphere-initial-top));
+  left: var(--sphere-left, var(--sphere-initial-left));
+  width: var(--skill-chip-size);
+  height: var(--skill-chip-size);
+  margin: calc(var(--skill-chip-size) / -2) 0 0 calc(var(--skill-chip-size) / -2);
+  list-style: none;
+  opacity: var(--sphere-opacity, var(--sphere-initial-opacity));
+  transform: var(
+    --sphere-transform,
+    translate3d(-50%, -50%, 0) scale(var(--sphere-initial-scale))
+  );
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.skill-sphere__chip {
+  position: relative;
+  display: grid;
+  width: var(--skill-chip-size);
+  height: var(--skill-chip-size);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  place-items: center;
+}
+
+.skill-sphere__chip-face {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgb(17 19 15 / 18%);
+  border-radius: 50%;
+  background: rgb(255 253 245 / 96%);
+  box-shadow: 0 0.36rem 1rem rgb(17 19 15 / 7%);
+  color: var(--skill-color);
+  pointer-events: none;
+  place-items: center;
+  transition:
+    border-color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.skill-sphere__glyph {
+  display: block;
+  width: 61%;
+  height: 61%;
+}
+
+.skill-sphere__label {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  padding: 0.42rem 0.66rem;
+  border-radius: 999px;
+  background: #1d1b16;
+  color: var(--paper);
+  font-size: clamp(0.54rem, 0.65vw, 0.64rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  text-transform: uppercase;
+  transform: translate(-50%, 0.25rem);
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 140ms var(--ease-out),
+    visibility 140ms step-end;
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+.skill-sphere__chip:is(:hover, :focus-visible, [data-active="true"]) .skill-sphere__chip-face {
+  border-color: var(--skill-color);
+  box-shadow: 0 0.5rem 1.1rem rgb(17 19 15 / 12%);
+  transform: translateY(-0.2rem);
+}
+
+.skill-sphere__chip:is(:hover, :focus-visible, [data-active="true"]) .skill-sphere__label {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition: opacity 140ms var(--ease-out), transform 140ms var(--ease-out);
+  visibility: visible;
+}
+
+.skill-sphere__chip:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.skill-sphere-noscript {
+  padding: 0 clamp(1rem, 2.4vw, 2.5rem) clamp(1rem, 2.4vw, 2.5rem);
+}
+
 .craft-marquee {
   display: none;
 }
@@ -231,5 +450,39 @@
 
   .skill-logo__glyph {
     width: clamp(1.35rem, 7vw, 1.8rem);
+  }
+
+  .skill-sphere {
+    --skill-chip-size: 2.75rem;
+    padding: 0.8rem;
+  }
+
+  .skill-sphere__scene {
+    aspect-ratio: 4 / 5;
+  }
+
+  .skill-sphere__halo {
+    width: 78%;
+    max-width: none;
+  }
+
+  .skill-sphere__item {
+    top: var(--sphere-top, var(--sphere-mobile-top));
+    left: var(--sphere-left, var(--sphere-mobile-left));
+  }
+
+  .skill-sphere__caption,
+  .skill-sphere__hint {
+    font-size: 0.54rem;
+    letter-spacing: 0.11em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-sphere *,
+  .skill-sphere *::before,
+  .skill-sphere *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }
