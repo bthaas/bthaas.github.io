@@ -43,4 +43,15 @@ describe('Skill Sphere presentation contract', () => {
     expect(stylesheet).not.toContain('blur(')
     expect(stylesheet).not.toContain('.skill-globe')
   })
+
+  it('renders the wireframe as non-interactive, non-scaling hairlines behind the chips', () => {
+    expect(declarationsFor('.skill-sphere__mesh')).toMatchObject({
+      position: 'absolute',
+      'pointer-events': 'none',
+    })
+    expect(declarationsFor('.skill-sphere__edge')).toMatchObject({
+      fill: 'none',
+      'vector-effect': 'non-scaling-stroke',
+    })
+  })
 })

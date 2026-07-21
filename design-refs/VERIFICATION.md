@@ -259,9 +259,9 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   retains the existing logo grid.
 - The pure Fibonacci distribution, rotation, projection, pitch clamp, and
   velocity helpers have dedicated Vitest coverage. The React owner performs no
-  frame-time layout reads or allocations: a ResizeObserver caches geometry,
-  preallocated records receive projection output, and an IntersectionObserver
-  stops transform writes while the plate is offscreen.
+  frame-time layout reads: a ResizeObserver caches geometry, preallocated
+  records receive projection output, and an IntersectionObserver stops
+  transform writes while the plate is offscreen.
 - Dragging works in both axes with pointer capture and bounded pitch. Desktop
   hover, keyboard focus, Escape, touch toggles, inertia, and idle rotation were
   exercised in Chromium, Firefox, desktop WebKit, and iPhone WebKit. Focus rings
@@ -280,10 +280,44 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   initial homepage JavaScript chunks. The Skill Sphere build measures 252,901
   bytes gzip: a +2,337 byte gzip delta with zero dependency delta.
 
+## 2026-07-21 — Skill Sphere wireframe extension
+
+- The supplied globe reference is now represented by four latitude rings and
+  seven meridian strands. Their 28 row-major intersections are the 28 catalog
+  skills. The pointed single-node poles were replaced with seven-node shallow
+  cap rings at the crown and base, so the mesh closes as an oval rather than a
+  needle point. The resulting 77 quadratic SVG segments include 14 cap edges.
+  Unit tests verify unique unit vectors, valid endpoints, complete cap rings,
+  and exactly two latitude plus two meridian connections at every skill.
+- A deterministic coprime-stride order disperses neighboring catalog entries
+  without randomness between renders. React Native is at row 1/meridian 4 and
+  React at row 4/meridian 6, five grid steps apart; DOM and keyboard order still
+  follow the visible row-major sphere order.
+- Lines rotate through the same yaw/pitch projection as the chips and attenuate
+  by average segment depth. Focusing, hovering, or tapping a skill brightens its
+  seven-edge latitude ring and five-edge meridian while preserving the existing
+  label, focus, drag, inertia, and touch behavior.
+- The mesh remains decorative and non-interactive (`aria-hidden`, no canvas,
+  non-scaling hairlines). Reduced motion starts no animation frame loop. The
+  full-motion loop now cancels entirely offscreen and restarts on intersection,
+  avoiding idle work while the visitor is in another chapter. The production
+  export reported 103 fps while the connected sphere was visible and rotating,
+  with zero application console errors.
+- Six inspected captures live in `docs/awwwards/screenshots/step-23/`: rest,
+  mid-spin, and focused states at 1440×1000 and 390×844. They confirm that the
+  dusk/ink mesh remains legible without overpowering the cream/citron plate.
+- The rounded-cap desktop and mobile checks are retained in
+  `docs/awwwards/screenshots/step-24/`. Both were opened at original resolution;
+  the crown/base remain distinct on the 390 px composition and comfortably
+  shallow on the 1440 px composition.
+- The updated build measures 253,364 bytes gzip across the same 11 initial
+  homepage JavaScript chunks: +217 bytes gzip over the first connected sphere
+  and zero dependency delta.
+
 ## Automated release gates
 
-- Unit/component/content tests: 204/204 passing across 50 files.
-- Coverage: 90.39% statements, 81.08% branches, 82.97% functions, and 93.69% lines.
+- Unit/component/content tests: 211/211 passing across 51 files.
+- Coverage: 90.75% statements, 81.06% branches, 83.70% functions, and 94.03% lines.
 - TypeScript: `tsc --noEmit` passing.
 - Production build: all eight routes are statically generated with the normal
   hydrated Next.js runtime and versioned deployment assets.

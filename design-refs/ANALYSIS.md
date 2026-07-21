@@ -141,28 +141,42 @@ may lift that state another 8–12% toward white while retaining faint texture.
 
 ## Phase 7 — The Skill Sphere / Craft
 
-Source: the approved “Fig. 5” product brief supplied on July 20, 2026. It
-supersedes the earlier dark constellation concept and explicitly specifies a
-light, hand-rolled DOM projection with evenly distributed brand-logo chips.
+Sources: the approved “Fig. 5” product brief supplied on July 20, 2026,
+`frames/phase7-skill-sphere-wireframe.png`, and the July 21 visual critique
+`frames/phase7-skill-sphere-pointed-cap.png`. The wireframe reference replaces
+the unconnected point cloud with a classic latitude/longitude structure; the
+critique identifies the single-coordinate pole convergence as visually too
+sharp.
 
 ### Composition and projection
 
 - Preserve the citron Craft board, artwork, copy, and marquee without edits.
   Insert one cream, hairline-framed plate between the board and marquee.
-- Center a circular cloud of all 28 catalog skills. A Fibonacci lattice supplies
-  an even unit-sphere distribution; a fixed yaw/pitch creates the initial view.
+- Center a circular globe of all 28 catalog skills. Arrange them as four
+  latitude rings crossed by seven curved meridian strands, so every skill is a
+  real intersection and every ring/strand carries an equal visual rhythm. A
+  slight per-ring longitude phase avoids perfect near/far chip occlusion while
+  retaining the reference silhouette. A fixed yaw/pitch creates the initial
+  view.
+- Do not terminate all meridians at one north or south coordinate. Use seven
+  small virtual cap nodes near each pole and join each set into a shallow ring.
+  These cap rings close the mesh with a rounded crown and base while keeping
+  all 28 skill nodes on the four main latitude rings.
   Desktop uses a 2:1 plate and a 31% short-axis radius. Mobile uses a 4:5 plate
   with a 36% radius ratio so touch targets remain distinct while both read as a
   compact, graspable object.
-- Perspective is communicated only through projected position, scale, opacity,
-  and z-order. Near-side chips render at full scale/opacity; the far side reaches
-  0.55 scale and 0.3 opacity. There is no Earth texture, geography, canvas, WebGL,
-  or connecting-line decoration.
+- Perspective is communicated through projected position, scale, opacity,
+  z-order, and line depth. Near-side chips render at full scale/opacity; the far
+  side reaches 0.55 scale and 0.3 opacity. Latitude and meridian segments fade
+  toward the rear hemisphere but remain visible enough to complete the globe.
+  There is no Earth texture, geography, canvas, WebGL, or Three.js scene.
 
 ### Materials and typography
 
 - The plate stays on the site’s `--paper` cream with the established subtle
-  grain, citron reflected at the center, and a restrained ghost sphere outline.
+  grain and citron reflected at the center. The reference's heavy black strokes
+  become restrained ink/dusk hairlines; the existing ghost sphere outline is
+  the outer silhouette while the rotating SVG mesh supplies internal structure.
 - Each chip is cream with a hairline ink border, a 44–52 px circular hit target,
   and the existing Simple Icons glyph in its catalog brand color.
 - Use existing tiny uppercase wayfinding for `Fig. 5 — The skill sphere` at the
@@ -174,12 +188,17 @@ light, hand-rolled DOM projection with evenly distributed brand-logo chips.
 - Pointer Events rotate yaw and pitch in any direction. Pointer capture retains
   control outside the plate, pitch clamps at ±1.5 radians, and velocity decays
   into a 0.006-radian desktop idle rotation (0.0038 on coarse pointers).
-- Hover and keyboard focus pause autonomous rotation and reveal the label. Escape
-  and blur clear it. Touch taps toggle a persistent label while drag-spin and
-  inertia remain available. Catalog order is also DOM/tab order.
+- Hover and keyboard focus pause autonomous rotation and reveal the label. The
+  active skill also brightens its complete latitude ring and meridian strand,
+  making its place in the system readable. Escape and blur clear it. Touch taps
+  toggle a persistent label while drag-spin and inertia remain available.
+  Apply one deterministic coprime-stride permutation to the catalog before
+  assigning row-major slots, separating closely related entries such as React
+  and React Native. DOM/tab order then follows the visible row-major sphere
+  order, so focus movement remains spatially coherent.
 - Cache the plate size in a ResizeObserver. The requestAnimationFrame loop writes
-  only transform, opacity, and z-index; it performs no per-frame DOM reads and
-  uses preallocated projection records.
+  chip transform/opacity/z-index and SVG path geometry/depth variables; it
+  performs no per-frame DOM reads and uses preallocated projection records.
 - Reduced motion retains the fixed projected sphere and direct manipulation but
   starts no animation frame loop, inertia, or idle spin. The server-rendered
   chips plus noscript grid ensure all skills remain present without JavaScript.
