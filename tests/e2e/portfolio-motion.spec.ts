@@ -411,8 +411,7 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
   expect(errors).toEqual([])
 })
 
-test('keeps projects as three vertical cards with a continuous chapter transition', async ({
-  isMobile,
+test('spins the project helix and keeps a complete static fallback', async ({
   page,
 }) => {
   const errors = observeApplicationErrors(page)
@@ -420,31 +419,49 @@ test('keeps projects as three vertical cards with a continuous chapter transitio
     sessionStorage.setItem('atlas-preloader-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
-  await page.goto('/', { waitUntil: 'networkidle' })
+  await page.goto('/?stats=1', { waitUntil: 'networkidle' })
 
+  const spiral = page.locator('.project-spiral')
+  const stage = page.locator('[data-project-spiral-stage]')
   const panelList = page.getByRole('navigation', { name: 'Select a project' })
-  const panels = page.locator('[data-testid="project-panel-trigger"]')
+  const panels = page.locator('[data-project-spiral-fallback] a')
   await expect(panels).toHaveCount(3)
-  await panelList.scrollIntoViewIfNeeded()
+  await stage.scrollIntoViewIfNeeded()
   await expect(page.locator('[data-project-flight-stage], .project-flight-canvas')).toHaveCount(0)
-  await expect(panels.first().locator('[data-project-pan]')).toHaveCount(1)
 
-  const panelBounds = await panels.evaluateAll((nodes) => nodes.map((node) => {
-    const bounds = node.getBoundingClientRect()
-    return { height: bounds.height, layoutTop: (node as HTMLElement).offsetTop, width: bounds.width }
-  }))
-  expect(panelBounds.every(({ height, width }) => height > width)).toBe(true)
-  if (!isMobile) {
-    expect(Math.max(...panelBounds.map(({ layoutTop }) => layoutTop))
-      - Math.min(...panelBounds.map(({ layoutTop }) => layoutTop))).toBeLessThanOrEqual(1)
-    const viewportWidth = page.viewportSize()?.width ?? 1600
-    expect(panelBounds.every(({ width }) => width < viewportWidth / 2)).toBe(true)
+  if (await spiral.getAttribute('data-project-spiral-enhanced') !== null) {
+    await expect(spiral).toHaveAttribute('data-project-spiral-enhanced', '')
+    await expect(stage).toBeVisible()
+    await expect(stage).toHaveAttribute('data-project-spiral-ready', '')
+    await expect(stage.locator('canvas')).toHaveCount(1)
+    await expect(page.locator('.project-spiral-stats')).toHaveCount(1)
+    await expect(panelList).toBeHidden()
+    const activeLink = stage.getByRole('link', { name: 'Open Court Vision case study' })
+    await expect(activeLink).toHaveAttribute('href', '/projects/courtvision')
+    const stageTop = await stage.evaluate((node) => node.getBoundingClientRect().top + scrollY)
+    await page.evaluate((top) => scrollTo({
+      behavior: 'instant',
+      top: top + innerHeight * 0.55,
+    }), stageTop)
+    await expect(stage.locator('.project-spiral__active-link')).not.toHaveAttribute(
+      'href',
+      '/projects/courtvision',
+    )
+  } else {
+    await expect(stage).toBeHidden()
+    await expect(panelList).toBeVisible()
+    await expect(stage.locator('canvas')).toHaveCount(0)
   }
 
-  const beatStream = page.getByRole('link', { name: /Open Beat Stream/i })
+  const beatStream = await spiral.getAttribute('data-project-spiral-enhanced') !== null
+    ? stage.getByRole('link', { name: '02 Beat Stream' })
+    : panelList.getByRole('link', { name: /Open Beat Stream/i })
   await beatStream.focus()
   await expect(beatStream).toBeFocused()
-  await expect(page.getByRole('link', { name: 'Open Vision Bias Steering case study' }))
+  const visionBiasSteering = await spiral.getAttribute('data-project-spiral-enhanced') !== null
+    ? stage.getByRole('link', { name: '03 Vision Bias Steering' })
+    : panelList.getByRole('link', { name: 'Open Vision Bias Steering case study' })
+  await expect(visionBiasSteering)
     .toHaveAttribute('href', '/projects/vision-bias-steering')
 
   await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)

@@ -35,15 +35,28 @@ class MeshAccumulator:
 
     vertices: list[tuple[float, float, float]] = field(default_factory=list)
     faces: list[tuple[int, ...]] = field(default_factory=list)
+    uvs: list[tuple[float, float]] = field(default_factory=list)
 
     def append(
         self,
         vertices: Iterable[Vector],
         faces: Iterable[tuple[int, ...]],
+        uvs: Iterable[tuple[float, float]] | None = None,
     ) -> None:
+        appended_vertices = [tuple(vertex) for vertex in vertices]
         offset = len(self.vertices)
-        self.vertices.extend(tuple(vertex) for vertex in vertices)
+        self.vertices.extend(appended_vertices)
         self.faces.extend(tuple(index + offset for index in face) for face in faces)
+        if uvs is None:
+            if self.uvs:
+                raise ValueError("UVs must be supplied for every appended vertex batch")
+            return
+        appended_uvs = [tuple(uv) for uv in uvs]
+        if len(appended_uvs) != len(appended_vertices):
+            raise ValueError("UV count must match the appended vertex count")
+        if offset and not self.uvs:
+            raise ValueError("Cannot add UVs after an untextured vertex batch")
+        self.uvs.extend(appended_uvs)
 
 
 @dataclass(frozen=True)
@@ -61,6 +74,15 @@ class CurvedPanelTemplate:
     vertices: tuple[Vector, ...]
     faces: tuple[tuple[int, ...], ...]
     loop_uvs: tuple[tuple[float, float], ...]
+
+
+@dataclass(frozen=True)
+class CurvedCardTemplate:
+    """Reusable UV-mapped card plane facing Blender's negative Y axis."""
+
+    vertices: tuple[Vector, ...]
+    faces: tuple[tuple[int, ...], ...]
+    uvs: tuple[tuple[float, float], ...]
 
 
 def reset_scene() -> None:
@@ -247,6 +269,53 @@ def make_curved_panel_template(
     return CurvedPanelTemplate(tuple(vertices), tuple(faces), tuple(loop_uvs))
 
 
+def make_curved_card_template(
+    width: float,
+    height: float,
+    bend: float,
+    x_segments: int = 24,
+    y_segments: int = 12,
+) -> CurvedCardTemplate:
+    """Build a low-poly UV plane with a shallow camera-facing center bow."""
+
+    if width <= 0 or height <= 0:
+        raise ValueError("Card dimensions must be positive")
+    if bend < 0:
+        raise ValueError("Card bend cannot be negative")
+    if x_segments < 2 or y_segments < 2:
+        raise ValueError("Card geometry requires at least two segments per axis")
+
+    vertices: list[Vector] = []
+    uvs: list[tuple[float, float]] = []
+    row_width = x_segments + 1
+    for y_index in range(y_segments + 1):
+        v = y_index / y_segments
+        local_z = (v - 0.5) * height
+        for x_index in range(x_segments + 1):
+            u = x_index / x_segments
+            local_x = (u - 0.5) * width
+            center_bow = math.sin(math.pi * u) ** 1.35
+            vertical_relief = 0.96 + 0.04 * math.sin(math.pi * v)
+            vertices.append(Vector((local_x, -bend * center_bow * vertical_relief, local_z)))
+            uvs.append((u, v))
+
+    faces: list[tuple[int, ...]] = []
+    for y_index in range(y_segments):
+        for x_index in range(x_segments):
+            lower_left = y_index * row_width + x_index
+            lower_right = lower_left + 1
+            upper_left = lower_left + row_width
+            upper_right = upper_left + 1
+            faces.extend(
+                (
+                    (lower_left, lower_right, upper_right),
+                    (lower_left, upper_right, upper_left),
+                )
+            )
+
+    return CurvedCardTemplate(tuple(vertices), tuple(faces), tuple(uvs))
+
+
 def create_mesh_object(
     name: str,
     accumulator: MeshAccumulator,
@@ -278,6 +347,14 @@ def create_mesh_object(
         uv_layer = mesh.uv_layers.new(name="UVMap")
         for loop, uv in zip(uv_layer.data, loop_uvs, strict=True):
             loop.uv = uv
+    elif accumulator.uvs:
+        if len(accumulator.uvs) != len(accumulator.vertices):
+            raise ValueError("UV count must match mesh vertex count")
+        uv_layer = mesh.uv_layers.new(name="UVMap")
+        for polygon in mesh.polygons:
+            for loop_index in polygon.loop_indices:
+                vertex_index = mesh.loops[loop_index].vertex_index
+                uv_layer.data[loop_index].uv = accumulator.uvs[vertex_index]
     for polygon in mesh.polygons:
         polygon.use_smooth = True
     obj = bpy.data.objects.new(name, mesh)

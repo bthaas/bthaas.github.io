@@ -228,7 +228,7 @@ describe('Portfolio', () => {
   it('keeps project details off the homepage and links every panel to its own page', () => {
     render(<Portfolio />)
 
-    const panelTriggers = screen.getAllByTestId('project-panel-trigger')
+    const panelTriggers = screen.getAllByTestId('project-spiral-fallback-link')
     expect(panelTriggers).toHaveLength(3)
     expect(screen.queryAllByTestId('project-case-study')).toHaveLength(0)
 
@@ -246,23 +246,19 @@ describe('Portfolio', () => {
     expect(screen.queryByRole('link', { name: /repository/i })).not.toBeInTheDocument()
   })
 
-  it('renders projects as the original three-card gallery with scroll-linked image pans', () => {
+  it('server-renders the project spiral with its complete static fallback', () => {
     render(<Portfolio />)
 
     const panelList = screen.getByRole('navigation', { name: 'Select a project' })
-    const panels = screen.getAllByTestId('project-panel-trigger')
+    const panels = screen.getAllByTestId('project-spiral-fallback-link')
 
-    expect(panelList).toHaveClass('atlas-shell', 'project-panel-list')
-    expect(panelList).toHaveAttribute('data-reveal-stagger')
-    expect(panelList).not.toHaveAttribute('data-project-flight-track')
+    expect(panelList).toHaveClass('project-spiral__fallback')
+    expect(panelList).toHaveAttribute('data-project-spiral-fallback')
     panels.forEach((panel, index) => {
       expect(panel).toHaveAttribute('id', `project-${siteContent.projects[index].id}`)
-      expect(panel).toHaveAttribute('data-atlas-velocity-plate')
-      expect(panel.querySelector('[data-project-pan]')).toHaveAttribute(
-        'data-project-pan-index',
-        String(index),
-      )
+      expect(within(panel).getByText(siteContent.projects[index].name)).toBeInTheDocument()
     })
+    expect(document.querySelector('[data-project-spiral-stage]')).toBeInTheDocument()
     expect(document.querySelector('[data-project-flight-stage]')).not.toBeInTheDocument()
   })
 

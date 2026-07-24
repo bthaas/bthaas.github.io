@@ -841,3 +841,129 @@ portfolio's existing Experience, Projects, and Skills artwork.
 - Load and clone the GLB with `useGLTF`/local Draco in a lazily mounted R3F
   scene. Reuse textures/materials, render on demand, expose `?stats=1`, and keep
   the static DOM composition visible until the first textured frame is ready.
+
+---
+
+# Project spiral reference analysis
+
+## Sources
+
+- Live reference: <https://pacomepertant.com/>, inspected at 1800 × 914 on
+  July 21, 2026.
+- Supplied overview capture: `frames/reference-spiral-overview.png`.
+- Recorded wheel-driven reference sequence:
+  `video/pacomepertant-spiral-reference.mp4` (H.264, 1800 × 914, 3 fps,
+  3 seconds).
+- Curated motion frames: `frames/spiral-rest.png`,
+  `frames/spiral-quarter-turn.png`, `frames/spiral-mid-turn.png`, and
+  `frames/spiral-late-turn.png`.
+
+## Composition and camera
+
+- The experience occupies a fixed, full-viewport black stage. A subtle square
+  grid sits behind the artwork at roughly 60–64 px spacing.
+- The spiral is centered close to 50% of the viewport width and 48% of its
+  height. At rest it fills approximately the middle 45% of the viewport width,
+  with off-axis cards reaching into the upper-right and lower-left corners.
+- The silhouette is an open vertical helix. The nearest card is large and
+  nearly frontal around the center. Cards above and below rotate away from the
+  camera and compress into narrow edge-on profiles before returning from the
+  opposite side.
+- The camera is eye-level with no visible horizon. Perspective is moderate,
+  equivalent to an approximately 40–48° field of view: depth is readable but
+  the front card does not feel dramatically wide-angle.
+- The visual center intentionally leaves negative space on the far left and
+  right. At least one card is clipped at the top and bottom so the loop feels
+  continuous beyond the viewport.
+
+## Lighting, color, and atmosphere
+
+- There is no environmental horizon, fog, cloud layer, or visible key light.
+  The project images behave as self-lit color fields on a near-black stage.
+- Front-facing cards retain full saturation and contrast. Cards turning away
+  darken slightly with depth and angle; edge-on cards remain visible as colored
+  slivers.
+- The reference has soft screen-space shadowing and overlap rather than hard
+  cast shadows. The required implementation target is a restrained black shadow
+  plus depth/angle opacity, not a second light source.
+- The portfolio adaptation keeps the reference's dark grid for the immersive
+  stage, while using the site's existing cream, citron, and cobalt accents for
+  labels and controls.
+
+## Repetition, geometry, and variation
+
+- Between 10 and 12 planes are visible at once. Neighboring planes are separated
+  by approximately 42–50° of helix phase and 90–120 px of vertical pitch.
+- The apparent horizontal radius is approximately 330–420 px at 1800 px wide.
+  The depth scale ranges from about 0.55 at the back to 1.10 at the front.
+- Cards use mixed source aspect ratios. Their target display width ranges from
+  roughly 210 px at the back to 420 px at the front, while height follows the
+  original project artwork.
+- Every plane has a shallow cylindrical bend across its width. The center bows
+  toward the camera while the left and right edges recede. Local variation is
+  limited to small deterministic roll, bend, width, and vertical offsets so the
+  helix remains legible.
+- The portfolio has three project images, so the visual loop repeats them over
+  nine slots. Copies are distributed unevenly around the helix to stop matching
+  artwork from lining up into one oversized surface; labels and links always
+  resolve to the corresponding real case study.
+
+## Motion and interaction
+
+- The document itself does not scroll (`scrollHeight` equals the viewport in the
+  reference). Wheel input advances a continuous helix phase with damped momentum.
+- Increasing phase moves each plane through a stable order: upper/back,
+  upper/front, center/front, lower/front, lower/back, then wraps.
+- Rotation, depth, scale, and vertical position change together. A card grows as
+  it approaches center, faces the camera at the front, then narrows as it exits.
+- Fast input adds temporary deformation and motion smear. The adaptation will
+  use shallow geometry bend plus velocity-driven skew/blur, capped so project
+  artwork and text remain readable.
+- Scroll scrubs multiple turns through a pinned stage. Pointer position adds a
+  bounded camera-parallax response without creating a second animation system.
+  A very slow idle drift prevents the scene from feeling frozen.
+- Project information appears in a compact floating label for the front card.
+  Activating a card opens its existing case-study route.
+
+## Structural and damage analysis
+
+- There is no fracture, damage, detached geometry, or destruction sequence in
+  this reference. Negative space comes from helix spacing and edge-on planes.
+- Motion order is cyclic rather than destructive. No object permanently leaves
+  the system; slots wrap deterministically after one full revolution.
+
+## Implementation targets
+
+### Geometry and naming
+
+- Build three shallow curved plane variants headlessly and arrange nine named
+  animation units: `project_card_01` through `project_card_09`.
+- Keep each card pivot at its local bounds center so R3F can independently
+  rotate and reposition it without orbit artifacts.
+- Use deterministic dimensions and bend variation. The exported GLB remains
+  texture-free; project textures and interaction shading are assigned in R3F.
+
+### Material and rendering
+
+- Apply the three existing project images in R3F, repeated across the nine
+  named nodes. Use sRGB texture output, moderate anisotropy, and depth-write so
+  overlap reads correctly.
+- Add a subtle angle/depth darkening response and a bounded velocity skew.
+  Do not add decorative lighting that changes the source artwork's colors.
+
+### Camera and layout
+
+- Use a perspective camera near 44° FOV. Helix radius and pitch scale from
+  viewport dimensions; the front card remains approximately 24–30vw wide.
+- Keep the stage at one viewport high while ScrollTrigger pins it for multiple
+  turns. Progress is passed through mutable refs rather than React state.
+
+### Responsive and reduced motion
+
+- Desktop/WebGL: nine-card helical scene, pinned scroll, bounded DPR, no
+  postprocessing or multisampling.
+- Mobile WebGL keeps the real nine-card scene at DPR 1 with a demand-driven
+  30 fps render loop and narrower responsive composition.
+- No-WebGL and `prefers-reduced-motion` use a normal-flow list of the three
+  project cards with the same images, titles, and links. No essential content or
+  route is exclusive to WebGL.
