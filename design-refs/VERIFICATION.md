@@ -528,3 +528,27 @@ The reference analysis, two procedural iterations, compressed named-node GLB,
 R3F integration, responsive/reduced-motion fallbacks, performance overlay,
 five-state comparison, coverage, production build, and cross-browser E2E gates
 are complete.
+
+## July 24, 2026 — Upright texture and card-gap correction
+
+- The live reference and deployed project section were reopened at 1800 × 914.
+  The deployed image textures were vertically inverted, and the nearest cards
+  intersected in both projected axes.
+- Root cause: TextureLoader's default vertical flip was being applied to
+  geometry using glTF UV orientation. The shared texture configuration now
+  enforces `flipY = false`, sRGB output, capped anisotropy, and a texture update
+  before the material becomes visible.
+- The desktop card target was reduced to 19% of the R3F viewport width and the
+  helix radius increased to 32%. A pure layout regression test uses the real
+  Court Vision and Beat Stream aspect ratios and proves immediate neighbors do
+  not intersect in projected 2D space. Mobile keeps a larger readable card ratio
+  with the same negative-space invariant.
+- `comparison.png` was rebuilt from the live reference plus corrected production
+  captures at start, 25%, 50%, 75%, and 100%. It was opened at 1800 × 720 and
+  confirms upright artwork and visible black gaps at all five states. Desktop
+  and 390 × 844 browser renders were also inspected directly.
+- Final verification: 234 tests across 57 files, 90.13% statements, 80.41%
+  branches, 83.02% functions, and 93.44% lines. TypeScript and the eight-route
+  production static export pass. The isolated production spiral journey passes
+  in Chromium, Firefox, desktop WebKit, and iPhone WebKit with no
+  application-origin console errors.

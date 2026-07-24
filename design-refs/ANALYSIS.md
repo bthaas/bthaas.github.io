@@ -938,6 +938,22 @@ portfolio's existing Experience, Projects, and Skills artwork.
 - Motion order is cyclic rather than destructive. No object permanently leaves
   the system; slots wrap deterministically after one full revolution.
 
+## July 24 orientation and spacing correction
+
+- The project artwork must read upright on every front-facing card. Because the
+  procedural card UVs are exported through glTF, runtime image textures use
+  `flipY = false`; the TextureLoader default inverts the artwork.
+- The user-confirmed silhouette requires visible black negative space between
+  neighboring cards. At the 1800 × 914 reference viewport, the projected
+  center-to-center vertical separation of the front card and either immediate
+  neighbor must exceed their combined projected half-heights.
+- The nearest card targets roughly 19% of the desktop viewport width, while the
+  helix radius targets roughly 27%. Mobile keeps a larger readable card ratio
+  but preserves the same non-contact vertical invariant.
+- Depth ordering may create visual overlap between distant back cards, as in the
+  reference, but the three nearest readable cards must not share an edge or
+  merge into a continuous image wall.
+
 ## Implementation targets
 
 ### Geometry and naming

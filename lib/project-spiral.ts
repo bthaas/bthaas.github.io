@@ -10,6 +10,17 @@ interface ProjectSpiralFrameInput {
   readonly velocity: number
 }
 
+interface ProjectSpiralViewport {
+  readonly height: number
+  readonly width: number
+}
+
+export interface ProjectSpiralLayout {
+  readonly horizontalRadius: number
+  readonly targetCardWidth: number
+  readonly verticalPitch: number
+}
+
 export interface ProjectSpiralFrame {
   readonly angle: number
   readonly depth: number
@@ -29,6 +40,17 @@ function positiveModulo(value: number, divisor: number) {
 function getCenteredSlot(slotIndex: number, phase: number, slotCount: number) {
   const half = slotCount / 2
   return positiveModulo(slotIndex - phase + half, slotCount) - half
+}
+
+export function getProjectSpiralLayout(
+  viewport: ProjectSpiralViewport,
+  isMobile = false,
+): ProjectSpiralLayout {
+  return {
+    horizontalRadius: Math.min(viewport.width * (isMobile ? 0.72 : 0.32), isMobile ? 3.2 : 5.2),
+    targetCardWidth: Math.min(viewport.width * (isMobile ? 0.52 : 0.19), isMobile ? 2.2 : 3.6),
+    verticalPitch: viewport.height * 0.5,
+  }
 }
 
 export function getProjectSpiralFrame({
@@ -51,7 +73,7 @@ export function getProjectSpiralFrame({
     scale: 0.62 + depthProgress * 0.46,
     velocitySkew: Math.max(-0.14, Math.min(0.14, velocity * 0.0014)),
     x: Math.sin(angle),
-    y: -centeredSlot * 0.285,
+    y: -centeredSlot * 0.48,
     zIndex: Math.round(depth * 1_000),
   }
 }
