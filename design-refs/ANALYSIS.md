@@ -739,3 +739,105 @@ Verified and inspected sources:
   most 6° on either axis, with a short damped return. The transform belongs to a
   dedicated inner surface so Atlas's rule drawing, SplitText index entrance, and
   Flip dossier expansion keep their existing owners and geometry.
+
+# Scene 03 — Portfolio Gateway Carousel
+
+Source: `video/02-portfolio-carousel-reference.mp4` (1280×720, 4.333 seconds,
+H.264, 3 fps), captured from the supplied
+`https://aikawakenichi.com/` reference on July 21, 2026. Curated ground-truth
+frames are `frames/carousel-composition-journey.png`,
+`carousel-category-work.png`, `carousel-category-fashion.png`,
+`carousel-category-journey.png`, and `carousel-motion-contact-sheet.png`.
+The reference imagery is analysis-only; the shipped carousel uses the
+portfolio's existing Experience, Projects, and Skills artwork.
+
+## Composition and camera
+
+- The scene is a full-viewport white editorial plate placed directly after the
+  hero and before the detailed Experience chapter. A one-line portfolio
+  introduction sits at the top center. An oversized high-contrast serif
+  `PORTFOLIO` spans beyond both viewport edges behind the object.
+- At 1280×720 the visible upper drum is about 594×337 px, centered near x=640
+  and y=359. Its top sits around 27% of the viewport and its bottom around 73%.
+  The background word occupies y=58–280, so the drum occludes the middle third.
+- The camera is level with the center of the upper drum with no visible horizon.
+  A restrained 34–40° perspective field of view shows the curved face and
+  narrow side slivers without revealing a steep top plane. The façade width is
+  about 1.75× its height.
+- Mobile at 390×844 preserves the same stack. `PORTFOLIO` sits near y=290 and
+  the upper drum is about 330×152 px at y=348–500. The controls remain close to
+  the bottom safe area; the object does not collapse into flat cards.
+
+## Geometry, repetition, and materials
+
+- Three semantically named curved panels form a complete radial carousel:
+  `carousel_experience_panel`, `carousel_projects_panel`, and
+  `carousel_skills_panel`. Each covers 120°, uses 24 horizontal segments, and
+  overlaps its neighbor by a visually negligible seam allowance. The active
+  face spans roughly 78–82° of the camera view; adjacent faces appear only as
+  10–18 px slivers at the sides.
+- Each panel has a centered local pivot, deterministic dimensions, usable UVs,
+  and a slight outward thickness so rotations do not reveal a paper-thin edge.
+  Runtime textures map the existing Experience trajectory, first Projects case
+  study, and Skills workshop images onto those panels.
+- A second, shallower lower shell sits 0.12–0.18 drum-heights below the carousel.
+  It is a single semantically named `carousel_reflector_shell` object with a
+  softly faceted surface. In R3F it receives the same active texture at low
+  opacity, vertically mirrored and washed toward warm white. It is decorative
+  and may be omitted on constrained mobile hardware if frame pacing requires it.
+- The reference has no fracture, damage, detached parts, or negative structural
+  gaps. Visual separation comes only from the small vertical gap between the
+  upper drum and lower shell and the fine seams between radial panels.
+- The upper panels use the image texture as the material base with roughness
+  near 0.42, zero metalness, a soft clearcoat highlight, and restrained warm
+  upper-right/cool lower-left reflection. No copied reference photograph,
+  baked font, or external texture ships in the site.
+
+## Light, typography, and depth cues
+
+- The environment is high-key `#FAF8F4`/paper white. A broad warm key comes from
+  upper-right/front and a weaker cool cyan fill comes from lower-left/front.
+  Shadow contrast is low; the image itself supplies most category color.
+- Depth is communicated by cylinder curvature, the narrow neighbor slivers,
+  a small contact shadow, the lower reflection, and a gentle highlight moving
+  across the face. There is no atmospheric fog, cloud field, bloom, or strong
+  depth of field in this section.
+- The background word uses the site's existing editorial serif at a fluid size
+  large enough to crop on both sides. The active category label is rendered in
+  the same serif over the center of the drum with translucent paper fill, a
+  faint dark inner shadow, and no baked texture.
+
+## Motion, interaction, and fallbacks
+
+- Previous/next buttons and ArrowLeft/ArrowRight rotate the panel group exactly
+  120° per action. Next moves Experience → Projects → Skills → Experience;
+  previous reverses the order. Each input advances the continuous ring by one
+  120° step with a damped 760–900 ms ease; additional input queues another
+  same-direction step instead of snapping backward when the category wraps.
+- Pointer movement adds at most ±2° yaw and ±1° pitch around the selected angle.
+  Idle motion is a sub-degree breathing drift. Buttons, the active category
+  chip, and the centered panel are real links to `#experience`, `#projects`, and
+  `#craft`; the canvas is decorative and pointer-transparent.
+- Wheel and page scroll remain owned by Lenis/native document flow. The gateway
+  never pins, traps scroll, or consumes touch gestures. A category link scrolls
+  to the existing detailed chapter below.
+- The initial selected category is Experience, matching the next section. The
+  DOM label, destination, and thumbnail update atomically when an input is
+  accepted while the decorative ring settles toward the same category.
+- Reduced motion, no WebGL, loading, and scene failure show the same composition
+  as a three-layer CSS curved-card fallback with Experience selected. All three
+  category links and both controls remain keyboard accessible at a minimum
+  44×44 px target size. Mobile keeps the real 3D scene when WebGL is available,
+  with DPR 1 and a 30 fps invalidation cap.
+
+## Implementation targets
+
+- Build the texture-free named-node GLB headlessly from a deterministic Blender
+  script, export via `export_and_compress_glb()`, retain Draco compression and
+  all four required node names, and stay well below 3 MiB/150,000 triangles.
+- Render and inspect two six-view warm turntable iterations. Iteration 1 verifies
+  silhouette, panel seams, side thickness, and pivots; iteration 2 refines the
+  lower shell gap and active-face camera presentation before acceptance.
+- Load and clone the GLB with `useGLTF`/local Draco in a lazily mounted R3F
+  scene. Reuse textures/materials, render on demand, expose `?stats=1`, and keep
+  the static DOM composition visible until the first textured frame is ready.

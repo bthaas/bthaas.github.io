@@ -54,7 +54,7 @@ describe('Portfolio', () => {
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
     )
-    expect(ids).toEqual(['hero', 'experience', 'projects', 'craft', 'contact'])
+    expect(ids).toEqual(['hero', 'portfolio-gateway', 'experience', 'projects', 'craft', 'contact'])
     expect(container.querySelector('[data-chapter-wipe]')).not.toBeInTheDocument()
     expect(container.querySelector('[data-experience-light-step]')).not.toBeInTheDocument()
   })

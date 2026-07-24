@@ -24,6 +24,7 @@ def add_area_light(
     color: tuple[float, float, float],
     energy: float,
     size: float,
+    target: Vector,
 ) -> None:
     data = bpy.data.lights.new(name, type="AREA")
     data.energy = energy
@@ -32,8 +33,15 @@ def add_area_light(
     data.size = size
     light = bpy.data.objects.new(name, data)
     light.location = location
-    look_at(light, Vector((0.35, 0.0, 0.0)))
+    look_at(light, target)
     bpy.context.collection.objects.link(light)
+
+
+def get_scene_bounds(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
+    corners = [obj.matrix_world @ Vector(corner) for obj in objects for corner in obj.bound_box]
+    minimum = Vector(tuple(min(corner[axis] for corner in corners) for axis in range(3)))
+    maximum = Vector(tuple(max(corner[axis] for corner in corners) for axis in range(3)))
+    return minimum, maximum
 
 
 def parse_arguments() -> tuple[Path, Path]:
@@ -49,6 +57,13 @@ def main() -> None:
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.object.delete(use_global=False)
     bpy.ops.import_scene.gltf(filepath=str(model))
+    mesh_objects = [obj for obj in bpy.context.scene.objects if obj.type == "MESH"]
+    if not mesh_objects:
+        raise RuntimeError(f"No mesh objects were imported from {model}")
+    minimum, maximum = get_scene_bounds(mesh_objects)
+    target = (minimum + maximum) * 0.5
+    extent = maximum - minimum
+    orbit_radius = max(extent.x, extent.y, extent.z) * 1.55
 
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_EEVEE"
@@ -67,19 +82,23 @@ def main() -> None:
     )
     world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.68
     scene.world = world
-    add_area_light("Warm_Key", (4.6, -3.8, 5.8), (1.0, 0.74, 0.44), 690, 3.7)
-    add_area_light("Cool_Fill", (-3.5, -2.0, 2.4), (0.63, 0.74, 0.88), 280, 4.6)
-    add_area_light("Gold_Rim", (2.0, 3.3, 3.7), (1.0, 0.84, 0.42), 520, 2.8)
+    light_scale = max(1.0, orbit_radius / 3.2)
+    add_area_light("Warm_Key", target + Vector((4.6, -3.8, 5.8)) * light_scale, (1.0, 0.74, 0.44), 690, 3.7 * light_scale, target)
+    add_area_light("Cool_Fill", target + Vector((-3.5, -2.0, 2.4)) * light_scale, (0.63, 0.74, 0.88), 280, 4.6 * light_scale, target)
+    add_area_light("Gold_Rim", target + Vector((2.0, 3.3, 3.7)) * light_scale, (1.0, 0.84, 0.42), 520, 2.8 * light_scale, target)
 
     camera_data = bpy.data.cameras.new("Turntable_Camera")
     camera_data.lens = 54
     camera = bpy.data.objects.new("Turntable_Camera", camera_data)
     bpy.context.collection.objects.link(camera)
     scene.camera = camera
-    target = Vector((0.35, 0.0, 0.0))
     for index, degrees in enumerate((-24, -12, 0, 12, 24, 38), start=1):
         angle = math.radians(degrees)
-        camera.location = (math.sin(angle) * 3.2, -math.cos(angle) * 3.2, 0.45)
+        camera.location = target + Vector((
+            math.sin(angle) * orbit_radius,
+            -math.cos(angle) * orbit_radius,
+            extent.z * 0.12,
+        ))
         look_at(camera, target)
         scene.render.filepath = str(output / f"turntable-{index:02d}.png")
         bpy.ops.render.render(write_still=True)

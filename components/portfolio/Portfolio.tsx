@@ -17,6 +17,7 @@ import {
   SkillLogoSequence,
 } from './SkillLogos'
 import { SkillSphere } from './SkillSphere'
+import { PortfolioGateway } from './PortfolioGateway'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
 
@@ -179,6 +180,8 @@ export function Portfolio() {
           </div>
 
         </section>
+
+        <PortfolioGateway />
 
         <section className="experience-section" id="experience" aria-labelledby="experience-title">
           <div className="experience-board">

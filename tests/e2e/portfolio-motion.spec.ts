@@ -42,10 +42,11 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(page.locator('script[src*="/_next/static/"]')).not.toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-atlas', 'ready')
   await expect(page.locator('html')).toHaveClass(/atlas-js/)
-  await expect(page.locator('#hero, #experience, #projects, #craft, #contact')).toHaveCount(5)
+  await expect(page.locator('#hero, #portfolio-gateway, #experience, #projects, #craft, #contact'))
+    .toHaveCount(6)
   await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
   const sectionBackgrounds = await page
-    .locator('#hero, #experience, #projects, #craft, #contact')
+    .locator('#hero, #portfolio-gateway, #experience, #projects, #craft, #contact')
     .evaluateAll((sections) => sections.map((section) => getComputedStyle(section).backgroundColor))
   expect(new Set(sectionBackgrounds)).toEqual(new Set(['rgb(243, 239, 227)']))
   await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
@@ -60,6 +61,33 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(page.locator('.hero-liquid__canvas canvas')).toHaveCount(1)
   await expect(page.locator('.kinetic-type-band')).toHaveCount(0)
   await expect(page.locator('.atlas-picture--hero img')).toHaveAttribute('fetchpriority', 'high')
+  await expectNoHorizontalOverflow(page)
+
+  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+  await gateway.scrollIntoViewIfNeeded()
+  await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  await expect(gateway).toHaveAttribute('data-active-index', '0')
+  await expect(gateway.locator('.portfolio-gateway__fallback-face')).toHaveCount(3)
+  await expect(gateway).toHaveAttribute('data-canvas-ready', '', { timeout: 10_000 })
+  await expect(gateway.locator('.portfolio-gateway-canvas')).toHaveCount(1)
+  await expect(page.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
+    'href',
+    '#experience',
+  )
+  await gateway.focus()
+  await gateway.press('ArrowRight')
+  await expect(gateway).toHaveAttribute('data-active-index', '1')
+  await expect(page.getByRole('link', { name: 'Open Projects' })).toHaveAttribute(
+    'href',
+    '#projects',
+  )
+  await gateway.press('ArrowRight')
+  await expect(gateway).toHaveAttribute('data-active-index', '2')
+  await expect(page.getByRole('link', { name: 'Open Skills' })).toHaveAttribute('href', '#craft')
+  await gateway.press('ArrowRight')
+  await expect(gateway).toHaveAttribute('data-active-index', '0')
+  await gateway.press('ArrowLeft')
+  await expect(gateway).toHaveAttribute('data-active-index', '2')
   await expectNoHorizontalOverflow(page)
 
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
@@ -146,12 +174,14 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     '[data-fluid-cursor]',
     '[data-feather-fall-layer]',
     '.hero-liquid__canvas',
+    '.portfolio-gateway-canvas',
     'script[data-atlas-horizon]',
   ].join(', ')))
     .toHaveCount(0)
   await expect(page.locator('.flight-dossier__toggle').first())
     .toHaveAttribute('aria-expanded', 'true')
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
+  await expect(page.locator('.portfolio-gateway__fallback-face')).toHaveCount(3)
   await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
   await page.locator('[data-skill-sphere]').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-motion', 'reduced')
@@ -435,7 +465,8 @@ test('preserves the complete no-JS document', async ({ browser, isMobile }) => {
   const page = await context.newPage()
   await page.goto('http://127.0.0.1:4173/')
 
-  await expect(page.locator('#hero, #experience, #projects, #craft, #contact')).toHaveCount(5)
+  await expect(page.locator('#hero, #portfolio-gateway, #experience, #projects, #craft, #contact'))
+    .toHaveCount(6)
   await expect(page.locator('html')).not.toHaveClass(/atlas-js/)
   await expect(page.locator('[data-atlas-cursor], script[data-atlas-horizon], canvas')).toHaveCount(0)
   await expect(page.locator('.flight-dossier__toggle').first())
