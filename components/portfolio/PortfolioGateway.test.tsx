@@ -11,7 +11,7 @@ vi.mock('../scenes/AtlasWebGLScenes', () => ({
 
 describe('PortfolioGateway', () => {
   it('starts on Experience with semantic carousel controls and destinations', () => {
-    render(<PortfolioGateway />)
+    const { container } = render(<PortfolioGateway />)
 
     expect(screen.getByRole('heading', { name: 'Explore the portfolio' })).toBeInTheDocument()
     expect(screen.getByText('BRETT HAAS')).toHaveAttribute('aria-hidden', 'true')
@@ -27,6 +27,26 @@ describe('PortfolioGateway', () => {
       'carousel',
     )
     expect(screen.getByRole('status')).toHaveTextContent('Experience category selected')
+    expect(
+      container.querySelectorAll(
+        '.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice',
+      ),
+    ).toHaveLength(36)
+    expect(
+      container.querySelectorAll(
+        '.portfolio-gateway__fallback-reflection-ring > .portfolio-gateway__fallback-slice',
+      ),
+    ).toHaveLength(36)
+    expect(container.querySelectorAll('.portfolio-gateway__fallback-face')).toHaveLength(0)
+    expect(
+      container.querySelectorAll('[data-gateway-category="experience"]'),
+    ).toHaveLength(24)
+    expect(
+      container.querySelectorAll('[data-gateway-category="projects"]'),
+    ).toHaveLength(24)
+    expect(
+      container.querySelectorAll('[data-gateway-category="skills"]'),
+    ).toHaveLength(24)
   })
 
   it('cycles categories with buttons and arrow keys while wrapping', () => {
@@ -83,7 +103,9 @@ describe('PortfolioGateway', () => {
     expect(capture).toHaveBeenCalledWith(7)
 
     fireEvent.pointerMove(dragSurface, { clientX: 280, clientY: 300, pointerId: 7 })
-    expect(ring).toHaveStyle({ transform: 'translateZ(-19rem) rotateY(-72deg)' })
+    expect(ring).toHaveStyle({
+      transform: 'translateZ(calc(-1 * var(--gateway-cylinder-radius))) rotateY(-72deg)',
+    })
 
     fireEvent.pointerUp(dragSurface, { clientX: 280, pointerId: 7 })
     expect(carousel).toHaveAttribute('data-dragging', 'false')

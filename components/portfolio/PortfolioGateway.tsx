@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { Component, useCallback, useEffect, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
 import {
   WEBGL_ACTIVATED_ATTRIBUTE,
@@ -11,6 +11,7 @@ import {
 import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
 import {
   GATEWAY_CATEGORIES,
+  GATEWAY_CYLINDER_SEGMENTS,
   getGatewayDragRotation,
   getGatewayRotation,
   getGatewayStepDeltaFromDrag,
@@ -31,6 +32,26 @@ interface GatewayDragState {
   pointerId: number | null
   startX: number
   width: number
+}
+
+function GatewayCylinderSlices() {
+  return GATEWAY_CYLINDER_SEGMENTS.map((segment) => {
+    const category = GATEWAY_CATEGORIES[segment.categoryIndex]
+    const style = {
+      '--gateway-segment-angle': `${segment.angle}deg`,
+      '--gateway-segment-image': `url("${category.image}")`,
+      '--gateway-segment-position': `${segment.imagePosition}%`,
+    } as CSSProperties
+
+    return (
+      <span
+        className="portfolio-gateway__fallback-slice"
+        data-gateway-category={segment.categoryId}
+        key={segment.id}
+        style={style}
+      />
+    )
+  })
 }
 
 class GatewayBoundary extends Component<React.PropsWithChildren, GatewayBoundaryState> {
@@ -216,34 +237,21 @@ export function PortfolioGateway() {
           <div className="portfolio-gateway__fallback">
             <div
               className="portfolio-gateway__fallback-ring"
-              style={{ transform: `translateZ(-19rem) rotateY(${carouselRotation}deg)` }}
+              style={{
+                transform: `translateZ(calc(-1 * var(--gateway-cylinder-radius))) rotateY(${carouselRotation}deg)`,
+              }}
             >
-              {GATEWAY_CATEGORIES.map((category, index) => (
-                <div
-                  className="portfolio-gateway__fallback-face"
-                  style={{ transform: `rotateY(${index * 120}deg) translateZ(19rem)` }}
-                  key={category.id}
-                >
-                  <img
-                    src={category.image}
-                    alt=""
-                    width="960"
-                    height="640"
-                    decoding="async"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
+              <GatewayCylinderSlices />
             </div>
             <div className="portfolio-gateway__fallback-reflection">
-              <img
-                src={activeCategory.image}
-                alt=""
-                width="960"
-                height="640"
-                decoding="async"
-                loading="lazy"
-              />
+              <div
+                className="portfolio-gateway__fallback-reflection-ring"
+                style={{
+                  transform: `translateZ(calc(-1 * var(--gateway-cylinder-radius))) rotateY(${carouselRotation}deg)`,
+                }}
+              >
+                <GatewayCylinderSlices />
+              </div>
             </div>
           </div>
           {mounted && (
