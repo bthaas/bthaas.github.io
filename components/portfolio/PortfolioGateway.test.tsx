@@ -14,7 +14,8 @@ describe('PortfolioGateway', () => {
     render(<PortfolioGateway />)
 
     expect(screen.getByRole('heading', { name: 'Explore the portfolio' })).toBeInTheDocument()
-    expect(screen.getByText('PORTFOLIO')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByText('BRETT HAAS')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
       'href',
       '#experience',
@@ -49,5 +50,48 @@ describe('PortfolioGateway', () => {
 
     fireEvent.keyDown(carousel, { key: 'ArrowLeft' })
     expect(screen.getByRole('link', { name: 'Open Skills' })).toHaveAttribute('href', '#craft')
+  })
+
+  it('tracks a captured horizontal drag and snaps to the nearest category', () => {
+    render(<PortfolioGateway />)
+    const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
+    const dragSurface = screen.getByTestId('portfolio-gateway-drag-surface')
+    const ring = dragSurface.querySelector('.portfolio-gateway__fallback-ring')
+    const capture = vi.fn()
+    const release = vi.fn()
+    Object.defineProperties(dragSurface, {
+      getBoundingClientRect: {
+        configurable: true,
+        value: () => ({
+          bottom: 500,
+          height: 400,
+          left: 0,
+          right: 800,
+          top: 100,
+          width: 800,
+          x: 0,
+          y: 100,
+          toJSON: () => ({}),
+        }),
+      },
+      releasePointerCapture: { configurable: true, value: release },
+      setPointerCapture: { configurable: true, value: capture },
+    })
+
+    fireEvent.pointerDown(dragSurface, { button: 0, clientX: 600, pointerId: 7 })
+    expect(carousel).toHaveAttribute('data-dragging', 'true')
+    expect(capture).toHaveBeenCalledWith(7)
+
+    fireEvent.pointerMove(dragSurface, { clientX: 280, clientY: 300, pointerId: 7 })
+    expect(ring).toHaveStyle({ transform: 'translateZ(-19rem) rotateY(-72deg)' })
+
+    fireEvent.pointerUp(dragSurface, { clientX: 280, pointerId: 7 })
+    expect(carousel).toHaveAttribute('data-dragging', 'false')
+    expect(carousel).toHaveAttribute('data-active-index', '1')
+    expect(screen.getByRole('link', { name: 'Open Projects' })).toHaveAttribute(
+      'href',
+      '#projects',
+    )
+    expect(release).toHaveBeenCalledWith(7)
   })
 })

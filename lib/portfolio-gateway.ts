@@ -34,3 +34,17 @@ export function getWrappedGatewayIndex(index: number): number {
 export function getGatewayRotation(index: number): number {
   return index === 0 ? 0 : index * -120
 }
+
+const GATEWAY_DRAG_DEGREES_PER_WIDTH = 180
+const GATEWAY_DRAG_WIDTHS_PER_STEP = 0.42
+
+export function getGatewayDragRotation(deltaX: number, width: number): number {
+  if (!Number.isFinite(deltaX) || !Number.isFinite(width) || width <= 0) return 0
+  return (deltaX / width) * GATEWAY_DRAG_DEGREES_PER_WIDTH
+}
+
+export function getGatewayStepDeltaFromDrag(deltaX: number, width: number): number {
+  if (!Number.isFinite(deltaX) || !Number.isFinite(width) || width <= 0) return 0
+  const stepDelta = Math.round(-deltaX / (width * GATEWAY_DRAG_WIDTHS_PER_STEP))
+  return stepDelta === 0 ? 0 : stepDelta
+}

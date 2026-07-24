@@ -754,9 +754,10 @@ portfolio's existing Experience, Projects, and Skills artwork.
 ## Composition and camera
 
 - The scene is a full-viewport white editorial plate placed directly after the
-  hero and before the detailed Experience chapter. A one-line portfolio
-  introduction sits at the top center. An oversized high-contrast serif
-  `PORTFOLIO` spans beyond both viewport edges behind the object.
+  hero and before the detailed Experience chapter. The standalone role line
+  `Engineer · Researcher · Builder` sits at the top center in an italic
+  editorial serif. An oversized high-contrast serif `BRETT HAAS` spans beyond
+  both viewport edges behind the object.
 - At 1280×720 the visible upper drum is about 594×337 px, centered near x=640
   and y=359. Its top sits around 27% of the viewport and its bottom around 73%.
   The background word occupies y=58–280, so the drum occludes the middle third.
@@ -764,7 +765,7 @@ portfolio's existing Experience, Projects, and Skills artwork.
   A restrained 34–40° perspective field of view shows the curved face and
   narrow side slivers without revealing a steep top plane. The façade width is
   about 1.75× its height.
-- Mobile at 390×844 preserves the same stack. `PORTFOLIO` sits near y=290 and
+- Mobile at 390×844 preserves the same stack. `BRETT HAAS` sits near y=290 and
   the upper drum is about 330×152 px at y=348–500. The controls remain close to
   the bottom safe area; the object does not collapse into flat cards.
 
@@ -802,10 +803,11 @@ portfolio's existing Experience, Projects, and Skills artwork.
   a small contact shadow, the lower reflection, and a gentle highlight moving
   across the face. There is no atmospheric fog, cloud field, bloom, or strong
   depth of field in this section.
-- The background word uses the site's existing editorial serif at a fluid size
-  large enough to crop on both sides. The active category label is rendered in
-  the same serif over the center of the drum with translucent paper fill, a
-  faint dark inner shadow, and no baked texture.
+- The background name uses the site's existing editorial serif at a fluid size
+  large enough to crop on both sides. The role line uses the same family in
+  italic with looser tracking and a much smaller scale. The active category
+  label is rendered in the serif over the center of the drum with translucent
+  paper fill, a faint dark inner shadow, and no baked texture.
 
 ## Motion, interaction, and fallbacks
 
@@ -818,12 +820,16 @@ portfolio's existing Experience, Projects, and Skills artwork.
   Idle motion is a sub-degree breathing drift. Buttons, the active category
   chip, and the centered panel are real links to `#experience`, `#projects`, and
   `#craft`; the canvas is decorative and pointer-transparent.
-- Wheel and page scroll remain owned by Lenis/native document flow. The gateway
-  never pins, traps scroll, or consumes touch gestures. A category link scrolls
-  to the existing detailed chapter below.
+- Horizontal pointer drag rotates the CSS and R3F rings continuously, captures
+  the active pointer, and snaps to the nearest 120° category on release. A drag
+  across more than one step may advance multiple faces. The drag surface uses a
+  grab/grabbing cursor and `touch-action: pan-y`, so vertical page movement
+  remains owned by Lenis/native document flow while horizontal intent spins the
+  ring. The gateway never pins or traps scroll.
 - The initial selected category is Experience, matching the next section. The
   DOM label, destination, and thumbnail update atomically when an input is
-  accepted while the decorative ring settles toward the same category.
+  accepted or a drag is released while the decorative ring settles toward the
+  same category.
 - Reduced motion, no WebGL, loading, and scene failure show the same composition
   as a three-layer CSS curved-card fallback with Experience selected. All three
   category links and both controls remain keyboard accessible at a minimum
