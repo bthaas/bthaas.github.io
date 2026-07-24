@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getFrontProjectIndex,
   getProjectSpiralFrame,
+  getProjectSpiralLayout,
   getProjectSpiralPhase,
 } from './project-spiral'
 
@@ -41,6 +42,67 @@ describe('project spiral choreography', () => {
     expect(wrappedNeighbor.x).toBeLessThan(0)
     expect(wrappedNeighbor.y).toBeGreaterThan(0)
     expect(wrappedNeighbor.depth).toBeCloseTo(firstNeighbor.depth, 5)
+  })
+
+  it('keeps neighboring front cards separated at the reference viewport', () => {
+    const layout = getProjectSpiralLayout({ height: 7.68, width: 15.1 })
+    const front = getProjectSpiralFrame({
+      phase: 0,
+      slotCount: 9,
+      slotIndex: 0,
+      velocity: 0,
+    })
+    const neighbor = getProjectSpiralFrame({
+      phase: 0,
+      slotCount: 9,
+      slotIndex: 1,
+      velocity: 0,
+    })
+    const horizontalSeparation = Math.abs(front.x - neighbor.x) * layout.horizontalRadius
+    const combinedHalfWidth = (
+      layout.targetCardWidth * front.scale
+      + layout.targetCardWidth * neighbor.scale
+    ) / 2
+    const verticalSeparation = Math.abs(front.y - neighbor.y) * layout.verticalPitch
+    const combinedHalfHeight = (
+      layout.targetCardWidth * front.scale / (1200 / 848)
+      + layout.targetCardWidth * neighbor.scale / (1200 / 686)
+    ) / 2
+
+    expect(layout.targetCardWidth).toBeLessThanOrEqual(layout.horizontalRadius * 0.75)
+    expect(
+      horizontalSeparation > combinedHalfWidth
+      || verticalSeparation > combinedHalfHeight,
+    ).toBe(true)
+  })
+
+  it('keeps mobile cards large enough to read without merging them', () => {
+    const layout = getProjectSpiralLayout({ height: 7.8, width: 3.6 }, true)
+    const front = getProjectSpiralFrame({
+      phase: 0,
+      slotCount: 9,
+      slotIndex: 0,
+      velocity: 0,
+    })
+    const neighbor = getProjectSpiralFrame({
+      phase: 0,
+      slotCount: 9,
+      slotIndex: 1,
+      velocity: 0,
+    })
+    const horizontalSeparation = Math.abs(front.x - neighbor.x) * layout.horizontalRadius
+    const combinedHalfWidth = layout.targetCardWidth * (front.scale + neighbor.scale) / 2
+    const verticalSeparation = Math.abs(front.y - neighbor.y) * layout.verticalPitch
+    const combinedHalfHeight = (
+      layout.targetCardWidth * front.scale / (1200 / 848)
+      + layout.targetCardWidth * neighbor.scale / (1200 / 686)
+    ) / 2
+
+    expect(layout.targetCardWidth).toBeGreaterThanOrEqual(3.6 * 0.5)
+    expect(
+      horizontalSeparation > combinedHalfWidth
+      || verticalSeparation > combinedHalfHeight,
+    ).toBe(true)
   })
 
   it('advances the next slot to the front after one phase step', () => {

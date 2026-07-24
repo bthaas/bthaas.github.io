@@ -9,8 +9,10 @@ import * as THREE from 'three'
 import type { ProjectSpiralMotionState } from '@/components/projects/project-spiral-types'
 import {
   getProjectSpiralFrame,
+  getProjectSpiralLayout,
   PROJECT_SPIRAL_SLOT_ORDER,
 } from '@/lib/project-spiral'
+import { configureProjectSpiralTexture } from '@/lib/project-spiral-rendering'
 
 const CARD_COUNT = 9
 const MODEL_PATH = '/models/project-spiral.glb'
@@ -80,12 +82,8 @@ function ProjectSpiralCards({
   )
 
   useEffect(() => {
-    const anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy())
-    textures.forEach((texture) => {
-      texture.anisotropy = anisotropy
-      texture.colorSpace = THREE.SRGBColorSpace
-      texture.needsUpdate = true
-    })
+    const maximumAnisotropy = gl.capabilities.getMaxAnisotropy()
+    textures.forEach((texture) => configureProjectSpiralTexture(texture, maximumAnisotropy))
     return () => materials.forEach((material) => material.dispose())
   }, [gl, materials, textures])
 
@@ -119,9 +117,11 @@ function ProjectSpiralCards({
       delta,
     )
 
-    const horizontalRadius = Math.min(viewport.width * 0.23, 4.4)
-    const verticalPitch = viewport.height * 0.44
-    const targetCardWidth = Math.min(viewport.width * 0.26, 4.45)
+    const {
+      horizontalRadius,
+      targetCardWidth,
+      verticalPitch,
+    } = getProjectSpiralLayout(viewport, isMobile)
     for (let index = 0; index < CARD_COUNT; index += 1) {
       const mesh = meshRefs.current[index]
       if (!mesh) continue
