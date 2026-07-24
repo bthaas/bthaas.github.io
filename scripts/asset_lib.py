@@ -54,6 +54,15 @@ class FeatherTemplate:
     faces: tuple[tuple[int, ...], ...]
 
 
+@dataclass(frozen=True)
+class CurvedPanelTemplate:
+    """Closed cylindrical panel with one continuous outer-face UV strip."""
+
+    vertices: tuple[Vector, ...]
+    faces: tuple[tuple[int, ...], ...]
+    loop_uvs: tuple[tuple[float, float], ...]
+
+
 def reset_scene() -> None:
     """Remove objects and reusable datablocks from the current scene."""
 
@@ -174,10 +183,75 @@ def make_feather_template(
     return FeatherTemplate(tuple(vertices), tuple(faces))
 
 
+def make_curved_panel_template(
+    radius: float,
+    height: float,
+    sweep_degrees: float,
+    segments: int,
+    thickness: float,
+) -> CurvedPanelTemplate:
+    """Build a deterministic, closed, UV-mapped cylindrical panel around Z."""
+
+    if segments < 3:
+        raise ValueError("Curved panels require at least three segments")
+    if radius <= 0 or height <= 0 or thickness <= 0:
+        raise ValueError("Curved panel dimensions must be positive")
+    if thickness >= radius:
+        raise ValueError("Curved panel thickness must be smaller than its radius")
+    if not 0 < sweep_degrees <= 360:
+        raise ValueError("Curved panel sweep must be within (0, 360]")
+
+    half_height = height * 0.5
+    inner_radius = radius - thickness
+    start_angle = math.radians(-sweep_degrees * 0.5)
+    sweep_angle = math.radians(sweep_degrees)
+    is_full_sweep = sweep_degrees == 360.0
+    ring_count = segments if is_full_sweep else segments + 1
+    vertices: list[Vector] = []
+    for index in range(ring_count):
+        angle = start_angle + sweep_angle * index / segments
+        sine = math.sin(angle)
+        cosine = math.cos(angle)
+        for current_radius in (radius, inner_radius):
+            x = current_radius * sine
+            y = -current_radius * cosine
+            vertices.extend(
+                (
+                    Vector((x, y, -half_height)),
+                    Vector((x, y, half_height)),
+                )
+            )
+
+    faces: list[tuple[int, ...]] = []
+    loop_uvs: list[tuple[float, float]] = []
+    for index in range(segments):
+        current = index * 4
+        following = ((index + 1) % ring_count) * 4
+        u0 = index / segments
+        u1 = (index + 1) / segments
+        faces.append((current, following, following + 1, current + 1))
+        loop_uvs.extend(((u0, 0.0), (u1, 0.0), (u1, 1.0), (u0, 1.0)))
+        faces.append((current + 2, current + 3, following + 3, following + 2))
+        loop_uvs.extend(((u0, 0.0), (u0, 1.0), (u1, 1.0), (u1, 0.0)))
+        faces.append((current + 1, following + 1, following + 3, current + 3))
+        loop_uvs.extend(((u0, 0.0), (u1, 0.0), (u1, 1.0), (u0, 1.0)))
+        faces.append((current, current + 2, following + 2, following))
+        loop_uvs.extend(((u0, 0.0), (u0, 1.0), (u1, 1.0), (u1, 0.0)))
+
+    if not is_full_sweep:
+        end = segments * 4
+        faces.append((0, 1, 3, 2))
+        loop_uvs.extend(((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)))
+        faces.append((end, end + 2, end + 3, end + 1))
+        loop_uvs.extend(((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)))
+    return CurvedPanelTemplate(tuple(vertices), tuple(faces), tuple(loop_uvs))
+
+
 def create_mesh_object(
     name: str,
     accumulator: MeshAccumulator,
     material: bpy.types.Material,
+    loop_uvs: Sequence[tuple[float, float]] | None = None,
 ) -> bpy.types.Object:
     """Create a smooth named object with its pivot at local bounds center."""
 
@@ -198,6 +272,12 @@ def create_mesh_object(
     )
     mesh.materials.append(material)
     mesh.update()
+    if loop_uvs is not None:
+        if len(loop_uvs) != len(mesh.loops):
+            raise ValueError(f"UV loop count does not match mesh loops for {name}")
+        uv_layer = mesh.uv_layers.new(name="UVMap")
+        for loop, uv in zip(uv_layer.data, loop_uvs, strict=True):
+            loop.uv = uv
     for polygon in mesh.polygons:
         polygon.use_smooth = True
     obj = bpy.data.objects.new(name, mesh)
@@ -231,6 +311,8 @@ def build_gltf_transform_command(input_path: Path, output_path: Path) -> list[st
         "--join",
         "false",
         "--instance",
+        "false",
+        "--prune-attributes",
         "false",
         "--simplify",
         "false",

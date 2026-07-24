@@ -9,6 +9,7 @@ main {
 }
 
 .hero-section,
+.portfolio-gateway,
 .experience-section,
 .projects-section,
 .craft-section,
@@ -116,6 +117,7 @@ html.atlas-js .craft-marquee {
 
 @media (max-width: 720px) {
   .hero-section,
+  .portfolio-gateway,
   .experience-section,
   .projects-section,
   .craft-section,

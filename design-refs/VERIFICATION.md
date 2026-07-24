@@ -325,3 +325,73 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   skips across Chromium, Firefox, desktop WebKit, and iPhone WebKit.
 - `git diff --check`, dependency audit, credential/debug scan, and production
   console scan are release gates for the final branch.
+
+## 2026-07-21 — Portfolio gateway carousel
+
+### Reference and geometry evidence
+
+- The supplied Aikawa Kenichi portfolio gateway was captured at 1280×720 as a
+  4.333-second H.264 reference at 3 fps. The extracted sequence was opened as a
+  contact sheet, and Work, Fashion, Journey, composition, and motion frames were
+  curated before modeling. Scene 03 in `ANALYSIS.md` is the visual contract.
+- The deterministic Blender builder produced four inspected six-view passes.
+  Iteration 01 exposed an oversized lower shell and loose vertical gap;
+  iteration 02 tightened both; iteration 03 removed coincident full-circle seam
+  caps; iteration 04 wrapped the seam onto shared manifold vertices and is
+  mirrored in `carousel-accepted/`.
+- The accepted `portfolio-gateway.glb` is 4,760 bytes and 972 triangles. It
+  requires `KHR_draco_mesh_compression`, retains `TEXCOORD_0`, and re-imports
+  with `carousel_experience_panel`, `carousel_projects_panel`,
+  `carousel_skills_panel`, and `carousel_reflector_shell`. The shared Blender
+  contract passes 7/7 tests.
+
+### Site comparison and fallbacks
+
+- The full-viewport gateway is directly between Hero and Experience. Its
+  oversized PORTFOLIO word, three 120° curved faces, mirrored lower shell,
+  category chip, arrows, and orbit mark preserve the reference hierarchy at
+  1280×720 and 390×844. Experience, Projects, and Skills link to the existing
+  detailed chapters.
+- `comparison.png` was opened at 1920×720 and compares the curated reference
+  with Experience, both transition states, Projects, and Skills. The five site
+  captures are in `site-screenshots/carousel-*`; the clean 390×844 no-WebGL
+  composition is `carousel-fallback-mobile.png`.
+- The CSS 3D ring remains the complete static composition. A lazily mounted,
+  texture-mapped R3F/Draco scene adds physical curvature and light only while
+  the gateway intersects the viewport. This persistent underlay also avoids a
+  blank frame in multi-canvas compositors. Reduced motion and no-WebGL mount no
+  gateway canvas and retain all links and controls.
+- Keyboard ArrowLeft/ArrowRight and both 44 px arrow buttons wrap continuously
+  without trapping document scroll. Mobile controls were moved into the visible
+  safe-area composition after the first 390×844 inspection.
+
+### Automated and performance verification
+
+- Vitest: 216/216 tests passing across 53 files. Coverage is 90.47% statements,
+  80.58% branches, 83.09% functions, and 93.72% lines. `tsc --noEmit`, the
+  production Next.js build, all eight statically generated routes, and
+  `git diff --check` pass.
+- The new cross-browser choreography and keyboard assertions pass in Chromium,
+  Firefox, desktop WebKit, and iPhone WebKit; the six-section no-JavaScript
+  document also passes. The production journey reports no application-origin
+  console errors or horizontal overflow.
+- Complete-page headless pacing measured Firefox at 17.4–63.8 fps, desktop
+  WebKit at 28.5–30.1 fps, and iPhone WebKit at 29.9–30.1 fps. The final
+  Chromium SwiftShader rerun measured 11.2–16.0 fps and passed its 10 fps
+  software-renderer gate after the gateway was kept out of the hero startup
+  budget with intersection gating, content containment, and lazy images.
+- The real hardware in-app browser measured the visible gateway at 103 fps with
+  a 67–103 fps observed range at 1280×720. The labeled evidence is
+  `site-screenshots/carousel-hardware-stats.png`; this confirms the desktop
+  section clears the 60 fps target despite headless WebKit's 30 Hz ceiling.
+- One inherited Chromium SwiftShader gate remains below its existing threshold:
+  the pre-existing fluid cursor reports 13–15 fps versus the test's 18 fps
+  software floor. The gateway is not mounted during that measurement. The same
+  rerun passed the gateway journey, sun spectacle, reversible hero, and complete
+  frame-pacing gates. Development also surfaces Three.js's upstream `Clock`
+  deprecation warning; production application errors remain zero.
+- The credential/debug scan found no feature-owned diagnostics or secrets.
+  `npm audit` currently reports two high-severity transitive `sharp`/libvips
+  advisories inherited through Next.js; its only proposed automatic remediation
+  is a breaking Next.js downgrade, so no force-fix was applied in this feature
+  branch.
