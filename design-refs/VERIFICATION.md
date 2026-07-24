@@ -395,3 +395,120 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   advisories inherited through Next.js; its only proposed automatic remediation
   is a breaking Next.js downgrade, so no force-fix was applied in this feature
   branch.
+
+---
+
+# Project spiral verification
+
+Verified July 24, 2026 in the `codex/project-spiral` worktree.
+
+## Reference and analysis
+
+- The supplied screenshot and live `pacomepertant.com` experience were inspected
+  before modeling.
+- `video/pacomepertant-spiral-reference.mp4` was verified with `ffprobe`: H.264,
+  1800 × 914, 3 fps, 3 seconds.
+- The extracted sequence was inspected and the stable rest, quarter, middle, and
+  late frames were curated under `frames/`.
+- The complete composition, camera, repetition, motion, geometry, material, and
+  fallback targets are appended to `ANALYSIS.md` without replacing the earlier
+  hero analysis.
+
+## Procedural asset
+
+- `scripts/build_project_spiral.py` deterministically builds nine independently
+  animated nodes: `project_card_01` through `project_card_09`.
+- Two complete build/render/review passes are retained in
+  `blender-renders/project-spiral-iteration-01/` and
+  `blender-renders/project-spiral-iteration-02/`. The accepted six views are
+  `blender-renders/turntable-01.png` through `turntable-06.png`.
+- Blender library contract: 6/6 tests passed in Blender 5.1.2.
+- Final GLB: `public/models/project-spiral.glb`.
+  - 8,220 bytes compressed.
+  - 5,184 triangles.
+  - `KHR_draco_mesh_compression` used and required.
+  - `NORMAL`, `POSITION`, and `TEXCOORD_0` survive optimization.
+  - No embedded textures.
+  - Headless Blender re-import confirmed all nine exact node names.
+- Local Draco decoders are served from `public/draco/`; there is no decoder CDN
+  dependency.
+
+## Site integration and fallbacks
+
+- The project section uses a pinned R3F helix with three real project textures
+  distributed across nine curved cards.
+- Scroll phase and velocity are passed through mutable refs; React state changes
+  only when the active linked project changes.
+- Desktop uses bounded DPR and continuous rendering. Mobile uses DPR 1 and an
+  intentional demand-driven 30 fps loop.
+- `?stats=1` exposes the R3F performance overlay.
+- No-WebGL, no-JavaScript, and `prefers-reduced-motion` retain the complete
+  normal-flow three-project list with the same images, titles, and routes.
+- The scene is lazy-mounted near the viewport and cloned before materials and
+  named nodes are used.
+
+## Visual comparison
+
+- Production captures exist at the start and at 25%, 50%, 75%, and 100% of the
+  pinned scroll range under `site-screenshots/spiral-*.jpg`.
+- `comparison.png` was opened and reviewed against the reference. The result
+  preserves the black grid, open vertical helix, edge-on card silhouettes,
+  depth scaling, viewport clipping, cyclic order, and scroll-driven rotation.
+- A clean mobile WebGL capture and static fallback capture are retained as
+  `site-screenshots/spiral-mobile.jpg` and
+  `site-screenshots/spiral-fallback.jpg`.
+
+Intentional differences:
+
+- The portfolio has three source artworks, so the nine-card loop repeats those
+  works instead of presenting the reference's 10–12 unique pieces.
+- The existing cream portfolio header remains visible for wayfinding.
+- Velocity skew is restrained and motion blur is omitted to preserve artwork
+  clarity and mobile performance.
+
+## Performance
+
+- Dedicated scene, desktop 1280 × 720: Stats reported 108–120 fps at rest on the
+  connected hardware-accelerated browser.
+- Dedicated scene, mobile 390 × 844: Stats reported 30–44 fps with DPR 1 and the
+  demand-driven mobile loop.
+- The cross-browser production E2E sampler checked 0%, 25%, 50%, 75%, and 100%
+  page states. WebKit desktop held 55.3–60.1 fps and WebKit iPhone held
+  59.8–60.2 fps. Chromium's automated renderer identified itself as SwiftShader,
+  so its lower software-rendered measurements are treated as throttled test
+  infrastructure rather than the hardware target.
+- No postprocessing, multisampling, per-frame React rendering, or per-frame
+  object allocation was added to the spiral.
+
+## Automated gates
+
+- Unit/integration coverage: 54 files, 224 tests passed.
+  - Statements: 90.50%.
+  - Branches: 80.96%.
+  - Functions: 83.65%.
+  - Lines: 93.73%.
+- TypeScript: `tsc --noEmit` passed.
+- Production static build: passed for the home page, not-found page, and all
+  three statically generated case-study routes.
+- Browser E2E: 23 applicable tests passed and 17 platform-specific tests were
+  skipped by design across Chromium, Firefox, WebKit desktop, and WebKit iPhone.
+- Application-origin console errors: none in the passing E2E matrix.
+- `git diff --check`: passed.
+
+Non-release warnings:
+
+- The test runner reports that `NO_COLOR` is overridden by `FORCE_COLOR`.
+- Blender reports a deprecated world-node property during exploratory product
+  renders; it does not affect the exported GLB or runtime.
+- `npm audit --omit=dev` reports two high advisories in the existing Next.js and
+  Sharp dependency chain. This project deploys a static export and does not ship
+  the affected Server Actions, middleware/proxy, rewrites, image optimizer, Edge
+  runtime, or custom Next.js server paths; upgrading the framework remains a
+  separate dependency-maintenance follow-up.
+
+## Result
+
+The reference analysis, two procedural iterations, compressed named-node GLB,
+R3F integration, responsive/reduced-motion fallbacks, performance overlay,
+five-state comparison, coverage, production build, and cross-browser E2E gates
+are complete.

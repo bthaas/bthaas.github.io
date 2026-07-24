@@ -17,6 +17,7 @@ from asset_lib import (  # noqa: E402
     build_gltf_transform_command,
     create_marble_material,
     create_mesh_object,
+    make_curved_card_template,
     make_feather_template,
     make_curved_panel_template,
     reset_scene,
@@ -102,6 +103,43 @@ class CurvedPanelPrimitiveTests(unittest.TestCase):
         mesh.edges.ensure_lookup_table()
         self.assertEqual(sum(not edge.is_manifold for edge in mesh.edges), 0)
         mesh.free()
+
+
+class CurvedCardPrimitiveTests(unittest.TestCase):
+    def test_card_keeps_uvs_aspect_and_shallow_center_bend(self) -> None:
+        template = make_curved_card_template(
+            width=1.4,
+            height=0.8,
+            bend=0.12,
+            x_segments=20,
+            y_segments=10,
+        )
+        self.assertEqual(len(template.vertices), len(template.uvs))
+        self.assertEqual(len(template.faces), 20 * 10 * 2)
+        xs = [vertex.x for vertex in template.vertices]
+        zs = [vertex.z for vertex in template.vertices]
+        center_depth = min(vertex.y for vertex in template.vertices)
+        edge_depth = max(vertex.y for vertex in template.vertices)
+        self.assertAlmostEqual(max(xs) - min(xs), 1.4, places=5)
+        self.assertAlmostEqual(max(zs) - min(zs), 0.8, places=5)
+        self.assertLess(center_depth, -0.11)
+        self.assertAlmostEqual(edge_depth, 0.0, places=5)
+
+    def test_card_object_has_centered_pivot_and_exportable_uv_layer(self) -> None:
+        reset_scene()
+        template = make_curved_card_template(1.4, 0.8, 0.12)
+        accumulator = MeshAccumulator()
+        accumulator.append(template.vertices, template.faces, template.uvs)
+        obj = create_mesh_object(
+            "project_card_01",
+            accumulator,
+            create_marble_material(),
+        )
+        xs = [vertex.co.x for vertex in obj.data.vertices]
+        zs = [vertex.co.z for vertex in obj.data.vertices]
+        self.assertAlmostEqual(min(xs) + max(xs), 0.0, places=5)
+        self.assertAlmostEqual(min(zs) + max(zs), 0.0, places=5)
+        self.assertEqual(len(obj.data.uv_layers), 1)
 
 
 class MaterialAndExportTests(unittest.TestCase):

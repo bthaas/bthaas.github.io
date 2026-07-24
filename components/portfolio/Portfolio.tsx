@@ -3,6 +3,7 @@ import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { FlightTiltSurface } from '@/components/motion/FlightTiltSurface'
 import { HeroMasthead } from '@/components/motion/HeroMasthead'
 import { SunBadge } from '@/components/motion/SunBadge'
+import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
 import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
 import {
   siteContent,
@@ -10,7 +11,6 @@ import {
 } from '@/content/site-content'
 
 import { AtlasPicture } from './AtlasPicture'
-import { projectVisualAlts } from './ProjectCaseStudy'
 import {
   getSkillLogos,
   SkillLogoGrid,
@@ -275,49 +275,11 @@ export function Portfolio() {
             </div>
             <p>
               Three builds across computer vision, real-time collaboration, and language-model
-              research. Choose a panel to open the complete case study on its own page.
+              research. Follow the spiral and choose a project to open its complete case study.
             </p>
           </div>
 
-          <nav
-            className="atlas-shell project-panel-list"
-            aria-label="Select a project"
-            data-project-panel-list
-            data-reveal-stagger
-          >
-            {projects.map((project, index) => (
-              <a
-                className={`project-panel project-panel--${index + 1}`}
-                href={`/projects/${project.id}`}
-                id={`project-${project.id}`}
-                aria-label={`Open ${project.name} case study`}
-                data-testid="project-panel-trigger"
-                data-atlas-plate-sheen
-                data-atlas-velocity-plate
-                data-cursor="read"
-                key={project.id}
-              >
-                <AtlasPicture
-                  visual={atlasVisuals.projects[project.visualKey]}
-                  alt={projectVisualAlts[project.visualKey]}
-                  className="atlas-picture project-panel__art"
-                  cursor="read"
-                  printReveal
-                  projectPan
-                  projectPanIndex={index}
-                  sizes="(max-width: 720px) 82vw, 32vw"
-                />
-                <span className="project-panel__shade" aria-hidden="true" />
-                <span className="project-panel__copy">
-                  <span className="project-panel__name">{project.name}</span>
-                  <span className="project-panel__description">{project.description}</span>
-                </span>
-                <span className="project-panel__action" aria-hidden="true">
-                  <span>↗</span>
-                </span>
-              </a>
-            ))}
-          </nav>
+          <ProjectsSpiral projects={projects} />
 
         </section>
 
