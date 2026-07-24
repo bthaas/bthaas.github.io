@@ -422,7 +422,8 @@ Verified July 24, 2026 in the `codex/project-spiral` worktree.
   `blender-renders/project-spiral-iteration-01/` and
   `blender-renders/project-spiral-iteration-02/`. The accepted six views are
   `blender-renders/turntable-01.png` through `turntable-06.png`.
-- Blender library contract: 6/6 tests passed in Blender 5.1.2.
+- Shared Blender library contract: 9/9 tests passed in Blender 5.1.2 after
+  integrating the existing gateway-panel and new project-card primitives.
 - Final GLB: `public/models/project-spiral.glb`.
   - 8,220 bytes compressed.
   - 5,184 triangles.
@@ -438,7 +439,9 @@ Verified July 24, 2026 in the `codex/project-spiral` worktree.
 - The project section uses a pinned R3F helix with three real project textures
   distributed across nine curved cards.
 - Scroll phase and velocity are passed through mutable refs; React state changes
-  only when the active linked project changes.
+  only when the active linked project changes. A native sticky stage owns the
+  viewport hold while ScrollTrigger measures progress, so direct anchor jumps
+  always release the spiral at the Projects section boundary.
 - Desktop uses bounded DPR and continuous rendering. Mobile uses DPR 1 and an
   intentional demand-driven 30 fps loop.
 - `?stats=1` exposes the R3F performance overlay.
@@ -482,16 +485,18 @@ Intentional differences:
 
 ## Automated gates
 
-- Unit/integration coverage: 54 files, 224 tests passed.
-  - Statements: 90.50%.
-  - Branches: 80.96%.
-  - Functions: 83.65%.
-  - Lines: 93.73%.
+- Unit/integration coverage: 56 files, 229 tests passed.
+  - Statements: 90.24%.
+  - Branches: 80.51%.
+  - Functions: 83.07%.
+  - Lines: 93.44%.
 - TypeScript: `tsc --noEmit` passed.
 - Production static build: passed for the home page, not-found page, and all
   three statically generated case-study routes.
-- Browser E2E: 23 applicable tests passed and 17 platform-specific tests were
-  skipped by design across Chromium, Firefox, WebKit desktop, and WebKit iPhone.
+- The project spiral journey passed in Chromium, Firefox, desktop WebKit, and
+  iPhone WebKit. The integrated spiral/skill regression set passed 6 applicable
+  journeys with 2 intentional engine skips after replacing GSAP pin ownership
+  with the bounded sticky stage.
 - Application-origin console errors: none in the passing E2E matrix.
 - `git diff --check`: passed.
 
@@ -505,6 +510,11 @@ Non-release warnings:
   the affected Server Actions, middleware/proxy, rewrites, image optimizer, Edge
   runtime, or custom Next.js server paths; upgrading the framework remains a
   separate dependency-maintenance follow-up.
+- The full integrated Playwright pass reproduces the live branch's inherited
+  Chromium SwiftShader fluid-cursor floor failure (4–5 fps reported by that
+  isolated canvas versus its 18 fps test floor). The untouched `source` worktree
+  reproduces the same failure. Complete-page SwiftShader pacing remained
+  19.2–23.1 fps, and WebKit remained 57.5–61 fps.
 
 ## Result
 

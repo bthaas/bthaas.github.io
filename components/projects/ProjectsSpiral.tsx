@@ -174,15 +174,15 @@ export function ProjectsSpiral({ projects }: ProjectsSpiralProps) {
   }, [enhanced, handleActiveProjectChange, projects.length])
 
   useGSAP(() => {
+    const root = rootRef.current
     const stage = stageRef.current
-    if (!stage || !enhanced) return
+    if (!root || !stage || !enhanced) return
     const trigger = ScrollTrigger.create({
-      anticipatePin: 1,
-      end: () => `+=${window.innerHeight * 2.6}`,
+      end: 'bottom bottom',
       invalidateOnRefresh: true,
-      pin: stage,
       scrub: 0.55,
       start: 'top top',
+      trigger: root,
       onUpdate: (self) => {
         const phase = getProjectSpiralPhase(self.progress, CARD_COUNT)
         motionRef.current.phase = phase

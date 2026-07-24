@@ -22,6 +22,10 @@
   position: relative;
 }
 
+.project-spiral[data-project-spiral-enhanced] {
+  min-height: 360svh;
+}
+
 .project-spiral__stage {
   position: relative;
   isolation: isolate;
@@ -50,6 +54,8 @@
 }
 
 .project-spiral[data-project-spiral-enhanced] .project-spiral__stage {
+  position: sticky;
+  top: 0;
   display: grid;
   place-items: center;
 }
