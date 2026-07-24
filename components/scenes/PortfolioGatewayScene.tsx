@@ -6,14 +6,14 @@ import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as THREE from 'three'
 
-import { GATEWAY_CATEGORIES, getGatewayRotation } from '@/lib/portfolio-gateway'
+import { GATEWAY_CATEGORIES } from '@/lib/portfolio-gateway'
 
 interface PortfolioGatewaySceneProps {
   readonly activeIndex: number
   readonly isConstrained: boolean
   readonly onReady: () => void
   readonly pointerRef: RefObject<{ x: number; y: number }>
-  readonly rotationStep: number
+  readonly rotationDegrees: number
   readonly showStats: boolean
 }
 
@@ -30,7 +30,7 @@ function GatewayModel({
   isConstrained,
   onReady,
   pointerRef,
-  rotationStep,
+  rotationDegrees,
 }: Omit<PortfolioGatewaySceneProps, 'showStats'>) {
   const groupRef = useRef<THREE.Group>(null)
   const readyRef = useRef(false)
@@ -112,7 +112,7 @@ function GatewayModel({
   useFrame(({ clock }, delta) => {
     const group = groupRef.current
     if (!group) return
-    const targetRotation = THREE.MathUtils.degToRad(getGatewayRotation(rotationStep))
+    const targetRotation = THREE.MathUtils.degToRad(rotationDegrees)
     const pointerYaw = isConstrained ? 0 : pointerRef.current.x * 0.035
     const pointerPitch = isConstrained ? 0 : -pointerRef.current.y * 0.018
     group.rotation.y = THREE.MathUtils.damp(

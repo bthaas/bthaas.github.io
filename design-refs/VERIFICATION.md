@@ -348,7 +348,8 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
 ### Site comparison and fallbacks
 
 - The full-viewport gateway is directly between Hero and Experience. Its
-  oversized PORTFOLIO word, three 120° curved faces, mirrored lower shell,
+  oversized BRETT HAAS name, italic `Engineer · Researcher · Builder` role line,
+  three 120° curved faces, mirrored lower shell,
   category chip, arrows, and orbit mark preserve the reference hierarchy at
   1280×720 and 390×844. Experience, Projects, and Skills link to the existing
   detailed chapters.
@@ -361,20 +362,25 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   the gateway intersects the viewport. This persistent underlay also avoids a
   blank frame in multi-canvas compositors. Reduced motion and no-WebGL mount no
   gateway canvas and retain all links and controls.
-- Keyboard ArrowLeft/ArrowRight and both 44 px arrow buttons wrap continuously
-  without trapping document scroll. Mobile controls were moved into the visible
-  safe-area composition after the first 390×844 inspection.
+- Horizontal pointer drag captures the band, follows the pointer continuously,
+  and snaps to the nearest category on release. Its grab/grabbing cursor and
+  `touch-action: pan-y` preserve vertical touch scrolling. Keyboard
+  ArrowLeft/ArrowRight and both 44 px arrow buttons continue to wrap without
+  trapping document scroll. Mobile controls remain inside the visible safe area.
 
 ### Automated and performance verification
 
-- Vitest: 216/216 tests passing across 53 files. Coverage is 90.47% statements,
-  80.58% branches, 83.09% functions, and 93.72% lines. `tsc --noEmit`, the
+- Vitest: 231/231 tests passing across 56 files. Coverage is 90.11% statements,
+  80.22% branches, 82.97% functions, and 93.43% lines. `tsc --noEmit`, the
   production Next.js build, all eight statically generated routes, and
   `git diff --check` pass.
-- The new cross-browser choreography and keyboard assertions pass in Chromium,
-  Firefox, desktop WebKit, and iPhone WebKit; the six-section no-JavaScript
-  document also passes. The production journey reports no application-origin
-  console errors or horizontal overflow.
+- The cross-browser choreography, keyboard, and pointer-drag assertions pass in
+  Chromium, Firefox, desktop WebKit, and iPhone WebKit; the six-section
+  no-JavaScript document also passes. The production journey reports no
+  application-origin console errors or horizontal overflow.
+- A July 24 in-app browser pass at 1280×720 visually confirmed the new name and
+  role typography, grab cursor, horizontal snap from Experience to Projects,
+  and unchanged reflection/controls hierarchy.
 - Complete-page headless pacing measured Firefox at 17.4–63.8 fps, desktop
   WebKit at 28.5–30.1 fps, and iPhone WebKit at 29.9–30.1 fps. The final
   Chromium SwiftShader rerun measured 11.2–16.0 fps and passed its 10 fps

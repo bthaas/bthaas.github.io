@@ -70,6 +70,10 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(gateway.locator('.portfolio-gateway__fallback-face')).toHaveCount(3)
   await expect(gateway).toHaveAttribute('data-canvas-ready', '', { timeout: 10_000 })
   await expect(gateway.locator('.portfolio-gateway-canvas')).toHaveCount(1)
+  await expect(page.locator('#portfolio-gateway').getByText('BRETT HAAS')).toBeVisible()
+  await expect(
+    page.locator('#portfolio-gateway').getByText('Engineer · Researcher · Builder', { exact: true }),
+  ).toBeVisible()
   await expect(page.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
     'href',
     '#experience',
@@ -88,6 +92,17 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await gateway.press('ArrowLeft')
   await expect(gateway).toHaveAttribute('data-active-index', '2')
+  const gatewayDragSurface = gateway.getByTestId('portfolio-gateway-drag-surface')
+  const gatewayBox = await gatewayDragSurface.boundingBox()
+  expect(gatewayBox).not.toBeNull()
+  const gatewayDragY = gatewayBox!.y + gatewayBox!.height * 0.36
+  await page.mouse.move(gatewayBox!.x + gatewayBox!.width * 0.72, gatewayDragY)
+  await page.mouse.down()
+  await expect(gateway).toHaveAttribute('data-dragging', 'true')
+  await page.mouse.move(gatewayBox!.x + gatewayBox!.width * 0.32, gatewayDragY, { steps: 6 })
+  await page.mouse.up()
+  await expect(gateway).toHaveAttribute('data-dragging', 'false')
+  await expect(gateway).toHaveAttribute('data-active-index', '0')
   await expectNoHorizontalOverflow(page)
 
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()

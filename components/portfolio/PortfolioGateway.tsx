@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { Component, useCallback, useEffect, useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
 
 import {
   WEBGL_ACTIVATED_ATTRIBUTE,
@@ -10,7 +11,9 @@ import {
 import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
 import {
   GATEWAY_CATEGORIES,
+  getGatewayDragRotation,
   getGatewayRotation,
+  getGatewayStepDeltaFromDrag,
   getWrappedGatewayIndex,
 } from '@/lib/portfolio-gateway'
 
@@ -21,6 +24,13 @@ const PortfolioGatewayScene = dynamic(
 
 interface GatewayBoundaryState {
   readonly failed: boolean
+}
+
+interface GatewayDragState {
+  deltaX: number
+  pointerId: number | null
+  startX: number
+  width: number
 }
 
 class GatewayBoundary extends Component<React.PropsWithChildren, GatewayBoundaryState> {
@@ -38,7 +48,15 @@ class GatewayBoundary extends Component<React.PropsWithChildren, GatewayBoundary
 export function PortfolioGateway() {
   const rootRef = useRef<HTMLElement>(null)
   const pointerRef = useRef({ x: 0, y: 0 })
+  const dragRef = useRef<GatewayDragState>({
+    deltaX: 0,
+    pointerId: null,
+    startX: 0,
+    width: 1,
+  })
   const [step, setStep] = useState(0)
+  const [dragRotation, setDragRotation] = useState(0)
+  const [dragging, setDragging] = useState(false)
   const [canvasReady, setCanvasReady] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [isConstrained, setIsConstrained] = useState(false)
@@ -46,6 +64,7 @@ export function PortfolioGateway() {
   const [showStats, setShowStats] = useState(false)
   const activeIndex = getWrappedGatewayIndex(step)
   const activeCategory = GATEWAY_CATEGORIES[activeIndex]
+  const carouselRotation = getGatewayRotation(step) + dragRotation
   const handleReady = useCallback(() => setCanvasReady(true), [])
 
   useEffect(() => {
@@ -91,6 +110,34 @@ export function PortfolioGateway() {
 
   const selectPrevious = useCallback(() => setStep((current) => current - 1), [])
   const selectNext = useCallback(() => setStep((current) => current + 1), [])
+  const updatePointerPosition = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    pointerRef.current.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1
+    pointerRef.current.y = -(((event.clientY - bounds.top) / bounds.height) * 2 - 1)
+  }
+  const finishDrag = (
+    event: ReactPointerEvent<HTMLDivElement>,
+    shouldSelectCategory: boolean,
+  ) => {
+    const drag = dragRef.current
+    if (drag.pointerId !== event.pointerId) return
+
+    if (shouldSelectCategory) {
+      const stepDelta = getGatewayStepDeltaFromDrag(drag.deltaX, drag.width)
+      if (stepDelta !== 0) setStep((current) => current + stepDelta)
+    }
+    drag.pointerId = null
+    drag.deltaX = 0
+    setDragRotation(0)
+    setDragging(false)
+    pointerRef.current.x = 0
+    pointerRef.current.y = 0
+    try {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    } catch {
+      // Native pointer cancellation may release capture before React is notified.
+    }
+  }
 
   return (
     <section
@@ -103,9 +150,12 @@ export function PortfolioGateway() {
         Explore the portfolio
       </h2>
       <p className="portfolio-gateway__introduction">
-        Brett Haas is an engineer, researcher, and builder.
+        Engineer · Researcher · Builder
       </p>
-      <p className="portfolio-gateway__word" aria-hidden="true">PORTFOLIO</p>
+      <p className="portfolio-gateway__word" aria-hidden="true">BRETT HAAS</p>
+      <p className="portfolio-gateway__sr-only" id="portfolio-gateway-instructions">
+        Drag horizontally over the artwork or use the left and right arrow keys to select a category.
+      </p>
       <p className="portfolio-gateway__sr-only" role="status" aria-live="polite">
         {activeCategory.label} category selected
       </p>
@@ -115,8 +165,10 @@ export function PortfolioGateway() {
         role="region"
         aria-label="Portfolio category carousel"
         aria-roledescription="carousel"
+        aria-describedby="portfolio-gateway-instructions"
         data-active-index={activeIndex}
         data-canvas-ready={canvasReady ? '' : undefined}
+        data-dragging={dragging ? 'true' : 'false'}
         onKeyDown={(event) => {
           if (event.key === 'ArrowLeft') {
             event.preventDefault()
@@ -132,20 +184,39 @@ export function PortfolioGateway() {
         <div
           className="portfolio-gateway__visual"
           aria-hidden="true"
-          onPointerMove={(event) => {
+          data-testid="portfolio-gateway-drag-surface"
+          onDragStart={(event) => event.preventDefault()}
+          onPointerDown={(event) => {
+            if (event.button !== 0) return
             const bounds = event.currentTarget.getBoundingClientRect()
-            pointerRef.current.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1
-            pointerRef.current.y = -(((event.clientY - bounds.top) / bounds.height) * 2 - 1)
+            dragRef.current = {
+              deltaX: 0,
+              pointerId: event.pointerId,
+              startX: event.clientX,
+              width: bounds.width,
+            }
+            setDragging(true)
+            event.currentTarget.setPointerCapture?.(event.pointerId)
+          }}
+          onPointerMove={(event) => {
+            updatePointerPosition(event)
+            const drag = dragRef.current
+            if (drag.pointerId !== event.pointerId) return
+            drag.deltaX = event.clientX - drag.startX
+            setDragRotation(getGatewayDragRotation(drag.deltaX, drag.width))
           }}
           onPointerLeave={() => {
+            if (dragRef.current.pointerId !== null) return
             pointerRef.current.x = 0
             pointerRef.current.y = 0
           }}
+          onPointerCancel={(event) => finishDrag(event, false)}
+          onPointerUp={(event) => finishDrag(event, true)}
         >
           <div className="portfolio-gateway__fallback">
             <div
               className="portfolio-gateway__fallback-ring"
-              style={{ transform: `translateZ(-19rem) rotateY(${getGatewayRotation(step)}deg)` }}
+              style={{ transform: `translateZ(-19rem) rotateY(${carouselRotation}deg)` }}
             >
               {GATEWAY_CATEGORIES.map((category, index) => (
                 <div
@@ -182,7 +253,7 @@ export function PortfolioGateway() {
                   activeIndex={activeIndex}
                   isConstrained={isConstrained}
                   pointerRef={pointerRef}
-                  rotationStep={step}
+                  rotationDegrees={carouselRotation}
                   showStats={showStats}
                   onReady={handleReady}
                 />

@@ -30,8 +30,11 @@
   top: clamp(1.5rem, 4.2vh, 2.35rem);
   left: 50%;
   margin: 0;
-  font-size: clamp(0.72rem, 1vw, 0.92rem);
-  letter-spacing: -0.02em;
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 1.8vw, 1.55rem);
+  font-style: italic;
+  letter-spacing: 0.025em;
+  line-height: 1;
   text-align: center;
   transform: translateX(-50%);
   white-space: nowrap;
@@ -65,7 +68,18 @@
   left: 50%;
   width: min(47rem, 72vw);
   height: min(31rem, 68svh);
+  cursor: grab;
+  touch-action: pan-y;
   transform: translateX(-50%);
+  user-select: none;
+}
+
+.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__visual {
+  cursor: grabbing;
+}
+
+.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__fallback-ring {
+  transition: none;
 }
 
 .portfolio-gateway__fallback,
@@ -119,6 +133,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .portfolio-gateway__fallback-reflection {
@@ -282,7 +298,7 @@
   .portfolio-gateway__introduction {
     top: 1.5rem;
     max-width: calc(100vw - 2rem);
-    font-size: 0.74rem;
+    font-size: clamp(0.92rem, 4.2vw, 1.12rem);
   }
 
   .portfolio-gateway__word {
