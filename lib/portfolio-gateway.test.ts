@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   GATEWAY_CATEGORIES,
+  GATEWAY_CYLINDER_SEGMENTS,
+  GATEWAY_SEGMENTS_PER_CATEGORY,
   getGatewayDragRotation,
   getGatewayRotation,
   getGatewayStepDeltaFromDrag,
@@ -41,5 +43,22 @@ describe('portfolio gateway choreography', () => {
     expect(getGatewayStepDeltaFromDrag(200, 800)).toBe(-1)
     expect(getGatewayStepDeltaFromDrag(60, 800)).toBe(0)
     expect(getGatewayStepDeltaFromDrag(-700, 800)).toBe(2)
+  })
+
+  it('maps all three images onto one evenly faceted 360 degree cylinder', () => {
+    expect(GATEWAY_SEGMENTS_PER_CATEGORY).toBe(12)
+    expect(GATEWAY_CYLINDER_SEGMENTS).toHaveLength(36)
+    expect(GATEWAY_CYLINDER_SEGMENTS.map(({ angle }) => angle)).toEqual(
+      Array.from({ length: 36 }, (_, index) => -55 + index * 10),
+    )
+
+    for (const category of GATEWAY_CATEGORIES) {
+      const categorySegments = GATEWAY_CYLINDER_SEGMENTS.filter(
+        (segment) => segment.categoryId === category.id,
+      )
+      expect(categorySegments).toHaveLength(12)
+      expect(categorySegments[0].imagePosition).toBe(0)
+      expect(categorySegments.at(-1)?.imagePosition).toBe(100)
+    }
   })
 })

@@ -26,6 +26,24 @@ export const GATEWAY_CATEGORIES = [
   },
 ] as const satisfies readonly GatewayCategory[]
 
+export const GATEWAY_SEGMENTS_PER_CATEGORY = 12
+const GATEWAY_SEGMENT_DEGREES = 120 / GATEWAY_SEGMENTS_PER_CATEGORY
+
+export const GATEWAY_CYLINDER_SEGMENTS = GATEWAY_CATEGORIES.flatMap(
+  (category, categoryIndex) => Array.from(
+    { length: GATEWAY_SEGMENTS_PER_CATEGORY },
+    (_, segmentIndex) => ({
+      angle: categoryIndex * 120
+        - 60
+        + GATEWAY_SEGMENT_DEGREES * (segmentIndex + 0.5),
+      categoryId: category.id,
+      categoryIndex,
+      id: `${category.id}-${segmentIndex + 1}`,
+      imagePosition: segmentIndex / (GATEWAY_SEGMENTS_PER_CATEGORY - 1) * 100,
+    }),
+  ),
+)
+
 export function getWrappedGatewayIndex(index: number): number {
   const length = GATEWAY_CATEGORIES.length
   return ((index % length) + length) % length

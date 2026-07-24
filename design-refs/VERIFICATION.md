@@ -402,6 +402,25 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   is a breaking Next.js downgrade, so no force-fix was applied in this feature
   branch.
 
+### 2026-07-24 physical-cylinder correction
+
+- Inspection found that the accepted GLB was already a continuous curved ring,
+  but the opaque DOM layer above it still used three broad rounded planes. That
+  layer created a triangular-prism structure whose curvature was only optical.
+- The static/loading/reduced-motion composition now uses 36 physical CSS 3D
+  facets around a full 360° ring: 12 contiguous 10° slices per category, plus a
+  matching 36-facet reflected ring. Back faces are culled and the old flat
+  full-width shading overlay was removed.
+- Once the first textured WebGL frame is ready, the CSS ring fades completely
+  and the 24-segment-per-panel Draco model is the sole upper surface. A live
+  1280×720 hardware-browser inspection confirmed visible neighbor panels at both
+  curved edges, correct foreshortening, a complete drag from Experience to
+  Projects, and zero application-console errors.
+- The correction passes 235/235 Vitest assertions across 57 files, 90.16%
+  statement / 80.41% branch / 83.11% function / 93.46% line coverage,
+  TypeScript, production build and deployment preparation, and the targeted
+  Chromium, Firefox, desktop WebKit, and iPhone WebKit production journeys.
+
 ---
 
 # Project spiral verification

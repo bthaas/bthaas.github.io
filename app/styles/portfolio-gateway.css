@@ -78,7 +78,8 @@
   cursor: grabbing;
 }
 
-.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__fallback-ring {
+.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__fallback-ring,
+.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__fallback-reflection-ring {
   transition: none;
 }
 
@@ -90,51 +91,44 @@
 
 .portfolio-gateway__fallback {
   perspective: 72rem;
+  transition: opacity 240ms ease;
 }
 
 .portfolio-gateway__carousel[data-canvas-ready] .portfolio-gateway__fallback {
-  opacity: 1;
+  opacity: 0;
 }
 
-.portfolio-gateway__fallback-ring {
+.portfolio-gateway__fallback-ring,
+.portfolio-gateway__fallback-reflection-ring {
+  --gateway-cylinder-radius: min(19rem, 36vw);
+  --gateway-cylinder-slice-width: min(3.36rem, 6.35vw);
+
   position: absolute;
   top: 3%;
-  left: 7%;
-  width: 86%;
+  left: 50%;
+  width: 0;
   height: 58%;
   transform-style: preserve-3d;
   transition: transform 860ms var(--ease-out);
 }
 
-.portfolio-gateway__fallback-face {
+.portfolio-gateway__fallback-slice {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: 48% 48% 46% 46% / 9% 9% 12% 12%;
-  box-shadow:
-    0 1.25rem 2.5rem rgb(22 20 30 / 13%),
-    inset 1.25rem 0 2.5rem rgb(95 174 226 / 14%),
-    inset -1.25rem 0 2.5rem rgb(244 119 95 / 14%);
-  backface-visibility: hidden;
-}
-
-.portfolio-gateway__fallback-face::after {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgb(185 216 239 / 30%), transparent 16% 82%, rgb(244 191 53 / 22%)),
-    linear-gradient(180deg, rgb(255 255 255 / 12%), transparent 70%);
-  content: '';
-  pointer-events: none;
-}
-
-.portfolio-gateway__fallback-face img,
-.portfolio-gateway__fallback-reflection img {
-  width: 100%;
+  top: 0;
+  left: 50%;
+  width: calc(var(--gateway-cylinder-slice-width) + 1px);
   height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-  -webkit-user-drag: none;
+  margin-left: calc(-0.5 * var(--gateway-cylinder-slice-width));
+  background-image:
+    linear-gradient(180deg, rgb(255 255 255 / 12%), transparent 70%),
+    var(--gateway-segment-image);
+  background-position: center, var(--gateway-segment-position) center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 1200% 100%;
+  backface-visibility: hidden;
+  transform:
+    rotateY(var(--gateway-segment-angle))
+    translateZ(var(--gateway-cylinder-radius));
 }
 
 .portfolio-gateway__fallback-reflection {
@@ -143,26 +137,35 @@
   left: 8%;
   width: 84%;
   height: 27%;
-  overflow: hidden;
-  border-radius: 45% 45% 49% 49% / 14% 14% 18% 18%;
-  filter: saturate(0.72) brightness(1.32);
   mask-image: linear-gradient(to bottom, rgb(0 0 0 / 58%), transparent 94%);
-  opacity: 0.29;
+  perspective: 72rem;
 }
 
-.portfolio-gateway__fallback-reflection img {
-  transform: scaleY(-1);
+.portfolio-gateway__fallback-reflection-ring {
+  --gateway-cylinder-radius: min(17.8rem, 34vw);
+  --gateway-cylinder-slice-width: min(3.15rem, 6vw);
+
+  top: 0;
+  height: 100%;
+}
+
+.portfolio-gateway__fallback-reflection-ring .portfolio-gateway__fallback-slice {
+  filter: saturate(0.72) brightness(1.32);
+  opacity: 0.29;
+  transform:
+    rotateY(var(--gateway-segment-angle))
+    translateZ(var(--gateway-cylinder-radius))
+    scaleY(-1);
 }
 
 .portfolio-gateway__canvas {
   z-index: 2;
   opacity: 0;
-  mix-blend-mode: multiply;
   transition: opacity 360ms ease;
 }
 
 .portfolio-gateway__carousel[data-canvas-ready] .portfolio-gateway__canvas {
-  opacity: 0.22;
+  opacity: 0.94;
 }
 
 .portfolio-gateway-canvas {
@@ -314,14 +317,13 @@
     height: min(24rem, 45svh);
   }
 
-  .portfolio-gateway__fallback-face {
-    border-radius: 48% 48% 46% 46% / 8% 8% 12% 12%;
-  }
-
   .portfolio-gateway__fallback-ring {
+    --gateway-cylinder-radius: min(10.8rem, 44vw);
+    --gateway-cylinder-slice-width: min(1.92rem, 7.8vw);
+
     top: 1%;
-    left: 6%;
-    width: 88%;
+    left: 50%;
+    width: 0;
     height: 47%;
   }
 
@@ -330,6 +332,16 @@
     left: 7%;
     width: 86%;
     height: 27%;
+  }
+
+  .portfolio-gateway__fallback-reflection-ring {
+    --gateway-cylinder-radius: min(10.3rem, 42vw);
+    --gateway-cylinder-slice-width: min(1.83rem, 7.45vw);
+
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 100%;
   }
 
   .portfolio-gateway__face-label {

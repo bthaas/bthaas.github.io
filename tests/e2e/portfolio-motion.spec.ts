@@ -67,7 +67,16 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await gateway.scrollIntoViewIfNeeded()
   await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
   await expect(gateway).toHaveAttribute('data-active-index', '0')
-  await expect(gateway.locator('.portfolio-gateway__fallback-face')).toHaveCount(3)
+  await expect(
+    gateway.locator(
+      '.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice',
+    ),
+  ).toHaveCount(36)
+  await expect(
+    gateway.locator(
+      '.portfolio-gateway__fallback-reflection-ring > .portfolio-gateway__fallback-slice',
+    ),
+  ).toHaveCount(36)
   await expect(gateway).toHaveAttribute('data-canvas-ready', '', { timeout: 10_000 })
   await expect(gateway.locator('.portfolio-gateway-canvas')).toHaveCount(1)
   await expect(page.locator('#portfolio-gateway').getByText('BRETT HAAS')).toBeVisible()
@@ -196,7 +205,9 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(page.locator('.flight-dossier__toggle').first())
     .toHaveAttribute('aria-expanded', 'true')
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
-  await expect(page.locator('.portfolio-gateway__fallback-face')).toHaveCount(3)
+  await expect(
+    page.locator('.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice'),
+  ).toHaveCount(36)
   await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
   await page.locator('[data-skill-sphere]').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-motion', 'reduced')

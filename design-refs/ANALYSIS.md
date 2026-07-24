@@ -830,11 +830,15 @@ portfolio's existing Experience, Projects, and Skills artwork.
   DOM label, destination, and thumbnail update atomically when an input is
   accepted or a drag is released while the decorative ring settles toward the
   same category.
-- Reduced motion, no WebGL, loading, and scene failure show the same composition
-  as a three-layer CSS curved-card fallback with Experience selected. All three
-  category links and both controls remain keyboard accessible at a minimum
-  44×44 px target size. Mobile keeps the real 3D scene when WebGL is available,
-  with DPR 1 and a 30 fps invalidation cap.
+- Reduced motion, no WebGL, loading, and scene failure preserve the cylinder as
+  36 narrow CSS 3D facets: 12 contiguous 10° slices for each of Experience,
+  Projects, and Skills. The image is distributed across the facets and rear
+  faces are culled, so this fallback has real radial depth rather than three
+  flat rounded cards that only suggest curvature. A second 36-facet ring
+  supplies the mirrored lower reflection. All three category links and both
+  controls remain keyboard accessible at a minimum 44×44 px target size.
+  Mobile keeps the real 3D scene when WebGL is available, with DPR 1 and a
+  30 fps invalidation cap.
 
 ## Implementation targets
 
@@ -847,6 +851,8 @@ portfolio's existing Experience, Projects, and Skills artwork.
 - Load and clone the GLB with `useGLTF`/local Draco in a lazily mounted R3F
   scene. Reuse textures/materials, render on demand, expose `?stats=1`, and keep
   the static DOM composition visible until the first textured frame is ready.
+  Once ready, the physical GLB fully replaces the faceted fallback; do not
+  retain a flat shading overlay or translucent card layer over the model.
 
 ---
 
