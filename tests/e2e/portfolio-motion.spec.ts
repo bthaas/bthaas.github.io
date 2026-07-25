@@ -71,6 +71,42 @@ test('keeps the gateway name fitted and individually legible across responsive v
   }
 })
 
+test('keeps the upper gateway surface unchanged when interaction activates WebGL', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(
+    browserName !== 'chromium' || isMobile,
+    'One desktop engine verifies activation continuity.',
+  )
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+  const fallback = gateway.locator('.portfolio-gateway__fallback')
+  const reflection = gateway.locator('.portfolio-gateway__fallback-reflection')
+  await gateway.scrollIntoViewIfNeeded()
+  await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  await expect(page.locator('html')).not.toHaveAttribute('data-atlas-webgl-activated')
+  await expect(fallback).toHaveCSS('opacity', '1')
+  await expect(reflection).toHaveCSS('opacity', '1')
+
+  await page.mouse.move(100, 100)
+  await expect(page.locator('html')).toHaveAttribute('data-atlas-webgl-activated', '')
+  await expect(gateway).toHaveAttribute('data-canvas-ready', '', { timeout: 10_000 })
+  await page.waitForTimeout(500)
+  await expect(fallback).toHaveCSS('opacity', '1')
+  await expect(reflection).toHaveCSS('opacity', '0')
+  await expect(gateway.locator('.portfolio-gateway__canvas')).toHaveCSS(
+    'clip-path',
+    'inset(63% 0px 0px)',
+  )
+})
+
 test('ships clean cross-browser choreography and an accessible dossier', async ({
   isMobile,
   page,

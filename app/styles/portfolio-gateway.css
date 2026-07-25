@@ -94,10 +94,6 @@
   transition: opacity 240ms ease;
 }
 
-.portfolio-gateway__carousel[data-canvas-ready] .portfolio-gateway__fallback {
-  opacity: 0;
-}
-
 .portfolio-gateway__fallback-ring,
 .portfolio-gateway__fallback-reflection-ring {
   --gateway-cylinder-radius: min(19rem, 36vw);
@@ -139,6 +135,11 @@
   height: 27%;
   mask-image: linear-gradient(to bottom, rgb(0 0 0 / 58%), transparent 94%);
   perspective: 72rem;
+  transition: opacity 240ms ease;
+}
+
+.portfolio-gateway__carousel[data-canvas-ready] .portfolio-gateway__fallback-reflection {
+  opacity: 0;
 }
 
 .portfolio-gateway__fallback-reflection-ring {
@@ -160,6 +161,7 @@
 
 .portfolio-gateway__canvas {
   z-index: 2;
+  clip-path: inset(63% 0 0);
   opacity: 0;
   transition: opacity 360ms ease;
 }
@@ -385,6 +387,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .portfolio-gateway__fallback,
+  .portfolio-gateway__fallback-reflection,
   .portfolio-gateway__fallback-ring,
   .portfolio-gateway__canvas,
   .portfolio-gateway__face-label,

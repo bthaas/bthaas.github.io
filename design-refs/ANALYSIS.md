@@ -844,6 +844,12 @@ portfolio's existing Experience, Projects, and Skills artwork.
   controls remain keyboard accessible at a minimum 44×44 px target size.
   Mobile keeps the real 3D scene when WebGL is available, with DPR 1 and a
   30 fps invalidation cap.
+- The 36-facet CSS ring is also the canonical upper surface after WebGL
+  activation. Its silhouette and crop must not change on the first pointer or
+  wheel input. Once the canvas is ready, the CSS reflection fades out and the
+  canvas is clipped below 63% of the visual stage so WebGL replaces only the
+  lower reflector. This preserves physical radial depth, drag rotation, and the
+  richer reflected material without an interaction-triggered composition swap.
 
 ## Implementation targets
 
