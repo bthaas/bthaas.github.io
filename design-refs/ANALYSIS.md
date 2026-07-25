@@ -764,7 +764,10 @@ portfolio's existing Experience, Projects, and Skills artwork.
 - The camera is level with the center of the upper drum with no visible horizon.
   A restrained 34–40° perspective field of view shows the curved face and
   narrow side slivers without revealing a steep top plane. The façade width is
-  about 1.75× its height.
+  about 1.75× its height. Runtime camera elevation must keep both the upper
+  panel rim and the lower reflector inside normalized device coordinates even
+  at the full ±0.018 rad pointer pitch; the accepted vertical bounds are at
+  least 5% inside both frame edges.
 - Mobile at 390×844 preserves the same stack. `BRETT HAAS` sits near y=290 and
   the upper drum is about 330×152 px at y=348–500. The controls remain close to
   the bottom safe area; the object does not collapse into flat cards.
@@ -804,10 +807,12 @@ portfolio's existing Experience, Projects, and Skills artwork.
   across the face. There is no atmospheric fog, cloud field, bloom, or strong
   depth of field in this section.
 - The background name uses the site's existing editorial serif at a fluid size
-  large enough to crop on both sides. The role line uses the same family in
-  italic with looser tracking and a much smaller scale. The active category
-  label is rendered in the serif over the center of the drum with translucent
-  paper fill, a faint dark inner shadow, and no baked texture.
+  that preserves at least a 16 px viewport inset at short desktop aspect ratios.
+  `BRETT HAAS` uses slightly positive tracking so the adjacent T glyphs remain
+  distinct. The role line uses the same family in italic with looser tracking
+  and a much smaller scale. The active category label is rendered in the serif
+  over the center of the drum with translucent paper fill, a faint dark inner
+  shadow, and no baked texture.
 
 ## Motion, interaction, and fallbacks
 

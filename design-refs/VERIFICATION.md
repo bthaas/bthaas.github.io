@@ -421,6 +421,23 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   TypeScript, production build and deployment preparation, and the targeted
   Chromium, Firefox, desktop WebKit, and iPhone WebKit production journeys.
 
+### 2026-07-25 spin clearance and name fit
+
+- The supplied 967×546 and 1799×550 CSS-pixel viewport references exposed two
+  responsive regressions: the spinning upper rim projected beyond the canvas
+  top at maximum pointer pitch, and the `BRETT HAAS` wordmark extended beyond
+  the viewport while its adjacent T glyphs touched.
+- The gateway camera elevation is now 0.42 scene units. A pure projection test
+  covers the complete ±0.018 rad pitch range and measures 6.3% top clearance
+  and 7.5% lower-reflector clearance in normalized device coordinates.
+- The wordmark now uses a 14.8vw/17rem responsive ceiling, centered translation,
+  and positive tracking with a 1 px floor. The 1800×550, 967×546, 721×844, and
+  390×844 production-layout journey confirms at least 16 px side insets and at
+  least 1 px computed tracking.
+- A hardware-browser pass at 1280×720 confirmed complete upper-rim visibility
+  before and after an Experience → Projects drag, a fully visible wordmark, and
+  zero application-console errors.
+
 ---
 
 # Project spiral verification

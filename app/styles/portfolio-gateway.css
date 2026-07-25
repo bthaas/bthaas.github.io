@@ -47,11 +47,11 @@
   left: 50%;
   margin: 0;
   font-family: var(--serif);
-  font-size: clamp(9rem, 19vw, 21rem);
+  font-size: clamp(6rem, 14.8vw, 17rem);
   font-weight: 400;
-  letter-spacing: -0.075em;
+  letter-spacing: max(0.005em, 1px);
   line-height: 0.74;
-  transform: translateX(-51%);
+  transform: translateX(-50%);
   white-space: nowrap;
 }
 
@@ -306,9 +306,9 @@
 
   .portfolio-gateway__word {
     top: 26%;
-    font-size: clamp(4.6rem, 21.5vw, 6.5rem);
+    font-size: clamp(3.4rem, 14vw, 6.4rem);
     line-height: 0.8;
-    transform: translate(-51%, -50%);
+    transform: translate(-50%, -50%);
   }
 
   .portfolio-gateway__visual {
