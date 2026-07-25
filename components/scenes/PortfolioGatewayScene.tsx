@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as THREE from 'three'
 
 import { GATEWAY_CATEGORIES } from '@/lib/portfolio-gateway'
+import { GATEWAY_SCENE_LAYOUT } from '@/lib/portfolio-gateway-scene'
 
 interface PortfolioGatewaySceneProps {
   readonly activeIndex: number
@@ -114,7 +115,9 @@ function GatewayModel({
     if (!group) return
     const targetRotation = THREE.MathUtils.degToRad(rotationDegrees)
     const pointerYaw = isConstrained ? 0 : pointerRef.current.x * 0.035
-    const pointerPitch = isConstrained ? 0 : -pointerRef.current.y * 0.018
+    const pointerPitch = isConstrained
+      ? 0
+      : -pointerRef.current.y * GATEWAY_SCENE_LAYOUT.pointerPitchRadians
     group.rotation.y = THREE.MathUtils.damp(
       group.rotation.y,
       targetRotation + pointerYaw + Math.sin(clock.elapsedTime * 0.42) * 0.006,
@@ -129,7 +132,7 @@ function GatewayModel({
   })
 
   return (
-    <group ref={groupRef} position={[0, 0.85, 0]}>
+    <group ref={groupRef} position={[0, GATEWAY_SCENE_LAYOUT.modelY, 0]}>
       <primitive object={setup.model} />
     </group>
   )
@@ -138,7 +141,10 @@ function GatewayModel({
 export function PortfolioGatewayScene(props: PortfolioGatewaySceneProps) {
   return (
     <Canvas
-      camera={{ fov: 38, position: [0, 0.18, 6.2] }}
+      camera={{
+        fov: GATEWAY_SCENE_LAYOUT.cameraFovDegrees,
+        position: [0, GATEWAY_SCENE_LAYOUT.cameraY, GATEWAY_SCENE_LAYOUT.cameraZ],
+      }}
       dpr={props.isConstrained ? 1 : [1, 1.5]}
       frameloop="demand"
       gl={{ alpha: true, antialias: !props.isConstrained, powerPreference: 'high-performance' }}

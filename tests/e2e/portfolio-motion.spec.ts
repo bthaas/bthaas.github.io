@@ -31,6 +31,46 @@ async function activateDecorativeWebGL(page: Page, isMobile: boolean) {
   }
 }
 
+test('keeps the gateway name fitted and individually legible across responsive viewports', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(browserName !== 'chromium' || isMobile, 'One desktop engine verifies typography fit.')
+  await page.setViewportSize({ height: 550, width: 1800 })
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  const gatewaySection = page.locator('#portfolio-gateway')
+  const gatewayWord = gatewaySection.getByText('BRETT HAAS', { exact: true })
+  for (const viewport of [
+    { height: 550, width: 1800 },
+    { height: 546, width: 967 },
+    { height: 844, width: 721 },
+    { height: 844, width: 390 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await gatewaySection.scrollIntoViewIfNeeded()
+    const metrics = await gatewayWord.evaluate((element) => {
+      const word = element.getBoundingClientRect()
+
+      return {
+        left: word.left,
+        right: word.right,
+        tracking: Number.parseFloat(getComputedStyle(element).letterSpacing),
+        viewportWidth: innerWidth,
+      }
+    })
+
+    expect(metrics.left).toBeGreaterThanOrEqual(16)
+    expect(metrics.right).toBeLessThanOrEqual(metrics.viewportWidth - 16)
+    expect(metrics.tracking).toBeGreaterThanOrEqual(1)
+  }
+})
+
 test('ships clean cross-browser choreography and an accessible dossier', async ({
   isMobile,
   page,
