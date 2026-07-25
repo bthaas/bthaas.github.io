@@ -921,9 +921,8 @@ portfolio's existing Experience, Projects, and Skills artwork.
   limited to small deterministic roll, bend, width, and vertical offsets so the
   helix remains legible.
 - The portfolio has three project images, so the visual loop repeats them over
-  nine slots. Copies are distributed unevenly around the helix to stop matching
-  artwork from lining up into one oversized surface; labels and links always
-  resolve to the corresponding real case study.
+  nine slots in a strict Court Vision → Beat Stream → Vision Bias Steering
+  cycle. Labels and links always resolve to the artwork on the front card.
 
 ## Motion and interaction
 
@@ -964,6 +963,31 @@ portfolio's existing Experience, Projects, and Skills artwork.
 - Depth ordering may create visual overlap between distant back cards, as in the
   reference, but the three nearest readable cards must not share an edge or
   merge into a continuous image wall.
+
+## July 24 visible-turn and sequence correction
+
+- User-supplied production capture:
+  `frames/project-spiral-diagonal-regression.png` (2632 × 1672). It shows the
+  upright/non-contact correction working, but the helix samples are separated
+  by too much vertical distance. Only the center card and disconnected diagonal
+  fragments are readable, so the path does not bend back toward the axis within
+  one viewport.
+- Keep the existing nine-card, 40° angular sampling. Compress desktop vertical
+  travel so the fourth card on either side of center reaches 40–46% of the
+  viewport height, rather than roughly 96%. This exposes the full progression:
+  center/front → outer/front → widest side → returning/back → clipped continuation.
+- The vertical step target is approximately 11% of desktop viewport height,
+  matching the reference's 90–120 px neighbor pitch. Mobile uses a 52% radius,
+  42% target card width, and approximately 14% vertical step so readable cards
+  retain black separation while at least seven centers still describe the
+  curve.
+- The final desktop layout uses an approximately 44% viewport-width horizontal
+  radius and a 17% target card width. The wider radius gives every projected
+  neighboring pair a measurable black gap after the vertical pitch is
+  compressed; the visible curve does not become a continuous image wall.
+- Slot artwork and front-card metadata must repeat exactly `A, B, C` three
+  times around the nine-card helix. Reverse movement naturally reads
+  `C, B, A`; no adjacent or alternating `A, B, A` sequence is permitted.
 
 ## Implementation targets
 

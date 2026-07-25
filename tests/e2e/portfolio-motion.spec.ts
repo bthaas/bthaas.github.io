@@ -504,15 +504,27 @@ test('spins the project helix and keeps a complete static fallback', async ({
     await expect(panelList).toBeHidden()
     const activeLink = stage.getByRole('link', { name: 'Open Court Vision case study' })
     await expect(activeLink).toHaveAttribute('href', '/projects/courtvision')
-    const stageTop = await stage.evaluate((node) => node.getBoundingClientRect().top + scrollY)
-    await page.evaluate((top) => scrollTo({
-      behavior: 'instant',
-      top: top + innerHeight * 0.55,
-    }), stageTop)
-    await expect(stage.locator('.project-spiral__active-link')).not.toHaveAttribute(
-      'href',
-      '/projects/courtvision',
-    )
+    const range = await spiral.evaluate((node) => {
+      const bounds = node.getBoundingClientRect()
+      return {
+        start: bounds.top + scrollY,
+        travel: Math.max(1, bounds.height - innerHeight),
+      }
+    })
+    for (const [phase, href] of [
+      [1, '/projects/beatstream'],
+      [2, '/projects/vision-bias-steering'],
+      [3, '/projects/courtvision'],
+    ] as const) {
+      await page.evaluate(({ phase, start, travel }) => scrollTo({
+        behavior: 'instant',
+        top: start + travel * phase / 18,
+      }), { ...range, phase })
+      await expect(stage.locator('.project-spiral__active-link')).toHaveAttribute(
+        'href',
+        href,
+      )
+    }
   } else {
     await expect(stage).toBeHidden()
     await expect(panelList).toBeVisible()

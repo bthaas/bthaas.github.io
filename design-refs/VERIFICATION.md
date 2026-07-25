@@ -588,3 +588,34 @@ are complete.
   production static export pass. The isolated production spiral journey passes
   in Chromium, Firefox, desktop WebKit, and iPhone WebKit with no
   application-origin console errors.
+
+## July 25, 2026 — Visible helix and strict project cycle
+
+- The user-supplied 2632 × 1672 production capture is retained as
+  `frames/project-spiral-diagonal-regression.png`. It confirms that the upright
+  and non-contact fixes were working, but the fourth card center sat roughly 96%
+  of a viewport height from center, leaving only disconnected diagonal samples
+  rather than a readable helix turn.
+- Desktop vertical travel now places the fourth card on either side at 44% of
+  viewport height. The horizontal radius is 44% of viewport width and target
+  card width is 17%, giving every adjacent projected card pair a tested black
+  gap while exposing the outward-and-returning S-curve.
+- Mobile uses a 52% horizontal radius, 42% target card width, and 29% pitch
+  factor. The outer center sits about 56% of viewport height from center, so the
+  returning side remains visible without merging the readable cards.
+- All nine slots now repeat the three real projects exactly:
+  Court Vision → Beat Stream → Vision Bias Steering, three times. The texture
+  material order and front-card route both consume the same exported slot
+  sequence. Reverse motion naturally presents the inverse order.
+- Five desktop captures at 0%, 25%, 50%, 75%, and 100% are retained as
+  `site-screenshots/spiral-curve-*.png`; the inspected responsive captures are
+  `spiral-curve-mobile.png` and `spiral-curve-fallback.png`.
+  `comparison.png` was rebuilt and opened at 1800 × 720 with the original
+  reference plus all five corrected states.
+- The GLB, textures, materials, draw-call count, and render loop are unchanged;
+  this refinement changes pure layout constants and project-slot data only.
+- Final verification: 237 tests across 57 files pass with 90.13% statements,
+  80.45% branches, 83.02% functions, and 93.44% lines. TypeScript and the
+  eight-route production static export pass. The updated spiral journey verifies
+  the A → B → C → A route sequence and passes in Chromium, Firefox, desktop
+  WebKit, and iPhone WebKit with no application-origin console errors.

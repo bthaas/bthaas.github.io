@@ -1,7 +1,7 @@
 const FULL_TURN = Math.PI * 2
 const DEFAULT_TURNS = 2
 
-export const PROJECT_SPIRAL_SLOT_ORDER = [0, 1, 0, 2, 1, 2, 0, 2, 1] as const
+export const PROJECT_SPIRAL_SLOT_ORDER = [0, 1, 2, 0, 1, 2, 0, 1, 2] as const
 
 interface ProjectSpiralFrameInput {
   readonly phase: number
@@ -47,9 +47,9 @@ export function getProjectSpiralLayout(
   isMobile = false,
 ): ProjectSpiralLayout {
   return {
-    horizontalRadius: Math.min(viewport.width * (isMobile ? 0.72 : 0.32), isMobile ? 3.2 : 5.2),
-    targetCardWidth: Math.min(viewport.width * (isMobile ? 0.52 : 0.19), isMobile ? 2.2 : 3.6),
-    verticalPitch: viewport.height * 0.5,
+    horizontalRadius: Math.min(viewport.width * (isMobile ? 0.52 : 0.44), isMobile ? 2.3 : 6.8),
+    targetCardWidth: Math.min(viewport.width * (isMobile ? 0.42 : 0.17), isMobile ? 1.9 : 3.2),
+    verticalPitch: viewport.height * (isMobile ? 0.29 : 0.23),
   }
 }
 
