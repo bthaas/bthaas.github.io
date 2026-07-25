@@ -47,9 +47,9 @@ export function getProjectSpiralLayout(
   isMobile = false,
 ): ProjectSpiralLayout {
   return {
-    horizontalRadius: Math.min(viewport.width * (isMobile ? 0.52 : 0.44), isMobile ? 2.3 : 6.8),
-    targetCardWidth: Math.min(viewport.width * (isMobile ? 0.42 : 0.17), isMobile ? 1.9 : 3.2),
-    verticalPitch: viewport.height * (isMobile ? 0.29 : 0.23),
+    horizontalRadius: Math.min(viewport.width * (isMobile ? 0.52 : 0.36), isMobile ? 2.3 : 5.7),
+    targetCardWidth: Math.min(viewport.width * (isMobile ? 0.42 : 0.24), isMobile ? 1.9 : 3.8),
+    verticalPitch: viewport.height * (isMobile ? 0.29 : 0.21),
   }
 }
 

@@ -989,6 +989,29 @@ portfolio's existing Experience, Projects, and Skills artwork.
   times around the nine-card helix. Reverse movement naturally reads
   `C, B, A`; no adjacent or alternating `A, B, A` sequence is permitted.
 
+## July 25 reference-density correction
+
+- The July 24 visible-turn capture overcorrects the non-contact requirement:
+  its approximately 44% viewport-width radius and 17% target card width make
+  each card read as a separate satellite. In the reference, the large readable
+  planes form a single cluster with only a narrow strip of black between their
+  projected side edges.
+- At the 2160 px-wide reference capture, the two dominant front planes are
+  approximately 31–34% of the viewport width and their nearest projected edges
+  are separated by roughly 16 px. The adaptation can retain slightly smaller
+  project cards for metadata legibility, but the front card must grow to
+  approximately 25–27% of the viewport after depth scaling.
+- Desktop implementation target: approximately 35–37% viewport-width radius,
+  23–25% base card width, and a 0.2–1% viewport-width projected gap between
+  the front card and its immediate neighbor. This preserves visible negative
+  space without scattering the sequence across the canvas.
+- Tighten the fourth-slot center to approximately 39–42% of viewport height.
+  The return side must still be visible, but its samples should feel connected
+  to the same helix rather than a diagonal chain of isolated planes.
+- Keep the mobile ratios unchanged until a mobile comparison demonstrates the
+  same density mismatch; this correction responds specifically to the supplied
+  wide-screen reference and production capture.
+
 ## Implementation targets
 
 ### Geometry and naming

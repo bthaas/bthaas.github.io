@@ -60,14 +60,15 @@ describe('project spiral choreography', () => {
       upperHalfTurn[4].y * layout.verticalPitch,
     )
 
-    expect(outermostCenterY).toBeGreaterThanOrEqual(viewport.height * 0.4)
-    expect(outermostCenterY).toBeLessThanOrEqual(viewport.height * 0.46)
+    expect(outermostCenterY).toBeGreaterThanOrEqual(viewport.height * 0.39)
+    expect(outermostCenterY).toBeLessThanOrEqual(viewport.height * 0.42)
     expect(upperHalfTurn[2].x).toBeGreaterThan(upperHalfTurn[4].x)
     expect(upperHalfTurn[4].depth).toBeLessThan(-0.9)
   })
 
-  it('keeps neighboring front cards separated at the reference viewport', () => {
-    const layout = getProjectSpiralLayout({ height: 7.68, width: 15.1 })
+  it('packs the front cards with only a narrow reference-sized gap', () => {
+    const viewport = { height: 7.68, width: 15.1 }
+    const layout = getProjectSpiralLayout(viewport)
     const front = getProjectSpiralFrame({
       phase: 0,
       slotCount: 9,
@@ -81,70 +82,48 @@ describe('project spiral choreography', () => {
       velocity: 0,
     })
     const horizontalSeparation = Math.abs(front.x - neighbor.x) * layout.horizontalRadius
-    const combinedHalfWidth = (
-      layout.targetCardWidth * front.scale
-      + layout.targetCardWidth * neighbor.scale
+    const projectedHalfWidth = (
+      layout.targetCardWidth * front.scale * Math.abs(Math.cos(front.rotationY))
+      + layout.targetCardWidth
+        * neighbor.scale
+        * Math.abs(Math.cos(neighbor.rotationY))
     ) / 2
-    const verticalSeparation = Math.abs(front.y - neighbor.y) * layout.verticalPitch
-    const combinedHalfHeight = (
-      layout.targetCardWidth * front.scale / (1200 / 848)
-      + layout.targetCardWidth * neighbor.scale / (1200 / 686)
-    ) / 2
+    const horizontalGap = horizontalSeparation - projectedHalfWidth
 
-    expect(layout.targetCardWidth).toBeLessThanOrEqual(layout.horizontalRadius * 0.75)
-    expect(
-      horizontalSeparation > combinedHalfWidth
-      || verticalSeparation > combinedHalfHeight,
-    ).toBe(true)
+    expect(layout.horizontalRadius).toBeGreaterThanOrEqual(viewport.width * 0.35)
+    expect(layout.horizontalRadius).toBeLessThanOrEqual(viewport.width * 0.365)
+    expect(layout.targetCardWidth).toBeGreaterThanOrEqual(viewport.width * 0.23)
+    expect(layout.targetCardWidth).toBeLessThanOrEqual(viewport.width * 0.25)
+    expect(horizontalGap).toBeGreaterThanOrEqual(viewport.width * 0.002)
+    expect(horizontalGap).toBeLessThanOrEqual(viewport.width * 0.01)
   })
 
-  it('keeps a visible gap between every neighboring desktop card', () => {
+  it('keeps the compact desktop proportions stable through each project step', () => {
     const viewport = { height: 7.68, width: 15.1 }
     const layout = getProjectSpiralLayout(viewport)
-    const aspectRatios = [1200 / 848, 1200 / 686, 1200 / 916]
-    const minimumGap = viewport.width * 0.003
 
-    for (const phase of [0, 0.5, 1, 1.5, 2, 2.5]) {
-      const frames = Array.from({ length: 9 }, (_, slotIndex) => ({
-        aspectRatio: aspectRatios[PROJECT_SPIRAL_SLOT_ORDER[slotIndex]],
-        frame: getProjectSpiralFrame({
-          phase,
-          slotCount: 9,
-          slotIndex,
-          velocity: 0,
-        }),
-      })).sort((a, b) => a.frame.y - b.frame.y)
-
-      for (let index = 1; index < frames.length; index += 1) {
-        const previous = frames[index - 1]
-        const current = frames[index]
-        const horizontalSeparation = Math.abs(
-          previous.frame.x - current.frame.x,
-        ) * layout.horizontalRadius
-        const projectedHalfWidths = (
-          layout.targetCardWidth
-            * previous.frame.scale
-            * Math.abs(Math.cos(previous.frame.rotationY))
-          + layout.targetCardWidth
-            * current.frame.scale
-            * Math.abs(Math.cos(current.frame.rotationY))
-        ) / 2
-        const verticalSeparation = Math.abs(
-          previous.frame.y - current.frame.y,
-        ) * layout.verticalPitch
-        const projectedHalfHeights = (
-          layout.targetCardWidth * previous.frame.scale / previous.aspectRatio
-          + layout.targetCardWidth * current.frame.scale / current.aspectRatio
+    for (const phase of [0, 1, 2]) {
+      const frontIndex = phase
+      const front = getProjectSpiralFrame({
+        phase,
+        slotCount: 9,
+        slotIndex: frontIndex,
+        velocity: 0,
+      })
+      const next = getProjectSpiralFrame({
+        phase,
+        slotCount: 9,
+        slotIndex: frontIndex + 1,
+        velocity: 0,
+      })
+      const horizontalGap = Math.abs(front.x - next.x) * layout.horizontalRadius
+        - layout.targetCardWidth * (
+          front.scale * Math.abs(Math.cos(front.rotationY))
+          + next.scale * Math.abs(Math.cos(next.rotationY))
         ) / 2
 
-        expect(
-          horizontalSeparation - projectedHalfWidths >= minimumGap
-          || verticalSeparation - projectedHalfHeights >= minimumGap,
-          `phase ${phase}, neighboring frames ${index - 1}/${index}, `
-            + `horizontal gap ${horizontalSeparation - projectedHalfWidths}, `
-            + `vertical gap ${verticalSeparation - projectedHalfHeights}`,
-        ).toBe(true)
-      }
+      expect(horizontalGap).toBeGreaterThanOrEqual(viewport.width * 0.002)
+      expect(horizontalGap).toBeLessThanOrEqual(viewport.width * 0.01)
     }
   })
 

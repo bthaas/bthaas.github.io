@@ -619,3 +619,34 @@ are complete.
   eight-route production static export pass. The updated spiral journey verifies
   the A → B → C → A route sequence and passes in Chromium, Firefox, desktop
   WebKit, and iPhone WebKit with no application-origin console errors.
+
+## July 25, 2026 — Reference-density refinement
+
+- The five-state comparison from the visible-helix pass was reopened beside the
+  2160 px-wide reference. Its 44% radius and 17% base card width preserved a
+  curve but scattered the planes across excessive black space. The reference's
+  two dominant planes instead occupy approximately 31–34% of its width with a
+  narrow projected seam between them.
+- Desktop now uses a 36% viewport-width radius, 24% base card width, and 21%
+  viewport-height pitch. Depth scaling makes the front plane approximately 26%
+  of the viewport width, while its immediate neighbor retains a tested
+  0.2–1% projected horizontal gap. The fourth slot sits 40.32% of a viewport
+  height from center, so the return side remains visibly curved.
+- A live 1800 × 914 browser pass measured the nearest visible seams at
+  approximately 18–22 px. The planes read as one compact helix without merging,
+  matching the density of the reference rather than the previous diagonal
+  satellite layout.
+- `site-screenshots/spiral-curve-0.png` through
+  `spiral-curve-100.png` were recaptured from the real WebGL scene at the five
+  required scroll states. `comparison.png` was rebuilt and opened at original
+  resolution; all five states preserve the compact cluster, upright artwork,
+  black seams, visible return arc, and unchanged A → B → C sequence.
+- Mobile ratios, the GLB, textures, materials, draw-call count, and render loop
+  remain unchanged. The correction is limited to desktop layout constants and
+  their reference-density regression tests.
+- Final verification remains 237 tests across 57 files with 90.13% statements,
+  80.45% branches, 83.02% functions, and 93.44% lines. TypeScript, the
+  eight-route production static export, deployment preparation, `git diff
+  --check`, and the isolated spiral journey all pass. The journey is green in
+  Chromium, Firefox, desktop WebKit, and iPhone WebKit with no
+  application-origin console errors.
