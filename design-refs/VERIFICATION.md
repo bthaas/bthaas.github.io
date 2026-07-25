@@ -397,10 +397,10 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   frame-pacing gates. Development also surfaces Three.js's upstream `Clock`
   deprecation warning; production application errors remain zero.
 - The credential/debug scan found no feature-owned diagnostics or secrets.
-  `npm audit` currently reports two high-severity transitive `sharp`/libvips
-  advisories inherited through Next.js; its only proposed automatic remediation
-  is a breaking Next.js downgrade, so no force-fix was applied in this feature
-  branch.
+  `npm audit --omit=dev` currently reports three high-severity advisories in the
+  existing Next.js, PostCSS, and Sharp dependency chain. This static export does
+  not ship the affected Next.js server paths; dependency upgrades remain a
+  separate maintenance task, so no unrelated lockfile change was applied here.
 
 ### 2026-07-24 physical-cylinder correction
 
@@ -411,11 +411,11 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   facets around a full 360° ring: 12 contiguous 10° slices per category, plus a
   matching 36-facet reflected ring. Back faces are culled and the old flat
   full-width shading overlay was removed.
-- Once the first textured WebGL frame is ready, the CSS ring fades completely
-  and the 24-segment-per-panel Draco model is the sole upper surface. A live
-  1280×720 hardware-browser inspection confirmed visible neighbor panels at both
-  curved edges, correct foreshortening, a complete drag from Experience to
-  Projects, and zero application-console errors.
+- The initial correction allowed the CSS ring to fade completely when the first
+  textured WebGL frame became ready. A live 1280×720 hardware-browser inspection
+  confirmed visible neighbor panels at both curved edges, correct
+  foreshortening, a complete drag from Experience to Projects, and zero
+  application-console errors.
 - The correction passes 235/235 Vitest assertions across 57 files, 90.16%
   statement / 80.41% branch / 83.11% function / 93.46% line coverage,
   TypeScript, production build and deployment preparation, and the targeted
@@ -437,6 +437,31 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
 - A hardware-browser pass at 1280×720 confirmed complete upper-rim visibility
   before and after an Experience → Projects drag, a fully visible wordmark, and
   zero application-console errors.
+
+### 2026-07-25 interaction activation continuity
+
+- The supplied follow-up capture isolated a first-interaction regression: the
+  upper cylinder was correctly framed at load, then appeared vertically cut
+  after pointer activation. The geometry was not moving outside its bounds; the
+  first input was crossfading from the 36-facet CSS ring to a wider,
+  differently cropped WebGL panel projection.
+- The physically radial CSS ring now remains the canonical upper surface before
+  and after activation. The CSS reflection alone fades when the first WebGL
+  frame is ready, while a 63% canvas inset exposes only the richer WebGL lower
+  reflector. Category labels, pointer drag, keyboard controls, and the full
+  360° facet rotation remain shared and synchronized.
+- A focused production-artifact regression asserts that initial input activates
+  WebGL without fading the upper ring, removes only the CSS reflection, and
+  retains the canvas inset. A hardware in-app browser pass at 1280×720 confirmed
+  identical upper-cylinder framing before and after hover, a complete
+  Experience → Projects drag, the updated reflection, and zero application
+  console errors.
+- Final automated results: 236/236 Vitest assertions across 58 files; 90.23%
+  statement, 80.41% branch, 83.27% function, and 93.51% line coverage;
+  TypeScript and the production static build passed. The focused continuity plus
+  main production journey produced five passing checks and three intentional
+  activation-test skips across Chromium, Firefox, desktop WebKit, and iPhone
+  WebKit.
 
 ---
 
@@ -547,11 +572,11 @@ Non-release warnings:
 - The test runner reports that `NO_COLOR` is overridden by `FORCE_COLOR`.
 - Blender reports a deprecated world-node property during exploratory product
   renders; it does not affect the exported GLB or runtime.
-- `npm audit --omit=dev` reports two high advisories in the existing Next.js and
-  Sharp dependency chain. This project deploys a static export and does not ship
-  the affected Server Actions, middleware/proxy, rewrites, image optimizer, Edge
-  runtime, or custom Next.js server paths; upgrading the framework remains a
-  separate dependency-maintenance follow-up.
+- `npm audit --omit=dev` reports three high advisories in the existing Next.js,
+  PostCSS, and Sharp dependency chain. This project deploys a static export and
+  does not ship the affected Server Actions, middleware/proxy, rewrites, image
+  optimizer, Edge runtime, or custom Next.js server paths; upgrading the
+  framework remains a separate dependency-maintenance follow-up.
 - The full integrated Playwright pass reproduces the live branch's inherited
   Chromium SwiftShader fluid-cursor floor failure (4–5 fps reported by that
   isolated canvas versus its 18 fps test floor). The untouched `source` worktree
