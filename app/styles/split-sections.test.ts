@@ -79,6 +79,43 @@ describe('Experience timeline', () => {
     })
   })
 
+  it('draws a proportional multilayer date map including the education milestone', () => {
+    const experienceStyles = readFileSync(
+      resolve(process.cwd(), 'app/styles/experience.css'),
+      'utf8',
+    )
+
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__lane',
+    )).toMatchObject({
+      display: 'grid',
+      'grid-template-columns': 'minmax(10rem, 17rem) minmax(0, 1fr)',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__lane-bar',
+    )).toMatchObject({
+      left: 'var(--experience-lane-start)',
+      right: 'calc(100% - var(--experience-lane-end))',
+      position: 'absolute',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__lane[data-kind=\"education\"] .experience-timeline__lane-bar',
+    )).toMatchObject({
+      left: 'auto',
+      right: '0',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__lane',
+      '(max-width: 640px)',
+    )).toMatchObject({
+      'grid-template-columns': 'minmax(0, 1fr)',
+    })
+  })
+
   it('uses an intentional stacked route at 390px', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),

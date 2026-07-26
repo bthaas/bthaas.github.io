@@ -3,6 +3,7 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 import { siteContent, type ExperienceEntry } from '@/content/site-content'
+import { buildExperienceTimeline } from '@/lib/experience-flight-path'
 
 import { ExperienceFlightPath } from './ExperienceFlightPath'
 
@@ -66,6 +67,58 @@ describe('ExperienceFlightPath', () => {
     )
     expect(within(educationStop!).getByText(education.degree)).toBeVisible()
     expect(within(educationStop!).getByText(`GPA ${education.gpa}`)).not.toBeVisible()
+  })
+
+  it('maps every role and the UVA degree onto its own proportional duration lane', () => {
+    const { container } = render(
+      <ExperienceFlightPath
+        education={siteContent.education}
+        experience={siteContent.experience}
+      />,
+    )
+    const timeline = buildExperienceTimeline(
+      siteContent.experience,
+      siteContent.education,
+    )
+    const lanes = screen.getByRole('list', {
+      name: 'Experience duration lanes',
+    })
+
+    expect(lanes.children).toHaveLength(4)
+
+    timeline.items.forEach((item, index) => {
+      const stop = [
+        ...siteContent.experience.map((entry) => ({
+          label: entry.organization,
+          period: entry.period,
+          role: entry.role,
+        })),
+        ...siteContent.education.map((entry) => ({
+          label: entry.institution,
+          period: entry.graduation,
+          role: entry.degree,
+        })),
+      ][index]
+      const lane = within(lanes).getByLabelText(
+        `${stop.role} at ${stop.label}, ${stop.period}`,
+      )
+      const bar = lane.querySelector('.experience-timeline__lane-bar')
+
+      expect(lane).toHaveAttribute('data-kind', item.kind)
+      expect(lane).toHaveStyle({
+        '--experience-lane-end': `${item.end * 100}%`,
+        '--experience-lane-start': `${item.start * 100}%`,
+      })
+      expect(bar).not.toBeNull()
+    })
+
+    const educationLane = container.querySelector(
+      '.experience-timeline__lane[data-kind="education"]',
+    )
+    expect(educationLane).toHaveTextContent('B.S. in Computer Science')
+    expect(educationLane).toHaveTextContent('University of Virginia')
+    expect(educationLane?.querySelector('.experience-timeline__lane-bar'))
+      .toHaveAttribute('data-milestone', 'true')
   })
 
   it('opens only the pressed role and collapses it when pressed again', () => {

@@ -16,6 +16,11 @@ type TimelineStyle = CSSProperties & {
   '--experience-stop-count': number
 }
 
+type TimelineLaneStyle = CSSProperties & {
+  '--experience-lane-end': string
+  '--experience-lane-start': string
+}
+
 type TimelineStop =
   | {
       readonly entry: ExperienceEntry
@@ -156,7 +161,7 @@ export function ExperienceFlightPath({
         </div>
         <div className="experience-timeline__intro-copy">
           <p>
-            Four upright stops across one compact timeline. Open a role when
+            Each role gets its own line across the date map. Open a column when
             you want the work behind the title.
           </p>
           <p>Company and role titles stay visible across the route.</p>
@@ -167,15 +172,69 @@ export function ExperienceFlightPath({
         className="experience-timeline__ledger atlas-shell"
         aria-label="Career timeline"
       >
-        <div
-          className="experience-timeline__range"
-          aria-label={`Timeline from ${timeline.startLabel} to ${timeline.endLabel}`}
-        >
-          <span>{timeline.startLabel}</span>
-          <span aria-hidden="true">
-            <i />
-          </span>
-          <span>{timeline.endLabel}</span>
+        <div className="experience-timeline__map" id="experience-duration-map">
+          <div
+            className="experience-timeline__map-axis"
+            aria-label={`Timeline from ${timeline.startLabel} to ${timeline.endLabel}`}
+          >
+            <span className="experience-timeline__map-kicker">
+              Parallel practice
+            </span>
+            <span className="experience-timeline__axis" aria-hidden="true">
+              {timeline.markers.map((marker) => (
+                <i
+                  className="experience-timeline__axis-marker"
+                  key={`${marker.label}-${marker.position}`}
+                  style={{ left: `${marker.position * 100}%` }}
+                >
+                  <span>{marker.label}</span>
+                </i>
+              ))}
+            </span>
+          </div>
+
+          <ol
+            className="experience-timeline__lanes"
+            aria-label="Experience duration lanes"
+          >
+            {stops.map((stop, index) => {
+              const item = timeline.items[index]
+              if (!item) return null
+
+              const accessibleRole = stop.kind === 'experience'
+                ? stop.entry.role
+                : stop.role
+              const isMilestone = item.start === item.end
+
+              return (
+                <li
+                  aria-label={`${accessibleRole} at ${stop.label}, ${stop.period}`}
+                  className="experience-timeline__lane"
+                  data-ends-timeline={item.end === 1 ? 'true' : undefined}
+                  data-kind={item.kind}
+                  key={`lane-${item.id}`}
+                  style={{
+                    '--experience-lane-end': `${item.end * 100}%`,
+                    '--experience-lane-start': `${item.start * 100}%`,
+                  } as TimelineLaneStyle}
+                >
+                  <span className="experience-timeline__lane-label">
+                    <span>{stop.label}</span>
+                    <span>{stop.role}</span>
+                  </span>
+                  <span className="experience-timeline__lane-track" aria-hidden="true">
+                    <i
+                      className="experience-timeline__lane-bar"
+                      data-milestone={isMilestone ? 'true' : undefined}
+                    />
+                    <span className="experience-timeline__lane-period">
+                      {stop.period}
+                    </span>
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
         </div>
 
         <div className="experience-timeline__rail">

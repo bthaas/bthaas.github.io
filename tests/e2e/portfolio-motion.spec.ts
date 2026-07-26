@@ -431,6 +431,9 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     'idle',
   )
   const careerPath = page.locator('[data-experience-flight]')
+  const durationLanes = careerPath.getByRole('list', {
+    name: 'Experience duration lanes',
+  })
   const stops = careerPath.locator('[data-experience-chapter]')
   const disclosures = stops.locator('details')
   const firstDetails = careerPath.locator(
@@ -440,6 +443,16 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     'summary[aria-label="Details for GenAI Technical Advisor Intern at Scale AI"]',
   )
   await expect(stops).toHaveCount(4)
+  await expect(durationLanes.getByRole('listitem')).toHaveCount(4)
+  await expect(
+    durationLanes.getByLabel('B.S. in Computer Science at University of Virginia, May 2026'),
+  ).toBeVisible()
+  const laneWidths = await durationLanes.locator('.experience-timeline__lane-bar')
+    .evaluateAll((elements) => elements.map((element) => (
+      element.getBoundingClientRect().width
+    )))
+  expect(laneWidths).toHaveLength(4)
+  expect(laneWidths.every((width) => width > 0)).toBe(true)
   await expect(disclosures).toHaveCount(4)
   await expect(careerPath).not.toHaveAttribute('data-experience-flight-enhanced')
   for (const stop of await stops.all()) await expect(stop).toBeVisible()
@@ -469,7 +482,9 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(page.getByRole('heading', { name: 'University of Virginia' })).toHaveCount(2)
   await expect(page.getByRole('heading', { name: 'Scale AI' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Refraction Innovation Hub' })).toBeVisible()
-  await expect(page.getByText('GenAI Technical Advisor Intern · SEAL')).toBeVisible()
+  await expect(
+    stops.nth(1).getByText('GenAI Technical Advisor Intern · SEAL'),
+  ).toBeVisible()
   await expect(page.getByText(siteContent.experience[1].summary)).toBeHidden()
 
   await secondDetails.focus()
@@ -629,6 +644,8 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(page.locator('[data-experience-flight]'))
     .not.toHaveAttribute('data-experience-flight-enhanced')
   await expect(page.locator('[data-experience-chapter]')).toHaveCount(4)
+  await expect(page.getByRole('list', { name: 'Experience duration lanes' })
+    .getByRole('listitem')).toHaveCount(4)
   for (const chapter of await page.locator('[data-experience-chapter]').all()) {
     await expect(chapter).toBeVisible()
   }
@@ -1159,6 +1176,8 @@ test('preserves every focused route without JavaScript', async (
   await expect(page.locator('[data-experience-flight]'))
     .not.toHaveAttribute('data-experience-flight-enhanced')
   await expect(page.locator('[data-experience-chapter]')).toHaveCount(4)
+  await expect(page.getByRole('list', { name: 'Experience duration lanes' })
+    .getByRole('listitem')).toHaveCount(4)
   for (const chapter of await page.locator('[data-experience-chapter]').all()) {
     await expect(chapter).toBeVisible()
   }
