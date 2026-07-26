@@ -7,6 +7,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -51,7 +52,14 @@ interface BeginPageTransitionOptions {
 type BeginPageTransition = (options: BeginPageTransitionOptions) => void
 
 const PageTransitionContext = createContext<BeginPageTransition | null>(null)
+const ARRIVAL_WATCHDOG_MS = 900
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+const PORTFOLIO_DESTINATIONS = [
+  '/experience',
+  '/projects',
+  '/skills',
+  '/contact',
+] as const
 const UNSPOOL_RIBBON_COUNT = 12
 const UNSPOOL_RIBBONS = Array.from(
   { length: UNSPOOL_RIBBON_COUNT },
@@ -115,12 +123,19 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
   const requestRef = useRef<PageTransitionRequest | null>(null)
   const [request, setRequest] = useState<PageTransitionRequest | null>(null)
   const [transitionState, setTransitionState] = useState<PageTransitionState>('idle')
+  const prefetch = router.prefetch
+
+  useEffect(() => {
+    if (pathname !== '/') return
+    PORTFOLIO_DESTINATIONS.forEach((href) => prefetch(href))
+  }, [pathname, prefetch])
 
   const finishTransition = useCallback(() => {
     lockedRef.current = false
     exitStartedForRef.current = null
     requestRef.current = null
     if (overlayRef.current) {
+      overlayRef.current.removeAttribute('data-transition-handoff')
       gsap.set(overlayRef.current, {
         display: 'none',
         pointerEvents: 'none',
@@ -188,11 +203,14 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
     gsap.set(overlay, { display: 'block', pointerEvents: 'auto', visibility: 'visible' })
 
     if (request.kind === 'portal') {
+      overlay.setAttribute('data-transition-handoff', 'pending')
+      const viewportHeight = Math.max(window.innerHeight, 1)
+      const viewportWidth = Math.max(window.innerWidth, 1)
       const bounds = request.bounds ?? {
-        height: window.innerHeight * 0.48,
-        left: window.innerWidth * 0.17,
-        top: window.innerHeight * 0.2,
-        width: window.innerWidth * 0.66,
+        height: viewportHeight * 0.48,
+        left: viewportWidth * 0.17,
+        top: viewportHeight * 0.2,
+        width: viewportWidth * 0.66,
       }
       const gatewayDetails = document.querySelectorAll<HTMLElement>([
         '.portfolio-gateway__introduction',
@@ -209,15 +227,18 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
       gsap.set(veil, { opacity: 0 })
       gsap.set(portal, {
         borderRadius: '50% / 8%',
-        height: bounds.height,
-        left: bounds.left,
+        height: viewportHeight,
+        left: 0,
         opacity: 1,
-        scale: 0.96,
-        top: bounds.top,
-        width: bounds.width,
+        scaleX: bounds.width / viewportWidth,
+        scaleY: bounds.height / viewportHeight,
+        top: 0,
+        transformOrigin: '0 0',
+        width: viewportWidth,
+        x: bounds.left,
+        y: bounds.top,
       })
       gsap.set(portalImage, {
-        filter: 'brightness(1) saturate(1)',
         opacity: 1,
         scale: 1,
       })
@@ -239,56 +260,53 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
 
       const timeline = gsap.timeline({
         defaults: { ease: 'power4.inOut' },
-        onComplete: () => router.push(request.href),
       })
       timeline
         .to(gatewayDetails, {
-          duration: 0.28,
+          duration: 0.22,
           opacity: 0,
-          stagger: 0.035,
-          y: -24,
+          stagger: 0.025,
+          y: -18,
         }, 0)
         .to(gatewayArtwork, {
-          duration: 0.48,
-          opacity: 0.18,
-          scale: 1.08,
+          duration: 0.38,
+          opacity: 0.28,
+          scale: 1.06,
         }, 0)
         .to(portal, {
           borderRadius: 0,
-          duration: 0.48,
+          duration: 0.38,
           ease: 'power3.inOut',
-          height: window.innerHeight,
-          left: 0,
-          scale: 1,
-          top: 0,
-          width: window.innerWidth,
+          scaleX: 1,
+          scaleY: 1,
+          x: 0,
+          y: 0,
         }, 0)
         .to(portalImage, {
-          duration: 0.72,
+          duration: 0.56,
           ease: 'power2.inOut',
-          filter: 'brightness(0.52) saturate(0.82)',
-          opacity: 0.24,
-          scale: 1.22,
+          opacity: 0.42,
+          scale: 1.14,
         }, 0)
         .to(portalFacets, {
-          duration: 0.34,
+          duration: 0.26,
           opacity: 0,
-        }, 0.06)
+        }, 0.04)
         .to(portalLabel, {
-          duration: 0.3,
+          duration: 0.24,
           ease: 'power3.in',
           opacity: 0,
-          scale: 0.9,
-          y: -18,
-        }, 0.04)
+          scale: 0.92,
+          y: -14,
+        }, 0.02)
         .to(portalAperture, {
-          duration: 0.68,
+          duration: 0.46,
           ease: 'power2.inOut',
-          opacity: 0.86,
-          scale: 1.18,
-        }, 0.16)
+          opacity: 0.66,
+          scale: 1,
+        }, 0.1)
         .to(ribbons, {
-          duration: 0.72,
+          duration: 0.56,
           ease: 'power3.inOut',
           rotateY: (index: number) => (
             getRibbonDirection(index) * (22 + getRibbonCenterDistance(index) * 30)
@@ -297,12 +315,31 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
             getRibbonDirection(index) * (1.5 + getRibbonCenterDistance(index) * 4)
           ),
           scaleY: 1.06,
-          stagger: { amount: 0.16, from: 'center' },
+          stagger: { amount: 0.1, from: 'center' },
           xPercent: (index: number) => (
             getRibbonDirection(index) * (62 + getRibbonCenterDistance(index) * 94)
           ),
-          z: (index: number) => 360 + (1 - getRibbonCenterDistance(index)) * 440,
-        }, 0.12)
+          z: (index: number) => 300 + (1 - getRibbonCenterDistance(index)) * 380,
+        }, 0.08)
+        .to(portalImage, {
+          duration: 0.72,
+          ease: 'sine.inOut',
+          opacity: 0.34,
+          repeat: -1,
+          scale: 1.18,
+          yoyo: true,
+        }, 0.52)
+        .to(portalAperture, {
+          duration: 0.8,
+          ease: 'sine.inOut',
+          opacity: 0.5,
+          repeat: -1,
+          scale: 1.08,
+          yoyo: true,
+        }, 0.52)
+
+      overlay.setAttribute('data-transition-handoff', 'requested')
+      router.push(request.href)
 
       return () => {
         timeline.kill()
@@ -376,64 +413,81 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
       const ribbons = Array.from(portalRibbons.querySelectorAll<HTMLElement>(
         '[data-page-transition-ribbon]',
       ))
+      let watchdog: number | undefined
+      const completeArrival = () => {
+        if (watchdog !== undefined) window.clearTimeout(watchdog)
+        finishTransition()
+      }
       const timeline = gsap.timeline({
         defaults: { ease: 'power3.out' },
-        onComplete: finishTransition,
+        onComplete: completeArrival,
       })
       timeline
         .to(ribbons, {
-          duration: 0.5,
+          duration: 0.36,
           ease: 'power3.in',
           opacity: 0,
           rotateY: (index: number) => getRibbonDirection(index) * 82,
-          stagger: { amount: 0.1, from: 'center' },
+          stagger: { amount: 0.06, from: 'center' },
           xPercent: (index: number) => (
-            getRibbonDirection(index) * (180 + getRibbonCenterDistance(index) * 110)
+            getRibbonDirection(index) * (154 + getRibbonCenterDistance(index) * 90)
           ),
-          z: (index: number) => 920 + (1 - getRibbonCenterDistance(index)) * 480,
+          z: (index: number) => 760 + (1 - getRibbonCenterDistance(index)) * 360,
         }, 0)
         .to(portalAperture, {
-          duration: 0.42,
+          duration: 0.28,
           ease: 'power2.in',
           opacity: 0,
-          scale: 1.9,
+          scale: 1.5,
         }, 0)
-        .to(portalFacets, { duration: 0.2, opacity: 0 }, 0)
+        .to(portalFacets, { duration: 0.16, opacity: 0 }, 0)
         .to(portalImage, {
-          duration: 0.48,
+          duration: 0.34,
           ease: 'power3.in',
-          filter: 'blur(9px) brightness(0.78)',
           opacity: 0,
-          scale: 1.46,
+          scale: 1.3,
         }, 0)
         .to(portal, {
-          duration: 0.54,
+          duration: 0.38,
           opacity: 0,
-        }, 0.08)
+          scaleX: 1,
+          scaleY: 1,
+          x: 0,
+          y: 0,
+        }, 0)
       if (main) {
         timeline.fromTo(main, {
-          filter: 'blur(10px)',
-          opacity: 0.55,
-          scale: 0.91,
-          y: 30,
+          opacity: 0.76,
+          scale: 0.975,
+          y: 16,
         }, {
-          clearProps: 'filter,opacity,transform',
-          duration: 0.62,
+          clearProps: 'opacity,transform',
+          duration: 0.44,
           opacity: 1,
           scale: 1,
           y: 0,
-        }, 0.04)
+        }, 0)
       }
+      watchdog = window.setTimeout(() => {
+        timeline.kill()
+        finishTransition()
+      }, ARRIVAL_WATCHDOG_MS)
 
       return () => {
+        if (watchdog !== undefined) window.clearTimeout(watchdog)
         timeline.kill()
       }
     }
 
     gsap.set(portal, { opacity: 0 })
+    let watchdog: number | undefined
+    const completeArrival = () => {
+      if (watchdog !== undefined) window.clearTimeout(watchdog)
+      finishTransition()
+    }
     const timeline = gsap.timeline({
       defaults: { ease: 'power2.out' },
-      onComplete: finishTransition,
+      onComplete: completeArrival,
     })
     timeline.fromTo(veil, { opacity: activeRequest ? 1 : 0.62 }, {
       duration: activeRequest ? 0.34 : 0.42,
@@ -450,8 +504,13 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
         y: 0,
       }, 0)
     }
+    watchdog = window.setTimeout(() => {
+      timeline.kill()
+      finishTransition()
+    }, ARRIVAL_WATCHDOG_MS)
 
     return () => {
+      if (watchdog !== undefined) window.clearTimeout(watchdog)
       timeline.kill()
     }
   }, [finishTransition, pathname])
