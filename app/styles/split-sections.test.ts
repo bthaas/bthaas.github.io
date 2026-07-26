@@ -27,17 +27,25 @@ function declarationsFor(
   return declarations
 }
 
-describe('Experience and Skills split boards', () => {
-  it('gives artwork and copy equal desktop columns with inset plates', () => {
+describe('Experience flight path and Skills split board', () => {
+  it('keeps the experience chapters readable by default and horizontal only when enhanced', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
     const craftStyles = readFileSync(resolve(process.cwd(), 'app/styles/craft.css'), 'utf8')
 
-    expect(declarationsFor(experienceStyles, '.experience-board')).toMatchObject({
+    expect(declarationsFor(experienceStyles, '.experience-flight__chapters')).toMatchObject({
       display: 'grid',
-      'grid-template-columns': 'repeat(2, minmax(0, 1fr))',
+      gap: '1rem',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '[data-experience-flight-enhanced] .experience-flight__chapters',
+      '(min-width: 960px)',
+    )).toMatchObject({
+      display: 'flex',
+      width: 'max-content',
     })
     expect(declarationsFor(craftStyles, '.craft-board')).toMatchObject({
       display: 'grid',
@@ -50,17 +58,13 @@ describe('Experience and Skills split boards', () => {
     expect(declarationsFor(craftStyles, '.craft-plate')).toMatchObject({
       'grid-area': 'artwork',
     })
-    expect(declarationsFor(experienceStyles, '.experience-plate--inset')).toMatchObject({
-      margin: 'clamp(1rem, 1.5vw, 1.75rem)',
-      'border-radius': 'clamp(1rem, 1.8vw, 1.6rem)',
-    })
     expect(declarationsFor(craftStyles, '.craft-plate--inset')).toMatchObject({
       margin: 'clamp(1rem, 1.5vw, 1.75rem)',
       'border-radius': 'clamp(1rem, 1.8vw, 1.6rem)',
     })
   })
 
-  it('stacks each image above its copy on narrow screens', () => {
+  it('keeps skills stacked and experience in normal document flow on narrow screens', () => {
     const mediaQuery = '(max-width: 720px)'
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
@@ -68,8 +72,9 @@ describe('Experience and Skills split boards', () => {
     )
     const craftStyles = readFileSync(resolve(process.cwd(), 'app/styles/craft.css'), 'utf8')
 
-    expect(declarationsFor(experienceStyles, '.experience-board', mediaQuery)).toMatchObject({
-      'grid-template-columns': '1fr',
+    expect(declarationsFor(experienceStyles, '.experience-flight__viewport')).toMatchObject({
+      position: 'relative',
+      width: 'var(--shell)',
     })
     expect(declarationsFor(craftStyles, '.craft-board', mediaQuery)).toMatchObject({
       'grid-template-areas': '"artwork" "copy"',

@@ -1,14 +1,11 @@
 import { atlasVisuals } from '@/content/editorial-visuals'
+import { ExperienceFlightPath } from '@/components/experience/ExperienceFlightPath'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
-import { FlightTiltSurface } from '@/components/motion/FlightTiltSurface'
 import { HeroMasthead } from '@/components/motion/HeroMasthead'
 import { SunBadge } from '@/components/motion/SunBadge'
 import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
 import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
-import {
-  siteContent,
-  type ExperienceEntry,
-} from '@/content/site-content'
+import { siteContent } from '@/content/site-content'
 
 import { AtlasPicture } from './AtlasPicture'
 import {
@@ -64,59 +61,6 @@ function ContactIcon({ name }: { readonly name: ContactIconName }) {
         strokeLinejoin="round"
         strokeWidth="1.8"
       />
-    </svg>
-  )
-}
-
-function FlightDossier({ entry }: { readonly entry: ExperienceEntry }) {
-  const panelId = `flight-dossier-${entry.id}`
-
-  return (
-    <div className="flight-dossier" data-dossier data-state="open">
-      <button
-        className="flight-dossier__toggle"
-        type="button"
-        aria-controls={panelId}
-        aria-expanded="true"
-        aria-label="Field notes +"
-        data-cursor="expand"
-      >
-        <span>Field notes</span>
-        <span className="flight-dossier__symbol" aria-hidden="true">
-          +
-        </span>
-      </button>
-      <div className="flight-dossier__panel" id={panelId}>
-        <div className="flight-dossier__inner">
-          <ul className="flight-highlights">
-            {entry.highlights.map((highlight) => (
-              <li key={highlight}>{highlight}</li>
-            ))}
-          </ul>
-          <ul
-            className="flight-technologies"
-            aria-label={`${entry.organization} technologies`}
-          >
-            {entry.technologies.map((technology) => (
-              <li key={technology}>{technology}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function FlightRule() {
-  return (
-    <svg
-      className="flight-rule"
-      aria-hidden="true"
-      focusable="false"
-      preserveAspectRatio="none"
-      viewBox="0 0 100 1"
-    >
-      <line data-flight-rule x1="0" y1="0.5" x2="100" y2="0.5" />
     </svg>
   )
 }
@@ -205,87 +149,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
 
         {(!screen || screen === 'experience') && (
           <section className="experience-section" id="experience" aria-labelledby="experience-title">
-          <div className="experience-board">
-            <div
-              className="experience-plate experience-plate--inset frame-reveal"
-              data-atlas-plate-sheen
-              data-reveal
-            >
-              <AtlasPicture
-                visual={atlasVisuals.experience}
-                alt="A rising coastal city and lighthouse at dusk"
-                className="atlas-picture experience-art"
-                cursor="read"
-                sizes="(max-width: 720px) 100vw, 50vw"
-                velocityPlate
-              />
-              <span className="experience-plate__warmth" aria-hidden="true" />
-            </div>
-            <div className="experience-panel">
-              <div className="experience-intro">
-                <div className="section-heading">
-                  <p className="eyebrow">01 / Flight log</p>
-                  <h2 id="experience-title">Experience</h2>
-                </div>
-                <p className="experience-kicker">
-                  From research and evaluation to production mobile systems: a path shaped by
-                  rigor, iteration, and useful outcomes.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="atlas-shell experience-log-shell">
-            <ol
-              className="flight-log"
-              aria-label="Professional experience"
-              data-reveal-stagger
-            >
-              {experience.map((entry, index) => (
-                <li className="flight-entry" key={entry.id}>
-                  <FlightTiltSurface>
-                    <FlightRule />
-                    <p className="flight-index" aria-hidden="true">
-                      {String(index + 1).padStart(2, '0')}
-                    </p>
-                    <div className="flight-heading">
-                      <h3>{entry.organization}</h3>
-                      <p className="flight-role">
-                        {entry.role}
-                        {entry.team ? ` · ${entry.team}` : ''}
-                      </p>
-                    </div>
-                    <p className="flight-summary">{entry.summary}</p>
-                    <p className="flight-period">
-                      {entry.period}
-                      <span>{entry.location}</span>
-                    </p>
-                    <FlightDossier entry={entry} />
-                  </FlightTiltSurface>
-                </li>
-              ))}
-              {education.map((entry) => (
-                <li className="flight-entry flight-entry--education" key={entry.degree}>
-                  <FlightTiltSurface>
-                    <FlightRule />
-                    <p className="flight-index" aria-hidden="true">04</p>
-                    <div className="flight-heading">
-                      <h3>{entry.institution}</h3>
-                      <p className="flight-role">{entry.degree}</p>
-                    </div>
-                    <p className="flight-summary flight-summary--education">
-                      <span>GPA: {entry.gpa}</span>
-                      <span>Relevant coursework: {entry.coursework.join(', ')}</span>
-                    </p>
-                    <p className="flight-period">
-                      {entry.graduation}
-                      <span>{entry.location}</span>
-                    </p>
-                  </FlightTiltSurface>
-                </li>
-              ))}
-            </ol>
-          </div>
+            <ExperienceFlightPath experience={experience} education={education} />
           </section>
         )}
 

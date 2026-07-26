@@ -280,7 +280,7 @@ test('opens every carousel category as its own routed screen', async ({
   expect(errors).toEqual([])
 })
 
-test('ships clean cross-browser routing, gateway choreography, and an accessible dossier', async ({
+test('ships clean cross-browser routing, gateway choreography, and an accessible career path', async ({
   isMobile,
   page,
 }) => {
@@ -374,17 +374,35 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(page).toHaveURL(/\/experience\/?$/)
   await expect(page.locator('#experience')).toHaveCount(1)
   await expect(page.locator('#hero, #portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
-  const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
-  await toggle.scrollIntoViewIfNeeded()
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false')
-  await toggle.focus()
-  await toggle.press('Enter')
-  await expect(toggle).toHaveAttribute('aria-expanded', 'true')
-  await toggle.press('Space')
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false')
-  await expect(toggle).toBeFocused()
+  const careerPath = page.locator('[data-experience-flight]')
+  const chapters = careerPath.locator('[data-experience-chapter]')
+  const route = careerPath.locator('.experience-flight__route')
+  const routeLinks = route.locator('a')
+  await expect(chapters).toHaveCount(4)
+  await expect(routeLinks).toHaveCount(4)
+  await expect(routeLinks.nth(1)).toHaveAttribute(
+    'href',
+    '#experience-chapter-scale-ai',
+  )
+  if (isMobile) {
+    await expect(careerPath).not.toHaveAttribute('data-experience-flight-enhanced')
+    await expect(route).toBeHidden()
+    for (const chapter of await chapters.all()) await expect(chapter).toBeVisible()
+  } else {
+    await expect(careerPath).toHaveAttribute('data-experience-flight-enhanced', '')
+    await expect(route).toBeVisible()
+    await routeLinks.nth(1).focus()
+    await expect(routeLinks.nth(1)).toBeFocused()
+    await expect(routeLinks.nth(1)).toHaveAttribute('aria-current', 'step')
+    await routeLinks.nth(1).press('Enter')
+    await expect(page).toHaveURL(/#experience-chapter-scale-ai$/)
+  }
+  await expect(page.locator('#experience')).toHaveCSS('background-color', 'rgb(25, 25, 43)')
+  await expectNoHorizontalOverflow(page)
 
-  await page.getByRole('link', { name: 'Contact' }).click()
+  const contactLink = page.getByRole('link', { name: 'Contact' })
+  await contactLink.focus()
+  await contactLink.press('Enter')
   await expect(page).toHaveURL(/\/contact\/?$/)
   await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
   if (isMobile) {
@@ -469,12 +487,13 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   ).toHaveCount(48)
 
   await page.goto('/experience', { waitUntil: 'networkidle' })
-  await expect(page.locator('.flight-dossier__toggle').first())
-    .toHaveAttribute('aria-expanded', 'true')
-  await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
-  expect(await page.locator('[data-atlas-plate-sheen]').first().evaluate((node) => (
-    getComputedStyle(node, '::before').display
-  ))).toBe('none')
+  await expect(page.locator('[data-experience-flight]'))
+    .not.toHaveAttribute('data-experience-flight-enhanced')
+  await expect(page.locator('[data-experience-chapter]')).toHaveCount(4)
+  for (const chapter of await page.locator('[data-experience-chapter]').all()) {
+    await expect(chapter).toBeVisible()
+  }
+  await expect(page.locator('#experience .pin-spacer')).toHaveCount(0)
 
   await page.goto('/skills', { waitUntil: 'networkidle' })
   await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
@@ -774,26 +793,35 @@ test('spins the project helix and keeps a complete static fallback', async ({
   expect(errors).toEqual([])
 })
 
-test('preserves every focused route without JavaScript', async ({ browser, isMobile }) => {
+test('preserves every focused route without JavaScript', async (
+  { browser, isMobile },
+  testInfo,
+) => {
+  const baseURL = String(testInfo.project.use.baseURL ?? 'http://127.0.0.1:4173')
   const context = await browser.newContext({
     javaScriptEnabled: false,
     viewport: isMobile ? { height: 844, width: 390 } : { height: 1200, width: 1600 },
   })
   const page = await context.newPage()
-  await page.goto('http://127.0.0.1:4173/')
+  await page.goto(`${baseURL}/`)
 
   await expect(page.locator('#hero, #portfolio-gateway')).toHaveCount(2)
   await expect(page.locator('#experience, #projects, #craft, #contact')).toHaveCount(0)
   await expect(page.locator('html')).not.toHaveClass(/atlas-js/)
   await expect(page.locator('[data-atlas-cursor], script[data-atlas-horizon], canvas')).toHaveCount(0)
 
-  await page.goto('http://127.0.0.1:4173/experience')
-  await expect(page.locator('.flight-dossier__toggle').first())
-    .toHaveAttribute('aria-expanded', 'true')
-  await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
+  await page.goto(`${baseURL}/experience`)
+  await expect(page.locator('[data-experience-flight]'))
+    .not.toHaveAttribute('data-experience-flight-enhanced')
+  await expect(page.locator('[data-experience-chapter]')).toHaveCount(4)
+  for (const chapter of await page.locator('[data-experience-chapter]').all()) {
+    await expect(chapter).toBeVisible()
+  }
+  await expect(page.locator('.experience-flight__route a'))
+    .toHaveCount(4)
 
   for (const route of ['/projects', '/skills', '/contact']) {
-    await page.goto(`http://127.0.0.1:4173${route}`)
+    await page.goto(`${baseURL}${route}`)
     await expect(page.locator('main > section')).toHaveCount(1)
   }
   await expectNoHorizontalOverflow(page)

@@ -1,9 +1,8 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
 import { spreadSkillSphereOrder } from '@/lib/atlas-motion/skill-sphere'
-import { setupDossiers } from '@/src/atlas/experience'
 
 import { Portfolio } from './Portfolio'
 import { getSkillLogos } from './SkillLogos'
@@ -101,7 +100,9 @@ describe('Portfolio', () => {
       screen.getByRole('region', { name: 'Technology logo ticker; focus to pause' }),
     ).toBeInTheDocument()
 
-    const flightLog = screen.getByRole('list', { name: 'Professional experience' })
+    const flightLog = screen.getByRole('list', {
+      name: 'Professional experience and education',
+    })
     expect(flightLog.tagName).toBe('OL')
     const flightEntries = Array.from(flightLog.children)
     expect(flightEntries).toHaveLength(4)
@@ -157,22 +158,16 @@ describe('Portfolio', () => {
       .toBeTruthy()
   })
 
-  it('server-renders every professional dossier from content and skips education', () => {
+  it('server-renders every career chapter from the unchanged content source', () => {
     const { container } = render(<Portfolio />)
-    const entries = Array.from(container.querySelectorAll<HTMLElement>('.flight-entry'))
-    const flightIndices = Array.from(container.querySelectorAll<HTMLElement>('.flight-index'))
+    const entries = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-experience-chapter]'),
+    )
 
     expect(entries).toHaveLength(4)
-    expect(flightIndices).toHaveLength(4)
-    flightIndices.forEach((index) => expect(index).toHaveAttribute('aria-hidden', 'true'))
     siteContent.experience.forEach((experience, index) => {
       const entry = entries[index]
-      const toggle = within(entry).getByRole('button', { name: 'Field notes +' })
-      const panelId = toggle.getAttribute('aria-controls')
 
-      expect(toggle).toHaveAttribute('aria-expanded', 'true')
-      expect(panelId).toBe(`flight-dossier-${experience.id}`)
-      expect(entry.querySelector(`#${panelId}`)).not.toBeNull()
       experience.highlights.forEach((highlight) => {
         expect(within(entry).getByText(highlight)).toBeInTheDocument()
       })
@@ -182,47 +177,13 @@ describe('Portfolio', () => {
     })
 
     const educationEntry = entries[3]
-    expect(within(educationEntry).queryByRole('button', { name: 'Field notes +' })).toBeNull()
-    expect(within(educationEntry).getByText('GPA: 3.7')).toBeVisible()
-    expect(
-      within(educationEntry).getByText(
-        'Relevant coursework: Computer Systems, Data Structures and Algorithms, Software Engineering, Cybersecurity, Machine Learning, Reinforcement Learning',
-      ),
-    ).toBeVisible()
+    expect(within(educationEntry).getByText('GPA 3.7')).toBeVisible()
+    expect(within(educationEntry).getByText('Computer Systems')).toBeVisible()
+    expect(within(educationEntry).getByText('Reinforcement Learning')).toBeVisible()
     expect(within(educationEntry).getByText('Charlottesville, VA')).toBeVisible()
-  })
-
-  it('collapses enhanced dossiers on init and toggles ARIA state without moving focus', () => {
-    document.documentElement.classList.add('atlas-js')
-    render(<Portfolio />)
-    const cleanup = setupDossiers(document)
-    const toggles = screen.getAllByRole('button', { name: 'Field notes +' })
-    const firstToggle = toggles[0]
-    const firstDossier = firstToggle.closest<HTMLElement>('[data-dossier]')
-
-    expect(toggles).toHaveLength(3)
-    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
-    expect(firstDossier).toHaveAttribute('data-state', 'closed')
-
-    firstToggle.focus()
-    fireEvent.click(firstToggle)
-    expect(firstToggle).toHaveAttribute('aria-expanded', 'true')
-    expect(firstDossier).toHaveAttribute('data-state', 'open')
-    expect(firstToggle).toHaveFocus()
-
-    fireEvent.click(firstToggle)
-    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
-    expect(firstDossier).toHaveAttribute('data-state', 'closed')
-
-    firstToggle.click()
-    expect(firstToggle).toHaveAttribute('aria-expanded', 'true')
-    firstToggle.click()
-    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
-    fireEvent.keyDown(firstToggle, { key: 'Escape' })
-    expect(firstToggle).toHaveAttribute('aria-expanded', 'false')
-
-    cleanup()
-    document.documentElement.classList.remove('atlas-js')
+    expect(screen.getByRole('navigation', { name: 'Career timeline' }))
+      .toBeInTheDocument()
+    expect(container.querySelector('.flight-dossier')).not.toBeInTheDocument()
   })
 
   it('keeps project details off the homepage and links every panel to its own page', () => {
@@ -326,24 +287,23 @@ describe('Portfolio', () => {
     ).toBeInTheDocument()
   })
 
-  it('pairs Experience and Skills artwork with dedicated editorial copy panels', () => {
+  it('gives Experience an atmospheric flight path while Skills keeps its split board', () => {
     const { container } = render(<Portfolio />)
-    const experienceBoard = container.querySelector<HTMLElement>('.experience-board')
+    const experienceFlight = container.querySelector<HTMLElement>('[data-experience-flight]')
     const craftBoard = container.querySelector<HTMLElement>('.craft-board')
 
-    expect(experienceBoard?.children).toHaveLength(2)
-    expect(experienceBoard?.firstElementChild).toHaveClass(
-      'experience-plate',
-      'experience-plate--inset',
-    )
-    expect(experienceBoard?.lastElementChild).toHaveClass('experience-panel')
     expect(
-      within(experienceBoard as HTMLElement).getByRole('img', {
+      within(experienceFlight as HTMLElement).getByRole('img', {
         name: 'A rising coastal city and lighthouse at dusk',
       }),
     ).toBeInTheDocument()
     expect(
-      within(experienceBoard as HTMLElement).getByRole('heading', { name: 'Experience' }),
+      within(experienceFlight as HTMLElement).getByRole('heading', { name: 'Experience' }),
+    ).toBeInTheDocument()
+    expect(
+      within(experienceFlight as HTMLElement).getByRole('navigation', {
+        name: 'Career timeline',
+      }),
     ).toBeInTheDocument()
 
     expect(craftBoard?.children).toHaveLength(2)

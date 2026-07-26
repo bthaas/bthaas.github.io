@@ -295,13 +295,11 @@
   }
 
   .craft-heading,
-  .experience-intro .section-heading,
   .projects-intro .section-heading {
     grid-column: 1 / span 7;
   }
 
   .craft-copy,
-  .experience-kicker,
   .projects-intro > p {
     grid-column: 8 / -1;
   }
@@ -441,7 +439,6 @@
   }
 
   .craft-art,
-  .experience-art,
   .project-art {
     aspect-ratio: 4 / 3;
   }
@@ -450,44 +447,8 @@
     margin-top: 1rem;
   }
 
-  .experience-intro,
   .projects-intro {
     margin-bottom: 0;
-  }
-
-  .flight-entry {
-    display: grid;
-    min-height: auto;
-    padding: 1.2rem 0 1.5rem;
-    grid-template-columns: 2.5rem 1fr;
-  }
-
-  .flight-index {
-    grid-row: 1 / span 3;
-    grid-column: 1;
-  }
-
-  .flight-heading,
-  .flight-summary,
-  .flight-period {
-    grid-column: 2;
-  }
-
-  .flight-heading {
-    margin-bottom: 1rem;
-  }
-
-  .flight-summary {
-    margin-bottom: 1rem;
-  }
-
-  .flight-period {
-    text-align: left;
-  }
-
-  .flight-period span {
-    display: inline;
-    margin: 0 0 0 0.6rem;
   }
 
   .project-title :is(h1, h3) {

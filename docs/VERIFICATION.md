@@ -1,5 +1,29 @@
 # Awwwards portfolio verification
 
+Verified on 2026-07-26 from `codex/experience-redesign`. The standalone
+Experience screen now uses a date-derived career route and a native-scroll
+GSAP/ScrollTrigger horizontal pin on desktop. Its initial HTML, 390 px layout,
+reduced-motion path, and JavaScript-disabled path all keep the three roles and
+education chapter in ordinary document order.
+
+## Experience redesign gates
+
+| Gate | Result |
+| --- | --- |
+| `npm run verify` | Passed: 61 files / 246 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 89.36% statements, 80.44% branches, 83.03% functions, 92.45% lines |
+| Desktop engine | Chromium 1600 × 1200: pin, horizontal chapter travel, focused route links, dark editorial field, and zero horizontal document overflow passed |
+| Mobile engine | iPhone WebKit and a 390 × 844 live walk: four normal-flow chapters, hidden desktop route visualization, and zero horizontal overflow passed |
+| Reduced motion | No pin spacer or enhancement attribute; all four chapters remain visible |
+| No JavaScript | Four chapters and four native fragment links remain in the static export on desktop and mobile |
+
+The visual date axis is computed from the unchanged periods in
+`content/site-content.ts`, including overlapping roles and the May 2026
+graduation milestone. Native fragment links remain the route controls before
+enhancement. Desktop focus maps each link to the matching normal-document
+position inside the pin; mobile deliberately omits the dense route visualization
+and presents the chapters as a single readable column.
+
 Verified on 2026-07-18 from `codex/phase-6-resubmission-polish`. Phase 6
 hardens the complete maximalist atlas for submission: heavy WebGL now waits for
 a real gesture, the entrance and spectacle have measured timing headroom,
@@ -363,13 +387,13 @@ work at 60 Hz and pauses outside its section.
 
 | Browser / device | Viewport | Result |
 | --- | --- | --- |
-| Chromium desktop | 1600 × 1200 | Full GSAP/ScrollTrigger choreography, Lenis, dossiers, cursor, flock, and programmatic scroll passed. |
+| Chromium desktop | 1600 × 1200 | Full GSAP/ScrollTrigger choreography, Lenis, career-path pin, cursor, flock, and programmatic scroll passed. |
 | Firefox desktop | 1600 × 1200 | Full choreography passed; no CSS scroll-timeline fallback or static downgrade. |
-| WebKit desktop | 1600 × 1200 | Choreography, keyboard scrolling, dossiers, lazy finale, and overflow checks passed. |
-| WebKit iPhone | iPhone 13 profile | Native touch scroll, responsive composition, stable 30 fps, and no premature finale bundle passed. |
+| WebKit desktop | 1600 × 1200 | Choreography, keyboard scrolling, career-path navigation, lazy finale, and overflow checks passed. |
+| WebKit iPhone | iPhone 13 profile | Native touch scroll, four normal-flow career chapters, responsive composition, and no premature finale bundle passed. |
 
 Every project checks application-origin console errors, failed same-origin
-requests, horizontal overflow, dossier keyboard/ARIA state, and the contact
+requests, horizontal overflow, career-route keyboard state, and the contact
 finale. None failed. Anchor and programmatic scrolling use a passive native
 scroll signal in addition to Lenis/ScrollTrigger, preventing stale progress when
 a browser jumps directly to a chapter.
@@ -382,9 +406,10 @@ a browser jumps directly to a chapter.
 - The reduced-motion DOM matches the static export, with zero running animations
   and intact native heading text.
 - JavaScript-disabled runs retain every section, project link, contact action,
-  semantic landmark, and dossier body.
-- Flip dossiers keep `aria-expanded`, `aria-controls`, Enter/Space operation,
-  visible focus, and settled neighboring layout.
+  semantic landmark, career chapter, highlight, and technology list.
+- Experience route controls are native fragment links. The dense route is
+  desktop-only; mobile and reduced-motion visitors read the same four chapters
+  in normal flow.
 - SplitText uses its built-in heading ARIA support. Decorative index and craft
   ghost numerals are removed from the accessibility tree.
 - Lighthouse accessibility is 100 on desktop and mobile; application-origin

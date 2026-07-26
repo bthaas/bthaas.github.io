@@ -3,7 +3,6 @@ import { setupContactFinale } from './contact'
 import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
 import { initializeAtlasEngine, type AtlasEngine } from './engine'
-import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupMetricCountUps } from './hero'
 import { setupHorizonLoader } from './horizon-loader'
 import { setupLocalTime } from './local-time'
@@ -24,9 +23,7 @@ interface AtlasRuntimeOptions {
   readonly prepareCraft?: (document: Document, window: Window) => () => void
   readonly prepareContact?: (document: Document, window: Window) => () => void
   readonly prepareCursor?: (document: Document) => () => void
-  readonly prepareDossiers?: (document: Document) => () => void
   readonly prepareHorizon?: (document: Document) => () => void
-  readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareMagnetic?: (document: Document) => () => void
   readonly prepareMarquee?: (document: Document) => () => void
@@ -50,9 +47,7 @@ export function initializeAtlas({
   prepareCraft = setupCraftChapter,
   prepareContact = setupContactFinale,
   prepareCursor = setupCursor,
-  prepareDossiers = setupDossiers,
   prepareHorizon = setupHorizonLoader,
-  prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
   prepareMagnetic = setupMagnetic,
   prepareMarquee = setupMarquee,
@@ -85,8 +80,6 @@ export function initializeAtlas({
   const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
   const cleanupCursor = prepareCursor(runtimeDocument)
-  const cleanupDossiers = prepareDossiers(runtimeDocument)
-  const cleanupExperience = prepareExperience(runtimeDocument, runtimeWindow)
   const cleanupHorizon = prepareHorizon(runtimeDocument)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupMagnetic = prepareMagnetic(runtimeDocument)
@@ -142,8 +135,6 @@ export function initializeAtlas({
     cleanupCraft()
     cleanupContact()
     cleanupCursor()
-    cleanupDossiers()
-    cleanupExperience()
     cleanupHorizon()
     cleanupMetrics()
     cleanupMagnetic()

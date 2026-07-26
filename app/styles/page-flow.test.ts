@@ -20,7 +20,7 @@ function declarationsFor(stylesheet: string, selector: string): Record<string, s
 }
 
 describe('continuous page color system', () => {
-  it('uses the opening cream and one shared hairline across every homepage chapter', () => {
+  it('uses the opening cream and one shared hairline across the light chapters', () => {
     expect(existsSync(stylesheetPath)).toBe(true)
     const stylesheet = readFileSync(stylesheetPath, 'utf8')
     const root = declarationsFor(stylesheet, ':root')
@@ -33,7 +33,6 @@ describe('continuous page color system', () => {
 
     for (const selector of [
       '.hero-section',
-      '.experience-section',
       '.projects-section',
       '.craft-section',
       '.contact-section',
@@ -48,18 +47,14 @@ describe('continuous page color system', () => {
     }
   })
 
-  it('removes the dark experience wash and keeps its text readable on cream', () => {
+  it('gives the experience flight path a deliberate dark editorial field', () => {
     expect(existsSync(stylesheetPath)).toBe(true)
     const stylesheet = readFileSync(stylesheetPath, 'utf8')
 
-    expect(declarationsFor(stylesheet, '.experience-section::before')).toMatchObject({
-      content: 'none',
-    })
-    expect(declarationsFor(stylesheet, '.experience-intro .section-heading h2')).toMatchObject({
-      color: 'var(--ink)',
-    })
-    expect(declarationsFor(stylesheet, '.experience-kicker')).toMatchObject({
-      color: 'var(--muted)',
+    expect(declarationsFor(stylesheet, '.experience-section')).toMatchObject({
+      'background-color': 'var(--dusk-deep)',
+      'background-image': 'none',
+      color: 'var(--paper)',
     })
   })
 

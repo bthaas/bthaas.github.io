@@ -51,7 +51,6 @@
 }
 
 .craft-copy p,
-.experience-kicker,
 .projects-intro > p,
 .contact-copy p {
   font-size: clamp(0.94rem, 1.35vw, 1.14rem);

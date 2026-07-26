@@ -17,16 +17,6 @@ export interface ChapterDissolveFrame {
   readonly offsetX: number
 }
 
-export interface NormalizedPointer {
-  readonly x: number
-  readonly y: number
-}
-
-export interface FlightLogTilt {
-  readonly rotateX: number
-  readonly rotateY: number
-}
-
 function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(maximum, Math.max(minimum, value))
 }
@@ -72,16 +62,5 @@ export function getChapterDissolveFrame(
   return {
     dotRadius: clampedProgress * 9,
     offsetX: (1 - clampedProgress) * 12 * direction,
-  }
-}
-
-export function getFlightLogTilt(
-  pointer: NormalizedPointer,
-  maximumDegrees = 6,
-): FlightLogTilt {
-  const limit = Math.max(0, maximumDegrees)
-  return {
-    rotateX: -clamp(pointer.y, -1, 1) * limit,
-    rotateY: clamp(pointer.x, -1, 1) * limit,
   }
 }
