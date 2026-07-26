@@ -880,6 +880,20 @@ portfolio's existing Experience, Projects, Skills, and Contact artwork.
   standalone screen containing that chapter's existing content and global
   navigation; project case studies remain nested under `/projects/[slug]`.
 
+## July 25 active-reflector size correction
+
+- The production regression is preserved as
+  `frames/carousel-active-reflector-regression.png` at 2014×1302 device pixels.
+  The upper drum is correctly sized and must remain unchanged. Its visible
+  silhouette is approximately 1,174×700 device pixels, while the active WebGL
+  reflector expands to roughly 1,429×169 device pixels.
+- The final direction removes every mirrored reflection surface but restores
+  grounding with one solid black oval. It must be filled rather than hollow,
+  sit a few pixels below the drum, and stay visibly inset from both sides:
+  target 84–94% of the projected upper width and 30–46 px high at 1280×720.
+  Keep the 48-facet upper CSS drum, approved typography, drag behavior, category
+  sequence, and routes unchanged. Do not remount the clipped WebGL canvas.
+
 ## Implementation targets
 
 - Build the texture-free named-node GLB headlessly from a deterministic Blender

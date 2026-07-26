@@ -69,6 +69,7 @@
   width: min(56.5rem, 82vw);
   height: min(35.5rem, 74svh);
   cursor: grab;
+  isolation: isolate;
   touch-action: pan-y;
   transform: translateX(-50%);
   user-select: none;
@@ -78,24 +79,34 @@
   cursor: grabbing;
 }
 
-.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__fallback-ring,
-.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__fallback-reflection-ring {
+.portfolio-gateway__carousel[data-dragging="true"] .portfolio-gateway__fallback-ring {
   transition: none;
 }
 
-.portfolio-gateway__fallback,
-.portfolio-gateway__canvas {
-  position: absolute;
-  inset: 0;
-}
-
 .portfolio-gateway__fallback {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
   perspective: 72rem;
   transition: opacity 240ms ease;
 }
 
-.portfolio-gateway__fallback-ring,
-.portfolio-gateway__fallback-reflection-ring {
+.portfolio-gateway__ground-shadow {
+  position: absolute;
+  z-index: 0;
+  top: 65%;
+  left: 50%;
+  width: min(33rem, 74vw);
+  height: min(2.35rem, 6vw);
+  border-radius: 50%;
+  background: #0a0b08;
+  filter: blur(clamp(0.28rem, 0.6vw, 0.55rem));
+  opacity: 0.28;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.portfolio-gateway__fallback-ring {
   --gateway-cylinder-radius: min(23.5rem, 42.5vw);
   --gateway-cylinder-slice-width: min(3.03rem, 5.48vw);
 
@@ -125,54 +136,6 @@
   transform:
     rotateY(var(--gateway-segment-angle))
     translateZ(var(--gateway-cylinder-radius));
-}
-
-.portfolio-gateway__fallback-reflection {
-  position: absolute;
-  top: 66%;
-  left: 7%;
-  width: 86%;
-  height: 20%;
-  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 58%), transparent 94%);
-  perspective: 72rem;
-  transition: opacity 240ms ease;
-}
-
-.portfolio-gateway__carousel[data-canvas-ready] .portfolio-gateway__fallback-reflection {
-  opacity: 0;
-}
-
-.portfolio-gateway__fallback-reflection-ring {
-  --gateway-cylinder-radius: min(22.2rem, 40.25vw);
-  --gateway-cylinder-slice-width: min(2.86rem, 5.2vw);
-
-  top: 0;
-  height: 100%;
-}
-
-.portfolio-gateway__fallback-reflection-ring .portfolio-gateway__fallback-slice {
-  filter: saturate(0.72) brightness(1.32);
-  opacity: 0.29;
-  transform:
-    rotateY(var(--gateway-segment-angle))
-    translateZ(var(--gateway-cylinder-radius))
-    scaleY(-1);
-}
-
-.portfolio-gateway__canvas {
-  z-index: 2;
-  clip-path: inset(63% 0 0);
-  opacity: 0;
-  transition: opacity 360ms ease;
-}
-
-.portfolio-gateway__carousel[data-canvas-ready] .portfolio-gateway__canvas {
-  opacity: 0.94;
-}
-
-.portfolio-gateway-canvas {
-  pointer-events: none;
-  transform: translateY(0.9rem);
 }
 
 .portfolio-gateway__face-label {
@@ -331,21 +294,12 @@
     height: 50%;
   }
 
-  .portfolio-gateway__fallback-reflection {
-    top: 54%;
-    left: 7%;
-    width: 86%;
-    height: 17%;
-  }
-
-  .portfolio-gateway__fallback-reflection-ring {
-    --gateway-cylinder-radius: min(10.7rem, 44vw);
-    --gateway-cylinder-slice-width: min(1.38rem, 5.65vw);
-
-    top: 0;
-    left: 50%;
-    width: 0;
-    height: 100%;
+  .portfolio-gateway__ground-shadow {
+    top: 52%;
+    width: min(20.5rem, 76vw);
+    height: min(1.8rem, 7vw);
+    filter: blur(0.3rem);
+    opacity: 0.26;
   }
 
   .portfolio-gateway__face-label {
@@ -389,9 +343,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .portfolio-gateway__fallback,
-  .portfolio-gateway__fallback-reflection,
   .portfolio-gateway__fallback-ring,
-  .portfolio-gateway__canvas,
   .portfolio-gateway__face-label,
   .portfolio-gateway__arrows button {
     transition: none;

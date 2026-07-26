@@ -3,12 +3,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { PortfolioGateway } from './PortfolioGateway'
 
-vi.mock('../scenes/AtlasWebGLScenes', () => ({
-  PortfolioGatewayScene: ({ activeIndex }: { activeIndex: number }) => (
-    <div data-testid="portfolio-gateway-scene" data-active-index={activeIndex} />
-  ),
-}))
-
 describe('PortfolioGateway', () => {
   it('starts on Experience with semantic carousel controls and destinations', () => {
     const { container } = render(<PortfolioGateway />)
@@ -40,20 +34,23 @@ describe('PortfolioGateway', () => {
       container.querySelectorAll(
         '.portfolio-gateway__fallback-reflection-ring > .portfolio-gateway__fallback-slice',
       ),
-    ).toHaveLength(48)
+    ).toHaveLength(0)
+    expect(container.querySelector('.portfolio-gateway__fallback-reflection')).toBeNull()
+    expect(container.querySelector('.portfolio-gateway__canvas')).toBeNull()
+    expect(container.querySelectorAll('.portfolio-gateway__ground-shadow')).toHaveLength(1)
     expect(container.querySelectorAll('.portfolio-gateway__fallback-face')).toHaveLength(0)
     expect(
       container.querySelectorAll('[data-gateway-category="experience"]'),
-    ).toHaveLength(24)
+    ).toHaveLength(12)
     expect(
       container.querySelectorAll('[data-gateway-category="projects"]'),
-    ).toHaveLength(24)
+    ).toHaveLength(12)
     expect(
       container.querySelectorAll('[data-gateway-category="skills"]'),
-    ).toHaveLength(24)
+    ).toHaveLength(12)
     expect(
       container.querySelectorAll('[data-gateway-category="contact"]'),
-    ).toHaveLength(24)
+    ).toHaveLength(12)
   })
 
   it('cycles categories with buttons and arrow keys while wrapping', () => {

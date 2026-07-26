@@ -27,14 +27,8 @@ await page.goto(origin, { waitUntil: 'networkidle' })
 const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
 await gateway.evaluate((element) => element.scrollIntoView({ block: 'start' }))
 await page.mouse.move(100, 100)
-await page.waitForSelector('[data-atlas-webgl-activated]')
 await gateway.waitFor({ state: 'visible' })
-await page.waitForFunction(() => (
-  document
-    .querySelector('[aria-label="Portfolio category carousel"]')
-    ?.hasAttribute('data-canvas-ready')
-))
-await page.waitForTimeout(1_500)
+await page.waitForTimeout(500)
 
 const proportions = await gateway.evaluate((element) => {
   const union = (selector) => {
@@ -59,12 +53,15 @@ const proportions = await gateway.evaluate((element) => {
   const upper = union(
     '.portfolio-gateway__fallback-ring .portfolio-gateway__fallback-slice',
   )
-  const fallbackReflection = union(
-    '.portfolio-gateway__fallback-reflection-ring .portfolio-gateway__fallback-slice',
-  )
+  const shadow = element
+    .querySelector('.portfolio-gateway__ground-shadow')
+    ?.getBoundingClientRect()
+  if (!shadow) throw new Error('Missing gateway ground shadow')
   return {
-    fallbackGap: Number((fallbackReflection.top - upper.bottom).toFixed(1)),
-    fallbackReflectionHeight: Number(fallbackReflection.height.toFixed(1)),
+    canvasCount: element.querySelectorAll('.portfolio-gateway__canvas').length,
+    groundShadowHeight: Number(shadow.height.toFixed(1)),
+    groundShadowWidth: Number(shadow.width.toFixed(1)),
+    reflectionCount: element.querySelectorAll('.portfolio-gateway__fallback-reflection').length,
     upperHeight: Number(upper.height.toFixed(1)),
     upperWidth: Number(upper.width.toFixed(1)),
   }
@@ -83,6 +80,31 @@ for (const [index, state] of states.entries()) {
 }
 
 await context.close()
+
+const shadowlessContext = await browser.newContext({
+  colorScheme: 'light',
+  deviceScaleFactor: 1,
+  reducedMotion: 'no-preference',
+  viewport: { height: 651, width: 1007 },
+})
+const shadowlessPage = await shadowlessContext.newPage()
+await shadowlessPage.addInitScript(() => {
+  sessionStorage.setItem('atlas-preloader-entered', '1')
+  sessionStorage.setItem('atlas-entered', '1')
+})
+await shadowlessPage.goto(`${origin}/?ground-shadow=1#portfolio-gateway`, {
+  waitUntil: 'networkidle',
+})
+const shadowlessGateway = shadowlessPage.getByRole('region', {
+  name: 'Portfolio category carousel',
+})
+await shadowlessGateway.waitFor({ state: 'visible' })
+await shadowlessPage.mouse.move(510, 365)
+await shadowlessPage.waitForTimeout(500)
+await shadowlessPage.screenshot({
+  path: `${output}/carousel-ground-shadow.png`,
+})
+await shadowlessContext.close()
 
 const fallbackContext = await browser.newContext({
   colorScheme: 'light',
@@ -104,8 +126,19 @@ await fallbackPage.screenshot({
 const fallbackAudit = await fallbackPage.evaluate(() => ({
   activated: document.documentElement.hasAttribute('data-atlas-webgl-activated'),
   carouselCanvases: document.querySelectorAll('#portfolio-gateway canvas').length,
+  groundShadows: document.querySelectorAll(
+    '#portfolio-gateway .portfolio-gateway__ground-shadow',
+  ).length,
+  reflectionLayers: document.querySelectorAll(
+    '#portfolio-gateway .portfolio-gateway__fallback-reflection',
+  ).length,
 }))
-if (fallbackAudit.activated || fallbackAudit.carouselCanvases !== 0) {
+if (
+  fallbackAudit.activated
+  || fallbackAudit.carouselCanvases !== 0
+  || fallbackAudit.groundShadows !== 1
+  || fallbackAudit.reflectionLayers !== 0
+) {
   throw new Error(`Reduced-motion carousel is not static: ${JSON.stringify(fallbackAudit)}`)
 }
 
