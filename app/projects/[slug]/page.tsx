@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { AtlasNavigation } from '@/components/portfolio/AtlasNavigation'
 import { ProjectCaseStudy } from '@/components/portfolio/ProjectCaseStudy'
 import { siteContent } from '@/content/site-content'
 
@@ -46,24 +47,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <a className="skip-link" href="#project-case-study">
         Skip to case study
       </a>
-      <header className="site-header project-site-header">
-        <nav className="site-nav atlas-shell" aria-label="Project navigation">
-          <a className="nav-name" href="/">
-            <img
-              className="nav-name__mark"
-              src="/original-wing-filled.png"
-              alt=""
-              width="128"
-              height="128"
-              aria-hidden="true"
-            />
-            Brett Haas
-          </a>
-          <a className="project-back-link" href="/projects">
-            Back to projects
-          </a>
-        </nav>
-      </header>
+      <AtlasNavigation current="projects" />
       <main className="project-page" id="project-case-study">
         <ProjectCaseStudy project={project} projectIndex={projectIndex} />
         <nav className="project-page__footer atlas-shell" aria-label="More projects">

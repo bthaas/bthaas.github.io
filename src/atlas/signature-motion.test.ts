@@ -142,17 +142,19 @@ describe('Phase C signature motion', () => {
     expect(harness.timelines[0].kill).toHaveBeenCalledOnce()
   })
 
-  it('decodes wayfinding once and repeats nav labels on hover', () => {
+  it('decodes editorial labels without scrambling the persistent route index', () => {
     document.body.innerHTML = `
-      <nav class="nav-links"><a href="#craft">Skills</a></nav>
+      <nav><a class="atlas-route-link" href="/skills">
+        <span class="atlas-route-link__label">Skills</span>
+      </a></nav>
       <p class="eyebrow">03 / Skills</p>
       <p class="art-caption">Plate 03</p>
     `
     const harness = createSignatureHarness()
     const cleanup = setupScrambleWayfinding(document, harness.engine)
-    const nav = document.querySelector<HTMLAnchorElement>('.nav-links a')!
+    const nav = document.querySelector<HTMLElement>('.atlas-route-link__label')!
 
-    expect(nav).toHaveAttribute('aria-label', 'Skills')
+    expect(nav).not.toHaveAttribute('aria-label')
     expect(harness.triggers).toHaveLength(2)
     ;(harness.triggers[0].vars.onEnter as () => void)()
     expect(harness.to).toHaveBeenCalledWith(
@@ -162,8 +164,9 @@ describe('Phase C signature motion', () => {
         scrambleText: expect.objectContaining({ chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 /·' }),
       }),
     )
+    const decodeCount = harness.to.mock.calls.length
     nav.dispatchEvent(new MouseEvent('pointerenter'))
-    expect(harness.to).toHaveBeenCalledWith(nav, expect.objectContaining({ duration: 0.45 }))
+    expect(harness.to).toHaveBeenCalledTimes(decodeCount)
     cleanup()
   })
 

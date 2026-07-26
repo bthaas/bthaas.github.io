@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import postcss, { type Rule } from 'postcss'
+import postcss, { type AtRule, type Declaration, type Rule } from 'postcss'
 import { describe, expect, it } from 'vitest'
 
 const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/craft.css'), 'utf8')
@@ -48,6 +48,19 @@ describe('Skill Workbench presentation contract', () => {
     expect(stylesheet).toContain('@media (prefers-reduced-motion: reduce)')
     expect(stylesheet).toContain('.skill-workbench__fallback')
     expect(stylesheet).toContain('@media (max-width: 720px)')
+    let mobile: AtRule | undefined
+    postcss.parse(stylesheet).walkAtRules('media', (rule) => {
+      if (rule.params.includes('max-width: 720px')) mobile = rule
+    })
+    const mobileWorkbench = mobile?.nodes?.find(
+      (node): node is Rule => node.type === 'rule' && node.selector === '.skill-workbench',
+    )
+    const mobilePadding = mobileWorkbench?.nodes.find(
+      (node): node is Declaration => node.type === 'decl' && node.prop === 'padding',
+    )
+    expect(mobilePadding?.value.replace(/\s+/g, ' ')).toBe(
+      '1.2rem 0.85rem calc(1.35rem + 4.75rem + env(safe-area-inset-bottom))',
+    )
     expect(stylesheet).not.toContain('.skill-sphere')
   })
 })

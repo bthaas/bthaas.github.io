@@ -73,10 +73,9 @@ describe('contact choreography', () => {
     expect(() => getContactDetailRevealProgress(0.5, 6)).toThrow(RangeError)
   })
 
-  it('completes the glow only when both the finale and sun handshake complete', () => {
-    expect(getContactGlowProgress(0, 0.98)).toBe(0)
-    expect(getContactGlowProgress(1, 0.8)).toBe(0)
-    expect(getContactGlowProgress(1, 0.98)).toBe(1)
-    expect(getContactGlowProgress(0.5, 0.98)).toBe(0.5)
+  it('tracks the contact finale after the retired sun arc is removed', () => {
+    expect(getContactGlowProgress(0)).toBe(0)
+    expect(getContactGlowProgress(0.5)).toBe(0.5)
+    expect(getContactGlowProgress(1)).toBe(1)
   })
 })

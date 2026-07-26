@@ -826,7 +826,6 @@
   box-shadow: inset 0 0 0 1px rgb(216 239 75 / 16%);
 }
 
-.project-site-header .project-back-link,
 .project-page__footer a {
   font-size: 0.67rem;
   font-weight: 700;
@@ -835,12 +834,12 @@
 }
 
 .project-page {
-  min-height: calc(100svh - 58px);
+  min-height: 100svh;
   background: var(--cream);
 }
 
 .project-page-study {
-  min-height: calc(100svh - 58px);
+  min-height: 100svh;
 }
 
 .project-page__footer {
@@ -858,13 +857,10 @@
   gap: 0.6rem;
 }
 
-.project-back-link,
 .project-page__footer a {
   transition: opacity 220ms ease;
 }
 
-.project-back-link:hover,
-.project-back-link:focus-visible,
 .project-page__footer a:hover,
 .project-page__footer a:focus-visible {
   opacity: 0.58;
@@ -1340,6 +1336,7 @@ html.atlas-js .chapter-wipe__layer {
   }
 
   .project-page__footer {
+    padding-bottom: calc(7rem + env(safe-area-inset-bottom));
     align-items: flex-start;
     flex-direction: column;
   }

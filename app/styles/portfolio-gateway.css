@@ -1,13 +1,13 @@
 .portfolio-gateway {
   position: relative;
   z-index: 50;
-  height: calc(100svh - var(--site-header-height));
+  height: 100svh;
   min-height: 0;
   overflow: hidden;
   background: var(--paper);
   color: var(--ink);
   contain: layout paint style;
-  contain-intrinsic-size: auto calc(100svh - var(--site-header-height));
+  contain-intrinsic-size: auto 100svh;
   content-visibility: auto;
   isolation: isolate;
 }
@@ -361,7 +361,7 @@
 
 @media (max-width: 720px) {
   .portfolio-gateway {
-    height: calc(100svh - var(--site-header-height));
+    height: calc(100svh - 4.75rem - env(safe-area-inset-bottom));
     min-height: 0;
   }
 

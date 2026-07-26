@@ -201,38 +201,8 @@
   }
 
   html {
-    scroll-padding-top: 7rem;
-  }
-
-  .nav-links {
-    z-index: 4;
-    max-width: 74vw;
-    gap: 0.8rem;
-    overflow-x: auto;
-    padding: 0.5rem 0;
-    scrollbar-width: none;
-  }
-
-  .nav-links::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav-links a {
-    flex: 0 0 auto;
-    font-size: 0.58rem;
-  }
-
-  .nav-name {
-    display: none;
-  }
-
-  .sun-arc {
-    top: 27px;
-    right: 0;
-    left: auto;
-    width: 7rem;
-    height: 24px;
-    transform: none;
+    scroll-padding-top: 1rem;
+    scroll-padding-bottom: 5rem;
   }
 
   .editorial-grid,

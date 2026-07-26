@@ -26,10 +26,7 @@ describe('Portfolio', () => {
     expect(container.querySelector('[data-craft-ghost]')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Pick up the stack.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connect with me.' })).toBeInTheDocument()
-    expect(container.querySelector('.sun-badge__orbit .circular-text')).not.toBeInTheDocument()
-    expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
-      'Release the sun spectacle',
-    )
+    expect(container.querySelector('.sun-badge')).not.toBeInTheDocument()
 
     expect(container.querySelector('.kinetic-type-band')).not.toBeInTheDocument()
 
@@ -45,10 +42,12 @@ describe('Portfolio', () => {
     render(<Portfolio />)
 
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
-    const brandLink = within(navigation).getByRole('link', { name: 'Brett Haas' })
-    expect(brandLink).toHaveAttribute('href', '/')
-    expect(brandLink.querySelector('img')).toHaveAttribute('src', '/original-wing-filled.png')
-    expect(brandLink.querySelector('img')).toHaveAttribute('alt', '')
+    const homeLink = within(navigation).getByRole('link', { name: 'Home' })
+    expect(homeLink).toHaveAttribute('href', '/')
+    expect(homeLink).toHaveAttribute('aria-current', 'page')
+    expect(homeLink.querySelector('img')).toHaveAttribute('src', '/original-wing-filled.png')
+    expect(homeLink.querySelector('img')).toHaveAttribute('alt', '')
+    expect(within(navigation).queryByText('Brett Haas')).not.toBeInTheDocument()
     expect(within(navigation).getByRole('link', { name: 'Experience' })).toHaveAttribute(
       'href',
       '/experience',

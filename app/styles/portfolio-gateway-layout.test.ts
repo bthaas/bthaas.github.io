@@ -30,11 +30,11 @@ function declarationsFor(
 }
 
 describe('single-screen portfolio gateway layout', () => {
-  it('owns exactly the viewport space below the desktop header', () => {
+  it('owns the complete desktop viewport beneath the floating corners', () => {
     const stylesheet = readFileSync(gatewayStylesheetPath, 'utf8')
 
     expect(declarationsFor(stylesheet, '.portfolio-gateway')).toMatchObject({
-      height: 'calc(100svh - var(--site-header-height))',
+      height: '100svh',
       'min-height': '0',
       overflow: 'hidden',
     })
@@ -44,12 +44,12 @@ describe('single-screen portfolio gateway layout', () => {
     expect(declarationsFor(stylesheet, '.portfolio-gateway__fallback-ring').height).toBe('68%')
   })
 
-  it('keeps the mobile poster inside the shorter header-adjusted viewport', () => {
+  it('reserves the fixed bottom index on mobile', () => {
     const stylesheet = readFileSync(gatewayStylesheetPath, 'utf8')
     const media = '(max-width: 720px)'
 
     expect(declarationsFor(stylesheet, '.portfolio-gateway', media)).toMatchObject({
-      height: 'calc(100svh - var(--site-header-height))',
+      height: 'calc(100svh - 4.75rem - env(safe-area-inset-bottom))',
       'min-height': '0',
     })
     expect(declarationsFor(stylesheet, '.portfolio-gateway__word', media).top).toBe('28%')

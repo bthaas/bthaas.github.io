@@ -1,76 +1,95 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import postcss from 'postcss'
+import postcss, { type AtRule, type Root } from 'postcss'
 import { describe, expect, it } from 'vitest'
 
-describe('header brand mark', () => {
-  it('publishes exact desktop and mobile height tokens for viewport sections', () => {
-    const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/header.css'), 'utf8')
-    const root = postcss.parse(stylesheet)
-    const heights: string[] = []
-    const navHeights: string[] = []
+const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/header.css'), 'utf8')
+const root = postcss.parse(stylesheet)
 
-    root.walkRules(':root', (rule) => {
-      rule.walkDecls('--site-header-height', (declaration) => {
-        heights.push(declaration.value)
-      })
-    })
-    root.walkRules('.site-nav', (rule) => {
-      rule.walkDecls('min-height', (declaration) => {
-        navHeights.push(declaration.value)
-      })
-    })
-
-    expect(heights).toEqual(['59px', '55px'])
-    expect(navHeights).toEqual(['58px', '54px'])
-  })
-
-  it('renders the centered favicon one pixel larger than the approved size', () => {
-    const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/header.css'), 'utf8')
-    const root = postcss.parse(stylesheet)
-    let filter: string | undefined
-    let height: string | undefined
-    let transform: string | undefined
-    let width: string | undefined
-
-    root.walkRules('.nav-name__mark', (rule) => {
-      rule.walkDecls('filter', (declaration) => {
-        filter = declaration.value
-      })
-      rule.walkDecls('height', (declaration) => {
-        height = declaration.value
-      })
-      rule.walkDecls('transform', (declaration) => {
-        transform = declaration.value
-      })
-      rule.walkDecls('width', (declaration) => {
-        width = declaration.value
-      })
-    })
-
-    expect(filter).toBeUndefined()
-    expect({ height, transform, width }).toEqual({
-      height: 'calc(1.4rem + 1px)',
-      transform: undefined,
-      width: 'calc(1.4rem + 1px)',
+function declarations(source: Root | AtRule, selector: string) {
+  const values: Record<string, string> = {}
+  source.walkRules(selector, (rule) => {
+    if (rule.parent !== source) return
+    rule.walkDecls((declaration) => {
+      values[declaration.prop] = declaration.value
     })
   })
+  return values
+}
 
-  it('keeps mobile navigation links above the animated sun control', () => {
-    const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/motion.css'), 'utf8')
-    const root = postcss.parse(stylesheet)
-    let mobileNavZIndex: string | undefined
+describe('Atlas Corners navigation', () => {
+  it('floats the home mark and route index without a persistent top bar', () => {
+    expect(declarations(root, '.site-header')).toMatchObject({
+      position: 'fixed',
+      'pointer-events': 'none',
+    })
+    expect(declarations(root, '.atlas-home-link')).toMatchObject({
+      position: 'fixed',
+      'min-height': '44px',
+      'min-width': '44px',
+    })
+    expect(declarations(root, '.atlas-route-index')).toMatchObject({
+      position: 'fixed',
+      'list-style': 'none',
+    })
+    expect(declarations(root, '.site-header[data-current="home"] .atlas-route-index')).toMatchObject({
+      top: 'auto',
+      bottom: 'clamp(7rem, 14vh, 9rem)',
+    })
+    expect(declarations(root, '.site-header[data-current="skills"] .atlas-route-index')).toMatchObject({
+      'grid-template-columns': 'repeat(4, max-content)',
+      'min-width': '0',
+    })
+    expect(declarations(root, '.site-header[data-current="skills"] .atlas-route-link')).toMatchObject({
+      'grid-template-columns': 'max-content max-content',
+    })
+    expect(stylesheet).not.toContain('.nav-name')
+    expect(stylesheet).not.toContain('.nav-links')
+    expect(stylesheet).not.toContain('.sun-arc')
+  })
 
-    root.walkAtRules('media', (atRule) => {
-      if (!atRule.params.includes('max-width: 720px')) return
-      atRule.walkRules('.nav-links', (rule) => {
-        rule.walkDecls('z-index', (declaration) => {
-          mobileNavZIndex = declaration.value
-        })
-      })
+  it('uses a one-pixel solar marker for the current route', () => {
+    expect(declarations(root, '.atlas-route-link[aria-current]::before')).toMatchObject({
+      background: 'var(--solar)',
+      opacity: '1',
+    })
+  })
+
+  it('becomes a five-destination bottom index at phone width', () => {
+    let mobile: AtRule | undefined
+    root.walkAtRules('media', (rule) => {
+      if (rule.params.includes('max-width: 720px')) mobile = rule
     })
 
-    expect(mobileNavZIndex).toBe('4')
+    expect(mobile).toBeDefined()
+    expect(declarations(mobile as AtRule, '.site-nav')).toMatchObject({
+      display: 'grid',
+      'grid-template-columns': '44px minmax(0, 1fr)',
+    })
+    expect(declarations(mobile as AtRule, '.atlas-home-link')).toMatchObject({
+      position: 'relative',
+    })
+    expect(declarations(mobile as AtRule, '.atlas-route-index')).toMatchObject({
+      position: 'relative',
+      display: 'grid',
+      'grid-template-columns': 'repeat(4, minmax(0, 1fr))',
+    })
+    expect(
+      declarations(
+        mobile as AtRule,
+        '.site-header[data-current="home"] .atlas-route-index',
+      ),
+    ).toMatchObject({
+      bottom: 'auto',
+    })
+    expect(
+      declarations(
+        mobile as AtRule,
+        '.site-header[data-current="skills"] .atlas-route-index',
+      ),
+    ).toMatchObject({
+      'grid-template-columns': 'repeat(4, minmax(0, 1fr))',
+    })
   })
 })

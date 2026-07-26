@@ -40,8 +40,20 @@ await page.waitForTimeout(800)
 await page.screenshot({ path: `${submission}/01-hero-liquid-1600x1200.png` })
 await page.screenshot({ path: `${step}/hero-liquid-production-1600.png` })
 
-const sun = page.locator('[data-atlas-sun-trigger]')
-for (let click = 0; click < 5; click += 1) await sun.click()
+for (const key of [
+  'ArrowUp',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowRight',
+  'b',
+  'a',
+]) {
+  await page.keyboard.press(key)
+}
 await page.waitForFunction(() => document.documentElement.hasAttribute('data-atlas-spectacle-start'))
 await page.locator('#experience').scrollIntoViewIfNeeded()
 await page.waitForTimeout(620)
