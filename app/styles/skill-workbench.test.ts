@@ -45,6 +45,16 @@ describe('Skill Workbench presentation contract', () => {
     })
   })
 
+  it('does not reserve header space for a tool-count readout', () => {
+    expect(stylesheet).not.toContain('.skill-workbench__meta')
+    expect(declarationsFor('.skill-workbench__status')).toMatchObject({
+      position: 'absolute',
+      width: '1px',
+      height: '1px',
+      overflow: 'hidden',
+    })
+  })
+
   it('keeps the actively dragged rigid body above the rest of the pile', () => {
     expect(
       declarationsFor('.skill-workbench__item[data-dragging="true"]'),

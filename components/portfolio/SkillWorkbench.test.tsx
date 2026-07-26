@@ -91,24 +91,32 @@ describe('SkillWorkbench', () => {
 
   })
 
-  it('starts stuck, drops automatically, and offers a persistent stick/drop control', () => {
+  it('starts stuck and offers the controls without a tool-count readout', () => {
     vi.useFakeTimers()
     vi.stubGlobal('requestAnimationFrame', vi.fn(() => 1))
     vi.stubGlobal('cancelAnimationFrame', vi.fn())
 
     render(<SkillWorkbench logos={logos} />)
     const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
+    const status = within(workbench).getByRole('status')
 
     expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    expect(within(workbench).queryByText('tools · held')).not.toBeInTheDocument()
+    expect(within(workbench).queryByText(String(logos.length))).not.toBeInTheDocument()
+    expect(status).toHaveClass('skill-workbench__status')
+    expect(status).toHaveTextContent('Skills fixed in their starting positions.')
     expect(screen.getByRole('button', { name: 'Drop skills' })).toBeVisible()
 
     act(() => vi.advanceTimersByTime(1_000))
 
     expect(workbench).toHaveAttribute('data-physics', 'dropped')
+    expect(within(workbench).queryByText('tools · colliding')).not.toBeInTheDocument()
+    expect(status).toHaveTextContent('Skills released; drag, toss, or use arrow keys.')
     expect(screen.getByRole('button', { name: 'Stick skills' })).toBeVisible()
 
     fireEvent.click(screen.getByRole('button', { name: 'Stick skills' }))
     expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    expect(status).toHaveTextContent('Skills fixed in their starting positions.')
     expect(screen.getByRole('button', { name: 'Drop skills' })).toBeVisible()
 
     fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
