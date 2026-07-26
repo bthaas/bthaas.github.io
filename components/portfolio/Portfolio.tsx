@@ -296,10 +296,6 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
               <p className="eyebrow">02 / Field studies</p>
               <h2 id="projects-title">Projects</h2>
             </div>
-            <p>
-              Three builds across computer vision, real-time collaboration, and language-model
-              research. Follow the spiral and choose a project to open its complete case study.
-            </p>
           </div>
 
           <ProjectsSpiral projects={projects} />

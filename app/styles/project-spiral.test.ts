@@ -18,10 +18,20 @@ describe('project spiral styles', () => {
   it('keeps the 3D stage responsive while preserving the reduced-motion fallback', () => {
     expect(css).toContain('@media (max-width: 767px)')
     expect(css).toContain('@media (prefers-reduced-motion: reduce)')
-    expect(css).toContain('.project-spiral__fallback')
+    expect(css).toContain('.project-spiral__projects')
     const mobileRules = css.split('@media (max-width: 767px)')[1]
       ?.split('@media (prefers-reduced-motion: reduce)')[0]
     expect(mobileRules).not.toContain('.project-spiral__stage')
-    expect(mobileRules).toContain('.project-spiral__index')
+    expect(mobileRules).toContain('.project-spiral__view-toggle')
+    expect(mobileRules).toContain('.project-spiral__projects')
+  })
+
+  it('styles a visible view toggle and two layouts for the same project list', () => {
+    expect(css).toContain('.project-spiral__view-toggle')
+    expect(css).toContain('.project-spiral__projects')
+    expect(css).toContain('[data-project-view="spiral"]')
+    expect(css).toContain('[data-project-view="index"]')
+    expect(css).toContain('grid-template-columns')
+    expect(css).toContain('.project-spiral__technologies')
   })
 })
