@@ -277,7 +277,12 @@ test('opens every carousel category as its own routed screen', async ({
 
     const face = page.getByRole('link', { name: `Open ${label} screen` })
     await expect(face).toHaveAttribute('href', route)
+    await expect(page.locator('[data-page-transition-ribbon]')).toHaveCount(12)
     await face.click()
+    await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-category',
+      label.toLowerCase(),
+    )
     await expect(page).toHaveURL(new RegExp(`${route}/?$`), { timeout: 15_000 })
     await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', screenName)
     await expect(page.locator('main > section')).toHaveCount(1)

@@ -1,4 +1,5 @@
 .page-transition {
+  --page-transition-accent: #d4af37;
   position: fixed;
   z-index: 20000;
   inset: 0;
@@ -6,6 +7,22 @@
   overflow: hidden;
   pointer-events: none;
   visibility: hidden;
+}
+
+.page-transition[data-transition-category='experience'] {
+  --page-transition-accent: #f4775f;
+}
+
+.page-transition[data-transition-category='projects'] {
+  --page-transition-accent: #2f67c8;
+}
+
+.page-transition[data-transition-category='skills'] {
+  --page-transition-accent: #d8ef4b;
+}
+
+.page-transition[data-transition-category='contact'] {
+  --page-transition-accent: #e2b83d;
 }
 
 .page-transition[data-transition-state='exiting'],
@@ -39,16 +56,20 @@
     0 0 0 1px rgb(255 252 243 / 16%),
     0 2rem 7rem rgb(10 11 8 / 36%);
   opacity: 0;
+  perspective: 1100px;
   transform-origin: center;
 }
 
 .page-transition__portal-image,
+.page-transition__portal-aperture,
+.page-transition__portal-ribbons,
 .page-transition__portal-facets {
   position: absolute;
   inset: -1px;
 }
 
 .page-transition__portal-image {
+  z-index: 0;
   background-color: #292721;
   background-image:
     linear-gradient(180deg, rgb(255 255 255 / 10%), rgb(14 15 12 / 12%)),
@@ -59,7 +80,63 @@
   transform-origin: center;
 }
 
+.page-transition__portal-aperture {
+  z-index: 1;
+  background:
+    radial-gradient(
+      circle at center,
+      rgb(5 6 5 / 98%) 0 8%,
+      rgb(12 13 11 / 88%) 24%,
+      color-mix(in srgb, var(--page-transition-accent) 22%, transparent) 42%,
+      transparent 69%
+    );
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.24);
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
+.page-transition__portal-ribbons {
+  z-index: 2;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.page-transition__portal-ribbon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--page-transition-ribbon-index) * 100% / 12);
+  display: block;
+  width: calc(100% / 12 + 2px);
+  background-image:
+    linear-gradient(
+      90deg,
+      rgb(255 255 255 / 13%),
+      transparent 24% 72%,
+      rgb(5 6 5 / 32%)
+    ),
+    var(--page-transition-image);
+  background-position:
+    center,
+    var(--page-transition-ribbon-position) center;
+  background-repeat: no-repeat;
+  background-size:
+    100% 100%,
+    1200% 100%;
+  box-shadow:
+    inset 1px 0 rgb(255 255 255 / 18%),
+    inset -2px 0 color-mix(in srgb, var(--page-transition-accent) 62%, transparent);
+  backface-visibility: hidden;
+  filter: brightness(1.04);
+  transform-origin: center;
+  transform-style: preserve-3d;
+  will-change: opacity, transform;
+}
+
 .page-transition__portal-facets {
+  z-index: 3;
   background-image: repeating-linear-gradient(
     90deg,
     rgb(255 255 255 / 13%) 0,
@@ -74,6 +151,7 @@
 
 .page-transition__portal-label {
   position: absolute;
+  z-index: 4;
   top: 50%;
   left: 50%;
   color: rgb(255 252 243 / 94%);
@@ -87,6 +165,19 @@
   transform: translate(-50%, -50%);
   -webkit-text-stroke: 0.75px rgb(18 19 16 / 34%);
   white-space: nowrap;
+  will-change: opacity, transform;
+}
+
+@media (max-width: 720px) {
+  .page-transition__portal {
+    perspective: 850px;
+  }
+
+  .page-transition__portal-ribbon {
+    box-shadow:
+      inset 1px 0 rgb(255 255 255 / 9%),
+      inset -1px 0 color-mix(in srgb, var(--page-transition-accent) 28%, transparent);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

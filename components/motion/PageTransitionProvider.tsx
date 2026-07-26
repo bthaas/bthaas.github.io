@@ -52,6 +52,25 @@ type BeginPageTransition = (options: BeginPageTransitionOptions) => void
 
 const PageTransitionContext = createContext<BeginPageTransition | null>(null)
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+const UNSPOOL_RIBBON_COUNT = 12
+const UNSPOOL_RIBBONS = Array.from(
+  { length: UNSPOOL_RIBBON_COUNT },
+  (_, index) => index,
+)
+
+function getRibbonCenterDistance(index: number) {
+  const center = (UNSPOOL_RIBBON_COUNT - 1) / 2
+  return Math.abs(index - center) / center
+}
+
+function getRibbonDirection(index: number) {
+  return index < UNSPOOL_RIBBON_COUNT / 2 ? -1 : 1
+}
+
+function getTransitionCategory(request: PageTransitionRequest | null) {
+  if (request?.kind !== 'portal' || !request.label) return undefined
+  return request.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+}
 
 function pathsMatch(left: string, right: string) {
   const normalize = (value: string) => {
@@ -84,8 +103,11 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
   const router = useRouter()
   const overlayRef = useRef<HTMLDivElement>(null)
   const portalRef = useRef<HTMLDivElement>(null)
+  const portalApertureRef = useRef<HTMLDivElement>(null)
   const portalImageRef = useRef<HTMLDivElement>(null)
   const portalFacetsRef = useRef<HTMLSpanElement>(null)
+  const portalLabelRef = useRef<HTMLSpanElement>(null)
+  const portalRibbonsRef = useRef<HTMLDivElement>(null)
   const veilRef = useRef<HTMLDivElement>(null)
   const exitStartedForRef = useRef<PageTransitionRequest | null>(null)
   const lockedRef = useRef(false)
@@ -144,10 +166,22 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
 
     const overlay = overlayRef.current
     const portal = portalRef.current
+    const portalAperture = portalApertureRef.current
     const portalImage = portalImageRef.current
     const portalFacets = portalFacetsRef.current
+    const portalLabel = portalLabelRef.current
+    const portalRibbons = portalRibbonsRef.current
     const veil = veilRef.current
-    if (!overlay || !portal || !portalImage || !portalFacets || !veil) return
+    if (
+      !overlay
+      || !portal
+      || !portalAperture
+      || !portalImage
+      || !portalFacets
+      || !portalLabel
+      || !portalRibbons
+      || !veil
+    ) return
 
     document.documentElement.setAttribute('data-page-transition', 'exiting')
     document.documentElement.setAttribute('data-page-transition-kind', request.kind)
@@ -168,6 +202,9 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
       const gatewayArtwork = document.querySelector<HTMLElement>(
         '.portfolio-gateway__fallback',
       )
+      const ribbons = Array.from(portalRibbons.querySelectorAll<HTMLElement>(
+        '[data-page-transition-ribbon]',
+      ))
 
       gsap.set(veil, { opacity: 0 })
       gsap.set(portal, {
@@ -179,8 +216,26 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
         top: bounds.top,
         width: bounds.width,
       })
-      gsap.set(portalImage, { scale: 1 })
+      gsap.set(portalImage, {
+        filter: 'brightness(1) saturate(1)',
+        opacity: 1,
+        scale: 1,
+      })
+      gsap.set(portalAperture, { opacity: 0, scale: 0.24 })
       gsap.set(portalFacets, { backgroundSize: '8.333% 100%', opacity: 0.68 })
+      gsap.set(portalLabel, { opacity: 1, scale: 1, y: 0 })
+      gsap.set(portalRibbons, { opacity: 1 })
+      gsap.set(ribbons, {
+        opacity: 1,
+        rotateX: 0,
+        rotateY: 0,
+        rotateZ: 0,
+        scaleX: 1.015,
+        scaleY: 1,
+        xPercent: 0,
+        yPercent: 0,
+        z: 0,
+      })
 
       const timeline = gsap.timeline({
         defaults: { ease: 'power4.inOut' },
@@ -188,19 +243,20 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
       })
       timeline
         .to(gatewayDetails, {
-          duration: 0.34,
+          duration: 0.28,
           opacity: 0,
           stagger: 0.035,
           y: -24,
         }, 0)
         .to(gatewayArtwork, {
-          duration: 0.62,
-          opacity: 0.24,
-          scale: 1.12,
+          duration: 0.48,
+          opacity: 0.18,
+          scale: 1.08,
         }, 0)
         .to(portal, {
           borderRadius: 0,
-          duration: 0.76,
+          duration: 0.48,
+          ease: 'power3.inOut',
           height: window.innerHeight,
           left: 0,
           scale: 1,
@@ -208,14 +264,45 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
           width: window.innerWidth,
         }, 0)
         .to(portalImage, {
-          duration: 0.76,
-          scale: 1.09,
+          duration: 0.72,
+          ease: 'power2.inOut',
+          filter: 'brightness(0.52) saturate(0.82)',
+          opacity: 0.24,
+          scale: 1.22,
         }, 0)
         .to(portalFacets, {
-          backgroundSize: '18% 100%',
-          duration: 0.62,
-          opacity: 0.12,
-        }, 0.08)
+          duration: 0.34,
+          opacity: 0,
+        }, 0.06)
+        .to(portalLabel, {
+          duration: 0.3,
+          ease: 'power3.in',
+          opacity: 0,
+          scale: 0.9,
+          y: -18,
+        }, 0.04)
+        .to(portalAperture, {
+          duration: 0.68,
+          ease: 'power2.inOut',
+          opacity: 0.86,
+          scale: 1.18,
+        }, 0.16)
+        .to(ribbons, {
+          duration: 0.72,
+          ease: 'power3.inOut',
+          rotateY: (index: number) => (
+            getRibbonDirection(index) * (22 + getRibbonCenterDistance(index) * 30)
+          ),
+          rotateZ: (index: number) => (
+            getRibbonDirection(index) * (1.5 + getRibbonCenterDistance(index) * 4)
+          ),
+          scaleY: 1.06,
+          stagger: { amount: 0.16, from: 'center' },
+          xPercent: (index: number) => (
+            getRibbonDirection(index) * (62 + getRibbonCenterDistance(index) * 94)
+          ),
+          z: (index: number) => 360 + (1 - getRibbonCenterDistance(index)) * 440,
+        }, 0.12)
 
       return () => {
         timeline.kill()
@@ -251,10 +338,20 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
     const activeRequest = requestRef.current
     const overlay = overlayRef.current
     const portal = portalRef.current
+    const portalAperture = portalApertureRef.current
     const portalImage = portalImageRef.current
     const portalFacets = portalFacetsRef.current
+    const portalRibbons = portalRibbonsRef.current
     const veil = veilRef.current
-    if (!overlay || !portal || !portalImage || !portalFacets || !veil) {
+    if (
+      !overlay
+      || !portal
+      || !portalAperture
+      || !portalImage
+      || !portalFacets
+      || !portalRibbons
+      || !veil
+    ) {
       finishTransition()
       return
     }
@@ -276,30 +373,56 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
 
     const main = document.querySelector<HTMLElement>('main')
     if (arrivalRequest.kind === 'portal') {
+      const ribbons = Array.from(portalRibbons.querySelectorAll<HTMLElement>(
+        '[data-page-transition-ribbon]',
+      ))
       const timeline = gsap.timeline({
         defaults: { ease: 'power3.out' },
         onComplete: finishTransition,
       })
       timeline
-        .to(portalFacets, { duration: 0.26, opacity: 0 }, 0)
-        .to(portal, {
-          duration: 0.46,
+        .to(ribbons, {
+          duration: 0.5,
           ease: 'power3.in',
           opacity: 0,
-          scale: 1.12,
+          rotateY: (index: number) => getRibbonDirection(index) * 82,
+          stagger: { amount: 0.1, from: 'center' },
+          xPercent: (index: number) => (
+            getRibbonDirection(index) * (180 + getRibbonCenterDistance(index) * 110)
+          ),
+          z: (index: number) => 920 + (1 - getRibbonCenterDistance(index)) * 480,
         }, 0)
+        .to(portalAperture, {
+          duration: 0.42,
+          ease: 'power2.in',
+          opacity: 0,
+          scale: 1.9,
+        }, 0)
+        .to(portalFacets, { duration: 0.2, opacity: 0 }, 0)
+        .to(portalImage, {
+          duration: 0.48,
+          ease: 'power3.in',
+          filter: 'blur(9px) brightness(0.78)',
+          opacity: 0,
+          scale: 1.46,
+        }, 0)
+        .to(portal, {
+          duration: 0.54,
+          opacity: 0,
+        }, 0.08)
       if (main) {
         timeline.fromTo(main, {
-          opacity: 0.72,
-          scale: 0.945,
-          y: 24,
+          filter: 'blur(10px)',
+          opacity: 0.55,
+          scale: 0.91,
+          y: 30,
         }, {
-          clearProps: 'opacity,transform',
-          duration: 0.54,
+          clearProps: 'filter,opacity,transform',
+          duration: 0.62,
           opacity: 1,
           scale: 1,
           y: 0,
-        }, 0.08)
+        }, 0.04)
       }
 
       return () => {
@@ -346,6 +469,7 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
         aria-hidden="true"
         className="page-transition"
         data-testid="page-transition-overlay"
+        data-transition-category={getTransitionCategory(request)}
         data-transition-kind={request?.kind ?? 'standard'}
         data-transition-state={transitionState}
         ref={overlayRef}
@@ -354,8 +478,28 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
         <div className="page-transition__veil" ref={veilRef} />
         <div className="page-transition__portal" ref={portalRef}>
           <div className="page-transition__portal-image" ref={portalImageRef} />
+          <div className="page-transition__portal-aperture" ref={portalApertureRef} />
+          <div className="page-transition__portal-ribbons" ref={portalRibbonsRef}>
+            {UNSPOOL_RIBBONS.map((index) => {
+              const position = `${(index / (UNSPOOL_RIBBON_COUNT - 1)) * 100}%`
+              const style = {
+                '--page-transition-ribbon-index': index,
+                '--page-transition-ribbon-position': position,
+              } as CSSProperties
+
+              return (
+                <span
+                  className="page-transition__portal-ribbon"
+                  data-page-transition-ribbon
+                  data-testid="page-transition-ribbon"
+                  key={index}
+                  style={style}
+                />
+              )
+            })}
+          </div>
           <span className="page-transition__portal-facets" ref={portalFacetsRef} />
-          <span className="page-transition__portal-label">
+          <span className="page-transition__portal-label" ref={portalLabelRef}>
             {request?.kind === 'portal' ? request.label : null}
           </span>
         </div>
