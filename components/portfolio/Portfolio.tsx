@@ -92,15 +92,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
 
         {(!screen || screen === 'projects') && (
           <section className="projects-section" id="projects" aria-labelledby="projects-title">
-          <div className="atlas-shell projects-intro editorial-grid">
-            <div className="section-heading">
-              <p className="eyebrow">02 / Field studies</p>
-              <h2 id="projects-title">Projects</h2>
-            </div>
-          </div>
-
-          <ProjectsSpiral projects={projects} />
-
+            <ProjectsSpiral projects={projects} />
           </section>
         )}
 
