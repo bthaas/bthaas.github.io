@@ -27,37 +27,46 @@ function declarationsFor(
   return declarations
 }
 
-describe('Experience flight path', () => {
-  it('keeps the experience chapters readable by default and horizontal only when enhanced', () => {
+describe('Experience timeline', () => {
+  it('lays every career stop out as one clean editorial ledger', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
 
-    expect(declarationsFor(experienceStyles, '.experience-flight__chapters')).toMatchObject({
+    expect(declarationsFor(experienceStyles, '.experience-timeline__list')).toMatchObject({
       display: 'grid',
-      gap: '1rem',
+      position: 'relative',
     })
     expect(declarationsFor(
       experienceStyles,
-      '[data-experience-flight-enhanced] .experience-flight__chapters',
+      '.experience-timeline__stop-header',
       '(min-width: 960px)',
     )).toMatchObject({
-      display: 'flex',
-      width: 'max-content',
+      display: 'grid',
+      'grid-template-columns': '4rem minmax(16rem, 1.25fr) minmax(13rem, 0.8fr) minmax(10rem, 0.65fr) auto',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__stop details:not([open]) > .experience-timeline__details',
+    )).toMatchObject({
+      display: 'none',
     })
   })
 
-  it('keeps experience in normal document flow on narrow screens', () => {
-    const mediaQuery = '(max-width: 720px)'
+  it('uses an intentional stacked route at 390px', () => {
+    const mediaQuery = '(max-width: 640px)'
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
 
-    expect(declarationsFor(experienceStyles, '.experience-flight__viewport')).toMatchObject({
-      position: 'relative',
-      width: 'var(--shell)',
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__stop-header',
+      mediaQuery,
+    )).toMatchObject({
+      'grid-template-columns': '3rem minmax(0, 1fr) auto',
     })
   })
 })

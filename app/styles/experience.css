@@ -1,265 +1,431 @@
 .experience-section {
-  --experience-coral: #ff725c;
-  --experience-gold: #f4bf35;
-  --experience-ink: #121221;
-  --experience-rule: rgb(255 253 245 / 20%);
-  --experience-surface: #19192b;
+  --experience-coral: #ff7b63;
+  --experience-gold: #f4c84a;
+  --experience-rule: rgb(255 253 245 / 18%);
+  --experience-rule-strong: rgb(255 253 245 / 34%);
+  --experience-surface: #171727;
   overflow: clip;
   background: var(--experience-surface);
   color: var(--paper);
 }
 
-.experience-flight {
+.experience-timeline {
   position: relative;
+  min-height: calc(100svh - 58px);
+  padding-bottom: clamp(4rem, 8vw, 8rem);
   isolation: isolate;
 }
 
-.experience-flight__stage {
-  position: relative;
-  min-height: 100svh;
-  overflow: clip;
-  padding-bottom: clamp(4rem, 9vw, 8rem);
-}
-
-.experience-flight__atmosphere {
+.experience-timeline__atmosphere {
   position: absolute;
   z-index: -2;
   inset: 0 0 auto;
-  height: min(42rem, 82svh);
+  height: min(48rem, 92svh);
   overflow: hidden;
   pointer-events: none;
 }
 
-.experience-flight__art,
-.experience-flight__art img {
+.experience-timeline__art,
+.experience-timeline__art img {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.experience-flight__art img {
+.experience-timeline__art img {
   object-fit: cover;
-  object-position: 62% 54%;
-  filter: saturate(0.72) contrast(1.04);
+  object-position: 66% 54%;
+  filter: saturate(0.62) contrast(1.05);
+  transform: scale(1.015);
 }
 
-.experience-flight__shade,
-.experience-flight__haze {
+.experience-timeline__shade,
+.experience-timeline__glow {
   position: absolute;
   inset: 0;
 }
 
-.experience-flight__shade {
+.experience-timeline__shade {
   background:
-    linear-gradient(180deg, rgb(16 16 29 / 42%), rgb(16 16 29 / 74%) 58%, var(--experience-surface)),
-    linear-gradient(90deg, rgb(16 16 29 / 76%), transparent 65%);
+    linear-gradient(
+      180deg,
+      rgb(18 18 33 / 48%),
+      rgb(18 18 33 / 82%) 65%,
+      var(--experience-surface) 96%
+    ),
+    linear-gradient(90deg, rgb(18 18 33 / 88%), rgb(18 18 33 / 28%) 72%);
 }
 
-.experience-flight__haze {
+.experience-timeline__glow {
   background:
-    radial-gradient(circle at 82% 28%, rgb(244 191 53 / 16%), transparent 24%),
-    linear-gradient(180deg, transparent 55%, var(--experience-surface));
+    radial-gradient(circle at 82% 22%, rgb(244 200 74 / 18%), transparent 23%),
+    radial-gradient(circle at 8% 42%, rgb(255 123 99 / 9%), transparent 24%);
   mix-blend-mode: screen;
-  opacity: 0.6;
 }
 
-.experience-flight__intro {
-  position: relative;
-  z-index: 2;
+.experience-timeline__intro {
   display: grid;
-  padding-top: clamp(3rem, 9vw, 6rem);
-  padding-bottom: 2.25rem;
-  gap: 1.5rem;
+  padding-top: clamp(4rem, 8vw, 7.5rem);
+  padding-bottom: clamp(3rem, 6vw, 5.5rem);
+  gap: 2rem;
 }
 
-.experience-flight__intro .eyebrow {
-  margin-bottom: 0.75rem;
+.experience-timeline__intro .eyebrow {
+  margin-bottom: 0.8rem;
   color: var(--experience-coral);
 }
 
-.experience-flight__intro h2 {
+.experience-timeline__intro h2 {
   margin: 0;
   color: var(--paper);
   font-family: var(--serif);
-  font-size: clamp(4.25rem, 19vw, 7rem);
+  font-size: clamp(4.8rem, 17vw, 8rem);
   font-weight: 500;
   letter-spacing: -0.075em;
-  line-height: 0.8;
+  line-height: 0.78;
 }
 
-.experience-flight__intro > p {
-  max-width: 33rem;
+.experience-timeline__intro-copy {
+  max-width: 34rem;
+}
+
+.experience-timeline__intro-copy p {
   margin: 0;
-  color: rgb(255 253 245 / 72%);
+  color: rgb(255 253 245 / 78%);
   font-family: var(--serif);
-  font-size: clamp(1.05rem, 4.4vw, 1.35rem);
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
   line-height: 1.42;
 }
 
-.experience-flight__route {
-  position: relative;
-  z-index: 3;
-  display: none;
+.experience-timeline__intro-copy p + p {
+  margin-top: 1rem;
+  color: rgb(255 253 245 / 46%);
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.09em;
+  line-height: 1.5;
+  text-transform: uppercase;
 }
 
-.experience-flight__viewport {
+.experience-timeline__ledger {
   position: relative;
-  z-index: 2;
-  width: var(--shell);
-  margin-inline: auto;
 }
 
-.experience-flight__chapters,
-.experience-flight__highlights,
-.experience-flight__technologies,
-.experience-flight__coursework,
-.experience-flight__route-items {
+.experience-timeline__range {
+  display: grid;
+  padding-bottom: 1rem;
+  align-items: center;
+  color: rgb(255 253 245 / 48%);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  grid-template-columns: auto minmax(2rem, 1fr) auto;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.experience-timeline__range > span:nth-child(2) {
+  display: flex;
+  margin-inline: 1rem;
+  align-items: center;
+}
+
+.experience-timeline__range i {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--experience-coral),
+      var(--experience-gold)
+    );
+}
+
+.experience-timeline__list,
+.experience-timeline__highlights,
+.experience-timeline__tags {
   padding: 0;
   margin: 0;
   list-style: none;
 }
 
-.experience-flight__chapters {
-  display: grid;
-  gap: 1rem;
-}
-
-.experience-flight__chapter {
+.experience-timeline__list {
   position: relative;
-  scroll-margin-top: 5rem;
-  overflow: hidden;
-  padding: clamp(1.2rem, 5vw, 2rem);
-  border: 1px solid var(--experience-rule);
-  border-radius: 0.9rem;
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 7%), transparent 48%),
-    rgb(14 14 27 / 88%);
-  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 20%);
+  display: grid;
+  border-bottom: 1px solid var(--experience-rule);
 }
 
-.experience-flight__chapter::before {
+.experience-timeline__list::before {
   position: absolute;
   top: 0;
-  right: 0;
-  left: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--experience-coral), transparent 72%);
+  bottom: 0;
+  left: 1.45rem;
+  width: 1px;
+  background: linear-gradient(
+    var(--experience-coral),
+    var(--experience-gold) 72%,
+    rgb(255 253 245 / 24%)
+  );
   content: '';
 }
 
-.experience-flight__chapter-heading {
-  display: grid;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--experience-rule);
-  grid-template-columns: 2.75rem 1fr auto;
-  gap: 0.75rem;
+.experience-timeline__stop {
+  position: relative;
+  border-top: 1px solid var(--experience-rule);
+  background: rgb(12 12 23 / 22%);
+  transition: background-color 220ms ease;
 }
 
-.experience-flight__chapter-heading img,
-.experience-flight__chapter-mark {
+.experience-timeline__stop:has(details[open]) {
+  background: rgb(11 11 22 / 78%);
+}
+
+.experience-timeline__stop article {
+  position: relative;
+}
+
+.experience-timeline__stop-header {
+  display: grid;
+  min-width: 0;
+  padding: 1.15rem 0;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.8rem 1rem;
+  list-style: none;
+}
+
+.experience-timeline__stop-header::-webkit-details-marker {
+  display: none;
+}
+
+.experience-timeline__node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 2.9rem;
+  height: 3.7rem;
+  align-content: space-between;
+  justify-items: center;
+}
+
+.experience-timeline__node > span {
+  color: var(--experience-coral);
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.12em;
+}
+
+.experience-timeline__node img,
+.experience-timeline__node-mark {
   width: 2.5rem;
   height: 2.5rem;
-  border: 1px solid rgb(255 253 245 / 16%);
+  padding: 0.35rem;
+  border: 1px solid rgb(255 253 245 / 24%);
   border-radius: 50%;
-  background: rgb(255 253 245 / 90%);
-}
-
-.experience-flight__chapter-heading img {
+  background: rgb(255 253 245 / 92%);
+  box-shadow: 0 0 0 0.35rem var(--experience-surface);
   object-fit: contain;
-  padding: 0.32rem;
 }
 
-.experience-flight__chapter-mark {
+.experience-timeline__node-mark {
   display: block;
   background:
     radial-gradient(circle, var(--experience-coral) 0 0.22rem, transparent 0.24rem),
-    rgb(255 253 245 / 8%);
+    rgb(255 253 245 / 9%);
 }
 
-.experience-flight__chapter-heading > p:first-of-type {
-  margin: 0;
+.experience-timeline__identity {
+  min-width: 0;
+}
+
+.experience-timeline__identity > span:first-child {
+  display: block;
+  margin: 0 0 0.32rem;
   color: var(--experience-coral);
   font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  line-height: 2.5rem;
-}
-
-.experience-flight__chapter-heading > div {
-  grid-row: 2;
-  grid-column: 1 / -1;
-}
-
-.experience-flight__chapter-heading > div p,
-.experience-flight__chapter-heading > p:last-child {
-  margin: 0;
-  color: rgb(255 253 245 / 58%);
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.08em;
-  line-height: 1.5;
+  font-size: 0.61rem;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
   text-transform: uppercase;
 }
 
-.experience-flight__chapter-heading h3 {
-  max-width: 16ch;
-  margin: 0.2rem 0 0;
+.experience-timeline__identity > [role='heading'] {
+  display: block;
+  margin: 0;
   color: var(--paper);
   font-family: var(--serif);
-  font-size: clamp(2.1rem, 10vw, 3.7rem);
+  font-size: clamp(1.9rem, 7.8vw, 3rem);
   font-weight: 500;
-  letter-spacing: -0.055em;
-  line-height: 0.92;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
 }
 
-.experience-flight__chapter-heading > p:last-child {
+.experience-timeline__period,
+.experience-timeline__location {
   display: grid;
-  margin-top: 0.75rem;
-  grid-row: 3;
-  grid-column: 1 / -1;
-  gap: 0.18rem;
+  margin: 0;
+  color: rgb(255 253 245 / 68%);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  gap: 0.2rem;
+  letter-spacing: 0.055em;
+  line-height: 1.45;
+  text-transform: uppercase;
 }
 
-.experience-flight__summary {
-  max-width: 48rem;
-  margin: 1.35rem 0 1.75rem;
-  color: rgb(255 253 245 / 82%);
-  font-family: var(--serif);
-  font-size: clamp(1.15rem, 4.8vw, 1.6rem);
-  line-height: 1.38;
+.experience-timeline__period > span,
+.experience-timeline__location > span {
+  color: rgb(255 253 245 / 34%);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
 }
 
-.experience-flight__evidence {
+.experience-timeline__toggle {
+  display: inline-flex;
+  min-width: 7.6rem;
+  min-height: 44px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--experience-rule-strong);
+  border-radius: 999px;
+  align-items: center;
+  justify-content: space-between;
+  background: rgb(255 253 245 / 3%);
+  color: var(--paper);
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.59rem;
+  gap: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.experience-timeline__toggle-open {
+  display: none;
+}
+
+.experience-timeline__toggle i {
+  position: relative;
+  display: block;
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.experience-timeline__toggle i::before,
+.experience-timeline__toggle i::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.8rem;
+  height: 1px;
+  background: currentcolor;
+  content: '';
+  transform: translate(-50%, -50%);
+  transition: transform 180ms ease;
+}
+
+.experience-timeline__toggle i::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.experience-timeline__stop details[open] .experience-timeline__toggle {
+  border-color: var(--experience-gold);
+  background: var(--experience-gold);
+  color: var(--experience-surface);
+}
+
+.experience-timeline__stop details[open] .experience-timeline__toggle-closed {
+  display: none;
+}
+
+.experience-timeline__stop details[open] .experience-timeline__toggle-open {
+  display: inline;
+}
+
+.experience-timeline__stop details[open] .experience-timeline__toggle i::after {
+  transform: translate(-50%, -50%) rotate(0);
+}
+
+.experience-timeline__stop-header:is(:hover, :focus-visible) .experience-timeline__toggle {
+  border-color: var(--experience-gold);
+}
+
+.experience-timeline__stop-header:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: -2px;
+}
+
+.experience-timeline__details {
   display: grid;
-  gap: 1.8rem;
+  padding: 0.5rem 0 2rem 3.9rem;
+  border-top: 1px solid rgb(255 253 245 / 10%);
+  gap: clamp(1.5rem, 3vw, 3.5rem);
+  grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
 }
 
-.experience-flight__evidence h4 {
+.experience-timeline__stop details:not([open]) > .experience-timeline__details {
+  display: none;
+}
+
+.experience-timeline__summary {
+  padding-top: 1.5rem;
+}
+
+.experience-timeline__details-label,
+.experience-timeline__evidence h4 {
   margin: 0 0 0.85rem;
   color: var(--experience-coral);
   font-family: var(--mono);
-  font-size: 0.66rem;
+  font-size: 0.58rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
-.experience-flight__highlights {
-  display: grid;
-  gap: 0.8rem;
+.experience-timeline__summary > p:last-child {
+  max-width: 33rem;
+  margin: 0;
+  color: rgb(255 253 245 / 84%);
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  letter-spacing: -0.02em;
+  line-height: 1.35;
 }
 
-.experience-flight__highlights li {
+.experience-timeline__summary .experience-timeline__gpa {
+  color: var(--experience-gold);
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+}
+
+.experience-timeline__evidence {
+  display: grid;
+  padding-top: 1.5rem;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  grid-template-columns: minmax(0, 1.35fr) minmax(12rem, 0.65fr);
+}
+
+.experience-timeline__highlights {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.experience-timeline__highlights li {
   position: relative;
   padding-left: 1.1rem;
-  color: rgb(255 253 245 / 68%);
-  font-size: 0.84rem;
-  line-height: 1.55;
+  color: rgb(255 253 245 / 66%);
+  font-size: 0.82rem;
+  line-height: 1.52;
 }
 
-.experience-flight__highlights li::before {
+.experience-timeline__highlights li::before {
   position: absolute;
-  top: 0.67em;
+  top: 0.7em;
   left: 0;
   width: 0.35rem;
   height: 1px;
@@ -267,342 +433,182 @@
   content: '';
 }
 
-.experience-flight__technologies,
-.experience-flight__coursework {
+.experience-timeline__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: 0.42rem;
 }
 
-.experience-flight__technologies li,
-.experience-flight__coursework li {
-  padding: 0.48rem 0.65rem;
+.experience-timeline__tags li {
+  padding: 0.48rem 0.64rem;
   border: 1px solid rgb(255 253 245 / 18%);
   border-radius: 999px;
-  color: rgb(255 253 245 / 74%);
+  color: rgb(255 253 245 / 70%);
   font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.07em;
+  font-size: 0.55rem;
+  letter-spacing: 0.075em;
   line-height: 1.2;
   text-transform: uppercase;
 }
 
-.experience-flight__coursework li {
-  border-radius: 0.25rem;
+.experience-timeline__tags--courses li {
+  border-radius: 0.3rem;
 }
 
-.experience-flight__gpa {
-  margin: 0 0 1rem;
-  color: var(--experience-gold);
-  font-family: var(--serif);
-  font-size: clamp(2.2rem, 11vw, 3.5rem);
-  letter-spacing: -0.045em;
-  line-height: 1;
-}
-
-.experience-flight__prompt {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .experience-flight__intro {
-    grid-template-columns: 1.1fr 0.9fr;
+@media (min-width: 720px) {
+  .experience-timeline__intro {
     align-items: end;
+    grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 0.65fr);
   }
 
-  .experience-flight__intro > p {
+  .experience-timeline__intro-copy {
     justify-self: end;
   }
 
-  .experience-flight__chapter-heading {
-    align-items: start;
-    grid-template-columns: 3.2rem 2.25rem minmax(0, 1fr) auto;
-  }
-
-  .experience-flight__chapter-heading img,
-  .experience-flight__chapter-mark {
-    grid-column: 1;
-  }
-
-  .experience-flight__chapter-heading > p:first-of-type {
-    grid-column: 2;
-  }
-
-  .experience-flight__chapter-heading > div {
-    grid-row: 1;
-    grid-column: 3;
-  }
-
-  .experience-flight__chapter-heading > p:last-child {
-    margin: 0;
-    text-align: right;
-    grid-row: 1;
-    grid-column: 4;
-  }
-
-  .experience-flight__evidence {
-    grid-template-columns: minmax(0, 1.55fr) minmax(12rem, 0.75fr);
+  .experience-timeline__list::before {
+    left: 1.95rem;
   }
 }
 
 @media (min-width: 960px) {
-  .experience-flight__intro {
-    padding-top: clamp(2.5rem, 5.5vh, 5rem);
-    padding-bottom: clamp(1.5rem, 2.5vh, 2.5rem);
-    grid-template-columns: minmax(0, 1.4fr) minmax(20rem, 0.6fr);
+  .experience-timeline__intro h2 {
+    font-size: clamp(7rem, 11.5vw, 11rem);
   }
 
-  .experience-flight__intro h2 {
-    font-size: clamp(5.75rem, 9vw, 9.75rem);
+  .experience-timeline__stop-header {
+    display: grid;
+    min-height: 8.5rem;
+    padding: 1.35rem 1rem 1.35rem 0;
+    grid-template-columns: 4rem minmax(16rem, 1.25fr) minmax(13rem, 0.8fr) minmax(10rem, 0.65fr) auto;
   }
 
-  .experience-flight__intro > p {
-    font-size: clamp(1.05rem, 1.35vw, 1.4rem);
+  .experience-timeline__node {
+    width: 4rem;
   }
 
-  .experience-flight__route {
-    display: block;
-    height: clamp(9.5rem, 17vh, 12rem);
+  .experience-timeline__identity > [role='heading'] {
+    font-size: clamp(2.25rem, 3.2vw, 3.65rem);
   }
 
-  .experience-flight__axis {
+  .experience-timeline__stop:hover {
+    background: rgb(255 253 245 / 3%);
+  }
+
+  .experience-timeline__stop:has(details[open]):hover {
+    background: rgb(11 11 22 / 78%);
+  }
+}
+
+@media (max-width: 959px) {
+  .experience-timeline__stop-header {
+    padding-left: 0;
+    grid-template-areas:
+      'node identity toggle'
+      'node period period'
+      'node location location';
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+  }
+
+  .experience-timeline__node {
+    grid-area: node;
+  }
+
+  .experience-timeline__identity {
+    grid-area: identity;
+  }
+
+  .experience-timeline__period {
+    margin-top: 0.5rem;
+    grid-area: period;
+  }
+
+  .experience-timeline__location {
+    grid-area: location;
+  }
+
+  .experience-timeline__toggle {
+    min-width: 44px;
+    padding-inline: 0.8rem;
+    grid-area: toggle;
+  }
+
+  .experience-timeline__toggle > span {
     position: absolute;
-    top: 1.25rem;
-    right: 0;
-    left: 0;
-    height: 1px;
-  }
-
-  .experience-flight__axis-line,
-  .experience-flight__axis-progress {
-    position: absolute;
-    inset: 0;
-    background: rgb(255 253 245 / 24%);
-  }
-
-  .experience-flight__axis-progress {
-    background: linear-gradient(
-      90deg,
-      var(--experience-coral),
-      var(--experience-gold)
-    );
-    transform: scaleX(var(--experience-flight-progress, 0));
-    transform-origin: left center;
-  }
-
-  .experience-flight__marker {
-    position: absolute;
-    top: -0.4rem;
-    left: var(--experience-position);
-    color: rgb(255 253 245 / 48%);
-    font-family: var(--mono);
-    font-size: 0.55rem;
-    letter-spacing: 0.08em;
-    transform: translateX(-50%);
-    white-space: nowrap;
-  }
-
-  .experience-flight__marker::before {
-    display: block;
+    overflow: hidden;
     width: 1px;
-    height: 1.15rem;
-    margin: 0.9rem auto 0.3rem;
-    background: rgb(255 253 245 / 30%);
-    content: '';
-  }
-
-  .experience-flight__marker:first-of-type {
-    transform: none;
-  }
-
-  .experience-flight__marker:last-of-type {
-    transform: translateX(-100%);
-  }
-
-  .experience-flight__route-items {
-    position: absolute;
-    top: 3.25rem;
-    right: 0;
-    left: 0;
-  }
-
-  .experience-flight__route-item {
-    position: absolute;
-    top: 0;
-    left: var(--experience-start);
-    width: max(1rem, calc(var(--experience-end) - var(--experience-start)));
-  }
-
-  .experience-flight__route-item:nth-child(2) {
-    top: 2rem;
-  }
-
-  .experience-flight__route-item:nth-child(3) {
-    top: 4rem;
-  }
-
-  .experience-flight__route-item:nth-child(4) {
-    top: 6rem;
-  }
-
-  .experience-flight__route-item a {
-    position: relative;
-    display: block;
-    min-width: 0.85rem;
     height: 1px;
-    border-top: 1px solid rgb(255 114 92 / 66%);
-    color: rgb(255 253 245 / 54%);
-    text-decoration: none;
-    transition: border-color 180ms ease, color 180ms ease;
-  }
-
-  .experience-flight__route-item a::before,
-  .experience-flight__route-item a::after {
-    position: absolute;
-    top: -0.22rem;
-    width: 0.38rem;
-    height: 0.38rem;
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    background: var(--experience-surface);
-    content: '';
-  }
-
-  .experience-flight__route-item a::before {
-    left: 0;
-  }
-
-  .experience-flight__route-item a::after {
-    right: 0;
-  }
-
-  .experience-flight__route-item a > span {
-    position: absolute;
-    top: 0.42rem;
-    left: 0;
-    overflow: hidden;
-    max-width: max(9rem, 100%);
-    font-family: var(--mono);
-    font-size: 0.55rem;
-    letter-spacing: 0.08em;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
     white-space: nowrap;
   }
 
-  .experience-flight__route-item a > span:last-child {
-    display: none;
+  .experience-timeline__details {
+    padding-left: 4rem;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .experience-timeline {
+    padding-bottom: 4rem;
   }
 
-  .experience-flight__route-item--education {
-    width: 0.9rem;
-    transform: translateX(-100%);
+  .experience-timeline__atmosphere {
+    height: 35rem;
   }
 
-  .experience-flight__route-item--education a {
-    border-color: transparent;
+  .experience-timeline__intro {
+    padding-top: 3.25rem;
+    padding-bottom: 2.75rem;
   }
 
-  .experience-flight__route-item--education a::after {
-    display: none;
+  .experience-timeline__intro h2 {
+    font-size: clamp(4.4rem, 21vw, 6.5rem);
   }
 
-  .experience-flight__route-item--education a > span {
-    right: 0;
-    left: auto;
-    text-align: right;
+  .experience-timeline__range {
+    font-size: 0.52rem;
   }
 
-  .experience-flight__route-item a:is(:hover, :focus-visible, [aria-current='step']) {
-    border-color: var(--experience-gold);
-    color: var(--experience-gold);
+  .experience-timeline__stop-header {
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
   }
 
-  .experience-flight__route-item a:focus-visible {
-    outline: 2px solid var(--paper);
-    outline-offset: 0.5rem;
+  .experience-timeline__list::before {
+    left: 1.25rem;
   }
 
-  [data-experience-flight-enhanced] .experience-flight__stage {
-    height: calc(100svh - 58px);
-    min-height: 44rem;
-    overflow: hidden;
-    padding-bottom: 0;
+  .experience-timeline__node {
+    width: 2.5rem;
   }
 
-  [data-experience-flight-enhanced] .experience-flight__atmosphere {
-    height: 100%;
+  .experience-timeline__node img,
+  .experience-timeline__node-mark {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
-  [data-experience-flight-enhanced] .experience-flight__viewport {
-    --experience-chapter-width: min(70vw, 68rem);
-    --experience-chapter-gutter: max(
-      5vw,
-      calc((100vw - var(--experience-chapter-width)) / 2)
-    );
-    position: absolute;
-    right: 0;
-    bottom: clamp(2.75rem, 5vh, 5rem);
-    left: 0;
-    width: 100%;
-    overflow: hidden;
+  .experience-timeline__identity > [role='heading'] {
+    font-size: clamp(1.85rem, 9vw, 2.6rem);
   }
 
-  [data-experience-flight-enhanced] .experience-flight__chapters {
-    display: flex;
-    width: max-content;
-    padding-right: var(--experience-chapter-gutter);
-    padding-left: var(--experience-chapter-gutter);
-    gap: clamp(2.5rem, 5vw, 6rem);
-    will-change: transform;
+  .experience-timeline__details {
+    padding: 0.25rem 0 1.75rem 3rem;
   }
 
-  [data-experience-flight-enhanced] .experience-flight__chapter-wrap {
-    width: var(--experience-chapter-width);
-    flex: 0 0 auto;
-  }
-
-  [data-experience-flight-enhanced] .experience-flight__chapter {
-    height: 100%;
-    max-height: min(33rem, 48svh);
-    overflow-y: auto;
-    opacity: 0.5;
-    scrollbar-color: rgb(255 253 245 / 28%) transparent;
-    transform: scale(0.975);
-    transform-origin: center;
-    transition: opacity 260ms ease, transform 260ms ease;
-  }
-
-  [data-experience-flight-enhanced] .experience-flight__chapter[data-active] {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  [data-experience-flight-enhanced] .experience-flight__prompt {
-    position: absolute;
-    z-index: 4;
-    right: max(1.5rem, calc((100vw - var(--shell)) / 2));
-    bottom: 1rem;
-    display: flex;
-    margin: 0;
-    align-items: center;
-    gap: 0.65rem;
-    color: rgb(255 253 245 / 48%);
-    font-family: var(--mono);
-    font-size: 0.55rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  [data-experience-flight-enhanced] .experience-flight__prompt span {
-    color: var(--experience-coral);
-    font-size: 1rem;
+  .experience-timeline__evidence {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .experience-flight__chapter,
-  .experience-flight__route-item a {
+  .experience-timeline__art img {
+    transform: none;
+  }
+
+  .experience-timeline__stop,
+  .experience-timeline__toggle,
+  .experience-timeline__toggle i::after {
     transition: none;
   }
 }

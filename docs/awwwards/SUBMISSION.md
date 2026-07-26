@@ -23,7 +23,7 @@ gallery, finale, and a separately verified reduced-motion atlas with no canvas.
 | --- | --- | --- |
 | 0–6 s | Hold through the 0.84 s drawn-glyph curtain. Move the pointer across the hero once so the plate ripples and citron/dusk ink blooms. | “An editorial flight atlas for engineering, applied AI, and product craft.” |
 | 6–14 s | Scroll out of Hero. Let “Brett Haas” scatter like shed feathers as the experience chapter crosses the fold. | “Icarus is the motion system: ascent, release, fall, and a measured landing.” |
-| 14–23 s | Enter Experience at peak feather density. Follow the pinned career route through one role and the education milestone. | “The chronology turns overlapping roles into one readable flight path without hiding the evidence.” |
+| 14–23 s | Enter Experience at peak feather density. Scan all four career stops, then open one role to reveal its evidence. | “The chronology keeps every title visible and brings the evidence forward only when requested.” |
 | 23–34 s | Follow the pinned Projects route through all three WebGL plates; pause on Beat Stream, then continue into the halftone chapter dissolve. | “Field studies bend with velocity while native scroll, links, focus, and reading order stay intact.” |
 | 34–42 s | Cross Craft, showing the print-in dissolve, varnish sweep, and technology-logo ticker. | “Every material response belongs to the atlas: ink, paper, light, and flight.” |
 | 42–50 s | Click the header sun five times, follow the brief blizzard, then land at Contact as the golden feather settles by email. | “The spectacle ends where the story must: ambition brought safely back to earth.” |
@@ -58,8 +58,9 @@ The flight narrative controls every escalation. Sparse paper-white feathers
 become a gold-rimmed fall over the dusk career path, react to scroll wind and
 pointer gusts, thin through the field studies, then settle at the horizon.
 Experience turns three overlapping roles and education into a date-derived
-native-scroll route. Its fragment links, complete chapter HTML, and normal-flow
-mobile version preserve reading order beneath the desktop pin. The three
+editorial ledger. Every company and role stays visible while native grouped
+disclosures reveal one focused set of evidence at a time, including without
+JavaScript. The three
 accepted project paintings travel through a second native-scroll horizontal pin;
 shared WebGL planes bend and skew with velocity while ghost numerals mark the
 cases. The next chapter prints itself in through a reversible halftone mask, and

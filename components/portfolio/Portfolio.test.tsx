@@ -133,7 +133,7 @@ describe('Portfolio', () => {
     expect(container.querySelector('#craft')?.firstElementChild).toBe(workbench)
   })
 
-  it('server-renders every career chapter from the unchanged content source', () => {
+  it('server-renders every career stop from the unchanged content source', () => {
     const { container } = render(<Portfolio />)
     const entries = Array.from(
       container.querySelectorAll<HTMLElement>('[data-experience-chapter]'),
@@ -144,19 +144,19 @@ describe('Portfolio', () => {
       const entry = entries[index]
 
       experience.highlights.forEach((highlight) => {
-        expect(within(entry).getByText(highlight)).toBeInTheDocument()
+        expect(within(entry).getByText(highlight)).not.toBeVisible()
       })
       experience.technologies.forEach((technology) => {
-        expect(within(entry).getByText(technology)).toBeInTheDocument()
+        expect(within(entry).getByText(technology)).not.toBeVisible()
       })
     })
 
     const educationEntry = entries[3]
-    expect(within(educationEntry).getByText('GPA 3.7')).toBeVisible()
-    expect(within(educationEntry).getByText('Computer Systems')).toBeVisible()
-    expect(within(educationEntry).getByText('Reinforcement Learning')).toBeVisible()
+    expect(within(educationEntry).getByText('GPA 3.7')).not.toBeVisible()
+    expect(within(educationEntry).getByText('Computer Systems')).not.toBeVisible()
+    expect(within(educationEntry).getByText('Reinforcement Learning')).not.toBeVisible()
     expect(within(educationEntry).getByText('Charlottesville, VA')).toBeVisible()
-    expect(screen.getByRole('navigation', { name: 'Career timeline' }))
+    expect(screen.getByRole('region', { name: 'Career timeline' }))
       .toBeInTheDocument()
     expect(container.querySelector('.flight-dossier')).not.toBeInTheDocument()
   })
@@ -282,20 +282,17 @@ describe('Portfolio', () => {
     ).toBeInTheDocument()
   })
 
-  it('gives Experience an atmospheric flight path while Skills uses its workbench', () => {
+  it('gives Experience an atmospheric timeline while Skills uses its workbench', () => {
     const { container } = render(<Portfolio />)
     const experienceFlight = container.querySelector<HTMLElement>('[data-experience-flight]')
 
-    expect(
-      within(experienceFlight as HTMLElement).getByRole('img', {
-        name: 'A rising coastal city and lighthouse at dusk',
-      }),
-    ).toBeInTheDocument()
+    expect(experienceFlight?.querySelector('.experience-timeline__art img'))
+      .toHaveAttribute('alt', '')
     expect(
       within(experienceFlight as HTMLElement).getByRole('heading', { name: 'Experience' }),
     ).toBeInTheDocument()
     expect(
-      within(experienceFlight as HTMLElement).getByRole('navigation', {
+      within(experienceFlight as HTMLElement).getByRole('region', {
         name: 'Career timeline',
       }),
     ).toBeInTheDocument()

@@ -17,10 +17,9 @@ describe('Portfolio responsive media contract', () => {
   })
 
   it('lazy loads every offscreen editorial artwork', () => {
-    render(<Portfolio />)
+    const { container } = render(<Portfolio />)
 
     const offscreen = [
-      screen.getByRole('img', { name: 'A rising coastal city and lighthouse at dusk' }),
       screen.getByRole('img', { name: 'A geometric arena with analytical trajectory arcs' }),
       screen.getByRole('img', { name: 'Coastal architecture crossed by rhythmic signal ribbons' }),
       screen.getByRole('img', { name: 'A labyrinth observatory with two controlled light paths' }),
@@ -29,6 +28,8 @@ describe('Portfolio responsive media contract', () => {
       }),
     ]
 
+    expect(container.querySelector('.experience-timeline__art img'))
+      .toHaveAttribute('loading', 'lazy')
     for (const image of offscreen) expect(image).toHaveAttribute('loading', 'lazy')
   })
 

@@ -15,14 +15,6 @@ const MONTHS = [
   'Dec',
 ] as const
 
-interface ExperienceChapterScrollInput {
-  readonly count: number
-  readonly headerOffset: number
-  readonly index: number
-  readonly pinDistance: number
-  readonly pinStart: number
-}
-
 interface ParsedMonth {
   readonly index: number
 }
@@ -46,10 +38,6 @@ export interface ExperienceTimeline {
   readonly items: readonly ExperienceTimelineItem[]
   readonly markers: readonly ExperienceTimelineMarker[]
   readonly startLabel: string
-}
-
-function clamp(value: number, minimum: number, maximum: number) {
-  return Math.min(maximum, Math.max(minimum, value))
 }
 
 function parseMonth(label: string): ParsedMonth {
@@ -154,24 +142,4 @@ export function buildExperienceTimeline(
 function formatFullMonth(monthIndex: number) {
   const year = Math.floor(monthIndex / 12)
   return `${MONTHS[monthIndex % 12]} ${year}`
-}
-
-export function getExperienceChapterProgress(index: number, count: number) {
-  if (count <= 1) return 0
-  return clamp(index / (count - 1), 0, 1)
-}
-
-export function getExperienceChapterScrollY({
-  count,
-  headerOffset,
-  index,
-  pinDistance,
-  pinStart,
-}: ExperienceChapterScrollInput) {
-  return Math.max(
-    0,
-    pinStart
-      - headerOffset
-      + pinDistance * getExperienceChapterProgress(index, count),
-  )
 }
