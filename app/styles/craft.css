@@ -162,6 +162,11 @@
   grid-template-columns: repeat(7, minmax(0, 1fr));
   grid-template-rows: repeat(4, minmax(0, 1fr));
   list-style: none;
+  opacity: 0;
+}
+
+.skill-workbench[data-ready="true"] .skill-workbench__list {
+  opacity: 1;
 }
 
 .skill-workbench__item {
