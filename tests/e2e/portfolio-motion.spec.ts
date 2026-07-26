@@ -473,15 +473,11 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   ))).toBe('none')
 
   await page.goto('/skills', { waitUntil: 'networkidle' })
-  await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
-  await page.locator('[data-skill-sphere]').scrollIntoViewIfNeeded()
-  await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-motion', 'reduced')
-  await expect(page.locator('[data-skill-sphere-chip]')).toHaveCount(28)
-  await expect(page.locator('[data-skill-sphere-edge]')).toHaveCount(77)
-  await expect(page.locator('[data-skill-sphere-mesh]')).toHaveAttribute('aria-hidden', 'true')
-  await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-auto-rotate', 'false')
-  await expect(page.locator('[data-skill-sphere-scene]')).toBeVisible()
-  await expect(page.locator('[data-skill-sphere-scene] canvas')).toHaveCount(0)
+  const reducedWorkbench = page.getByRole('region', { name: 'Interactive skill workbench' })
+  await expect(reducedWorkbench.locator('.skill-workbench__interactive')).toBeHidden()
+  await expect(reducedWorkbench.getByTestId('skill-workbench-fallback')).toBeVisible()
+  await expect(reducedWorkbench.locator('.skill-logo')).toHaveCount(28)
+  await expect(reducedWorkbench.locator('canvas')).toHaveCount(0)
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveCSS('display', 'none')
   await expect(page.locator('[data-atlas-sun-trigger]')).toHaveCSS('display', 'none')
 
@@ -494,12 +490,15 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   expect(errors).toEqual([])
 })
 
-test('spins and labels the accessible skill sphere on keyboard and touch', async ({
+test('drags, filters, and keyboard-controls the accessible skill workbench', async ({
   browserName,
   isMobile,
   page,
 }) => {
-  test.skip(browserName !== 'chromium' && !isMobile, 'Chromium and the touch project cover the chart.')
+  test.skip(
+    browserName !== 'chromium' && !isMobile,
+    'Chromium and the touch project cover the workbench.',
+  )
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => {
     sessionStorage.setItem('atlas-preloader-entered', '1')
@@ -507,45 +506,43 @@ test('spins and labels the accessible skill sphere on keyboard and touch', async
   })
   await page.goto('/skills', { waitUntil: 'networkidle' })
 
-  const sphere = page.getByRole('region', { name: 'Interactive skill sphere' })
-  await sphere.scrollIntoViewIfNeeded()
-  await expect(sphere.getByRole('button')).toHaveCount(28)
-  await expect(sphere.locator('canvas')).toHaveCount(0)
-  await expect(sphere).toHaveAttribute('data-auto-rotate', 'true')
-  const typeScript = sphere.getByRole('button', { name: 'TypeScript' })
-
-  await typeScript.focus()
-  await expect(typeScript).toHaveAttribute('data-active', 'true')
-  await expect(typeScript).toContainText('TypeScript')
-  await expect(sphere).toHaveAttribute('data-paused', 'true')
-
-  await typeScript.press('Escape')
-  await expect(sphere).toHaveAttribute('data-paused', 'false')
-
-  const scene = sphere.getByTestId('skill-sphere-scene')
-  const sceneBox = await scene.boundingBox()
-  expect(sceneBox).not.toBeNull()
-  const startX = sceneBox!.x + sceneBox!.width * 0.66
-  const startY = sceneBox!.y + sceneBox!.height * 0.5
-  const endX = sceneBox!.x + sceneBox!.width * 0.42
-  const endY = sceneBox!.y + sceneBox!.height * 0.42
-  await page.mouse.move(startX, startY)
-  await page.mouse.down()
-  await expect(sphere).toHaveAttribute('data-dragging', 'true')
-  await page.mouse.move(endX, endY, { steps: 5 })
-  await page.mouse.up()
-  await expect(sphere).toHaveAttribute('data-dragging', 'false')
+  const workbench = page.getByRole('region', { name: 'Interactive skill workbench' })
+  await workbench.scrollIntoViewIfNeeded()
+  await expect(workbench.locator('canvas')).toHaveCount(0)
 
   if (isMobile) {
-    await typeScript.tap({ force: true })
-    await expect(sphere).toHaveAttribute('data-active-skill', 'TypeScript')
-    await typeScript.tap()
+    await expect(workbench.locator('.skill-workbench__interactive')).toBeHidden()
+    await expect(workbench.getByTestId('skill-workbench-fallback')).toBeVisible()
+    await expect(workbench.locator('.skill-logo')).toHaveCount(28)
   } else {
-    await typeScript.hover()
-    await expect(sphere).toHaveAttribute('data-active-skill', 'TypeScript')
-    await page.mouse.move(sceneBox!.x + 8, sceneBox!.y + 8)
+    const tools = workbench.getByRole('list', { name: 'Movable technology tools' })
+    await expect(tools.getByRole('button')).toHaveCount(28)
+    const typeScript = tools.getByRole('button', { name: 'TypeScript, Languages' })
+
+    await typeScript.focus()
+    await typeScript.press('ArrowRight')
+    await expect(typeScript).toHaveAttribute('style', /translate3d\(12px, 0px, 0\)/)
+    await typeScript.press('Escape')
+    await expect(typeScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
+
+    const tokenBox = await typeScript.boundingBox()
+    expect(tokenBox).not.toBeNull()
+    const startX = tokenBox!.x + tokenBox!.width / 2
+    const startY = tokenBox!.y + tokenBox!.height / 2
+    await page.mouse.move(startX, startY)
+    await page.mouse.down()
+    await expect(workbench).toHaveAttribute('data-dragging', 'TypeScript')
+    await page.mouse.move(startX + 48, startY + 24, { steps: 5 })
+    await page.mouse.up()
+    await expect(workbench).not.toHaveAttribute('data-dragging')
+    await workbench.getByRole('button', { name: 'Reset workbench' }).click()
+    await expect(typeScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
   }
-  await expect(sphere).not.toHaveAttribute('data-active-skill')
+
+  const frameworks = workbench.getByRole('button', { name: 'Frameworks', exact: true })
+  await frameworks.click()
+  await expect(workbench).toHaveAttribute('data-active-category', 'frameworks')
+  await expect(frameworks).toHaveAttribute('aria-pressed', 'true')
   await expectNoHorizontalOverflow(page)
   expect(errors).toEqual([])
 })
