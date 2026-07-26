@@ -42,24 +42,11 @@ describe('project detail pages', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Court Vision' })).toBeInTheDocument()
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
-    expect(within(navigation).getAllByRole('link')).toHaveLength(5)
-    expect(within(navigation).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/')
-    expect(within(navigation).getByRole('link', { name: 'Experience' })).toHaveAttribute(
-      'href',
-      '/experience',
-    )
-    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
-    expect(within(navigation).getByRole('link', { name: 'Skills' })).toHaveAttribute(
-      'href',
-      '/skills',
-    )
-    expect(within(navigation).getByRole('link', { name: 'Contact' })).toHaveAttribute(
-      'href',
-      '/contact',
-    )
+    expect(within(navigation).getAllByRole('link')).toHaveLength(1)
+    expect(within(navigation).getByRole('link', { name: 'Home' }))
+      .toHaveAttribute('href', '/')
+    expect(within(navigation).getByRole('link', { name: 'Home' }))
+      .toHaveTextContent('←Home')
     expect(screen.getByRole('link', { name: 'All projects' })).toHaveAttribute(
       'href',
       '/projects',

@@ -1,4 +1,13 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
+import {
+  ATLAS_GATEWAY_SELECTION_EVENT,
+  type AtlasDestinationName,
+  type AtlasGatewaySelectionDetail,
+} from '@/lib/atlas-events'
 
 export type AtlasRouteName = 'home' | 'experience' | 'projects' | 'skills' | 'contact'
 
@@ -9,46 +18,72 @@ const routes = [
   { href: '/contact', index: '04', label: 'Contact', name: 'contact' },
 ] as const
 
+function isAtlasDestinationName(value: unknown): value is AtlasDestinationName {
+  return routes.some((route) => route.name === value)
+}
+
 export function AtlasNavigation({
   current,
 }: {
   readonly current: AtlasRouteName
 }) {
-  return (
-    <header className="site-header" data-current={current}>
-      <nav className="site-nav" aria-label="Primary navigation">
-        <TransitionLink
-          className="atlas-home-link"
-          href="/"
-          aria-current={current === 'home' ? 'page' : undefined}
-        >
-          <img
-            className="atlas-home-link__mark"
-            src="/original-wing-filled.png"
-            alt=""
-            width="128"
-            height="128"
-            aria-hidden="true"
-          />
-          <span className="atlas-home-link__label">Home</span>
-        </TransitionLink>
+  const [selectedDestination, setSelectedDestination] = useState<AtlasDestinationName>(
+    'experience',
+  )
+  const showHomeControl = current !== 'home'
+  const showRouteIndex = current === 'home' || current === 'skills'
 
-        <ol className="atlas-route-index">
-          {routes.map((route) => (
-            <li key={route.name}>
-              <TransitionLink
-                className="atlas-route-link"
-                href={route.href}
-                aria-current={current === route.name ? 'page' : undefined}
-              >
-                <span className="atlas-route-link__index" aria-hidden="true">
-                  {route.index}
-                </span>
-                <span className="atlas-route-link__label">{route.label}</span>
-              </TransitionLink>
-            </li>
-          ))}
-        </ol>
+  useEffect(() => {
+    if (current !== 'home') return
+
+    const handleGatewaySelection = (event: Event) => {
+      const route = (event as CustomEvent<AtlasGatewaySelectionDetail>).detail?.route
+      if (isAtlasDestinationName(route)) setSelectedDestination(route)
+    }
+
+    window.addEventListener(ATLAS_GATEWAY_SELECTION_EVENT, handleGatewaySelection)
+    return () => {
+      window.removeEventListener(ATLAS_GATEWAY_SELECTION_EVENT, handleGatewaySelection)
+    }
+  }, [current])
+
+  return (
+    <header
+      className="site-header"
+      data-current={current}
+      data-index-visible={showRouteIndex ? 'true' : 'false'}
+    >
+      <nav className="site-nav" aria-label="Primary navigation">
+        {showHomeControl && (
+          <TransitionLink className="atlas-home-link" href="/">
+            <span className="atlas-home-link__arrow" aria-hidden="true">←</span>
+            <span className="atlas-home-link__label">Home</span>
+          </TransitionLink>
+        )}
+
+        {showRouteIndex && (
+          <ol className="atlas-route-index">
+            {routes.map((route) => (
+              <li key={route.name}>
+                <TransitionLink
+                  className="atlas-route-link"
+                  href={route.href}
+                  aria-current={current === route.name ? 'page' : undefined}
+                  data-active-destination={
+                    current === 'home' && selectedDestination === route.name
+                      ? 'true'
+                      : undefined
+                  }
+                >
+                  <span className="atlas-route-link__index" aria-hidden="true">
+                    {route.index}
+                  </span>
+                  <span className="atlas-route-link__label">{route.label}</span>
+                </TransitionLink>
+              </li>
+            ))}
+          </ol>
+        )}
       </nav>
     </header>
   )
