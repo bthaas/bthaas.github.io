@@ -13,8 +13,8 @@ const ARENA_HEIGHT = 520
 const TOKEN_SIZES: readonly SkillTokenSize[] = Array.from(
   { length: TOKEN_COUNT },
   (_, index) => ({
-    height: 48 + (index % 3),
-    width: 142 + (index % 4) * 4,
+    height: [42, 44, 46, 48][index % 4],
+    width: [114, 128, 142, 155][index % 4],
   }),
 )
 
