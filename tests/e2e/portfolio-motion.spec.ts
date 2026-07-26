@@ -39,7 +39,7 @@ test('keeps the gateway name fitted and individually legible across responsive v
   test.skip(browserName !== 'chromium' || isMobile, 'One desktop engine verifies typography fit.')
   await page.setViewportSize({ height: 550, width: 1800 })
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/', { waitUntil: 'networkidle' })
@@ -81,7 +81,7 @@ test('renders one fitted ground shadow and no reflection before or after interac
     'One desktop engine verifies activation continuity.',
   )
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/', { waitUntil: 'networkidle' })
@@ -111,7 +111,7 @@ test('binds every category label to the rotating cylinder facets', async ({
 }) => {
   if (!isMobile) await page.setViewportSize({ height: 720, width: 1280 })
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/', { waitUntil: 'networkidle' })
@@ -121,7 +121,7 @@ test('binds every category label to the rotating cylinder facets', async ({
   await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
 
   const labels = gateway.locator(
-    '.portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+    '.portfolio-gateway__fallback-slice-body > .portfolio-gateway__surface-label',
   )
   await expect(labels).toHaveCount(48)
   await expect(gateway.locator('.portfolio-gateway__face-label')).toHaveCount(0)
@@ -179,7 +179,7 @@ test('matches the reference drum with a solid fitted shadow and no reflection', 
   )
   await page.setViewportSize({ height: 720, width: 1280 })
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/', { waitUntil: 'networkidle' })
@@ -250,7 +250,7 @@ test('opens every carousel category as its own routed screen', async ({
   )
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/', { waitUntil: 'networkidle' })
@@ -399,7 +399,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   expect(errors).toEqual([])
 })
 
-test('hands a sub-1.8s session entrance into the lazy Atlas ink simulation', async ({
+test('assembles the gateway once, locks interaction until landing, and hands off to carousel input', async ({
   browserName,
   isMobile,
   page,
@@ -409,38 +409,72 @@ test('hands a sub-1.8s session entrance into the lazy Atlas ink simulation', asy
   await page.addInitScript(() => sessionStorage.clear())
   await page.goto('/', { waitUntil: 'domcontentloaded' })
 
-  const preloader = page.locator('[data-atlas-preloader]')
-  await expect(preloader).toBeVisible()
-  await expect(preloader.locator('[data-atlas-preloader-counter]')).toHaveText(/^(?:\d{2}|100)$/)
-  await expect(preloader).toHaveCount(0, { timeout: 2200 })
+  await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
+  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+  const gatewaySection = page.locator('#portfolio-gateway')
+  await gatewaySection.scrollIntoViewIfNeeded()
+  await expect(gatewaySection).toHaveAttribute('data-gateway-entrance', 'entering')
+  await expect(gateway).toHaveAttribute('aria-disabled', 'true')
+  await expect(gateway).toHaveAttribute('tabindex', '-1')
+  await expect(page.getByRole('button', { name: 'Next category' })).toBeDisabled()
+  await gateway.dispatchEvent('keydown', { key: 'ArrowRight' })
+  await expect(gateway).toHaveAttribute('data-active-index', '0')
+  await expect(gatewaySection.locator('[data-gateway-entrance-slice]')).toHaveCount(48)
+  await expect(gatewaySection).toHaveAttribute(
+    'data-gateway-entrance',
+    'settled',
+    { timeout: 3_400 },
+  )
+  await expect(gateway).not.toHaveAttribute('aria-disabled')
+  await expect(gateway).toHaveAttribute('tabindex', '0')
+  await expect(page.getByRole('button', { name: 'Next category' })).toBeEnabled()
 
   const entranceDuration = await page.evaluate(() => performance
-    .getEntriesByName('atlas-preloader-duration')
+    .getEntriesByName('atlas-gateway-entrance-duration')
     .at(-1)?.duration ?? Number.POSITIVE_INFINITY)
-  expect(entranceDuration).toBeLessThanOrEqual(1800)
+  expect(entranceDuration).toBeGreaterThanOrEqual(2_300)
+  expect(entranceDuration).toBeLessThanOrEqual(2_900)
+  expect(await page.evaluate(() => sessionStorage.getItem('atlas-gateway-entered'))).toBe('1')
 
-  const fluid = page.locator('[data-fluid-cursor]')
-  await expect(fluid).toHaveCount(1)
-  await page.mouse.move(140, 180)
-  await page.mouse.move(520, 360, { steps: 12 })
-  await expect.poll(async () => Number(
-    await fluid.locator('canvas').getAttribute('data-fluid-splats'),
-  )).toBeGreaterThanOrEqual(8)
-  const renderer = await page.evaluate(() => {
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('webgl')
-    const extension = context?.getExtension('WEBGL_debug_renderer_info')
-    return context && extension
-      ? String(context.getParameter(extension.UNMASKED_RENDERER_WEBGL))
-      : 'unavailable'
-  })
-  const minimumFluidFps = /swiftshader|llvmpipe|software/i.test(renderer) ? 18 : 20
-  await expect.poll(async () => Number(
-    await fluid.locator('canvas').getAttribute('data-fluid-fps'),
-  )).toBeGreaterThanOrEqual(minimumFluidFps)
+  await gateway.focus()
+  await gateway.press('ArrowRight')
+  await expect(gateway).toHaveAttribute('data-active-index', '1')
 
   await page.reload({ waitUntil: 'domcontentloaded' })
+  await page.locator('#portfolio-gateway').scrollIntoViewIfNeeded()
+  await expect(page.locator('#portfolio-gateway')).toHaveAttribute(
+    'data-gateway-entrance',
+    'settled',
+  )
   await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
+test('skips the gateway assembly and unlocks input for reduced motion', async ({
+  browserName,
+  page,
+}) => {
+  test.skip(browserName !== 'chromium', 'One engine verifies the shared reduced-motion gate.')
+  const errors = observeApplicationErrors(page)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.addInitScript(() => sessionStorage.clear())
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  await page.waitForFunction(() => document.readyState === 'complete')
+
+  const gatewaySection = page.locator('#portfolio-gateway')
+  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+  await gatewaySection.scrollIntoViewIfNeeded()
+
+  await expect(gatewaySection).toHaveAttribute('data-gateway-entrance', 'settled')
+  await expect(gatewaySection.locator('[data-gateway-entrance-slice]')).toHaveCount(48)
+  await expect(gateway).not.toHaveAttribute('aria-disabled')
+  await expect(gateway).toHaveAttribute('tabindex', '0')
+  await expect(page.getByRole('button', { name: 'Next category' })).toBeEnabled()
+  await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
+  expect(await gatewaySection.locator('[data-gateway-entrance-slice]').evaluateAll(
+    (slices) => slices.filter((slice) => (slice as HTMLElement).style.transform).length,
+  )).toBe(0)
+  expect(await page.evaluate(() => sessionStorage.getItem('atlas-gateway-entered'))).toBeNull()
   expect(errors).toEqual([])
 })
 
@@ -467,6 +501,12 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(
     page.locator('.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice'),
   ).toHaveCount(48)
+  await expect(page.locator('#portfolio-gateway')).toHaveAttribute(
+    'data-gateway-entrance',
+    'settled',
+  )
+  await expect(page.getByRole('region', { name: 'Portfolio category carousel' }))
+    .not.toHaveAttribute('aria-disabled')
 
   await page.goto('/experience', { waitUntil: 'networkidle' })
   await expect(page.locator('.flight-dossier__toggle').first())
@@ -506,7 +546,7 @@ test('spins and labels the accessible skill sphere on keyboard and touch', async
   test.skip(browserName !== 'chromium' && !isMobile, 'Chromium and the touch project cover the chart.')
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/skills', { waitUntil: 'networkidle' })
@@ -564,7 +604,7 @@ test('releases one four-second sun spectacle on the homepage', async ({
   await page.addInitScript(() => {
     if (!sessionStorage.getItem('atlas-phase-five-e2e')) {
       sessionStorage.clear()
-      sessionStorage.setItem('atlas-preloader-entered', '1')
+      sessionStorage.setItem('atlas-gateway-entered', '1')
       sessionStorage.setItem('atlas-entered', '1')
       sessionStorage.setItem('atlas-phase-five-e2e', '1')
     }
@@ -641,7 +681,7 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
   test.skip(browserName !== 'chromium' || isMobile, 'One engine verifies Phase 3 choreography.')
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/', { waitUntil: 'networkidle' })
@@ -705,7 +745,7 @@ test('spins the project helix and keeps a complete static fallback', async ({
 }) => {
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
   await page.goto('/projects?stats=1', { waitUntil: 'networkidle' })

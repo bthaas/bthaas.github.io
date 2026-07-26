@@ -1,14 +1,32 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PortfolioGateway } from './PortfolioGateway'
 
+const gatewayEntrance = vi.hoisted(() => ({
+  state: 'settled' as 'entering' | 'pending' | 'settled',
+}))
+
+vi.mock('./useGatewayEntrance', () => ({
+  useGatewayEntrance: () => gatewayEntrance.state,
+}))
+
 describe('PortfolioGateway', () => {
+  beforeEach(() => {
+    gatewayEntrance.state = 'settled'
+    sessionStorage.clear()
+    sessionStorage.setItem('atlas-gateway-entered', '1')
+  })
+
   it('starts on Experience with semantic carousel controls and destinations', () => {
     const { container } = render(<PortfolioGateway />)
 
     expect(screen.getByRole('heading', { name: 'Explore the portfolio' })).toBeInTheDocument()
-    expect(screen.getByText('BRETT HAAS')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.portfolio-gateway__word')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    )
+    expect(container.querySelector('.portfolio-gateway__word')).toHaveTextContent('BRETT HAAS')
     expect(screen.getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
       'href',
@@ -24,6 +42,14 @@ describe('PortfolioGateway', () => {
       'aria-roledescription',
       'carousel',
     )
+    expect(container.querySelector('#portfolio-gateway')).toHaveAttribute(
+      'data-gateway-entrance',
+      'settled',
+    )
+    expect(screen.getByRole('region', { name: 'Portfolio category carousel' }))
+      .not.toHaveAttribute('aria-disabled')
+    expect(screen.getByRole('region', { name: 'Portfolio category carousel' }))
+      .toHaveAttribute('tabindex', '0')
     expect(screen.getByRole('status')).toHaveTextContent('Experience category selected')
     expect(
       container.querySelectorAll(
@@ -41,7 +67,7 @@ describe('PortfolioGateway', () => {
     expect(container.querySelectorAll('.portfolio-gateway__fallback-face')).toHaveLength(0)
     expect(
       container.querySelectorAll(
-        '.portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+        '.portfolio-gateway__fallback-slice-body > .portfolio-gateway__surface-label',
       ),
     ).toHaveLength(48)
     expect(container.querySelector('.portfolio-gateway__face-label')).toBeNull()
@@ -71,6 +97,47 @@ describe('PortfolioGateway', () => {
         ).map((label) => label.textContent),
       ).toEqual(Array(12).fill(category))
     }
+  })
+
+  it('locks every interaction while an unseen entrance waits for the viewport', () => {
+    sessionStorage.clear()
+    gatewayEntrance.state = 'pending'
+
+    const { container } = render(<PortfolioGateway />)
+    const gateway = container.querySelector('#portfolio-gateway')
+    const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
+
+    expect(gateway).toHaveAttribute('data-gateway-entrance', 'pending')
+    expect(carousel).toHaveAttribute('aria-disabled', 'true')
+    expect(carousel).toHaveAttribute('tabindex', '-1')
+    expect(screen.getByRole('button', { name: 'Previous category' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Next category' })).toBeDisabled()
+    expect(screen.getByRole('link', { name: 'Open Experience' }))
+      .toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByRole('link', { name: 'Open Experience' }))
+      .toHaveAttribute('tabindex', '-1')
+
+    fireEvent.keyDown(carousel, { key: 'ArrowRight' })
+    fireEvent.pointerDown(screen.getByTestId('portfolio-gateway-drag-surface'), {
+      button: 0,
+      clientX: 400,
+      pointerId: 19,
+    })
+    expect(carousel).toHaveAttribute('data-active-index', '0')
+    expect(carousel).toHaveAttribute('data-dragging', 'false')
+  })
+
+  it('keeps the reduced-motion settled result interactive', () => {
+    sessionStorage.clear()
+    const { container } = render(<PortfolioGateway />)
+
+    expect(container.querySelector('#portfolio-gateway')).toHaveAttribute(
+      'data-gateway-entrance',
+      'settled',
+    )
+    expect(screen.getByRole('region', { name: 'Portfolio category carousel' }))
+      .not.toHaveAttribute('aria-disabled')
+    expect(screen.getByRole('button', { name: 'Next category' })).toBeEnabled()
   })
 
   it('cycles categories with buttons and arrow keys while wrapping', () => {

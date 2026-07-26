@@ -32,7 +32,7 @@ describe('React-owned hero overdrive', () => {
   })
 
   it('splits an entered masthead for reversible scroll scatter and cleans it up', () => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
     const { container, unmount } = render(
       <section id="hero"><HeroMasthead name="Brett Haas" /></section>,
@@ -44,7 +44,7 @@ describe('React-owned hero overdrive', () => {
     expect(() => unmount()).not.toThrow()
   })
 
-  it('owns the first-session entrance and waits for the preloader handshake', () => {
+  it('owns the first-session masthead entrance independently of the gateway', () => {
     const { container } = render(
       <>
         <nav className="site-nav" />
@@ -53,8 +53,6 @@ describe('React-owned hero overdrive', () => {
       </>,
     )
 
-    expect(container.querySelectorAll('.hero-masthead__line > div')).toHaveLength(0)
-    act(() => window.dispatchEvent(new CustomEvent('atlas:preloader-complete')))
     expect(container.querySelectorAll('.hero-masthead__line > div')).toHaveLength(9)
     expect(sessionStorage.getItem('atlas-entered')).toBe('1')
     expect(document.documentElement).toHaveClass('atlas-entering')

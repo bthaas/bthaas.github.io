@@ -11,7 +11,6 @@ import { getMastheadScatter } from '@/lib/atlas-motion/hero-overdrive'
 gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText)
 
 const ENTRANCE_STORAGE_KEY = 'atlas-entered'
-const PRELOADER_STORAGE_KEY = 'atlas-preloader-entered'
 
 function readSessionFlag(key: string): boolean {
   try {
@@ -116,16 +115,10 @@ export function HeroMasthead({ name }: { readonly name: string }) {
       )
     }
 
-    const preloaderPending = !readSessionFlag(PRELOADER_STORAGE_KEY)
-    if (preloaderPending) {
-      window.addEventListener('atlas:preloader-complete', prepareMotion, { once: true })
-    } else {
-      prepareMotion()
-    }
+    prepareMotion()
 
     return () => {
       disposed = true
-      window.removeEventListener('atlas:preloader-complete', prepareMotion)
       entrance?.kill()
       scatter?.kill()
       split?.revert()

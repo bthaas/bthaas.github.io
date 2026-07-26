@@ -794,3 +794,46 @@ are complete.
   --check`, and the isolated spiral journey all pass. The journey is green in
   Chromium, Firefox, desktop WebKit, and iPhone WebKit with no
   application-origin console errors.
+
+## July 26, 2026 — Skyfall Assembly gateway entrance
+
+- The existing blocking preloader was replaced with a viewport-triggered,
+  session-once GSAP timeline on the home gateway. All 48 existing DOM slices
+  descend in deterministic rear-to-front order, overshoot into the ring with a
+  restrained `back.out(1.3)` landing, and hand off to the resolving `BRETT HAAS`
+  word, introduction, shadow, and controls over a measured 2,599.5 ms.
+- The ring geometry remains on the outer slice wrappers while entrance transforms
+  apply only to their inner bodies. The capture audit found 48 slices, zero
+  leftover inline transforms after settling, 0.0018 cumulative layout shift, and
+  a 568 ms largest-contentful-paint entry on the warmed `npm run dev` recording.
+  No new image, font, Three.js, GLB, or blocking asset was added.
+- Drag, pointer, keyboard, links, and arrow buttons are all inert in `pending`
+  and `entering` states. The recorded handoff advances the carousel from index
+  0 to index 1 only after the timeline reaches `settled`; reload then skips the
+  entrance from the `atlas-gateway-entered` session flag.
+- `prefers-reduced-motion: reduce` bypasses preparation and renders the exact
+  settled frame immediately. The reduced-motion audit found 48 slices, zero
+  inline transforms, no disabled carousel state, and no session flag written.
+- Clean headless Chromium requestAnimationFrame sampling measured 91.1 fps at
+  1440 × 900 and 120.2 fps at 390 × 844; the browser ran uncapped, so these
+  confirm the 60 fps desktop and 30 fps mobile budgets rather than representing
+  display refresh rates. The simultaneous five-PNG readback pass measured 49.2
+  fps, as expected while screenshots were encoded.
+- The accepted desktop beats are
+  `site-screenshots/entrance-skyfall-000.png` through
+  `site-screenshots/entrance-skyfall-100.png`. The static accessibility frame is
+  `site-screenshots/entrance-skyfall-reduced.png`, the responsive check is
+  `site-screenshots/entrance-skyfall-mobile.png`, and the trimmed 1440 × 900
+  H.264 recording is `site-screenshots/entrance-skyfall.mp4`.
+  `entrance-comparison.png` was opened at 1800 × 750 and confirms the empty sky,
+  first descending pieces, separated mid-assembly ring, final snap, word
+  resolution, and unchanged settled composition against the selected storyboard.
+- The focused production Chromium journeys pass for both the first-visit
+  entrance/interaction handoff and the reduced-motion bypass. The capture
+  reported no application console errors. No procedural 3D asset was introduced,
+  so Blender turntables, GLB compression, node-name validation, file size, and
+  triangle budgets are not applicable to this DOM/GSAP-only change.
+- Final verification passes 247 tests across 61 files, TypeScript, and the
+  12-page Next.js production build. Coverage passes at 90.41% statements, 81.36%
+  branches, 83.87% functions, and 93.84% lines; `git diff --check`, the
+  secret/debug scan, and the focused production Chromium journeys are clean.
