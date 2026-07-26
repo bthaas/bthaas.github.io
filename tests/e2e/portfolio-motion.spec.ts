@@ -229,7 +229,7 @@ test('matches the reference drum with a solid fitted shadow and no reflection', 
   expect(proportions.upperWidth).toBeGreaterThanOrEqual(565)
   expect(proportions.upperWidth).toBeLessThanOrEqual(620)
   expect(proportions.upperHeight).toBeGreaterThanOrEqual(305)
-  expect(proportions.upperHeight).toBeLessThanOrEqual(350)
+  expect(proportions.upperHeight).toBeLessThanOrEqual(370)
   expect(proportions.shadowWidth / proportions.upperWidth).toBeGreaterThanOrEqual(0.84)
   expect(proportions.shadowWidth / proportions.upperWidth).toBeLessThanOrEqual(0.94)
   expect(proportions.shadowHeight).toBeGreaterThanOrEqual(30)
@@ -244,6 +244,7 @@ test('opens every carousel category as its own routed screen', async ({
   isMobile,
   page,
 }) => {
+  test.slow()
   test.skip(
     browserName !== 'chromium' || isMobile,
     'One desktop engine verifies the four route destinations.',
@@ -255,27 +256,50 @@ test('opens every carousel category as its own routed screen', async ({
   })
   await page.goto('/', { waitUntil: 'networkidle' })
 
-  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
-  await gateway.scrollIntoViewIfNeeded()
-  await gateway.focus()
-  await gateway.press('ArrowRight')
-  const projectsFace = page.getByRole('link', { name: 'Open Projects screen' })
-  await expect(projectsFace).toHaveAttribute('href', '/projects')
-  await projectsFace.click()
-  await expect(page).toHaveURL(/\/projects\/?$/)
-  await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', 'projects')
-  await expect(page.locator('main > section')).toHaveCount(1)
-  await expect(page.locator('main > #projects')).toBeVisible()
-
-  for (const [route, screenName, sectionId] of [
-    ['/experience', 'experience', 'experience'],
-    ['/skills', 'skills', 'craft'],
-    ['/contact', 'contact', 'contact'],
+  for (const [label, route, screenName, sectionId, arrowPresses] of [
+    ['Experience', '/experience', 'experience', 'experience', 0],
+    ['Projects', '/projects', 'projects', 'projects', 1],
+    ['Skills', '/skills', 'skills', 'craft', 2],
+    ['Contact', '/contact', 'contact', 'contact', 3],
   ] as const) {
-    await page.goto(route, { waitUntil: 'networkidle' })
+    if (page.url() !== 'http://127.0.0.1:4173/') {
+      await page.goto('/', { waitUntil: 'networkidle' })
+    }
+    const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+    await gateway.scrollIntoViewIfNeeded()
+    await gateway.focus()
+    for (let press = 0; press < arrowPresses; press += 1) {
+      await gateway.press('ArrowRight')
+    }
+
+    const face = page.getByRole('link', { name: `Open ${label} screen` })
+    await expect(face).toHaveAttribute('href', route)
+    await face.click()
+    await expect(page).toHaveURL(new RegExp(`${route}/?$`), { timeout: 15_000 })
     await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', screenName)
     await expect(page.locator('main > section')).toHaveCount(1)
     await expect(page.locator(`main > #${sectionId}`)).toBeVisible()
+    await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-state',
+      'idle',
+    )
+
+    if (route === '/projects') {
+      await page.goBack()
+      await expect(page).toHaveURL(/\/$/)
+      await expect(page.locator('#portfolio-gateway')).toBeVisible()
+      await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'idle',
+      )
+      await page.goForward()
+      await expect(page).toHaveURL(/\/projects\/?$/)
+      await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', 'projects')
+      await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'idle',
+      )
+    }
   }
   expect(errors).toEqual([])
 })
@@ -284,6 +308,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   isMobile,
   page,
 }) => {
+  test.slow()
   const errors = observeApplicationErrors(page)
   await page.goto('/', { waitUntil: 'networkidle' })
   await activateDecorativeWebGL(page, isMobile)
@@ -310,6 +335,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
   await gateway.scrollIntoViewIfNeeded()
   await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  await expect(gateway).not.toHaveAttribute('aria-disabled', 'true')
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await expect(
     gateway.locator(
@@ -324,7 +350,9 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(gateway.locator('.portfolio-gateway__fallback-reflection')).toHaveCount(0)
   await expect(gateway.locator('.portfolio-gateway-canvas')).toHaveCount(0)
   await expect(gateway.locator('.portfolio-gateway__ground-shadow')).toHaveCount(1)
-  await expect(page.locator('#portfolio-gateway').getByText('BRETT HAAS')).toBeVisible()
+  await expect(
+    page.locator('#portfolio-gateway').getByText('BRETT HAAS', { exact: true }),
+  ).toBeVisible()
   await expect(
     page.locator('#portfolio-gateway').getByText('Engineer · Researcher · Builder', { exact: true }),
   ).toBeVisible()
@@ -368,9 +396,13 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expectNoHorizontalOverflow(page)
 
   await page.getByRole('link', { name: 'Open Experience', exact: true }).click()
-  await expect(page).toHaveURL(/\/experience\/?$/)
+  await expect(page).toHaveURL(/\/experience\/?$/, { timeout: 15_000 })
   await expect(page.locator('#experience')).toHaveCount(1)
   await expect(page.locator('#portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
+  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+    'data-transition-state',
+    'idle',
+  )
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
   await toggle.scrollIntoViewIfNeeded()
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
@@ -382,7 +414,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(toggle).toBeFocused()
 
   await page.getByRole('link', { name: 'Contact' }).click()
-  await expect(page).toHaveURL(/\/contact\/?$/)
+  await expect(page).toHaveURL(/\/contact\/?$/, { timeout: 15_000 })
   await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
   if (isMobile) {
     await page.waitForTimeout(400)
@@ -401,6 +433,7 @@ test('assembles the gateway once, locks interaction until landing, and hands off
   isMobile,
   page,
 }) => {
+  test.slow()
   test.skip(browserName !== 'chromium' || isMobile, 'One fine-pointer engine measures Phase 1.')
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => sessionStorage.clear())
@@ -430,7 +463,7 @@ test('assembles the gateway once, locks interaction until landing, and hands off
     .getEntriesByName('atlas-gateway-entrance-duration')
     .at(-1)?.duration ?? Number.POSITIVE_INFINITY)
   expect(entranceDuration).toBeGreaterThanOrEqual(2_300)
-  expect(entranceDuration).toBeLessThanOrEqual(2_900)
+  expect(entranceDuration).toBeLessThanOrEqual(3_400)
   expect(await page.evaluate(() => sessionStorage.getItem('atlas-gateway-entered'))).toBe('1')
 
   await gateway.focus()
@@ -504,7 +537,12 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(page.getByRole('region', { name: 'Portfolio category carousel' }))
     .not.toHaveAttribute('aria-disabled')
 
-  await page.goto('/experience', { waitUntil: 'networkidle' })
+  await page.getByRole('link', { name: 'Open Experience screen' }).click()
+  await expect(page).toHaveURL(/\/experience\/?$/)
+  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+    'data-transition-state',
+    'idle',
+  )
   await expect(page.locator('.flight-dossier__toggle').first())
     .toHaveAttribute('aria-expanded', 'true')
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()

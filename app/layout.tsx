@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 
+import { PageTransitionProvider } from '@/components/motion/PageTransitionProvider'
 import { WebGLActivationGate } from '@/components/motion/WebGLActivationGate'
 
 import './globals.css'
@@ -45,7 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        {children}
+        <PageTransitionProvider>{children}</PageTransitionProvider>
         <WebGLActivationGate />
         <Script src="/atlas.js" strategy="lazyOnload" />
       </body>

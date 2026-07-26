@@ -56,4 +56,21 @@ describe('header brand mark', () => {
       width: 'calc(1.4rem + 1px)',
     })
   })
+
+  it('keeps mobile navigation links above the animated sun control', () => {
+    const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/motion.css'), 'utf8')
+    const root = postcss.parse(stylesheet)
+    let mobileNavZIndex: string | undefined
+
+    root.walkAtRules('media', (atRule) => {
+      if (!atRule.params.includes('max-width: 720px')) return
+      atRule.walkRules('.nav-links', (rule) => {
+        rule.walkDecls('z-index', (declaration) => {
+          mobileNavZIndex = declaration.value
+        })
+      })
+    })
+
+    expect(mobileNavZIndex).toBe('4')
+  })
 })

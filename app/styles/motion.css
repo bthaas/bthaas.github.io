@@ -205,6 +205,7 @@
   }
 
   .nav-links {
+    z-index: 4;
     max-width: 74vw;
     gap: 0.8rem;
     overflow-x: auto;
