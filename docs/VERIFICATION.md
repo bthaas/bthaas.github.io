@@ -1,29 +1,31 @@
 # Awwwards portfolio verification
 
-Verified on 2026-07-26 from `codex/experience-timeline-polish`. The standalone
-Experience screen now uses a date-derived editorial ledger with four native
-disclosures. Company, role, dates, and location remain visible; summaries,
-highlights, and technologies appear only when a stop is opened. The same
-interaction works at 390 px, with reduced motion, and without JavaScript.
+Verified on 2026-07-26 from `codex/experience-horizontal-cards`. The standalone
+Experience screen now uses a date-derived horizontal rail with four upright
+career columns. Company, role, dates, and location remain visible; summaries,
+highlights, and technologies appear only when a column is opened. The same
+interaction becomes a vertical route at 390 px and remains complete with
+reduced motion or without JavaScript.
 
 ## Experience redesign gates
 
 | Gate | Result |
 | --- | --- |
-| `npm run verify` | Passed: 64 files / 248 tests, typecheck, and production build |
-| `npm run test:coverage` | Passed: 64 files / 248 tests; 90.91% statements, 81.60% branches, 86.72% functions, 94.23% lines |
+| `npm run verify` | Passed: 64 files / 254 tests, typecheck, and production build |
+| `npm run test:coverage -- --maxWorkers=4` | Passed: 64 files / 254 tests; 91.41% statements, 82.18% branches, 87.32% functions, 94.83% lines |
 | Focused Playwright | Passed: four desktop Chromium / iPhone WebKit experience and no-JavaScript journeys |
-| Desktop engine | Chromium 1600 × 1200: four scannable stops, exclusive native disclosures, keyboard toggling, dark editorial field, and zero horizontal document overflow passed |
+| Desktop engine | Chromium 1600 × 1200: four upright columns on one horizontal rail, exclusive native disclosures, keyboard toggling, and zero document overflow passed |
 | Mobile engine | iPhone WebKit and a 390 × 844 live walk: deliberate vertical route, touch disclosures, and zero horizontal overflow passed |
 | Reduced motion | Native disclosure layout remains intact with no scroll pinning or enhancement attribute |
 | No JavaScript | Four native `<details>` controls remain operable in the static export on desktop and mobile |
 
 The date range is computed from the unchanged periods in
 `content/site-content.ts`, including overlapping roles and the May 2026
-graduation milestone. The desktop ledger presents each stop as one editorial
-row; mobile turns the same semantic list into a vertical route. Grouped native
-disclosures keep only one description open at a time when JavaScript is
-available, while the underlying controls remain functional without it.
+graduation milestone. Desktop distributes every stop across a continuous
+left-to-right rail, then gives each role its own vertical column; mobile turns
+the same semantic list into a vertical route. Grouped native disclosures keep
+only one description open at a time when JavaScript is available, while the
+underlying controls remain functional without it.
 
 Verified on 2026-07-18 from `codex/phase-6-resubmission-polish`. Phase 6
 hardens the complete maximalist atlas for submission: heavy WebGL now waits for

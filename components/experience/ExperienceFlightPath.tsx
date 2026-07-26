@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { type CSSProperties, useRef } from 'react'
 
 import { AtlasPicture } from '@/components/portfolio/AtlasPicture'
 import { atlasVisuals } from '@/content/editorial-visuals'
@@ -10,6 +10,10 @@ import { buildExperienceTimeline } from '@/lib/experience-flight-path'
 interface ExperienceFlightPathProps {
   readonly education: readonly EducationEntry[]
   readonly experience: readonly ExperienceEntry[]
+}
+
+type TimelineStyle = CSSProperties & {
+  '--experience-stop-count': number
 }
 
 type TimelineStop =
@@ -152,10 +156,10 @@ export function ExperienceFlightPath({
         </div>
         <div className="experience-timeline__intro-copy">
           <p>
-            Three roles and one academic milestone. Open a stop when you want
-            the work behind the title.
+            Four upright stops across one compact timeline. Open a role when
+            you want the work behind the title.
           </p>
-          <p>Company and role titles remain visible at every point.</p>
+          <p>Company and role titles stay visible across the route.</p>
         </div>
       </header>
 
@@ -174,97 +178,102 @@ export function ExperienceFlightPath({
           <span>{timeline.endLabel}</span>
         </div>
 
-        <ol
-          className="experience-timeline__list"
-          aria-label="Professional experience and education"
-        >
-          {stops.map((stop, index) => {
-            const detailsId = `experience-details-${stop.id}`
-            const headingId = `experience-heading-${stop.id}`
-            const accessibleRole = stop.kind === 'experience'
-              ? stop.entry.role
-              : stop.role
-            const toggleLabel = `Details for ${accessibleRole} at ${stop.label}`
+        <div className="experience-timeline__rail">
+          <ol
+            className="experience-timeline__list"
+            aria-label="Professional experience and education"
+            style={{
+              '--experience-stop-count': stops.length,
+            } as TimelineStyle}
+          >
+            {stops.map((stop, index) => {
+              const detailsId = `experience-details-${stop.id}`
+              const headingId = `experience-heading-${stop.id}`
+              const accessibleRole = stop.kind === 'experience'
+                ? stop.entry.role
+                : stop.role
+              const toggleLabel = `Details for ${accessibleRole} at ${stop.label}`
 
-            return (
-              <li
-                className="experience-timeline__stop"
-                data-experience-chapter
-                data-kind={stop.kind}
-                id={`experience-stop-${stop.id}`}
-                key={stop.id}
-              >
-                <article aria-labelledby={headingId}>
-                  <details data-stop-id={stop.id} name="experience-timeline">
-                    <summary
-                      className="experience-timeline__stop-header"
-                      aria-controls={detailsId}
-                      aria-label={toggleLabel}
-                      onClick={() => {
-                        rootRef.current
-                          ?.querySelectorAll<HTMLDetailsElement>('details[open]')
-                          .forEach((disclosure) => {
-                            if (disclosure.dataset.stopId !== stop.id) {
-                              disclosure.open = false
-                            }
-                          })
-                      }}
-                    >
-                      <span className="experience-timeline__node" aria-hidden="true">
-                        <span>{String(index + 1).padStart(2, '0')}</span>
-                        {stop.entry.logo ? (
-                          <img
-                            src={stop.entry.logo}
-                            alt=""
-                            width="64"
-                            height="64"
-                          />
-                        ) : (
-                          <i className="experience-timeline__node-mark" />
-                        )}
-                      </span>
-
-                      <span className="experience-timeline__identity">
-                        <span>{stop.role}</span>
-                        <span id={headingId} role="heading" aria-level={3}>
-                          {stop.label}
-                        </span>
-                      </span>
-
-                      <span className="experience-timeline__period">
-                        <span>Tenure</span>
-                        {stop.period}
-                      </span>
-
-                      <span className="experience-timeline__location">
-                        <span>Location</span>
-                        {stop.location ?? '—'}
-                      </span>
-
-                      <span
-                        className="experience-timeline__toggle"
-                        aria-hidden="true"
+              return (
+                <li
+                  className="experience-timeline__stop"
+                  data-experience-chapter
+                  data-kind={stop.kind}
+                  id={`experience-stop-${stop.id}`}
+                  key={stop.id}
+                >
+                  <article aria-labelledby={headingId}>
+                    <details data-stop-id={stop.id} name="experience-timeline">
+                      <summary
+                        className="experience-timeline__stop-header"
+                        aria-controls={detailsId}
+                        aria-label={toggleLabel}
+                        onClick={() => {
+                          rootRef.current
+                            ?.querySelectorAll<HTMLDetailsElement>('details[open]')
+                            .forEach((disclosure) => {
+                              if (disclosure.dataset.stopId !== stop.id) {
+                                disclosure.open = false
+                              }
+                            })
+                        }}
                       >
-                        <span className="experience-timeline__toggle-closed">Details</span>
-                        <span className="experience-timeline__toggle-open">Close</span>
-                        <i />
-                      </span>
-                    </summary>
+                        <span className="experience-timeline__node" aria-hidden="true">
+                          <span>{String(index + 1).padStart(2, '0')}</span>
+                          {stop.entry.logo ? (
+                            <img
+                              src={stop.entry.logo}
+                              alt=""
+                              width="64"
+                              height="64"
+                            />
+                          ) : (
+                            <i className="experience-timeline__node-mark" />
+                          )}
+                        </span>
 
-                    <div
-                      className="experience-timeline__details"
-                      id={detailsId}
-                    >
-                      {stop.kind === 'experience'
-                        ? <ExperienceDetails entry={stop.entry} />
-                        : <EducationDetails entry={stop.entry} />}
-                    </div>
-                  </details>
-                </article>
-              </li>
-            )
-          })}
-        </ol>
+                        <span className="experience-timeline__identity">
+                          <span>{stop.role}</span>
+                          <span id={headingId} role="heading" aria-level={3}>
+                            {stop.label}
+                          </span>
+                        </span>
+
+                        <span className="experience-timeline__period">
+                          <span>Tenure</span>
+                          {stop.period}
+                        </span>
+
+                        <span className="experience-timeline__location">
+                          <span>Location</span>
+                          {stop.location ?? '—'}
+                        </span>
+
+                        <span
+                          className="experience-timeline__toggle"
+                          aria-hidden="true"
+                        >
+                          <span className="experience-timeline__toggle-closed">Details</span>
+                          <span className="experience-timeline__toggle-open">Close</span>
+                          <i />
+                        </span>
+                      </summary>
+
+                      <div
+                        className="experience-timeline__details"
+                        id={detailsId}
+                      >
+                        {stop.kind === 'experience'
+                          ? <ExperienceDetails entry={stop.entry} />
+                          : <EducationDetails entry={stop.entry} />}
+                      </div>
+                    </details>
+                  </article>
+                </li>
+              )
+            })}
+          </ol>
+        </div>
       </section>
     </div>
   )

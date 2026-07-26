@@ -111,6 +111,11 @@
   position: relative;
 }
 
+.experience-timeline__rail {
+  position: relative;
+  max-width: 100%;
+}
+
 .experience-timeline__range {
   display: grid;
   padding-bottom: 1rem;
@@ -481,19 +486,152 @@
     font-size: clamp(7rem, 11.5vw, 11rem);
   }
 
+  .experience-timeline__rail {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-color: var(--experience-coral) rgb(255 253 245 / 8%);
+    scrollbar-width: thin;
+    scroll-snap-type: x proximity;
+  }
+
+  .experience-timeline__rail::-webkit-scrollbar {
+    height: 0.35rem;
+  }
+
+  .experience-timeline__rail::-webkit-scrollbar-track {
+    background: rgb(255 253 245 / 8%);
+  }
+
+  .experience-timeline__rail::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--experience-coral);
+  }
+
+  .experience-timeline__list {
+    width: 100%;
+    min-width: calc(var(--experience-stop-count) * 15rem);
+    align-items: start;
+    grid-template-columns: repeat(var(--experience-stop-count), minmax(0, 1fr));
+  }
+
+  .experience-timeline__list::before {
+    content: none;
+  }
+
+  .experience-timeline__stop {
+    min-width: 0;
+    border-top: 0;
+    border-left: 1px solid var(--experience-rule);
+    background:
+      linear-gradient(180deg, rgb(255 253 245 / 3%), transparent 42%),
+      rgb(12 12 23 / 26%);
+    scroll-snap-align: start;
+  }
+
+  .experience-timeline__stop:last-child {
+    border-right: 1px solid var(--experience-rule);
+  }
+
+  .experience-timeline__stop::before {
+    position: absolute;
+    z-index: 0;
+    top: 4.05rem;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: var(--experience-rule-strong);
+    content: '';
+  }
+
+  .experience-timeline__stop:first-child::before {
+    left: 50%;
+  }
+
+  .experience-timeline__stop:last-child::before {
+    right: 50%;
+  }
+
+  .experience-timeline__stop article,
+  .experience-timeline__stop details {
+    height: 100%;
+  }
+
   .experience-timeline__stop-header {
     display: grid;
-    min-height: 8.5rem;
-    padding: 1.35rem 1rem 1.35rem 0;
-    grid-template-columns: 4rem minmax(16rem, 1.25fr) minmax(13rem, 0.8fr) minmax(10rem, 0.65fr) auto;
+    min-height: 30rem;
+    padding: 0 1.35rem 1.5rem;
+    align-content: start;
+    justify-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 5.3rem minmax(11rem, auto) auto auto 1fr;
   }
 
   .experience-timeline__node {
-    width: 4rem;
+    width: 100%;
+    height: 5.3rem;
+    justify-items: center;
+  }
+
+  .experience-timeline__node > span {
+    padding-top: 0.4rem;
+  }
+
+  .experience-timeline__identity {
+    align-self: start;
+    padding-top: 1.4rem;
+    text-align: center;
+  }
+
+  .experience-timeline__identity > span:first-child {
+    min-height: 2.7rem;
+    margin-bottom: 0.75rem;
   }
 
   .experience-timeline__identity > [role='heading'] {
-    font-size: clamp(2.25rem, 3.2vw, 3.65rem);
+    font-size: clamp(2.15rem, 2.85vw, 3.35rem);
+    overflow-wrap: anywhere;
+  }
+
+  .experience-timeline__period,
+  .experience-timeline__location {
+    justify-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(255 253 245 / 10%);
+    text-align: center;
+  }
+
+  .experience-timeline__location {
+    margin-top: 0.9rem;
+  }
+
+  .experience-timeline__toggle {
+    width: 100%;
+    min-width: 0;
+    margin-top: 1.5rem;
+    align-self: end;
+  }
+
+  .experience-timeline__details {
+    padding: 1.5rem 1.35rem 2rem;
+    gap: 1.75rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .experience-timeline__summary {
+    padding-top: 0;
+  }
+
+  .experience-timeline__summary > p:last-child {
+    font-size: clamp(1.12rem, 1.35vw, 1.4rem);
+  }
+
+  .experience-timeline__summary .experience-timeline__gpa {
+    font-size: clamp(2.4rem, 3.5vw, 3.6rem);
+  }
+
+  .experience-timeline__evidence {
+    padding-top: 0;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .experience-timeline__stop:hover {
@@ -506,6 +644,20 @@
 }
 
 @media (max-width: 959px) {
+  .experience-timeline__rail {
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+
+  .experience-timeline__list {
+    width: auto;
+    min-width: 0;
+    grid-auto-flow: row;
+    grid-template-columns: 1fr;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+
   .experience-timeline__stop-header {
     padding-left: 0;
     grid-template-areas:
