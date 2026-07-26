@@ -79,7 +79,7 @@ describe('Experience timeline', () => {
     })
   })
 
-  it('draws a proportional multilayer date map including the education milestone', () => {
+  it('draws one dominant axis, three tight sub-lines, and an education star above', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
@@ -87,32 +87,40 @@ describe('Experience timeline', () => {
 
     expect(declarationsFor(
       experienceStyles,
-      '.experience-timeline__lane',
+      '.experience-timeline__spine-line',
     )).toMatchObject({
-      display: 'grid',
-      'grid-template-columns': 'minmax(10rem, 17rem) minmax(0, 1fr)',
-    })
-    expect(declarationsFor(
-      experienceStyles,
-      '.experience-timeline__lane-bar',
-    )).toMatchObject({
-      left: 'var(--experience-lane-start)',
-      right: 'calc(100% - var(--experience-lane-end))',
+      height: '3px',
       position: 'absolute',
     })
     expect(declarationsFor(
       experienceStyles,
-      '.experience-timeline__lane[data-kind=\"education\"] .experience-timeline__lane-bar',
+      '.experience-timeline__duration-line',
     )).toMatchObject({
-      left: 'auto',
-      right: '0',
+      left: 'var(--experience-lane-start)',
+      right: 'calc(100% - var(--experience-lane-end))',
+      position: 'absolute',
+      top: 'calc(var(--experience-lane-index) * 1.65rem)',
     })
     expect(declarationsFor(
       experienceStyles,
-      '.experience-timeline__lane',
-      '(max-width: 640px)',
+      '.experience-timeline__milestone',
     )).toMatchObject({
-      'grid-template-columns': 'minmax(0, 1fr)',
+      bottom: 'calc(100% + 0.35rem)',
+      left: 'var(--experience-position)',
+      position: 'absolute',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__line-tooltip',
+    )).toMatchObject({
+      opacity: '0',
+      'pointer-events': 'none',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__duration-link:is(:hover, :focus) .experience-timeline__line-tooltip',
+    )).toMatchObject({
+      opacity: '1',
     })
   })
 

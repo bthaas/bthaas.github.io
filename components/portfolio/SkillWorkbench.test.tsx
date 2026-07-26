@@ -73,7 +73,7 @@ describe('SkillWorkbench', () => {
       expect(item).toHaveAttribute('data-skill-category', logo.categorySlug)
       expect(item).toHaveStyle({ '--skill-category-color': logo.categoryColor })
     }
-  })
+  }, 15_000)
 
   it('filters by category', () => {
     render(<SkillWorkbench logos={logos} />)

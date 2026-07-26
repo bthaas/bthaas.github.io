@@ -442,8 +442,11 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     'idle',
   )
   const careerPath = page.locator('[data-experience-flight]')
-  const durationLanes = careerPath.getByRole('list', {
-    name: 'Experience duration lanes',
+  const durationMap = careerPath.getByRole('navigation', {
+    name: 'Experience date map',
+  })
+  const durationLines = durationMap.getByRole('list', {
+    name: 'Professional duration lines',
   })
   const stops = careerPath.locator('[data-experience-chapter]')
   const disclosures = stops.locator('details')
@@ -454,16 +457,36 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     'summary[aria-label="Details for GenAI Technical Advisor Intern at Scale AI"]',
   )
   await expect(stops).toHaveCount(4)
-  await expect(durationLanes.getByRole('listitem')).toHaveCount(4)
-  await expect(
-    durationLanes.getByLabel('B.S. in Computer Science at University of Virginia, May 2026'),
-  ).toBeVisible()
-  const laneWidths = await durationLanes.locator('.experience-timeline__lane-bar')
+  await expect(durationLines.getByRole('listitem')).toHaveCount(3)
+  await expect(durationMap.getByRole('link')).toHaveCount(4)
+  const educationStar = durationMap.getByLabel(
+    'B.S. in Computer Science at University of Virginia, May 2026',
+  )
+  await expect(educationStar).toBeVisible()
+  const lineWidths = await durationLines.locator('.experience-timeline__duration-bar')
     .evaluateAll((elements) => elements.map((element) => (
       element.getBoundingClientRect().width
     )))
-  expect(laneWidths).toHaveLength(4)
-  expect(laneWidths.every((width) => width > 0)).toBe(true)
+  expect(lineWidths).toHaveLength(3)
+  expect(lineWidths.every((width) => width > 0)).toBe(true)
+  const spineBox = await durationMap.locator('.experience-timeline__spine-line')
+    .boundingBox()
+  const starBox = await educationStar.boundingBox()
+  const durationBoxes = await durationLines.locator('.experience-timeline__duration-bar')
+    .evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().top))
+  expect(spineBox).not.toBeNull()
+  expect(starBox).not.toBeNull()
+  expect(starBox!.y).toBeLessThan(spineBox!.y)
+  expect(durationBoxes.every((top) => top > spineBox!.y)).toBe(true)
+  const firstDurationLink = durationLines.getByLabel(
+    'ML Research Assistant at University of Virginia, Nov 2025 – May 2026',
+  )
+  const firstDurationTooltip = firstDurationLink.locator(
+    '.experience-timeline__line-tooltip',
+  )
+  await expect(firstDurationTooltip).toHaveCSS('opacity', '0')
+  await firstDurationLink.focus()
+  await expect(firstDurationTooltip).toHaveCSS('opacity', '1')
   await expect(disclosures).toHaveCount(4)
   await expect(careerPath).not.toHaveAttribute('data-experience-flight-enhanced')
   for (const stop of await stops.all()) await expect(stop).toBeVisible()
@@ -655,8 +678,10 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(page.locator('[data-experience-flight]'))
     .not.toHaveAttribute('data-experience-flight-enhanced')
   await expect(page.locator('[data-experience-chapter]')).toHaveCount(4)
-  await expect(page.getByRole('list', { name: 'Experience duration lanes' })
-    .getByRole('listitem')).toHaveCount(4)
+  await expect(page.getByRole('navigation', { name: 'Experience date map' })
+    .getByRole('link')).toHaveCount(4)
+  await expect(page.getByRole('list', { name: 'Professional duration lines' })
+    .getByRole('listitem')).toHaveCount(3)
   for (const chapter of await page.locator('[data-experience-chapter]').all()) {
     await expect(chapter).toBeVisible()
   }
@@ -1318,8 +1343,10 @@ test('preserves every focused route without JavaScript', async (
   await expect(page.locator('[data-experience-flight]'))
     .not.toHaveAttribute('data-experience-flight-enhanced')
   await expect(page.locator('[data-experience-chapter]')).toHaveCount(4)
-  await expect(page.getByRole('list', { name: 'Experience duration lanes' })
-    .getByRole('listitem')).toHaveCount(4)
+  await expect(page.getByRole('navigation', { name: 'Experience date map' })
+    .getByRole('link')).toHaveCount(4)
+  await expect(page.getByRole('list', { name: 'Professional duration lines' })
+    .getByRole('listitem')).toHaveCount(3)
   for (const chapter of await page.locator('[data-experience-chapter]').all()) {
     await expect(chapter).toBeVisible()
   }
