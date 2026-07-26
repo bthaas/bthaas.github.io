@@ -712,8 +712,10 @@ test('spins the project helix and keeps a complete static fallback', async ({
 
   const spiral = page.locator('.project-spiral')
   const stage = page.locator('[data-project-spiral-stage]')
-  const panelList = page.getByRole('navigation', { name: 'Select a project' })
+  const panelList = page.getByRole('list', { name: 'Projects' })
   const panels = page.locator('[data-project-spiral-fallback] a')
+  const spiralButton = page.getByRole('button', { name: 'Spiral view' })
+  const indexButton = page.getByRole('button', { name: 'Index view' })
   await expect(panels).toHaveCount(3)
   await stage.scrollIntoViewIfNeeded()
   await expect(page.locator('[data-project-flight-stage], .project-flight-canvas')).toHaveCount(0)
@@ -724,7 +726,8 @@ test('spins the project helix and keeps a complete static fallback', async ({
     await expect(stage).toHaveAttribute('data-project-spiral-ready', '')
     await expect(stage.locator('canvas')).toHaveCount(1)
     await expect(page.locator('.project-spiral-stats')).toHaveCount(1)
-    await expect(panelList).toBeHidden()
+    await expect(panelList).toBeVisible()
+    await expect(spiralButton).toHaveAttribute('aria-pressed', 'true')
     const activeLink = stage.getByRole('link', { name: 'Open Court Vision case study' })
     await expect(activeLink).toHaveAttribute('href', '/projects/courtvision')
     const range = await spiral.evaluate((node) => {
@@ -748,20 +751,31 @@ test('spins the project helix and keeps a complete static fallback', async ({
         href,
       )
     }
+
+    await indexButton.click()
+    await expect(spiral).toHaveAttribute('data-project-view', 'index')
+    await expect(indexButton).toHaveAttribute('aria-pressed', 'true')
+    await expect(stage).toBeHidden()
+    await expect(panelList.getByText('TensorFlow Lite')).toBeVisible()
+
+    await spiralButton.click()
+    await expect(spiral).toHaveAttribute('data-project-view', 'spiral')
+    await expect(spiralButton).toHaveAttribute('aria-pressed', 'true')
+    await expect(stage).toBeVisible()
   } else {
     await expect(stage).toBeHidden()
     await expect(panelList).toBeVisible()
     await expect(stage.locator('canvas')).toHaveCount(0)
+    await expect(indexButton).toHaveAttribute('aria-pressed', 'true')
   }
 
-  const beatStream = await spiral.getAttribute('data-project-spiral-enhanced') !== null
-    ? stage.getByRole('link', { name: '02 Beat Stream' })
-    : panelList.getByRole('link', { name: /Open Beat Stream/i })
+  const beatStream = panelList.getByRole('link', { name: /Open Beat Stream/i })
   await beatStream.focus()
   await expect(beatStream).toBeFocused()
-  const visionBiasSteering = await spiral.getAttribute('data-project-spiral-enhanced') !== null
-    ? stage.getByRole('link', { name: '03 Vision Bias Steering' })
-    : panelList.getByRole('link', { name: 'Open Vision Bias Steering case study' })
+  const visionBiasSteering = panelList.getByRole(
+    'link',
+    { name: 'Open Vision Bias Steering case study' },
+  )
   await expect(visionBiasSteering)
     .toHaveAttribute('href', '/projects/vision-bias-steering')
 

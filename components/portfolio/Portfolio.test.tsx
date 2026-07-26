@@ -234,12 +234,14 @@ describe('Portfolio', () => {
 
     siteContent.projects.forEach((project, index) => {
       const trigger = panelTriggers[index]
+      const projectItem = trigger.closest('li')
 
       expect(trigger).toHaveAttribute('href', `/projects/${project.id}`)
       expect(trigger).not.toHaveAttribute('aria-controls')
       expect(trigger).not.toHaveAttribute('aria-expanded')
-      expect(within(trigger).getByText(project.name)).toBeInTheDocument()
-      expect(within(trigger).getByText(project.description)).toBeInTheDocument()
+      expect(projectItem).not.toBeNull()
+      expect(within(projectItem as HTMLElement).getByText(project.name)).toBeInTheDocument()
+      expect(within(projectItem as HTMLElement).getByText(project.description)).toBeInTheDocument()
     })
 
     expect(screen.queryByText('View project results')).not.toBeInTheDocument()
@@ -249,17 +251,28 @@ describe('Portfolio', () => {
   it('server-renders the project spiral with its complete static fallback', () => {
     render(<Portfolio />)
 
-    const panelList = screen.getByRole('navigation', { name: 'Select a project' })
+    const panelList = screen.getByRole('list', { name: 'Projects' })
     const panels = screen.getAllByTestId('project-spiral-fallback-link')
 
-    expect(panelList).toHaveClass('project-spiral__fallback')
+    expect(panelList).toHaveClass('project-spiral__projects')
     expect(panelList).toHaveAttribute('data-project-spiral-fallback')
     panels.forEach((panel, index) => {
+      const projectItem = panel.closest('li')
       expect(panel).toHaveAttribute('id', `project-${siteContent.projects[index].id}`)
-      expect(within(panel).getByText(siteContent.projects[index].name)).toBeInTheDocument()
+      expect(projectItem).not.toBeNull()
+      expect(within(projectItem as HTMLElement).getByText(siteContent.projects[index].name))
+        .toBeInTheDocument()
     })
     expect(document.querySelector('[data-project-spiral-stage]')).toBeInTheDocument()
     expect(document.querySelector('[data-project-flight-stage]')).not.toBeInTheDocument()
+  })
+
+  it('lets the project spiral own the page without explanatory intro copy', () => {
+    render(<Portfolio />)
+
+    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
+    expect(screen.getByText('02 / Field studies')).toBeInTheDocument()
+    expect(screen.queryByText(/Three builds across computer vision/i)).not.toBeInTheDocument()
   })
 
   it('contains no legacy cinematic or modal presentation surfaces', () => {

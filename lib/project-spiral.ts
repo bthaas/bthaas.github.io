@@ -1,6 +1,12 @@
 const FULL_TURN = Math.PI * 2
 const DEFAULT_TURNS = 2
 
+export type ProjectView = 'spiral' | 'index'
+
+export function getDefaultProjectView(reducedMotion: boolean): ProjectView {
+  return reducedMotion ? 'index' : 'spiral'
+}
+
 export const PROJECT_SPIRAL_SLOT_ORDER = [0, 1, 2, 0, 1, 2, 0, 1, 2] as const
 
 interface ProjectSpiralFrameInput {
