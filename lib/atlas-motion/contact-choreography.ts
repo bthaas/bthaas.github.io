@@ -3,8 +3,6 @@ import { mapProgress } from './progress'
 
 const CHARACTER_GAP_EM = 0.02
 const CONTACT_DOCUMENT_START = 0.88
-const SUN_FINALE_START = 0.8
-const SUN_FINALE_END = 0.98
 const CONTACT_PLATE_END = 0.34
 const CONTACT_IMAGE_TRAVEL_PERCENT = 5
 const DETAIL_REVEAL_WINDOWS = [
@@ -73,7 +71,6 @@ export function getContactDetailRevealProgress(progress: number, index: number):
   return mapProgress(progress, revealWindow[0], revealWindow[1])
 }
 
-export function getContactGlowProgress(contactProgress: number, sunProgress: number): number {
-  const sunFinaleProgress = mapProgress(sunProgress, SUN_FINALE_START, SUN_FINALE_END)
-  return round(Math.min(clampProgress(contactProgress), sunFinaleProgress))
+export function getContactGlowProgress(contactProgress: number): number {
+  return round(clampProgress(contactProgress))
 }

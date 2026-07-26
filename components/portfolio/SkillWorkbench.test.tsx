@@ -118,6 +118,7 @@ describe('SkillWorkbench', () => {
     expect(release).toHaveBeenCalledWith(7)
 
     act(() => animate?.(performance.now() + 16))
+    act(() => animate?.(performance.now() + 32))
     fireEvent.click(screen.getByRole('button', { name: 'Reset workbench' }))
     expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
 
@@ -128,13 +129,21 @@ describe('SkillWorkbench', () => {
       pointerId: 9,
       pointerType: 'touch',
     })
+    fireEvent.pointerMove(token, {
+      clientX: 100,
+      clientY: 40,
+      pointerId: 9,
+      pointerType: 'touch',
+    })
     fireEvent.pointerCancel(token, {
       clientX: 100,
-      clientY: 100,
+      clientY: 40,
       pointerId: 9,
       pointerType: 'touch',
     })
     expect(release).toHaveBeenCalledWith(9)
+    act(() => animate?.(performance.now() + 48))
+    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
   })
 
   it('offers keyboard nudging and Escape-to-home without hiding the fallback grid', () => {

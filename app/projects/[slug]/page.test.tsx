@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import postcss from 'postcss'
 import { describe, expect, it } from 'vitest'
 
@@ -41,13 +41,24 @@ describe('project detail pages', () => {
     render(page)
 
     expect(screen.getByRole('heading', { level: 1, name: 'Court Vision' })).toBeInTheDocument()
-    const brandLink = screen.getByRole('link', { name: 'Brett Haas' })
-    expect(brandLink).toHaveAttribute('href', '/')
-    expect(brandLink.querySelector('img')).toHaveAttribute('src', '/original-wing-filled.png')
-    expect(brandLink.querySelector('img')).toHaveAttribute('alt', '')
-    expect(screen.getByRole('link', { name: 'Back to projects' })).toHaveAttribute(
+    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+    expect(within(navigation).getAllByRole('link')).toHaveLength(5)
+    expect(within(navigation).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/')
+    expect(within(navigation).getByRole('link', { name: 'Experience' })).toHaveAttribute(
       'href',
-      '/projects',
+      '/experience',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Skills' })).toHaveAttribute(
+      'href',
+      '/skills',
+    )
+    expect(within(navigation).getByRole('link', { name: 'Contact' })).toHaveAttribute(
+      'href',
+      '/contact',
     )
     expect(screen.getByRole('link', { name: 'All projects' })).toHaveAttribute(
       'href',

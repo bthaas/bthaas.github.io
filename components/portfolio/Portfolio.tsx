@@ -2,17 +2,20 @@ import { atlasVisuals } from '@/content/editorial-visuals'
 import { ExperienceFlightPath } from '@/components/experience/ExperienceFlightPath'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
-import { SunBadge } from '@/components/motion/SunBadge'
 import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
 import { siteContent } from '@/content/site-content'
 
 import { AtlasPicture } from './AtlasPicture'
+import {
+  AtlasNavigation,
+  type AtlasRouteName,
+} from './AtlasNavigation'
 import { getSkillLogos, SkillLogoGrid } from './SkillLogos'
 import { SkillWorkbench } from './SkillWorkbench'
 import { PortfolioGateway } from './PortfolioGateway'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
-export type PortfolioScreenName = 'home' | 'experience' | 'projects' | 'skills' | 'contact'
+export type PortfolioScreenName = AtlasRouteName
 
 interface PortfolioProps {
   readonly screen?: PortfolioScreenName
@@ -71,48 +74,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
         Skip to content
       </a>
 
-      <header className="site-header">
-        <nav className="site-nav atlas-shell" aria-label="Primary navigation">
-          <TransitionLink className="nav-name" href="/">
-            <img
-              className="nav-name__mark"
-              src="/original-wing-filled.png"
-              alt=""
-              width="128"
-              height="128"
-              aria-hidden="true"
-            />
-            Brett Haas
-          </TransitionLink>
-          <SunBadge />
-          <div className="nav-links">
-            <TransitionLink
-              href="/experience"
-              aria-current={screen === 'experience' ? 'page' : undefined}
-            >
-              Experience
-            </TransitionLink>
-            <TransitionLink
-              href="/projects"
-              aria-current={screen === 'projects' ? 'page' : undefined}
-            >
-              Projects
-            </TransitionLink>
-            <TransitionLink
-              href="/skills"
-              aria-current={screen === 'skills' ? 'page' : undefined}
-            >
-              Skills
-            </TransitionLink>
-            <TransitionLink
-              href="/contact"
-              aria-current={screen === 'contact' ? 'page' : undefined}
-            >
-              Contact
-            </TransitionLink>
-          </div>
-        </nav>
-      </header>
+      <AtlasNavigation current={screen ?? 'home'} />
 
       <main
         id="main-content"

@@ -10,7 +10,6 @@ import {
 } from '../../lib/atlas-motion/contact-choreography'
 
 import { splitText } from './split-text'
-import { SUN_PROGRESS_EVENT, type SunProgressDetail } from './sun-arc'
 
 interface ContactMetrics {
   elementHeight: number
@@ -62,7 +61,6 @@ export function setupContactFinale(
   const metrics: ContactMetrics = { elementHeight: 0, elementTop: 0 }
   let latestScrollY = runtimeWindow.scrollY
   let latestDocumentProgress = 0
-  let latestSunProgress = 0
   let measuredOnApproach = false
   let firstMeasureFrame = 0
   let secondMeasureFrame = 0
@@ -82,7 +80,7 @@ export function setupContactFinale(
       measuredProgress,
       getContactDocumentProgress(latestDocumentProgress),
     )
-    const glow = getContactGlowProgress(progress, latestSunProgress)
+    const glow = getContactGlowProgress(progress)
 
     section.style.setProperty('--atlas-contact-glow', String(glow))
     section.style.setProperty(
@@ -130,11 +128,6 @@ export function setupContactFinale(
     }
     render()
   }
-  const handleSunProgress = (event: Event) => {
-    const { detail } = event as CustomEvent<SunProgressDetail>
-    latestSunProgress = detail?.progress ?? latestSunProgress
-    render()
-  }
   const handleResize = () => {
     measure()
     latestScrollY = runtimeWindow.scrollY
@@ -149,7 +142,6 @@ export function setupContactFinale(
   section.dataset.contactScrollReady = ''
   resizeObserver?.observe(section)
   runtimeWindow.addEventListener('atlas:scroll', handleScroll)
-  runtimeWindow.addEventListener(SUN_PROGRESS_EVENT, handleSunProgress)
   runtimeWindow.addEventListener('resize', handleResize, { passive: true })
   if (root.readyState !== 'complete') {
     runtimeWindow.addEventListener('load', handleLoad, { once: true })
@@ -167,7 +159,6 @@ export function setupContactFinale(
     runtimeWindow.cancelAnimationFrame(secondMeasureFrame)
     resizeObserver?.disconnect()
     runtimeWindow.removeEventListener('atlas:scroll', handleScroll)
-    runtimeWindow.removeEventListener(SUN_PROGRESS_EVENT, handleSunProgress)
     runtimeWindow.removeEventListener('resize', handleResize)
     runtimeWindow.removeEventListener('load', handleLoad)
     section.style.removeProperty('--atlas-contact-glow')

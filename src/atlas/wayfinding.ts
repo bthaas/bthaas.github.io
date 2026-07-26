@@ -11,16 +11,14 @@ export function setupScrambleWayfinding(
   if (!engine) return () => undefined
 
   const runtimeWindow = root.defaultView ?? window
-  const navLabels = Array.from(root.querySelectorAll<HTMLElement>('.nav-links a'))
   const revealLabels = Array.from(
     root.querySelectorAll<HTMLElement>('.eyebrow, .art-caption'),
   )
-  const targets = [...navLabels, ...revealLabels]
+  const targets = revealLabels
   const originalLabels = new Map(targets.map((target) => [target, target.getAttribute('aria-label')]))
   const originalText = new Map(targets.map((target) => [target, target.textContent?.trim() ?? '']))
   const tweens: Array<{ kill: () => void }> = []
   const triggers: Array<{ kill: () => void }> = []
-  const cleanups: Array<() => void> = []
 
   const decode = (target: HTMLElement) => {
     const text = originalText.get(target) ?? ''
@@ -41,16 +39,6 @@ export function setupScrambleWayfinding(
     const text = originalText.get(target)
     if (text) target.setAttribute('aria-label', text)
   })
-  navLabels.forEach((label) => {
-    const handleRepeat = () => decode(label)
-    label.addEventListener('pointerenter', handleRepeat)
-    label.addEventListener('focus', handleRepeat)
-    cleanups.push(() => {
-      label.removeEventListener('pointerenter', handleRepeat)
-      label.removeEventListener('focus', handleRepeat)
-    })
-    decode(label)
-  })
   revealLabels.forEach((label) => {
     const measureStart = () => getViewportEntryRange({
       elementTop: label.getBoundingClientRect().top + runtimeWindow.scrollY,
@@ -67,7 +55,6 @@ export function setupScrambleWayfinding(
   })
 
   return () => {
-    cleanups.forEach((cleanup) => cleanup())
     triggers.forEach((trigger) => trigger.kill())
     tweens.forEach((tween) => tween.kill())
     originalLabels.forEach((ariaLabel, target) => {

@@ -10,7 +10,6 @@ import { setupPrintReveals, setupVelocityPlates } from './plates'
 import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
-import { setupSectionWayfinding, setupSunArc } from './sun-arc'
 import { setupScrambleWayfinding } from './wayfinding'
 
 interface AtlasRuntimeOptions {
@@ -27,10 +26,8 @@ interface AtlasRuntimeOptions {
   readonly prepareProjects?: (document: Document, window: Window) => () => void
   readonly preparePrintReveals?: (document: Document, window: Window) => () => void
   readonly prepareReveals?: () => () => void
-  readonly prepareSun?: (document: Document, window: Window) => () => void
   readonly prepareScramble?: (document: Document) => () => void
   readonly prepareVelocityPlates?: (document: Document) => () => void
-  readonly prepareWayfinding?: (document: Document) => () => void
   readonly prepareWipes?: (document: Document) => () => void
   readonly window?: Window
 }
@@ -49,10 +46,8 @@ export function initializeAtlas({
   prepareProjects = setupProjectPans,
   preparePrintReveals = setupPrintReveals,
   prepareReveals = setupReveals,
-  prepareSun = setupSunArc,
   prepareScramble = setupScrambleWayfinding,
   prepareVelocityPlates = setupVelocityPlates,
-  prepareWayfinding = setupSectionWayfinding,
   prepareWipes = setupChapterWipes,
   window: runtimeWindow = window,
 }: AtlasRuntimeOptions = {}): () => void {
@@ -69,7 +64,6 @@ export function initializeAtlas({
   html.classList.add('atlas-js')
   html.dataset.atlas = 'ready'
 
-  const cleanupWayfinding = prepareWayfinding(runtimeDocument)
   const cleanupLocalTime = prepareLocalTime(runtimeDocument)
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
   const cleanupCursor = prepareCursor(runtimeDocument)
@@ -79,7 +73,6 @@ export function initializeAtlas({
   const cleanupProjects = prepareProjects(runtimeDocument, runtimeWindow)
   const cleanupPrintReveals = preparePrintReveals(runtimeDocument, runtimeWindow)
   const cleanupScramble = prepareScramble(runtimeDocument)
-  const cleanupSun = prepareSun(runtimeDocument, runtimeWindow)
   const cleanupVelocityPlates = prepareVelocityPlates(runtimeDocument)
   const cleanupWipes = prepareWipes(runtimeDocument)
   const scrollBus = (createBus ?? ((activeEngine) => createScrollBus({
@@ -132,11 +125,9 @@ export function initializeAtlas({
     cleanupProjects()
     cleanupPrintReveals()
     cleanupScramble()
-    cleanupSun()
     cleanupVelocityPlates()
     cleanupWipes()
     cleanupLocalTime()
-    cleanupWayfinding()
     cleanupReveals()
     scrollBus.destroy()
     engine.destroy()

@@ -11,7 +11,6 @@ import {
 
 const STORAGE_KEY = 'atlas-sun-spectacle'
 const SPECTACLE_EVENT = 'atlas:sun-spectacle'
-const SUN_HIT_EVENT = 'atlas:sun-hit'
 
 gsap.registerPlugin(useGSAP)
 
@@ -39,7 +38,6 @@ export function AtlasSpectacle() {
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     let active = false
-    let hitCount = 0
     let konamiIndex = 0
     let timeline: gsap.core.Timeline | null = null
 
@@ -57,12 +55,6 @@ export function AtlasSpectacle() {
 
       const flare = root.querySelector<HTMLElement>('[data-atlas-sun-flare]')
       const goldenFeather = document.querySelector<HTMLElement>('[data-golden-feather-target]')
-      const sun = document.querySelector<HTMLElement>('[data-atlas-sun-trigger]')
-      if (sun) {
-        const sunBounds = sun.getBoundingClientRect()
-        root.style.setProperty('--atlas-flare-x', `${sunBounds.left + sunBounds.width / 2}px`)
-        root.style.setProperty('--atlas-flare-y', `${sunBounds.top + sunBounds.height / 2}px`)
-      }
       timeline?.kill()
       timeline = gsap.timeline({
         onComplete: () => {
@@ -88,13 +80,11 @@ export function AtlasSpectacle() {
           )
       }
 
-      if (goldenFeather && sun) {
+      if (goldenFeather) {
         const targetBounds = goldenFeather.getBoundingClientRect()
-        const sunBounds = sun.getBoundingClientRect()
-        const offsetX = sunBounds.left + sunBounds.width / 2
+        const offsetX = window.innerWidth / 2
           - (targetBounds.left + targetBounds.width / 2)
-        const offsetY = sunBounds.top + sunBounds.height / 2
-          - (targetBounds.top + targetBounds.height / 2)
+        const offsetY = 29 - (targetBounds.top + targetBounds.height / 2)
         timeline
           .set(goldenFeather, {
             opacity: 0,
@@ -118,21 +108,14 @@ export function AtlasSpectacle() {
       timeline.to({}, { duration: SUN_SPECTACLE_DURATION_MS / 1000 }, 0)
     }
 
-    const handleSunHit = () => {
-      hitCount += 1
-      root.dataset.sunHits = String(Math.min(hitCount, 5))
-      if (hitCount >= 5) trigger()
-    }
     const handleKeyDown = (event: KeyboardEvent) => {
       const result = advanceKonamiSequence(konamiIndex, event.key)
       konamiIndex = result.index
       if (result.complete) trigger()
     }
 
-    window.addEventListener(SUN_HIT_EVENT, handleSunHit)
     window.addEventListener('keydown', handleKeyDown)
     return () => {
-      window.removeEventListener(SUN_HIT_EVENT, handleSunHit)
       window.removeEventListener('keydown', handleKeyDown)
       timeline?.kill()
       delete document.documentElement.dataset.atlasSpectacleStart

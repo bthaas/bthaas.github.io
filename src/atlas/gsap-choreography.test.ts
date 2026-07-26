@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { setupChapterWipes } from './chapter-wipe'
 import type { AtlasEngine } from './engine'
 import { setupMetricCountUps } from './hero'
-import { setupSunArc, SUN_PROGRESS_EVENT } from './sun-arc'
 
 interface RecordedTween {
   readonly kill: ReturnType<typeof vi.fn>
@@ -136,48 +135,4 @@ describe('GSAP Atlas choreography', () => {
     expect(document.querySelectorAll('.chapter-wipe__layer')).toHaveLength(0)
   })
 
-  it('draws the real SVG arc and moves the sun along the same path', () => {
-    document.body.innerHTML = `
-      <svg>
-        <path data-atlas-sun-path d="M8 23 Q120 -5 232 23"></path>
-        <g data-atlas-sun></g>
-      </svg>
-      <section id="experience"></section>
-    `
-    const harness = createMotionHarness()
-    const dispatchEvent = vi.spyOn(window, 'dispatchEvent')
-    const cleanup = setupSunArc(document, window, () => 0.4, harness.engine)
-    const arc = harness.timelines[0]
-    const path = document.querySelector('[data-atlas-sun-path]')
-    const sun = document.querySelector('[data-atlas-sun]')
-
-    expect(arc.vars).toMatchObject({
-      scrollTrigger: expect.objectContaining({ end: 'max', scrub: 0.5, start: 0 }),
-    })
-    expect(arc.fromTo).toHaveBeenCalledWith(
-      path,
-      { drawSVG: '0%' },
-      expect.objectContaining({ drawSVG: '100%', ease: 'none' }),
-      0,
-    )
-    expect(arc.to).toHaveBeenCalledWith(
-      sun,
-      expect.objectContaining({
-        ease: 'none',
-        motionPath: expect.objectContaining({
-          align: path,
-          autoRotate: false,
-          path,
-        }),
-      }),
-      0,
-    )
-
-    window.dispatchEvent(new CustomEvent('atlas:scroll', {
-      detail: { documentProgress: 0.4, scrollY: 1000 },
-    }))
-    expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: SUN_PROGRESS_EVENT }))
-    cleanup()
-    expect(arc.kill).toHaveBeenCalledOnce()
-  })
 })

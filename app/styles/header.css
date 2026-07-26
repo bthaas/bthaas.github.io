@@ -1,96 +1,178 @@
-:root {
-  --site-header-height: 59px;
+.site-header {
+  --atlas-corner-top: max(0.75rem, env(safe-area-inset-top));
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  pointer-events: none;
 }
 
-.site-header {
-  position: sticky;
-  z-index: 100;
-  top: 0;
-  border-bottom: 1px solid var(--rule);
-  background: rgb(243 239 227 / 90%);
-  backdrop-filter: blur(16px);
+.site-header[data-current="home"] {
+  --atlas-corner-top: max(4.5rem, env(safe-area-inset-top));
 }
 
 .site-nav {
-  position: relative;
-  display: flex;
-  min-height: 58px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.nav-name,
-.nav-links {
-  position: relative;
-  z-index: 1;
-}
-
-.sun-arc {
-  position: absolute;
-  top: 13px;
-  left: 50%;
-  width: clamp(9rem, 18vw, 15rem);
-  height: 32px;
-  color: var(--ink);
+  position: static;
   pointer-events: none;
-  transform: translateX(-50%);
 }
 
-.sun-arc svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+.atlas-home-link,
+.atlas-route-index {
+  color: var(--ink);
+  pointer-events: auto;
 }
 
-.sun-arc__track,
-.sun-arc__halo {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
+.atlas-home-link {
+  position: fixed;
+  top: var(--atlas-corner-top);
+  left: max(clamp(1rem, 2vw, 2rem), env(safe-area-inset-left));
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
 }
 
-.sun-arc__track {
-  opacity: 0.2;
-}
-
-.sun-arc__halo {
-  stroke: var(--solar);
-  opacity: 0.55;
-}
-
-.sun-arc__disc {
-  fill: var(--solar);
-  stroke: var(--ink);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-
-.nav-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-family: var(--serif);
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-}
-
-.nav-name__mark {
-  width: calc(1.4rem + 1px);
-  height: calc(1.4rem + 1px);
-  flex: 0 0 auto;
+.atlas-home-link__mark {
+  width: 1.75rem;
+  height: 1.75rem;
   object-fit: contain;
+  filter:
+    brightness(0)
+    drop-shadow(0 0 0.55rem rgb(243 239 227 / 92%));
+  transition: transform 300ms var(--ease-out);
 }
 
-.nav-links {
-  display: flex;
+.atlas-home-link__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.atlas-home-link::after {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: var(--solar);
+  box-shadow: 0 0 0 2px rgb(243 239 227 / 72%);
+  content: "";
+  opacity: 0;
+  transform: scale(0.5);
+  transition:
+    opacity 220ms ease,
+    transform 300ms var(--ease-out);
+}
+
+.atlas-home-link[aria-current]::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.atlas-home-link:hover .atlas-home-link__mark,
+.atlas-home-link:focus-visible .atlas-home-link__mark {
+  transform: rotate(-8deg) translateY(-1px);
+}
+
+.atlas-route-index {
+  position: fixed;
+  top: var(--atlas-corner-top);
+  right: max(clamp(1rem, 2vw, 2rem), env(safe-area-inset-right));
+  display: grid;
+  min-width: 9.5rem;
+  padding: 0;
+  margin: 0;
+  gap: 0.05rem;
+  list-style: none;
+  text-shadow:
+    0 0 0.7rem var(--cream),
+    0 0 0.7rem var(--cream);
+}
+
+.site-header[data-current="home"] .atlas-route-index {
+  top: auto;
+  bottom: clamp(7rem, 14vh, 9rem);
+}
+
+.site-header[data-current="skills"] .atlas-route-index {
+  min-width: 0;
+  gap: clamp(0.7rem, 1.2vw, 1rem);
+  grid-template-columns: repeat(4, max-content);
+}
+
+.atlas-route-index li {
+  display: block;
+}
+
+.atlas-route-link {
+  position: relative;
+  display: grid;
+  min-height: 28px;
+  padding: 0.25rem 0;
   align-items: center;
-  gap: clamp(1rem, 2.5vw, 2.5rem);
+  gap: 0.65rem;
+  grid-template-columns: 1.5rem minmax(6.75rem, auto);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
-.nav-links a,
+.site-header[data-current="skills"] .atlas-route-link {
+  gap: 0.3rem;
+  grid-template-columns: max-content max-content;
+}
+
+.atlas-route-link::before {
+  position: absolute;
+  top: 50%;
+  left: -0.55rem;
+  width: 1px;
+  height: 1rem;
+  background: currentColor;
+  content: "";
+  opacity: 0;
+  transform: translateY(-50%) scaleY(0.25);
+  transition:
+    background-color 220ms ease,
+    opacity 220ms ease,
+    transform 300ms var(--ease-out);
+}
+
+.atlas-route-link[aria-current]::before {
+  background: var(--solar);
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
+}
+
+.atlas-route-link__index {
+  color: var(--muted);
+  font-size: 0.56rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  transition: color 220ms ease;
+}
+
+.atlas-route-link__label {
+  transition: transform 300ms var(--ease-out);
+}
+
+.atlas-route-link:hover .atlas-route-link__label,
+.atlas-route-link:focus-visible .atlas-route-link__label {
+  transform: translateX(0.22rem);
+}
+
+.atlas-route-link:hover .atlas-route-link__index,
+.atlas-route-link:focus-visible .atlas-route-link__index,
+.atlas-route-link[aria-current] .atlas-route-link__index {
+  color: var(--ink);
+}
+
 .text-link,
 .repository-link,
 .site-footer a {
@@ -101,7 +183,6 @@
   text-transform: uppercase;
 }
 
-.nav-links a::after,
 .text-link::after,
 .repository-link::after,
 .site-footer a::after {
@@ -117,11 +198,9 @@
   transition: transform 300ms var(--ease-out);
 }
 
-.nav-links a:hover::after,
 .text-link:hover::after,
 .repository-link:hover::after,
 .site-footer a:hover::after,
-.nav-links a:focus-visible::after,
 .text-link:focus-visible::after,
 .repository-link:focus-visible::after,
 .site-footer a:focus-visible::after {
@@ -129,22 +208,140 @@
   transform-origin: left;
 }
 
-.nav-links a[aria-current]::after {
-  transform: scaleX(0.5);
-  transform-origin: left;
-}
-
-.nav-links a[aria-current]:hover::after,
-.nav-links a[aria-current]:focus-visible::after {
-  transform: scaleX(1);
-}
-
 @media (max-width: 720px) {
-  :root {
-    --site-header-height: 55px;
+  .site-header {
+    --atlas-corner-top: auto;
+    top: auto;
+    height: calc(4.75rem + env(safe-area-inset-bottom));
+    background: linear-gradient(
+      to top,
+      rgb(243 239 227 / 98%) 0,
+      rgb(243 239 227 / 88%) 68%,
+      transparent 100%
+    );
   }
 
   .site-nav {
-    min-height: 54px;
+    position: absolute;
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.35rem, env(safe-area-inset-bottom));
+    left: max(0.75rem, env(safe-area-inset-left));
+    display: grid;
+    min-height: 52px;
+    align-items: center;
+    grid-template-columns: 44px minmax(0, 1fr);
+    pointer-events: auto;
+  }
+
+  .atlas-home-link {
+    position: relative;
+    top: auto;
+    left: auto;
+    display: grid;
+    align-self: stretch;
+    grid-template-rows: 1.65rem auto;
+  }
+
+  .atlas-home-link__mark {
+    width: 1.55rem;
+    height: 1.55rem;
+    align-self: end;
+  }
+
+  .atlas-home-link__label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .atlas-home-link::after {
+    top: 0.12rem;
+    right: 50%;
+    bottom: auto;
+    width: 0.9rem;
+    height: 1px;
+    border-radius: 0;
+    box-shadow: none;
+    transform: translateX(50%) scaleX(0.25);
+  }
+
+  .atlas-home-link[aria-current]::after {
+    transform: translateX(50%) scaleX(1);
+  }
+
+  .atlas-route-index {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: grid;
+    min-width: 0;
+    align-self: stretch;
+    gap: 0;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    text-shadow: none;
+  }
+
+  .site-header[data-current="home"] .atlas-route-index {
+    bottom: auto;
+  }
+
+  .site-header[data-current="skills"] .atlas-route-index {
+    gap: 0;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .atlas-route-link {
+    display: grid;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.2rem 0;
+    place-items: center;
+    gap: 0.1rem;
+    grid-template-columns: none;
+    grid-template-rows: 1.35rem auto;
+    text-align: center;
+  }
+
+  .site-header[data-current="skills"] .atlas-route-link {
+    gap: 0.1rem;
+    grid-template-columns: none;
+  }
+
+  .atlas-route-link::before {
+    top: 0.12rem;
+    left: 50%;
+    width: 0.9rem;
+    height: 1px;
+    transform: translateX(-50%) scaleX(0.25);
+  }
+
+  .atlas-route-link[aria-current]::before {
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  .atlas-route-link__index {
+    align-self: end;
+    font-size: 0.52rem;
+  }
+
+  .atlas-route-link__label {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: clamp(0.42rem, 1.8vw, 0.5rem);
+    letter-spacing: 0.05em;
+    text-overflow: clip;
+  }
+
+  .atlas-route-link:hover .atlas-route-link__label,
+  .atlas-route-link:focus-visible .atlas-route-link__label {
+    transform: translateY(-1px);
   }
 }

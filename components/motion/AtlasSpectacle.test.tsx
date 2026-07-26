@@ -1,7 +1,20 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AtlasSpectacle } from './AtlasSpectacle'
+
+const konamiKeys = [
+  'ArrowUp',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowRight',
+  'b',
+  'a',
+] as const
 
 function setReducedMotion(matches: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -26,38 +39,22 @@ describe('AtlasSpectacle', () => {
     setReducedMotion(false)
   })
 
-  it('fires once after five accessible sun activations and gates the session', () => {
+  it('triggers once from the Konami code and gates the session', () => {
     const spectacle = vi.fn()
     window.addEventListener('atlas:sun-spectacle', spectacle)
     render(<AtlasSpectacle />)
 
-    for (let index = 0; index < 5; index += 1) {
-      act(() => window.dispatchEvent(new CustomEvent('atlas:sun-hit')))
+    for (const key of konamiKeys) {
+      fireEvent.keyDown(window, { key })
     }
 
     expect(spectacle).toHaveBeenCalledTimes(1)
     expect(sessionStorage.getItem('atlas-sun-spectacle')).toBe('1')
     expect(document.documentElement).toHaveAttribute('data-atlas-spectacle-start')
 
-    for (let index = 0; index < 5; index += 1) {
-      act(() => window.dispatchEvent(new CustomEvent('atlas:sun-hit')))
-    }
-    expect(spectacle).toHaveBeenCalledTimes(1)
-    window.removeEventListener('atlas:sun-spectacle', spectacle)
-  })
-
-  it('also triggers from the Konami code', () => {
-    const spectacle = vi.fn()
-    window.addEventListener('atlas:sun-spectacle', spectacle)
-    render(<AtlasSpectacle />)
-
-    for (const key of [
-      'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
-      'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a',
-    ]) {
+    for (const key of konamiKeys) {
       fireEvent.keyDown(window, { key })
     }
-
     expect(spectacle).toHaveBeenCalledTimes(1)
     window.removeEventListener('atlas:sun-spectacle', spectacle)
   })
@@ -68,8 +65,8 @@ describe('AtlasSpectacle', () => {
     window.addEventListener('atlas:sun-spectacle', spectacle)
     render(<AtlasSpectacle />)
 
-    for (let index = 0; index < 5; index += 1) {
-      act(() => window.dispatchEvent(new CustomEvent('atlas:sun-hit')))
+    for (const key of konamiKeys) {
+      fireEvent.keyDown(window, { key })
     }
 
     expect(spectacle).not.toHaveBeenCalled()

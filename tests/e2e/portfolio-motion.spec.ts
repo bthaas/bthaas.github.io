@@ -576,7 +576,7 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(reducedWorkbench.locator('.skill-logo')).toHaveCount(28)
   await expect(reducedWorkbench.locator('canvas')).toHaveCount(0)
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveCSS('display', 'none')
-  await expect(page.locator('[data-atlas-sun-trigger]')).toHaveCSS('display', 'none')
+  await expect(page.locator('[data-atlas-sun-trigger]')).toHaveCount(0)
 
   await page.goto('/contact', { waitUntil: 'networkidle' })
   await expect(page.locator('[data-golden-feather-target]')).toHaveCSS('display', 'none')
@@ -663,15 +663,25 @@ test('releases one four-second sun spectacle on the homepage', async ({
   await activateDecorativeWebGL(page, isMobile)
   await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
 
-  const sun = page.getByRole('button', { name: 'Release the sun spectacle' })
-  await expect(sun).toBeVisible()
-  for (let index = 0; index < 4; index += 1) await sun.click()
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
     'data-state',
     'idle',
   )
 
-  await sun.click()
+  for (const key of [
+    'ArrowUp',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowLeft',
+    'ArrowRight',
+    'b',
+    'a',
+  ]) {
+    await page.keyboard.press(key)
+  }
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
     'data-state',
     'active',
@@ -690,7 +700,20 @@ test('releases one four-second sun spectacle on the homepage', async ({
   await expect(page.locator('html')).not.toHaveAttribute('data-atlas-spectacle-start')
 
   await page.reload({ waitUntil: 'networkidle' })
-  for (let index = 0; index < 5; index += 1) await sun.click()
+  for (const key of [
+    'ArrowUp',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowLeft',
+    'ArrowRight',
+    'b',
+    'a',
+  ]) {
+    await page.keyboard.press(key)
+  }
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
     'data-state',
     'idle',

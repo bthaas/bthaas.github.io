@@ -10,7 +10,6 @@ import { setupReveals } from './reveal'
 import { initializeAtlas } from './runtime'
 import { createScrollBus, type ScrollSnapshot } from './scroll-bus'
 import { splitText } from './split-text'
-import { setupSectionWayfinding, SUN_PROGRESS_EVENT } from './sun-arc'
 
 function createPointerEngine() {
   const quickTargets: Array<{
@@ -106,7 +105,6 @@ describe('atlas DOM capabilities', () => {
     expect(section.style.getPropertyValue('--atlas-contact-image-y')).toBe('2.5%')
     expect(details.map((detail) => detail.style.getPropertyValue('--atlas-contact-detail-reveal')))
       .toEqual(['0', '0', '0', '0', '0', '0'])
-    window.dispatchEvent(new CustomEvent(SUN_PROGRESS_EVENT, { detail: { progress: 0.98 } }))
     window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 2200 } }))
 
     expect(section.style.getPropertyValue('--atlas-contact-glow')).toBe('1')
@@ -257,42 +255,6 @@ describe('atlas DOM capabilities', () => {
     touchCleanup()
   })
 
-  it('sets one active nav link from the four observed narrative sections', () => {
-    document.body.innerHTML = `
-      <nav>
-        <div class="nav-links">
-          <a href="#experience">Experience</a><a href="#projects">Projects</a>
-          <a href="#craft">Craft</a><a href="#contact">Contact</a>
-        </div>
-      </nav>
-      <section id="experience"></section><section id="projects"></section>
-      <section id="craft"></section><section id="contact"></section>
-    `
-    const observed: Element[] = []
-    let update: IntersectionObserverCallback | undefined
-    const cleanup = setupSectionWayfinding(document, (callback) => {
-      update = callback
-      return {
-        disconnect: vi.fn(),
-        observe: (target: Element) => observed.push(target),
-        unobserve: vi.fn(),
-      } as unknown as IntersectionObserver
-    })
-
-    update?.([
-      { boundingClientRect: { top: 100 }, isIntersecting: true, target: observed[0] },
-    ] as IntersectionObserverEntry[], {} as IntersectionObserver)
-    expect(document.querySelector('a[href="#experience"]')).toHaveAttribute('aria-current', 'true')
-
-    update?.([
-      { boundingClientRect: { top: -100 }, isIntersecting: false, target: observed[0] },
-      { boundingClientRect: { top: 120 }, isIntersecting: true, target: observed[1] },
-    ] as IntersectionObserverEntry[], {} as IntersectionObserver)
-    expect(document.querySelector('a[href="#experience"]')).not.toHaveAttribute('aria-current')
-    expect(document.querySelector('a[href="#projects"]')).toHaveAttribute('aria-current', 'true')
-    cleanup()
-  })
-
   it('does no enhancement work when reduced motion is requested', () => {
     const createBus = vi.fn()
     const createEngine = vi.fn()
@@ -308,8 +270,6 @@ describe('atlas DOM capabilities', () => {
     const prepareVelocityPlates = vi.fn()
     const prepareWipes = vi.fn()
     const prepareReveals = vi.fn()
-    const prepareSun = vi.fn()
-    const prepareWayfinding = vi.fn()
     const matchMedia = vi.fn(() => ({ matches: true }))
 
     const cleanup = initializeAtlas({
@@ -326,11 +286,9 @@ describe('atlas DOM capabilities', () => {
       prepareProjects,
       preparePrintReveals,
       prepareReveals,
-      prepareSun,
       prepareScramble,
       prepareVelocityPlates,
       prepareWipes,
-      prepareWayfinding,
       window,
     })
 
@@ -350,8 +308,6 @@ describe('atlas DOM capabilities', () => {
     expect(prepareVelocityPlates).not.toHaveBeenCalled()
     expect(prepareWipes).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
-    expect(prepareSun).not.toHaveBeenCalled()
-    expect(prepareWayfinding).not.toHaveBeenCalled()
     cleanup()
   })
 
@@ -373,7 +329,6 @@ describe('atlas DOM capabilities', () => {
     const cleanupContact = vi.fn()
     const cleanupCursor = vi.fn()
     const cleanupMetrics = vi.fn()
-    const cleanupSun = vi.fn()
     const cleanupMagnetic = vi.fn()
     const cleanupLocalTime = vi.fn()
     const cleanupProjects = vi.fn()
@@ -381,7 +336,6 @@ describe('atlas DOM capabilities', () => {
     const cleanupScramble = vi.fn()
     const cleanupVelocityPlates = vi.fn()
     const cleanupWipes = vi.fn()
-    const cleanupWayfinding = vi.fn()
     const createBus = vi.fn(() => ({
       destroy: destroyBus,
       subscribe: (next: (snapshot: ScrollSnapshot) => void) => {
@@ -405,11 +359,9 @@ describe('atlas DOM capabilities', () => {
       prepareProjects: () => cleanupProjects,
       preparePrintReveals: () => cleanupPrintReveals,
       prepareReveals: () => cleanupReveals,
-      prepareSun: () => cleanupSun,
       prepareScramble: () => cleanupScramble,
       prepareVelocityPlates: () => cleanupVelocityPlates,
       prepareWipes: () => cleanupWipes,
-      prepareWayfinding: () => cleanupWayfinding,
       window,
     })
     subscriber?.({ documentProgress: 0.5, scrollY: 500, velocity: 8 })
@@ -427,7 +379,6 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupContact).toHaveBeenCalledOnce()
     expect(cleanupCursor).toHaveBeenCalledOnce()
     expect(cleanupMetrics).toHaveBeenCalledOnce()
-    expect(cleanupSun).toHaveBeenCalledOnce()
     expect(cleanupMagnetic).toHaveBeenCalledOnce()
     expect(cleanupLocalTime).toHaveBeenCalledOnce()
     expect(cleanupProjects).toHaveBeenCalledOnce()
@@ -435,7 +386,6 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupScramble).toHaveBeenCalledOnce()
     expect(cleanupVelocityPlates).toHaveBeenCalledOnce()
     expect(cleanupWipes).toHaveBeenCalledOnce()
-    expect(cleanupWayfinding).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()
     expect(destroyBus).toHaveBeenCalledOnce()
     expect(destroyEngine).toHaveBeenCalledOnce()

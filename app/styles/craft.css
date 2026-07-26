@@ -426,7 +426,10 @@
   .skill-workbench {
     min-height: calc(100svh - 59px);
     height: auto;
-    padding: 1.2rem 0.85rem 1.35rem;
+    padding:
+      1.2rem
+      0.85rem
+      calc(1.35rem + 4.75rem + env(safe-area-inset-bottom));
     gap: 1rem;
     grid-template-rows: auto auto auto;
   }
