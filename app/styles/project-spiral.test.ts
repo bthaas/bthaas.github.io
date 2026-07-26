@@ -14,7 +14,8 @@ describe('project spiral styles', () => {
   it('provides the grid stage, active link, and progressive-enhancement fallback', () => {
     expect(css).toContain('.project-spiral__stage')
     expect(css).toContain('data-project-spiral-enhanced')
-    expect(css).toContain('min-height: 640svh')
+    expect(css).toContain('min-height: 1180svh')
+    expect(css).not.toContain('min-height: 640svh')
     expect(css).not.toContain('min-height: 360svh')
     expect(css).toContain('position: sticky')
     expect(css).toContain('.project-spiral__active-link')
