@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { siteContent } from '../../content/site-content'
+
 function observeApplicationErrors(page: Page) {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
@@ -404,28 +406,37 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     'idle',
   )
   const careerPath = page.locator('[data-experience-flight]')
-  const chapters = careerPath.locator('[data-experience-chapter]')
-  const route = careerPath.locator('.experience-flight__route')
-  const routeLinks = route.locator('a')
-  await expect(chapters).toHaveCount(4)
-  await expect(routeLinks).toHaveCount(4)
-  await expect(routeLinks.nth(1)).toHaveAttribute(
-    'href',
-    '#experience-chapter-scale-ai',
+  const stops = careerPath.locator('[data-experience-chapter]')
+  const disclosures = stops.locator('details')
+  const firstDetails = careerPath.locator(
+    'summary[aria-label="Details for ML Research Assistant at University of Virginia"]',
   )
-  if (isMobile) {
-    await expect(careerPath).not.toHaveAttribute('data-experience-flight-enhanced')
-    await expect(route).toBeHidden()
-    for (const chapter of await chapters.all()) await expect(chapter).toBeVisible()
-  } else {
-    await expect(careerPath).toHaveAttribute('data-experience-flight-enhanced', '')
-    await expect(route).toBeVisible()
-    await routeLinks.nth(1).focus()
-    await expect(routeLinks.nth(1)).toBeFocused()
-    await expect(routeLinks.nth(1)).toHaveAttribute('aria-current', 'step')
-    await routeLinks.nth(1).press('Enter')
-    await expect(page).toHaveURL(/#experience-chapter-scale-ai$/)
+  const secondDetails = careerPath.locator(
+    'summary[aria-label="Details for GenAI Technical Advisor Intern at Scale AI"]',
+  )
+  await expect(stops).toHaveCount(4)
+  await expect(disclosures).toHaveCount(4)
+  await expect(careerPath).not.toHaveAttribute('data-experience-flight-enhanced')
+  for (const stop of await stops.all()) await expect(stop).toBeVisible()
+  for (const disclosure of await disclosures.all()) {
+    await expect(disclosure).not.toHaveAttribute('open')
   }
+  await expect(page.getByRole('heading', { name: 'University of Virginia' })).toHaveCount(2)
+  await expect(page.getByRole('heading', { name: 'Scale AI' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Refraction Innovation Hub' })).toBeVisible()
+  await expect(page.getByText('GenAI Technical Advisor Intern · SEAL')).toBeVisible()
+  await expect(page.getByText(siteContent.experience[1].summary)).toBeHidden()
+
+  await secondDetails.focus()
+  await secondDetails.press('Enter')
+  await expect(secondDetails).toBeFocused()
+  await expect(disclosures.nth(1)).toHaveAttribute('open', '')
+  await expect(page.getByText(siteContent.experience[1].summary)).toBeVisible()
+  await expect(disclosures.first()).not.toHaveAttribute('open')
+  await secondDetails.press('Space')
+  await expect(disclosures.nth(1)).not.toHaveAttribute('open')
+  await expect(page.getByText(siteContent.experience[1].summary)).toBeHidden()
+  await expect(firstDetails).toBeVisible()
   await expect(page.locator('#experience')).toHaveCSS('background-color', 'rgb(25, 25, 43)')
   await expectNoHorizontalOverflow(page)
 
@@ -568,6 +579,12 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     await expect(chapter).toBeVisible()
   }
   await expect(page.locator('#experience .pin-spacer')).toHaveCount(0)
+  const reducedDetails = page.locator(
+    'summary[aria-label="Details for ML Research Assistant at University of Virginia"]',
+  )
+  await expect(page.getByText(siteContent.experience[0].summary)).toBeHidden()
+  await reducedDetails.press('Enter')
+  await expect(page.getByText(siteContent.experience[0].summary)).toBeVisible()
 
   await page.goto('/skills', { waitUntil: 'networkidle' })
   const reducedWorkbench = page.getByRole('region', { name: 'Interactive skill workbench' })
@@ -852,8 +869,13 @@ test('preserves every focused route without JavaScript', async (
   for (const chapter of await page.locator('[data-experience-chapter]').all()) {
     await expect(chapter).toBeVisible()
   }
-  await expect(page.locator('.experience-flight__route a'))
+  await expect(page.locator('summary[aria-label^="Details for "]'))
     .toHaveCount(4)
+  await expect(page.getByText(siteContent.experience[0].summary)).toBeHidden()
+  await page.locator(
+    'summary[aria-label="Details for ML Research Assistant at University of Virginia"]',
+  ).press('Enter')
+  await expect(page.getByText(siteContent.experience[0].summary)).toBeVisible()
 
   for (const route of ['/projects', '/skills', '/contact']) {
     await page.goto(`${baseURL}${route}`)

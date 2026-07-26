@@ -4,8 +4,6 @@ import { siteContent } from '@/content/site-content'
 
 import {
   buildExperienceTimeline,
-  getExperienceChapterProgress,
-  getExperienceChapterScrollY,
 } from './experience-flight-path'
 
 describe('experience flight-path chronology', () => {
@@ -47,20 +45,5 @@ describe('experience flight-path chronology', () => {
     expect(refraction.end).toBeCloseTo(2 / 11)
     expect(education.start).toBe(1)
     expect(education.end).toBe(1)
-  })
-
-  it('maps every chapter link to normal document scroll inside the pin', () => {
-    expect([0, 1, 2, 3].map((index) => getExperienceChapterProgress(index, 4)))
-      .toEqual([0, 1 / 3, 2 / 3, 1])
-
-    const metrics = {
-      count: 4,
-      headerOffset: 58,
-      pinDistance: 2400,
-      pinStart: 1800,
-    }
-    expect(getExperienceChapterScrollY({ ...metrics, index: 0 })).toBe(1742)
-    expect(getExperienceChapterScrollY({ ...metrics, index: 2 })).toBe(3342)
-    expect(getExperienceChapterScrollY({ ...metrics, index: 3 })).toBe(4142)
   })
 })

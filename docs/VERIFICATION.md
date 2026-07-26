@@ -1,10 +1,10 @@
 # Awwwards portfolio verification
 
-Verified on 2026-07-26 from `codex/experience-redesign`. The standalone
-Experience screen now uses a date-derived career route and a native-scroll
-GSAP/ScrollTrigger horizontal pin on desktop. Its initial HTML, 390 px layout,
-reduced-motion path, and JavaScript-disabled path all keep the three roles and
-education chapter in ordinary document order.
+Verified on 2026-07-26 from `codex/experience-timeline-polish`. The standalone
+Experience screen now uses a date-derived editorial ledger with four native
+disclosures. Company, role, dates, and location remain visible; summaries,
+highlights, and technologies appear only when a stop is opened. The same
+interaction works at 390 px, with reduced motion, and without JavaScript.
 
 ## Experience redesign gates
 
@@ -12,17 +12,17 @@ education chapter in ordinary document order.
 | --- | --- |
 | `npm run verify` | Passed: 61 files / 246 tests, typecheck, and production build |
 | `npm run test:coverage` | Passed: 89.36% statements, 80.44% branches, 83.03% functions, 92.45% lines |
-| Desktop engine | Chromium 1600 × 1200: pin, horizontal chapter travel, focused route links, dark editorial field, and zero horizontal document overflow passed |
-| Mobile engine | iPhone WebKit and a 390 × 844 live walk: four normal-flow chapters, hidden desktop route visualization, and zero horizontal overflow passed |
-| Reduced motion | No pin spacer or enhancement attribute; all four chapters remain visible |
-| No JavaScript | Four chapters and four native fragment links remain in the static export on desktop and mobile |
+| Desktop engine | Chromium 1600 × 1200: four scannable stops, exclusive native disclosures, keyboard toggling, dark editorial field, and zero horizontal document overflow passed |
+| Mobile engine | iPhone WebKit and a 390 × 844 live walk: deliberate vertical route, touch disclosures, and zero horizontal overflow passed |
+| Reduced motion | Native disclosure layout remains intact with no scroll pinning or enhancement attribute |
+| No JavaScript | Four native `<details>` controls remain operable in the static export on desktop and mobile |
 
-The visual date axis is computed from the unchanged periods in
+The date range is computed from the unchanged periods in
 `content/site-content.ts`, including overlapping roles and the May 2026
-graduation milestone. Native fragment links remain the route controls before
-enhancement. Desktop focus maps each link to the matching normal-document
-position inside the pin; mobile deliberately omits the dense route visualization
-and presents the chapters as a single readable column.
+graduation milestone. The desktop ledger presents each stop as one editorial
+row; mobile turns the same semantic list into a vertical route. Grouped native
+disclosures keep only one description open at a time when JavaScript is
+available, while the underlying controls remain functional without it.
 
 Verified on 2026-07-18 from `codex/phase-6-resubmission-polish`. Phase 6
 hardens the complete maximalist atlas for submission: heavy WebGL now waits for
@@ -387,16 +387,14 @@ work at 60 Hz and pauses outside its section.
 
 | Browser / device | Viewport | Result |
 | --- | --- | --- |
-| Chromium desktop | 1600 × 1200 | Full GSAP/ScrollTrigger choreography, Lenis, career-path pin, cursor, flock, and programmatic scroll passed. |
+| Chromium desktop | 1600 × 1200 | Full site choreography, Lenis, native career disclosures, cursor, flock, and keyboard interaction passed. |
 | Firefox desktop | 1600 × 1200 | Full choreography passed; no CSS scroll-timeline fallback or static downgrade. |
-| WebKit desktop | 1600 × 1200 | Choreography, keyboard scrolling, career-path navigation, lazy finale, and overflow checks passed. |
-| WebKit iPhone | iPhone 13 profile | Native touch scroll, four normal-flow career chapters, responsive composition, and no premature finale bundle passed. |
+| WebKit desktop | 1600 × 1200 | Choreography, keyboard disclosure controls, lazy finale, and overflow checks passed. |
+| WebKit iPhone | iPhone 13 profile | Native touch scroll, four stacked career stops, touch disclosures, responsive composition, and no premature finale bundle passed. |
 
 Every project checks application-origin console errors, failed same-origin
-requests, horizontal overflow, career-route keyboard state, and the contact
-finale. None failed. Anchor and programmatic scrolling use a passive native
-scroll signal in addition to Lenis/ScrollTrigger, preventing stale progress when
-a browser jumps directly to a chapter.
+requests, horizontal overflow, career-disclosure keyboard state, and the
+contact finale. None failed.
 
 ## Accessibility and static paths
 
@@ -406,10 +404,10 @@ a browser jumps directly to a chapter.
 - The reduced-motion DOM matches the static export, with zero running animations
   and intact native heading text.
 - JavaScript-disabled runs retain every section, project link, contact action,
-  semantic landmark, career chapter, highlight, and technology list.
-- Experience route controls are native fragment links. The dense route is
-  desktop-only; mobile and reduced-motion visitors read the same four chapters
-  in normal flow.
+  semantic landmark, and operable native career disclosure.
+- Experience controls are grouped native `<details>` elements. Company and role
+  headings are always visible; descriptions, highlights, and technology lists
+  remain available on demand across desktop, mobile, and reduced motion.
 - SplitText uses its built-in heading ARIA support. Decorative index and craft
   ghost numerals are removed from the accessibility tree.
 - Lighthouse accessibility is 100 on desktop and mobile; application-origin
