@@ -283,9 +283,6 @@ export function ProjectsSpiral({ projects }: ProjectsSpiralProps) {
         onPointerLeave={resetPointer}
         onPointerMove={handlePointerMove}
       >
-        <p className="project-spiral__mode" aria-hidden="true">
-          <span>spiral</span><span>•</span><span>projects</span>
-        </p>
         {mounted && active && view === 'spiral' && (
           <div className="project-spiral__webgl" aria-hidden="true">
             <SceneBoundary onError={handleSceneError}>
@@ -318,28 +315,34 @@ export function ProjectsSpiral({ projects }: ProjectsSpiralProps) {
 
       <div className="project-spiral__overlay">
         <div className="atlas-shell project-spiral__overlay-inner">
-          <div
-            className="project-spiral__view-toggle"
-            role="group"
-            aria-label="Project view"
-          >
-            <span aria-hidden="true">View</span>
-            <button
-              aria-pressed={view === 'spiral'}
-              aria-label="Spiral view"
-              onClick={() => handleViewChange('spiral')}
-              type="button"
+          <div className="project-spiral__chrome">
+            <div className="project-spiral__scene-heading">
+              <p>02 / Field studies</p>
+              <h2 id="projects-title">Projects</h2>
+            </div>
+            <div
+              className="project-spiral__view-toggle"
+              role="group"
+              aria-label="Project view"
             >
-              Spiral
-            </button>
-            <button
-              aria-pressed={view === 'index'}
-              aria-label="Index view"
-              onClick={() => handleViewChange('index')}
-              type="button"
-            >
-              Index
-            </button>
+              <span aria-hidden="true">Project view</span>
+              <button
+                aria-pressed={view === 'spiral'}
+                aria-label="Spiral view"
+                onClick={() => handleViewChange('spiral')}
+                type="button"
+              >
+                Spiral
+              </button>
+              <button
+                aria-pressed={view === 'index'}
+                aria-label="Index view"
+                onClick={() => handleViewChange('index')}
+                type="button"
+              >
+                Index
+              </button>
+            </div>
           </div>
 
           <ul

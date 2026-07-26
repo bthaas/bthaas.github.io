@@ -204,10 +204,17 @@ describe('Portfolio', () => {
   })
 
   it('lets the project spiral own the page without explanatory intro copy', () => {
-    render(<Portfolio />)
+    const { container } = render(<Portfolio />)
+    const projectsSection = container.querySelector('#projects')
+    const projectScene = projectsSection?.querySelector('.project-spiral')
 
-    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
-    expect(screen.getByText('02 / Field studies')).toBeInTheDocument()
+    expect(projectsSection?.firstElementChild).toBe(projectScene)
+    expect(projectsSection?.querySelector('.projects-intro')).not.toBeInTheDocument()
+    expect(within(projectScene as HTMLElement).getByRole('heading', {
+      name: 'Projects',
+    })).toBeInTheDocument()
+    expect(within(projectScene as HTMLElement).getByText('02 / Field studies'))
+      .toBeInTheDocument()
     expect(screen.queryByText(/Three builds across computer vision/i)).not.toBeInTheDocument()
   })
 

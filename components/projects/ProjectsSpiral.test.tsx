@@ -122,9 +122,16 @@ describe('ProjectsSpiral', () => {
     const { container } = render(<ProjectsSpiral projects={siteContent.projects} />)
     const projectList = screen.getByRole('list', { name: 'Projects' })
     const projectItems = within(projectList).getAllByRole('listitem', { name: /project/i })
+    const sceneChrome = container.querySelector('.project-spiral__chrome')
+    const viewToggle = screen.getByRole('group', { name: 'Project view' })
     const spiralButton = screen.getByRole('button', { name: 'Spiral view' })
     const indexButton = screen.getByRole('button', { name: 'Index view' })
 
+    expect(sceneChrome).toContainElement(
+      screen.getByRole('heading', { level: 2, name: 'Projects' }),
+    )
+    expect(sceneChrome).toContainElement(viewToggle)
+    expect(within(viewToggle).getByText('Project view')).toBeInTheDocument()
     expect(container.querySelector('.project-spiral')).toHaveAttribute(
       'data-project-view',
       'spiral',
@@ -141,6 +148,8 @@ describe('ProjectsSpiral', () => {
     )
     expect(indexButton).toHaveAttribute('aria-pressed', 'true')
     expect(spiralButton).toHaveAttribute('aria-pressed', 'false')
+    expect(container.querySelector('.project-spiral__chrome')).toBe(sceneChrome)
+    expect(screen.getByRole('group', { name: 'Project view' })).toBe(viewToggle)
     expect(within(projectList).getAllByRole('listitem', { name: /project/i }))
       .toEqual(projectItems)
     siteContent.projects.forEach((project) => {
@@ -161,6 +170,8 @@ describe('ProjectsSpiral', () => {
       'data-project-view',
       'spiral',
     )
+    expect(container.querySelector('.project-spiral__chrome')).toBe(sceneChrome)
+    expect(screen.getByRole('group', { name: 'Project view' })).toBe(viewToggle)
     expect(Flip.from).toHaveBeenCalledTimes(2)
   })
 
