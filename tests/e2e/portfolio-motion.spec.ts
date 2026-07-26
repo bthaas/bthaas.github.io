@@ -971,6 +971,137 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
   expect(errors).toEqual([])
 })
 
+test('keeps a fast bottom-to-top skill drag solid and colliding', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(
+    browserName !== 'chromium' || isMobile,
+    'One desktop pointer engine verifies the swept drag collision.',
+  )
+  const errors = observeApplicationErrors(page)
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-gateway-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  const clockStart = new Date('2026-07-26T12:00:00Z')
+  await page.clock.install({ time: clockStart })
+  await page.clock.pauseAt(clockStart.getTime() + 1_000)
+  await page.goto('/skills', { waitUntil: 'networkidle' })
+
+  const workbench = page.getByRole('region', { name: 'Interactive skill workbench' })
+  const arena = workbench.locator('.skill-workbench__arena')
+  const tools = workbench.getByRole('list', { name: 'Movable technology tools' })
+  await workbench.scrollIntoViewIfNeeded()
+  await expect(workbench).toHaveAttribute('data-ready', 'true')
+  await page.clock.runFor(850)
+  await expect(workbench).toHaveAttribute('data-physics', 'dropped')
+  await page.clock.runFor(2_200)
+
+  const [arenaBox, tokenBodies] = await Promise.all([
+    arena.boundingBox(),
+    tools.getByRole('button').evaluateAll((tokens) => (
+      tokens.map((token) => {
+        const element = token as HTMLElement
+        const bounds = element.getBoundingClientRect()
+
+        return {
+          height: bounds.height,
+          label: element.getAttribute('aria-label') ?? '',
+          width: bounds.width,
+          x: bounds.left + bounds.width / 2,
+          y: bounds.top + bounds.height / 2,
+        }
+      })
+    )),
+  ])
+  if (!arenaBox) throw new Error('Missing skill arena bounds')
+
+  const bottomCandidates = [...tokenBodies]
+    .filter((token) => token.y > arenaBox.y + arenaBox.height * 0.62)
+    .sort((first, second) => second.y - first.y)
+  const dragPath = bottomCandidates.flatMap((source) => {
+    const blockers = tokenBodies
+      .filter((candidate) => (
+        candidate.label !== source.label
+        && candidate.y < source.y - Math.min(source.height, candidate.height) * 0.8
+        && candidate.y > arenaBox.y + Math.max(source.height, candidate.height) * 2
+      ))
+      .map((blocker) => ({
+        blocker,
+        score: (
+          Math.abs(blocker.x - source.x)
+          + Math.abs(blocker.y - source.y) * 0.12
+        ),
+        source,
+      }))
+      .sort((first, second) => first.score - second.score)
+
+    return blockers.slice(0, 1)
+  }).sort((first, second) => first.score - second.score)[0]
+  if (!dragPath) throw new Error('Could not find a bottom token and an intervening token')
+
+  const source = tools.getByRole('button', { name: dragPath.source.label })
+  const blocker = tools.getByRole('button', { name: dragPath.blocker.label })
+  const blockerBefore = await blocker.boundingBox()
+  if (!blockerBefore) throw new Error('Missing intervening skill bounds')
+
+  const deltaX = dragPath.blocker.x - dragPath.source.x
+  const deltaY = dragPath.blocker.y - dragPath.source.y
+  const distance = Math.hypot(deltaX, deltaY)
+  const extension = Math.max(dragPath.source.width, dragPath.blocker.width) * 0.8
+  const endX = Math.max(
+    arenaBox.x + dragPath.source.width / 2,
+    Math.min(
+      arenaBox.x + arenaBox.width - dragPath.source.width / 2,
+      dragPath.blocker.x + deltaX / distance * extension,
+    ),
+  )
+  const endY = Math.max(
+    arenaBox.y + dragPath.source.height / 2,
+    Math.min(
+      arenaBox.y + arenaBox.height - dragPath.source.height / 2,
+      dragPath.blocker.y + deltaY / distance * extension,
+    ),
+  )
+
+  await page.mouse.move(dragPath.source.x, dragPath.source.y)
+  await page.mouse.down()
+  await expect(workbench).toHaveAttribute(
+    'data-dragging',
+    dragPath.source.label.split(',')[0],
+  )
+  await page.mouse.move(endX, endY)
+
+  const draggedState = await source.evaluate((element) => {
+    const bounds = element.getBoundingClientRect()
+    const centerX = bounds.left + bounds.width / 2
+    const centerY = bounds.top + bounds.height / 2
+    const topmost = document.elementFromPoint(centerX, centerY)
+
+    return {
+      centerY,
+      itemDragging: element.parentElement?.dataset.dragging ?? null,
+      topmostLabel: topmost?.closest('button')?.getAttribute('aria-label') ?? null,
+    }
+  })
+  expect(draggedState.itemDragging).toBe('true')
+  expect(draggedState.topmostLabel).toBe(dragPath.source.label)
+  expect(draggedState.centerY).toBeLessThan(dragPath.blocker.y)
+
+  const blockerAfter = await blocker.boundingBox()
+  if (!blockerAfter) throw new Error('Missing intervening skill bounds after drag')
+  expect(Math.hypot(
+    blockerAfter.x - blockerBefore.x,
+    blockerAfter.y - blockerBefore.y,
+  )).toBeGreaterThan(2)
+
+  await page.mouse.up()
+  await expect(workbench).not.toHaveAttribute('data-dragging')
+  expect(errors).toEqual([])
+})
+
 test('releases one four-second sun spectacle on the homepage', async ({
   browserName,
   isMobile,

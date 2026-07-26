@@ -170,6 +170,7 @@ describe('SkillWorkbench', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
     const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
     const token = screen.getByRole('button', { name: 'TypeScript, Languages' })
+    const tokenItem = token.closest('li')
     const homeTransform = token.style.transform
     const home = readTransform(token)
     const capture = vi.fn()
@@ -211,6 +212,7 @@ describe('SkillWorkbench', () => {
     })
 
     expect(workbench).toHaveAttribute('data-dragging', 'TypeScript')
+    expect(tokenItem).toHaveAttribute('data-dragging', 'true')
     expect(capture).toHaveBeenCalledWith(7)
     expect(readTransform(token).x - home.x).toBeCloseTo(44, 1)
     expect(readTransform(token).y - home.y).toBeCloseTo(26, 1)
@@ -223,6 +225,7 @@ describe('SkillWorkbench', () => {
       pointerType: 'mouse',
     })
     expect(workbench).not.toHaveAttribute('data-dragging')
+    expect(tokenItem).not.toHaveAttribute('data-dragging')
     expect(release).toHaveBeenCalledWith(7)
 
     act(() => animate?.(performance.now() + 16))

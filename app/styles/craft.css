@@ -180,6 +180,10 @@
     opacity 180ms var(--ease-out);
 }
 
+.skill-workbench__item[data-dragging="true"] {
+  z-index: 4;
+}
+
 .skill-workbench__token {
   --skill-token-gap: clamp(0.42rem, 0.75vw, 0.72rem);
   --skill-token-glyph: clamp(1.25rem, 1.7vw, 1.7rem);
@@ -245,6 +249,12 @@
 
 .skill-workbench[data-dragging] .skill-workbench__token {
   cursor: grabbing;
+}
+
+.skill-workbench__item[data-dragging="true"] .skill-workbench__token {
+  box-shadow:
+    0 1rem 2rem rgb(17 19 15 / 20%),
+    0 0 0 2px color-mix(in srgb, var(--skill-category-color) 30%, transparent);
 }
 
 .skill-workbench[data-physics="stuck"] .skill-workbench__token {

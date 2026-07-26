@@ -307,7 +307,6 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
       snapshot.y + deltaY,
       snapshot.angle + deltaX * 0.004,
     )
-    worldRef.current?.step(FRAME_MS)
     applySnapshots()
     startAnimation()
   }
@@ -398,6 +397,7 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
                   itemRefs.current[index] = node
                 }}
                 className="skill-workbench__item"
+                data-dragging={draggingLabel === logo.label || undefined}
                 data-skill-category={logo.categorySlug}
                 key={logo.label}
                 style={{
