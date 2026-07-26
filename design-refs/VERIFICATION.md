@@ -547,6 +547,41 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   the two focused shadow-removal journeys, and the complete Chromium portfolio
   journey all pass without application-origin console errors.
 
+### 2026-07-26 surface-bound carousel labels
+
+- The formerly camera-facing `.portfolio-gateway__face-label` has been removed.
+  Each category word is now rendered as 12 clipped fragments inside the same
+  12 CSS facets that carry its image. The fragments inherit the ring's complete
+  rotation, including unsnapped drag angles and the 860 ms category transition.
+- The final readability pass replaces the low-contrast `soft-light` blend with
+  98%-opaque paper-white ink, a 0.5–0.8 px charcoal edge, and a compact local
+  relief shadow. The treatment remains split and clipped across the same
+  rotating facets, so it reads consistently over pale sky and dark architecture
+  without becoming an independent glow plane or camera-facing text layer.
+- The transparent `.portfolio-gateway__surface-link` preserves the active
+  category destination, accessible name, keyboard focus ring, and click target.
+  The category chip, four routes, drag thresholds, 48-facet geometry, artwork
+  crops, physical gaps, and fitted ground shadow are unchanged.
+- The production capture audit reports 48 surface labels and zero floating
+  labels on both animated and reduced-motion paths. The final 1280×720 drum
+  remains 586.3×330.6 px with its 528×37.6 px ground shadow.
+- `site-screenshots/carousel-surface-label.png` records the settled Projects
+  face, while `carousel-surface-label-transition.png` catches Experience leaving
+  as Projects arrives. The opened
+  `carousel-surface-label-comparison.png` places the former floating label,
+  settled integrated label, and mid-spin state side by side. The opened
+  `carousel-surface-label-readability-comparison.png` compares the faint
+  surface treatment, the higher-contrast settled word, and the higher-contrast
+  mid-spin state. Browser inspection at 1280×720 and 390×844 confirms the word
+  remains readable and attached to the facets on desktop and mobile.
+- Final verification passes 246 assertions across 60 files with 90.56%
+  statements, 81.75% branches, 84.05% functions, and 93.80% lines. TypeScript,
+  the 12-route production build, deployment preparation, capture audit, and the
+  isolated surface-label drag/readability journey pass in Chromium, Firefox,
+  desktop WebKit, and iPhone WebKit. The wider portfolio journey still reports
+  unrelated timing/interception failures in the hero-canvas and mobile sun
+  navigation checks after the carousel assertions have passed.
+
 ---
 
 # Project spiral verification

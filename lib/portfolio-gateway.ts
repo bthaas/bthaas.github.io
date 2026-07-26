@@ -48,6 +48,7 @@ export const GATEWAY_CYLINDER_SEGMENTS = GATEWAY_CATEGORIES.flatMap(
       categoryIndex,
       id: `${category.id}-${segmentIndex + 1}`,
       imagePosition: segmentIndex / (GATEWAY_SEGMENTS_PER_CATEGORY - 1) * 100,
+      segmentIndex,
     }),
   ),
 )

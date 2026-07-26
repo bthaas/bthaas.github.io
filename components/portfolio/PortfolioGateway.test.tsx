@@ -40,6 +40,17 @@ describe('PortfolioGateway', () => {
     expect(container.querySelectorAll('.portfolio-gateway__ground-shadow')).toHaveLength(1)
     expect(container.querySelectorAll('.portfolio-gateway__fallback-face')).toHaveLength(0)
     expect(
+      container.querySelectorAll(
+        '.portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+      ),
+    ).toHaveLength(48)
+    expect(container.querySelector('.portfolio-gateway__face-label')).toBeNull()
+    const surfaceLink = screen.getByRole('link', { name: 'Open Experience screen' })
+    expect(surfaceLink).toHaveClass('portfolio-gateway__surface-link')
+    expect(surfaceLink.querySelector('.portfolio-gateway__surface-link-text')).toHaveTextContent(
+      'Experience',
+    )
+    expect(
       container.querySelectorAll('[data-gateway-category="experience"]'),
     ).toHaveLength(12)
     expect(
@@ -51,6 +62,15 @@ describe('PortfolioGateway', () => {
     expect(
       container.querySelectorAll('[data-gateway-category="contact"]'),
     ).toHaveLength(12)
+    for (const category of ['Experience', 'Projects', 'Skills', 'Contact']) {
+      expect(
+        Array.from(
+          container.querySelectorAll(
+            `[data-gateway-category="${category.toLowerCase()}"] .portfolio-gateway__surface-label`,
+          ),
+        ).map((label) => label.textContent),
+      ).toEqual(Array(12).fill(category))
+    }
   })
 
   it('cycles categories with buttons and arrow keys while wrapping', () => {
@@ -122,5 +142,44 @@ describe('PortfolioGateway', () => {
       '/projects',
     )
     expect(release).toHaveBeenCalledWith(7)
+  })
+
+  it('starts a drag over the invisible surface link without following it', () => {
+    render(<PortfolioGateway />)
+    const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
+    const dragSurface = screen.getByTestId('portfolio-gateway-drag-surface')
+    const surfaceLink = screen.getByRole('link', { name: 'Open Experience screen' })
+    const capture = vi.fn()
+    const release = vi.fn()
+    Object.defineProperties(dragSurface, {
+      getBoundingClientRect: {
+        configurable: true,
+        value: () => ({
+          bottom: 500,
+          height: 400,
+          left: 0,
+          right: 800,
+          top: 100,
+          width: 800,
+          x: 0,
+          y: 100,
+          toJSON: () => ({}),
+        }),
+      },
+      releasePointerCapture: { configurable: true, value: release },
+      setPointerCapture: { configurable: true, value: capture },
+    })
+
+    fireEvent.pointerDown(surfaceLink, { button: 0, clientX: 600, pointerId: 11 })
+    expect(carousel).toHaveAttribute('data-dragging', 'true')
+    expect(capture).not.toHaveBeenCalled()
+
+    fireEvent.pointerMove(dragSurface, { clientX: 280, pointerId: 11 })
+    expect(capture).toHaveBeenCalledWith(11)
+    fireEvent.pointerUp(dragSurface, { clientX: 280, pointerId: 11 })
+
+    expect(carousel).toHaveAttribute('data-active-index', '1')
+    expect(fireEvent.click(surfaceLink)).toBe(false)
+    expect(release).toHaveBeenCalledWith(11)
   })
 })

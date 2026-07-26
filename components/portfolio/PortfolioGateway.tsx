@@ -13,11 +13,15 @@ import {
 } from '@/lib/portfolio-gateway'
 
 interface GatewayDragState {
+  captured: boolean
   deltaX: number
   pointerId: number | null
   startX: number
+  startedOnLink: boolean
   width: number
 }
+
+const GATEWAY_DRAG_CAPTURE_THRESHOLD_PX = 6
 
 function GatewayCylinderSlices() {
   return GATEWAY_CYLINDER_SEGMENTS.map((segment) => {
@@ -26,6 +30,7 @@ function GatewayCylinderSlices() {
       '--gateway-segment-angle': `${segment.angle}deg`,
       '--gateway-segment-image': `url("${category.image}")`,
       '--gateway-segment-position': `${segment.imagePosition}%`,
+      '--gateway-surface-label-index': segment.segmentIndex,
     } as CSSProperties
 
     return (
@@ -34,18 +39,23 @@ function GatewayCylinderSlices() {
         data-gateway-category={segment.categoryId}
         key={segment.id}
         style={style}
-      />
+      >
+        <span className="portfolio-gateway__surface-label">{category.label}</span>
+      </span>
     )
   })
 }
 
 export function PortfolioGateway() {
   const dragRef = useRef<GatewayDragState>({
+    captured: false,
     deltaX: 0,
     pointerId: null,
     startX: 0,
+    startedOnLink: false,
     width: 1,
   })
+  const suppressSurfaceClickRef = useRef(false)
   const [step, setStep] = useState(0)
   const [dragRotation, setDragRotation] = useState(0)
   const [dragging, setDragging] = useState(false)
@@ -66,15 +76,28 @@ export function PortfolioGateway() {
       const stepDelta = getGatewayStepDeltaFromDrag(drag.deltaX, drag.width)
       if (stepDelta !== 0) setStep((current) => current + stepDelta)
     }
+    const suppressSurfaceClick = shouldSelectCategory
+      && drag.startedOnLink
+      && Math.abs(drag.deltaX) > GATEWAY_DRAG_CAPTURE_THRESHOLD_PX
+    suppressSurfaceClickRef.current = suppressSurfaceClick
+    if (suppressSurfaceClick) {
+      window.setTimeout(() => {
+        suppressSurfaceClickRef.current = false
+      }, 0)
+    }
     drag.pointerId = null
     drag.deltaX = 0
     setDragRotation(0)
     setDragging(false)
-    try {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    } catch {
-      // Native pointer cancellation may release capture before React is notified.
+    if (drag.captured) {
+      try {
+        event.currentTarget.releasePointerCapture(event.pointerId)
+      } catch {
+        // Native pointer cancellation may release capture before React is notified.
+      }
     }
+    drag.captured = false
+    drag.startedOnLink = false
   }
 
   return (
@@ -123,21 +146,34 @@ export function PortfolioGateway() {
           onDragStart={(event) => event.preventDefault()}
           onPointerDown={(event) => {
             if (event.button !== 0) return
-            if (event.target instanceof Element && event.target.closest('a')) return
             const bounds = event.currentTarget.getBoundingClientRect()
+            const startedOnLink = event.target instanceof Element
+              && event.target.closest('a') !== null
             dragRef.current = {
+              captured: !startedOnLink,
               deltaX: 0,
               pointerId: event.pointerId,
               startX: event.clientX,
+              startedOnLink,
               width: bounds.width,
             }
+            suppressSurfaceClickRef.current = false
             setDragging(true)
-            event.currentTarget.setPointerCapture?.(event.pointerId)
+            if (!startedOnLink) {
+              event.currentTarget.setPointerCapture?.(event.pointerId)
+            }
           }}
           onPointerMove={(event) => {
             const drag = dragRef.current
             if (drag.pointerId !== event.pointerId) return
             drag.deltaX = event.clientX - drag.startX
+            if (
+              !drag.captured
+              && Math.abs(drag.deltaX) > GATEWAY_DRAG_CAPTURE_THRESHOLD_PX
+            ) {
+              event.currentTarget.setPointerCapture?.(event.pointerId)
+              drag.captured = true
+            }
             setDragRotation(getGatewayDragRotation(drag.deltaX, drag.width))
           }}
           onPointerCancel={(event) => finishDrag(event, false)}
@@ -155,11 +191,18 @@ export function PortfolioGateway() {
             </div>
           </div>
           <a
-            className="portfolio-gateway__face-label"
+            className="portfolio-gateway__surface-link"
             href={activeCategory.href}
             aria-label={`Open ${activeCategory.label} screen`}
+            onClick={(event) => {
+              if (!suppressSurfaceClickRef.current) return
+              event.preventDefault()
+              suppressSurfaceClickRef.current = false
+            }}
           >
-            {activeCategory.label}
+            <span className="portfolio-gateway__surface-link-text" aria-hidden="true">
+              {activeCategory.label}
+            </span>
           </a>
         </div>
 

@@ -105,6 +105,69 @@ test('renders one fitted ground shadow and no reflection before or after interac
   await expect(gateway.locator('.portfolio-gateway__ground-shadow')).toHaveCount(1)
 })
 
+test('binds every category label to the rotating cylinder facets', async ({
+  isMobile,
+  page,
+}) => {
+  if (!isMobile) await page.setViewportSize({ height: 720, width: 1280 })
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+  await gateway.scrollIntoViewIfNeeded()
+  await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+
+  const labels = gateway.locator(
+    '.portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+  )
+  await expect(labels).toHaveCount(48)
+  await expect(gateway.locator('.portfolio-gateway__face-label')).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Open Experience screen' })).toHaveClass(
+    /portfolio-gateway__surface-link/,
+  )
+
+  const labelGeometry = await labels.first().evaluate((label) => {
+    const slice = label.parentElement
+    if (!slice) throw new Error('Surface label is missing its facet')
+    const labelStyle = getComputedStyle(label)
+    const sliceStyle = getComputedStyle(slice)
+    return {
+      blendMode: labelStyle.mixBlendMode,
+      labelOpacity: Number.parseFloat(labelStyle.opacity),
+      labelStrokeWidth: Number.parseFloat(
+        labelStyle.getPropertyValue('-webkit-text-stroke-width'),
+      ),
+      labelTextShadow: labelStyle.textShadow,
+      labelWidth: label.getBoundingClientRect().width,
+      overflow: sliceStyle.overflow,
+      sliceWidth: slice.getBoundingClientRect().width,
+    }
+  })
+  expect(labelGeometry.overflow).toBe('hidden')
+  expect(labelGeometry.blendMode).toBe('normal')
+  expect(labelGeometry.labelOpacity).toBeGreaterThanOrEqual(0.95)
+  expect(labelGeometry.labelStrokeWidth).toBeGreaterThanOrEqual(0.5)
+  expect(labelGeometry.labelTextShadow).not.toBe('none')
+  expect(labelGeometry.labelWidth / labelGeometry.sliceWidth).toBeGreaterThan(10.5)
+
+  const dragSurface = gateway.getByTestId('portfolio-gateway-drag-surface')
+  await dragSurface.scrollIntoViewIfNeeded()
+  const ring = gateway.locator('.portfolio-gateway__fallback-ring')
+  const restingTransform = await ring.getAttribute('style')
+  const bounds = await dragSurface.boundingBox()
+  if (!bounds) throw new Error('Missing gateway drag surface bounds')
+  await page.mouse.move(bounds.x + bounds.width * 0.1, bounds.y + bounds.height * 0.2)
+  await page.mouse.down()
+  await page.mouse.move(bounds.x + bounds.width * 0.22, bounds.y + bounds.height * 0.2)
+  await expect(gateway).toHaveAttribute('data-dragging', 'true')
+  await expect(ring).toHaveCSS('transition-property', 'none')
+  expect(await ring.getAttribute('style')).not.toBe(restingTransform)
+  await page.mouse.up()
+})
+
 test('matches the reference drum with a solid fitted shadow and no reflection', async ({
   browserName,
   isMobile,
@@ -294,6 +357,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await gateway.press('ArrowLeft')
   await expect(gateway).toHaveAttribute('data-active-index', '3')
   const gatewayDragSurface = gateway.getByTestId('portfolio-gateway-drag-surface')
+  await gatewayDragSurface.scrollIntoViewIfNeeded()
   const gatewayBox = await gatewayDragSurface.boundingBox()
   expect(gatewayBox).not.toBeNull()
   const gatewayDragY = gatewayBox!.y + gatewayBox!.height * 0.36

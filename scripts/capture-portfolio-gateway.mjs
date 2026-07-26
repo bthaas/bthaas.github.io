@@ -61,11 +61,18 @@ const proportions = await gateway.evaluate((element) => {
     canvasCount: element.querySelectorAll('.portfolio-gateway__canvas').length,
     groundShadowHeight: Number(shadow.height.toFixed(1)),
     groundShadowWidth: Number(shadow.width.toFixed(1)),
+    floatingLabelCount: element.querySelectorAll('.portfolio-gateway__face-label').length,
     reflectionCount: element.querySelectorAll('.portfolio-gateway__fallback-reflection').length,
+    surfaceLabelCount: element.querySelectorAll(
+      '.portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+    ).length,
     upperHeight: Number(upper.height.toFixed(1)),
     upperWidth: Number(upper.width.toFixed(1)),
   }
 })
+if (proportions.surfaceLabelCount !== 48 || proportions.floatingLabelCount !== 0) {
+  throw new Error(`Carousel labels are not surface-bound: ${JSON.stringify(proportions)}`)
+}
 
 for (const [index, state] of states.entries()) {
   if (index > 0) {
@@ -104,6 +111,16 @@ await shadowlessPage.waitForTimeout(500)
 await shadowlessPage.screenshot({
   path: `${output}/carousel-ground-shadow.png`,
 })
+await shadowlessGateway.focus()
+await shadowlessGateway.press('ArrowRight')
+await shadowlessPage.waitForTimeout(80)
+await shadowlessPage.screenshot({
+  path: `${output}/carousel-surface-label-transition.png`,
+})
+await shadowlessPage.waitForTimeout(900)
+await shadowlessPage.screenshot({
+  path: `${output}/carousel-surface-label.png`,
+})
 await shadowlessContext.close()
 
 const fallbackContext = await browser.newContext({
@@ -129,15 +146,23 @@ const fallbackAudit = await fallbackPage.evaluate(() => ({
   groundShadows: document.querySelectorAll(
     '#portfolio-gateway .portfolio-gateway__ground-shadow',
   ).length,
+  floatingLabels: document.querySelectorAll(
+    '#portfolio-gateway .portfolio-gateway__face-label',
+  ).length,
   reflectionLayers: document.querySelectorAll(
     '#portfolio-gateway .portfolio-gateway__fallback-reflection',
+  ).length,
+  surfaceLabels: document.querySelectorAll(
+    '#portfolio-gateway .portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
   ).length,
 }))
 if (
   fallbackAudit.activated
   || fallbackAudit.carouselCanvases !== 0
+  || fallbackAudit.floatingLabels !== 0
   || fallbackAudit.groundShadows !== 1
   || fallbackAudit.reflectionLayers !== 0
+  || fallbackAudit.surfaceLabels !== 48
 ) {
   throw new Error(`Reduced-motion carousel is not static: ${JSON.stringify(fallbackAudit)}`)
 }
