@@ -291,11 +291,11 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(page.locator('script[src*="/_next/static/"]')).not.toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-atlas', 'ready')
   await expect(page.locator('html')).toHaveClass(/atlas-js/)
-  await expect(page.locator('#hero, #portfolio-gateway')).toHaveCount(2)
+  await expect(page.locator('#portfolio-gateway')).toHaveCount(1)
   await expect(page.locator('#experience, #projects, #craft, #contact')).toHaveCount(0)
   await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
   const sectionBackgrounds = await page
-    .locator('#hero, #portfolio-gateway')
+    .locator('#portfolio-gateway')
     .evaluateAll((sections) => sections.map((section) => getComputedStyle(section).backgroundColor))
   expect(new Set(sectionBackgrounds)).toEqual(new Set(['rgb(243, 239, 227)']))
   await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
@@ -304,10 +304,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     'data-feather-tier',
     isMobile ? 'mobile-40' : /^(desktop-120|desktop-software-40)$/,
   )
-  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
-  await expect(page.locator('.hero-liquid__canvas canvas')).toHaveCount(1)
   await expect(page.locator('.kinetic-type-band')).toHaveCount(0)
-  await expect(page.locator('.atlas-picture--hero img')).toHaveAttribute('fetchpriority', 'high')
   await expectNoHorizontalOverflow(page)
 
   const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
@@ -373,7 +370,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await page.getByRole('link', { name: 'Open Experience', exact: true }).click()
   await expect(page).toHaveURL(/\/experience\/?$/)
   await expect(page.locator('#experience')).toHaveCount(1)
-  await expect(page.locator('#hero, #portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
+  await expect(page.locator('#portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
   await toggle.scrollIntoViewIfNeeded()
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
@@ -459,7 +456,6 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     '[data-atlas-preloader]',
     '[data-fluid-cursor]',
     '[data-feather-fall-layer]',
-    '.hero-liquid__canvas',
     '.portfolio-gateway-canvas',
     'script[data-atlas-horizon]',
   ].join(', ')))
@@ -573,12 +569,6 @@ test('releases one four-second sun spectacle on the homepage', async ({
   await activateDecorativeWebGL(page, isMobile)
   await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
 
-  const heroPlate = page.locator('.hero-liquid__visual')
-  await heroPlate.hover()
-  await expect.poll(() => heroPlate.evaluate((node) => Number.parseFloat(
-    getComputedStyle(node, '::before').opacity,
-  ))).toBeGreaterThan(0)
-
   const sun = page.getByRole('button', { name: 'Release the sun spectacle' })
   await expect(sun).toBeVisible()
   for (let index = 0; index < 4; index += 1) await sun.click()
@@ -630,73 +620,6 @@ test('prints the missing plate in glitching ink with sparse feathers', async ({
   await expect(page.locator('[data-letter-glitch] canvas')).toHaveCount(1)
   await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
   await expectNoHorizontalOverflow(page)
-  expect(errors).toEqual([])
-})
-
-test('reverses the feather-like masthead scatter and restores the hero at the top', async ({
-  browserName,
-  isMobile,
-  page,
-}) => {
-  test.skip(browserName !== 'chromium' || isMobile, 'One engine verifies Phase 3 choreography.')
-  const errors = observeApplicationErrors(page)
-  await page.addInitScript(() => {
-    sessionStorage.setItem('atlas-preloader-entered', '1')
-    sessionStorage.setItem('atlas-entered', '1')
-  })
-  await page.goto('/', { waitUntil: 'networkidle' })
-  await activateDecorativeWebGL(page, isMobile)
-  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
-
-  const expectMatchingHeroBounds = async () => expect.poll(async () => page.evaluate(() => {
-    const image = document.querySelector<HTMLElement>('.atlas-picture--hero img')!
-    const canvasShell = document.querySelector<HTMLElement>('[data-hero-liquid-canvas]')!
-    const canvas = canvasShell.querySelector<HTMLCanvasElement>('canvas')!
-    const imageBounds = image.getBoundingClientRect()
-    const bounds = [canvasShell.getBoundingClientRect(), canvas.getBoundingClientRect()]
-    return Math.max(...bounds.flatMap((candidate) => [
-      Math.abs(imageBounds.top - candidate.top),
-      Math.abs(imageBounds.left - candidate.left),
-      Math.abs(imageBounds.width - candidate.width),
-      Math.abs(imageBounds.height - candidate.height),
-    ]))
-  })).toBeLessThanOrEqual(1)
-  await expectMatchingHeroBounds()
-
-  const characters = page.locator('.hero-masthead__line > div')
-  await expect(characters).toHaveCount(9)
-  const charactersAtRest = () => characters.evaluateAll((nodes) => nodes.every((node) => {
-    const style = getComputedStyle(node)
-    const matrix = new DOMMatrixReadOnly(style.transform)
-    return Number(style.opacity) >= 0.98
-      && Math.abs(matrix.a - 1) <= 0.001
-      && Math.abs(matrix.b) <= 0.005
-      && Math.abs(matrix.c) <= 0.005
-      && Math.abs(matrix.d - 1) <= 0.001
-      && Math.abs(matrix.e) <= 3.5
-      && Math.abs(matrix.f) <= 3.5
-  }))
-  await expect.poll(charactersAtRest).toBe(true)
-
-  await page.evaluate(() => {
-    const hero = document.querySelector<HTMLElement>('#hero')!
-    const heroBottom = hero.offsetTop + hero.offsetHeight
-    scrollTo({ behavior: 'instant', top: heroBottom - innerHeight * 0.53 })
-  })
-  await expect.poll(async () => characters.evaluateAll((nodes) => nodes.some((node) => {
-    const style = getComputedStyle(node)
-    const matrix = new DOMMatrixReadOnly(style.transform)
-    return Number(style.opacity) < 0.9 || Math.abs(matrix.e) > 10 || Math.abs(matrix.f) > 10
-  }))).toBe(true)
-
-  await page.locator('#portfolio-gateway').scrollIntoViewIfNeeded()
-  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(0)
-  await expect(page.locator('.hero-liquid')).not.toHaveAttribute('data-hero-liquid-ready', '')
-  await page.evaluate(() => scrollTo({ behavior: 'instant', top: 0 }))
-  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(1)
-  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
-  await expectMatchingHeroBounds()
-  await expect.poll(charactersAtRest).toBe(true)
   expect(errors).toEqual([])
 })
 
@@ -796,7 +719,7 @@ test('preserves every focused route without JavaScript', async ({ browser, isMob
   const page = await context.newPage()
   await page.goto('http://127.0.0.1:4173/')
 
-  await expect(page.locator('#hero, #portfolio-gateway')).toHaveCount(2)
+  await expect(page.locator('#portfolio-gateway')).toHaveCount(1)
   await expect(page.locator('#experience, #projects, #craft, #contact')).toHaveCount(0)
   await expect(page.locator('html')).not.toHaveClass(/atlas-js/)
   await expect(page.locator('[data-atlas-cursor], script[data-atlas-horizon], canvas')).toHaveCount(0)

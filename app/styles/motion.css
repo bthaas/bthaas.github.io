@@ -53,27 +53,6 @@
     will-change: transform;
   }
 
-  .atlas-picture--hero img {
-    position: absolute;
-    top: -6%;
-    left: 0;
-    width: 100%;
-    height: 112%;
-    max-width: none;
-  }
-
-  .hero-copy-release {
-    padding-bottom: 8vh;
-  }
-
-  .hero-copy {
-    position: sticky;
-    z-index: 1;
-    top: clamp(4.5rem, 9vh, 7rem);
-    align-items: start;
-    background: var(--cream);
-  }
-
   html.atlas-js [data-contact-ready] [data-contact-word] {
     opacity: var(--atlas-contact-word-reveal, 0);
     transform: translate3d(
@@ -121,12 +100,6 @@
   html.atlas-js [data-contact-ready]
     .atlas-split-mask--character > .atlas-split-token {
     transform: translate3d(var(--atlas-contact-character-x, 0), 0, 0);
-    will-change: transform;
-  }
-
-  html.atlas-js .atlas-picture--hero,
-  html.atlas-js .atlas-picture--hero img,
-  html.atlas-js .art-caption--light {
     will-change: transform;
   }
 
@@ -219,17 +192,6 @@
 
 }
 
-@media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
-  .hero-art {
-    height: clamp(28rem, 48vh, 34rem);
-  }
-
-  .atlas-picture--hero {
-    height: 100%;
-    aspect-ratio: auto;
-  }
-}
-
 @keyframes atlas-live-grain {
   from {
     transform: translate3d(-2%, 1.5%, 0);
@@ -286,14 +248,6 @@
     --shell: min(100vw - 40px, 1440px);
   }
 
-  .hero-identity {
-    grid-column: 1 / span 6;
-  }
-
-  .hero-actions {
-    grid-column: 7 / -1;
-  }
-
   .craft-heading,
   .experience-intro .section-heading,
   .projects-intro .section-heading {
@@ -339,10 +293,6 @@
     scroll-padding-top: 7rem;
   }
 
-  .site-nav {
-    min-height: 54px;
-  }
-
   .nav-links {
     max-width: 74vw;
     gap: 0.8rem;
@@ -376,59 +326,6 @@
   .editorial-grid,
   .project-grid {
     display: block;
-  }
-
-  .hero-section {
-    padding-top: 0.8rem;
-  }
-
-  .board-meta {
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
-    font-size: 0.54rem;
-  }
-
-  .board-meta p:nth-child(2) {
-    display: none;
-  }
-
-  .atlas-picture--hero {
-    aspect-ratio: 4 / 4.5;
-  }
-
-  .atlas-picture--hero img {
-    object-position: 55% center;
-  }
-
-  .art-caption {
-    right: 0.8rem;
-    bottom: 0.8rem;
-    left: 0.8rem;
-    font-size: 0.53rem;
-  }
-
-  .hero-copy {
-    padding: 1.8rem 0 2.5rem;
-  }
-
-  .hero-identity {
-    margin-bottom: 2rem;
-  }
-
-  .hero-identity h1 {
-    font-size: clamp(4.7rem, 24vw, 7rem);
-    line-height: 0.78;
-  }
-
-  .hero-actions {
-    width: min(100%, 22rem);
-    align-items: stretch;
-    margin-left: auto;
-    padding-bottom: 0;
-  }
-
-  .hero-actions .eyebrow {
-    margin-bottom: 1rem;
   }
 
   .craft-copy,

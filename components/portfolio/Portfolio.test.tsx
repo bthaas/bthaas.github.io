@@ -17,33 +17,19 @@ describe('Portfolio', () => {
       screen.queryByText('I build intelligent systems that hold up in the real world.'),
     ).not.toBeInTheDocument()
     expect(screen.queryByText(siteContent.identity.descriptor)).not.toBeInTheDocument()
-    const heroActions = screen.getByRole('group', { name: 'Portfolio roles and projects' })
-    expect(within(heroActions).getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
+    const introduction = screen.getByRole('group', { name: 'Portfolio introduction' })
+    expect(within(introduction).getByText('Portfolio / 2026')).toBeInTheDocument()
+    expect(within(introduction).getByText(siteContent.identity.title)).toBeInTheDocument()
+    expect(within(introduction).getByText(siteContent.identity.location)).toBeInTheDocument()
+    expect(screen.getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Experience' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
-    expect(within(heroActions).getByRole('link', { name: 'Explore projects' })).toHaveAttribute(
-      'href',
-      '/projects',
-    )
     expect(screen.getByText('03 / Skills')).toBeInTheDocument()
     const craftGhost = container.querySelector<HTMLElement>('[data-craft-ghost]')
     expect(craftGhost).toHaveAttribute('data-craft-ghost', '03')
     expect(craftGhost).toBeEmptyDOMElement()
     expect(screen.getByRole('heading', { name: 'The skills behind the flight.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connect with me.' })).toBeInTheDocument()
-    expect(
-      container.querySelector('.atlas-picture--hero source[type="image/avif"]'),
-    ).toHaveAttribute(
-      'srcset',
-      expect.stringContaining('/icarus-atlas/hero-flight-640.avif 640w'),
-    )
-    expect(
-      container.querySelector('.atlas-picture--hero source[type="image/avif"]'),
-    ).toHaveAttribute(
-      'srcset',
-      expect.stringContaining('/icarus-atlas/hero-flight-768.avif 768w'),
-    )
-    expect(container.querySelector('.hero-art')).not.toHaveAttribute('data-atlas-velocity-plate')
     expect(container.querySelector('.sun-badge__orbit .circular-text')).not.toBeInTheDocument()
     expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
       'Release the sun spectacle',
@@ -54,7 +40,7 @@ describe('Portfolio', () => {
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
     )
-    expect(ids).toEqual(['hero', 'portfolio-gateway', 'experience', 'projects', 'craft', 'contact'])
+    expect(ids).toEqual(['portfolio-gateway', 'experience', 'projects', 'craft', 'contact'])
     expect(container.querySelector('[data-chapter-wipe]')).not.toBeInTheDocument()
     expect(container.querySelector('[data-experience-light-step]')).not.toBeInTheDocument()
   })
