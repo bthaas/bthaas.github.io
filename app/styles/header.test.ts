@@ -5,6 +5,27 @@ import postcss from 'postcss'
 import { describe, expect, it } from 'vitest'
 
 describe('header brand mark', () => {
+  it('publishes exact desktop and mobile height tokens for viewport sections', () => {
+    const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/header.css'), 'utf8')
+    const root = postcss.parse(stylesheet)
+    const heights: string[] = []
+    const navHeights: string[] = []
+
+    root.walkRules(':root', (rule) => {
+      rule.walkDecls('--site-header-height', (declaration) => {
+        heights.push(declaration.value)
+      })
+    })
+    root.walkRules('.site-nav', (rule) => {
+      rule.walkDecls('min-height', (declaration) => {
+        navHeights.push(declaration.value)
+      })
+    })
+
+    expect(heights).toEqual(['59px', '55px'])
+    expect(navHeights).toEqual(['58px', '54px'])
+  })
+
   it('renders the centered favicon one pixel larger than the approved size', () => {
     const stylesheet = readFileSync(resolve(process.cwd(), 'app/styles/header.css'), 'utf8')
     const root = postcss.parse(stylesheet)

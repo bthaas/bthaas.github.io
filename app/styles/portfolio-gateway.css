@@ -1,14 +1,43 @@
 .portfolio-gateway {
   position: relative;
   z-index: 50;
-  min-height: max(46rem, 100svh);
+  height: calc(100svh - var(--site-header-height));
+  min-height: 0;
   overflow: hidden;
   background: var(--paper);
   color: var(--ink);
   contain: layout paint style;
-  contain-intrinsic-size: auto 100svh;
+  contain-intrinsic-size: auto calc(100svh - var(--site-header-height));
   content-visibility: auto;
   isolation: isolate;
+}
+
+.portfolio-gateway__meta {
+  position: absolute;
+  z-index: 4;
+  top: clamp(0.9rem, 2.2vh, 1.3rem);
+  right: clamp(2rem, 4vw, 4rem);
+  left: clamp(2rem, 4vw, 4rem);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.portfolio-gateway__meta p {
+  margin: 0;
+}
+
+.portfolio-gateway__meta p:nth-child(2) {
+  text-align: center;
+}
+
+.portfolio-gateway__meta p:last-child {
+  text-align: right;
 }
 
 .portfolio-gateway__sr-only {
@@ -27,7 +56,7 @@
 .portfolio-gateway__introduction {
   position: absolute;
   z-index: 4;
-  top: clamp(1.5rem, 4.2vh, 2.35rem);
+  top: clamp(2.8rem, 6.5vh, 3.7rem);
   left: 50%;
   margin: 0;
   font-family: var(--serif);
@@ -43,7 +72,7 @@
 .portfolio-gateway__word {
   position: absolute;
   z-index: 0;
-  top: clamp(4.8rem, 9.5vh, 7rem);
+  top: clamp(5.4rem, 11.5vh, 6.7rem);
   left: 50%;
   margin: 0;
   font-family: var(--serif);
@@ -80,7 +109,7 @@
 
 .portfolio-gateway__visual {
   position: absolute;
-  top: clamp(7rem, 14vh, 9rem);
+  top: clamp(10.5rem, 22vh, 12.5rem);
   left: 50%;
   width: min(56.5rem, 82vw);
   height: min(35.5rem, 74svh);
@@ -110,7 +139,7 @@
 .portfolio-gateway__ground-shadow {
   position: absolute;
   z-index: 0;
-  top: 65%;
+  top: 69%;
   left: 50%;
   width: min(33rem, 74vw);
   height: min(2.35rem, 6vw);
@@ -128,10 +157,10 @@
   --gateway-segments-per-category: 12;
 
   position: absolute;
-  top: 2%;
+  top: 0;
   left: 50%;
   width: 0;
-  height: 62%;
+  height: 68%;
   transform-style: preserve-3d;
   transition: transform 860ms var(--ease-out);
 }
@@ -193,7 +222,7 @@
 .portfolio-gateway__surface-link {
   position: absolute;
   z-index: 3;
-  top: 33%;
+  top: 34%;
   left: 50%;
   padding: 0.6rem 0.9rem;
   border-radius: 999px;
@@ -320,40 +349,50 @@
 
 @media (max-width: 720px) {
   .portfolio-gateway {
-    min-height: max(48rem, 100svh);
+    height: calc(100svh - var(--site-header-height));
+    min-height: 0;
+  }
+
+  .portfolio-gateway__meta {
+    top: 0.8rem;
+    right: 0.875rem;
+    left: 0.875rem;
+    column-gap: 0.45rem;
+    font-size: 0.48rem;
+    letter-spacing: 0.09em;
   }
 
   .portfolio-gateway__introduction {
-    top: 1.5rem;
+    top: 2.8rem;
     max-width: calc(100vw - 2rem);
     font-size: clamp(0.92rem, 4.2vw, 1.12rem);
   }
 
   .portfolio-gateway__word {
-    top: 26%;
+    top: 28%;
     font-size: clamp(3.4rem, 14vw, 6.4rem);
     line-height: 0.8;
     transform: translate(-50%, -50%);
   }
 
   .portfolio-gateway__visual {
-    top: 30%;
+    top: 31%;
     width: min(100vw, 31rem);
-    height: min(24rem, 45svh);
+    height: min(27rem, 52svh);
   }
 
   .portfolio-gateway__fallback-ring {
     --gateway-cylinder-radius: min(11.2rem, 46vw);
     --gateway-cylinder-slice-width: min(1.44rem, 5.9vw);
 
-    top: 1%;
+    top: 2%;
     left: 50%;
     width: 0;
-    height: 50%;
+    height: 58%;
   }
 
   .portfolio-gateway__ground-shadow {
-    top: 52%;
+    top: 62%;
     width: min(20.5rem, 76vw);
     height: min(1.8rem, 7vw);
     filter: blur(0.3rem);
@@ -365,13 +404,13 @@
   }
 
   .portfolio-gateway__surface-link {
-    top: 26%;
+    top: 31%;
     padding: 0.5rem 0.7rem;
     font-size: clamp(2.25rem, 11vw, 3.4rem);
   }
 
   .portfolio-gateway__controls {
-    top: calc(30% + min(20.5rem, 38svh));
+    top: calc(31% + min(22rem, 42svh));
     bottom: auto;
     gap: 0.35rem;
   }

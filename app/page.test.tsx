@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import HomePage from './page'
 
 describe('homepage', () => {
-  it('contains only the hero and rotating portfolio gateway', () => {
+  it('contains only the full-screen rotating portfolio gateway', () => {
     const { container } = render(<HomePage />)
 
     expect(screen.getByRole('heading', { level: 1, name: 'Brett Haas' })).toBeInTheDocument()
@@ -14,6 +14,7 @@ describe('homepage', () => {
     expect(container.querySelector('main')).toHaveAttribute('data-portfolio-screen', 'home')
     expect(
       Array.from(container.querySelectorAll('main > section')).map((section) => section.id),
-    ).toEqual(['hero', 'portfolio-gateway'])
+    ).toEqual(['portfolio-gateway'])
+    expect(container.querySelector('.hero-section')).not.toBeInTheDocument()
   })
 })

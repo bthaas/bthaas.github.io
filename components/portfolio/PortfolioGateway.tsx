@@ -24,6 +24,14 @@ interface GatewayDragState {
   width: number
 }
 
+interface PortfolioGatewayProps {
+  readonly identity: {
+    readonly location: string
+    readonly name: string
+    readonly title: string
+  }
+}
+
 const GATEWAY_DRAG_CAPTURE_THRESHOLD_PX = 6
 
 const GATEWAY_WORD = 'BRETT HAAS'
@@ -56,7 +64,7 @@ function GatewayCylinderSlices() {
   })
 }
 
-export function PortfolioGateway() {
+export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
   const rootRef = useRef<HTMLElement>(null)
   const dragRef = useRef<GatewayDragState>({
     captured: false,
@@ -128,9 +136,21 @@ export function PortfolioGateway() {
       id="portfolio-gateway"
       aria-labelledby="portfolio-gateway-title"
     >
-      <h2 className="portfolio-gateway__sr-only" id="portfolio-gateway-title">
+      <h1 className="portfolio-gateway__sr-only" id="portfolio-gateway-title">
+        {identity.name}
+      </h1>
+      <h2 className="portfolio-gateway__sr-only">
         Explore the portfolio
       </h2>
+      <div
+        className="portfolio-gateway__meta"
+        role="group"
+        aria-label="Portfolio introduction"
+      >
+        <p>Portfolio / 2026</p>
+        <p>{identity.title}</p>
+        <p>{identity.location}</p>
+      </div>
       <p className="portfolio-gateway__introduction">
         Engineer · Researcher · Builder
       </p>

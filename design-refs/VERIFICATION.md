@@ -801,11 +801,12 @@ are complete.
   session-once GSAP timeline on the home gateway. All 48 existing DOM slices
   descend in deterministic rear-to-front order, overshoot into the ring with a
   restrained `back.out(1.3)` landing, and hand off to the resolving `BRETT HAAS`
-  word, introduction, shadow, and controls over a measured 2,599.5 ms.
+  word, introduction, shadow, and controls over a measured 2,628.6 ms.
 - The ring geometry remains on the outer slice wrappers while entrance transforms
   apply only to their inner bodies. The capture audit found 48 slices, zero
-  leftover inline transforms after settling, 0.0018 cumulative layout shift, and
-  a 568 ms largest-contentful-paint entry on the warmed `npm run dev` recording.
+  leftover inline transforms after settling, 0.0001 cumulative layout shift, and
+  a 984 ms largest-contentful-paint entry on the warmed `npm run dev` recording
+  after reconciling the gateway-only home layout from `source`.
   No new image, font, Three.js, GLB, or blocking asset was added.
 - Drag, pointer, keyboard, links, and arrow buttons are all inert in `pending`
   and `entering` states. The recorded handoff advances the carousel from index
@@ -814,11 +815,11 @@ are complete.
 - `prefers-reduced-motion: reduce` bypasses preparation and renders the exact
   settled frame immediately. The reduced-motion audit found 48 slices, zero
   inline transforms, no disabled carousel state, and no session flag written.
-- Clean headless Chromium requestAnimationFrame sampling measured 91.1 fps at
-  1440 × 900 and 120.2 fps at 390 × 844; the browser ran uncapped, so these
+- Clean headless Chromium requestAnimationFrame sampling measured 83.1 fps at
+  1440 × 900 and 119.3 fps at 390 × 844; the browser ran uncapped, so these
   confirm the 60 fps desktop and 30 fps mobile budgets rather than representing
-  display refresh rates. The simultaneous five-PNG readback pass measured 49.2
-  fps, as expected while screenshots were encoded.
+  display refresh rates. The recorded desktop animation pass measured 60.2 fps
+  while screenshots and video frames were encoded.
 - The accepted desktop beats are
   `site-screenshots/entrance-skyfall-000.png` through
   `site-screenshots/entrance-skyfall-100.png`. The static accessibility frame is
@@ -833,7 +834,7 @@ are complete.
   reported no application console errors. No procedural 3D asset was introduced,
   so Blender turntables, GLB compression, node-name validation, file size, and
   triangle budgets are not applicable to this DOM/GSAP-only change.
-- Final verification passes 247 tests across 61 files, TypeScript, and the
-  12-page Next.js production build. Coverage passes at 90.41% statements, 81.36%
-  branches, 83.87% functions, and 93.84% lines; `git diff --check`, the
+- Final verification passes 232 tests across 60 files, TypeScript, and the
+  12-page Next.js production build. Coverage passes at 90.12% statements, 80.02%
+  branches, 85.36% functions, and 93.65% lines; `git diff --check`, the
   secret/debug scan, and the focused production Chromium journeys are clean.

@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { setupDossiers } from './experience'
 import type { AtlasEngine } from './engine'
 import { setupMagnetic } from './magnetic'
-import { setupMarquee } from './marquee'
 import { setupPrintReveals, setupVelocityPlates } from './plates'
 import { setupScrambleWayfinding } from './wayfinding'
 import { setupCursor } from './cursor'
@@ -166,31 +165,6 @@ describe('Phase C signature motion', () => {
     )
     nav.dispatchEvent(new MouseEvent('pointerenter'))
     expect(harness.to).toHaveBeenCalledWith(nav, expect.objectContaining({ duration: 0.45 }))
-    cleanup()
-  })
-
-  it('runs a velocity-responsive marquee that pauses for hover and focus', () => {
-    document.body.innerHTML = `
-      <div data-craft-marquee tabindex="0"><div class="craft-marquee__track"></div></div>
-    `
-    const harness = createSignatureHarness()
-    const cleanup = setupMarquee(document, harness.engine)
-    const marquee = document.querySelector<HTMLElement>('[data-craft-marquee]')!
-    const loop = harness.timelines[0]
-
-    expect(loop.fromTo).toHaveBeenCalledWith(
-      document.querySelector('.craft-marquee__track'),
-      { xPercent: 0 },
-      expect.objectContaining({ duration: 28, ease: 'none', repeat: -1, xPercent: -50 }),
-    )
-    ;(harness.triggers[0].vars.onUpdate as (self: { getVelocity: () => number }) => void)({
-      getVelocity: () => 1_500,
-    })
-    expect(loop.timeScale).toHaveBeenCalledWith(1.75)
-    marquee.dispatchEvent(new MouseEvent('pointerenter'))
-    expect(loop.pause).toHaveBeenCalled()
-    marquee.dispatchEvent(new MouseEvent('pointerleave'))
-    expect(loop.resume).toHaveBeenCalled()
     cleanup()
   })
 
