@@ -27,7 +27,7 @@ const context = await browser.newContext({
 const page = await context.newPage()
 
 await page.addInitScript(() => {
-  sessionStorage.setItem('atlas-preloader-entered', '1')
+  sessionStorage.setItem('atlas-gateway-entered', '1')
   sessionStorage.setItem('atlas-entered', '1')
   sessionStorage.removeItem('atlas-sun-spectacle')
 })

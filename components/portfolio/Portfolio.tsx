@@ -1,23 +1,17 @@
 import { atlasVisuals } from '@/content/editorial-visuals'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { FlightTiltSurface } from '@/components/motion/FlightTiltSurface'
-import { HeroMasthead } from '@/components/motion/HeroMasthead'
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
 import { SunBadge } from '@/components/motion/SunBadge'
 import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
-import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
 import {
   siteContent,
   type ExperienceEntry,
 } from '@/content/site-content'
 
 import { AtlasPicture } from './AtlasPicture'
-import {
-  getSkillLogos,
-  SkillLogoGrid,
-  SkillLogoSequence,
-} from './SkillLogos'
-import { SkillSphere } from './SkillSphere'
+import { getSkillLogos, SkillLogoGrid } from './SkillLogos'
+import { SkillWorkbench } from './SkillWorkbench'
 import { PortfolioGateway } from './PortfolioGateway'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
@@ -181,39 +175,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
         data-portfolio-screen={screen}
       >
         {(!screen || screen === 'home') && (
-          <>
-            <section className="hero-section atlas-shell" id="hero" aria-labelledby="hero-name">
-          <div className="board-meta hero-meta" role="group" aria-label="Portfolio introduction">
-            <p>Portfolio / 2026</p>
-            <p>{identity.title}</p>
-            <p>{identity.location}</p>
-          </div>
-
-          <HeroLiquidPlate />
-
-          <div className="hero-copy-release">
-            <div className="hero-copy editorial-grid">
-              <div className="hero-identity">
-                <HeroMasthead name={identity.name} />
-              </div>
-              <div
-                className="hero-actions"
-                role="group"
-                aria-label="Portfolio roles and projects"
-              >
-                <p className="eyebrow">Engineer · Researcher · Builder</p>
-                <TransitionLink className="hero-projects-link" href="/projects">
-                  <span>Explore projects</span>
-                  <span className="hero-projects-link__arrow" aria-hidden="true">↓</span>
-                </TransitionLink>
-              </div>
-            </div>
-          </div>
-
-            </section>
-
-            <PortfolioGateway />
-          </>
+          <PortfolioGateway identity={identity} />
         )}
 
         {(!screen || screen === 'experience') && (
@@ -309,10 +271,6 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
               <p className="eyebrow">02 / Field studies</p>
               <h2 id="projects-title">Projects</h2>
             </div>
-            <p>
-              Three builds across computer vision, real-time collaboration, and language-model
-              research. Follow the spiral and choose a project to open its complete case study.
-            </p>
           </div>
 
           <ProjectsSpiral projects={projects} />
@@ -326,60 +284,12 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
             id="craft"
             aria-labelledby="craft-title"
           >
-          <div className="craft-board">
-            <div
-              className="craft-plate craft-plate--inset"
-              data-atlas-plate-sheen
-              data-atlas-velocity-plate
-            >
-              <AtlasPicture
-                visual={atlasVisuals.craft}
-                alt="A cliffside workshop with sculptural wings"
-                className="atlas-picture craft-art"
-                cursor="read"
-                printReveal
-                sizes="(max-width: 720px) 100vw, 50vw"
-              />
-            </div>
-            <div className="craft-panel">
-              <div className="craft-narrative">
-                <div className="section-heading craft-heading">
-                  <span className="craft-ghost" data-craft-ghost="03" aria-hidden="true" />
-                  <p className="eyebrow">03 / Skills</p>
-                  <h2 id="craft-title">The skills behind the flight.</h2>
-                </div>
-                <div className="craft-copy">
-                  <p className="lede">
-                    My work sits where software engineering, machine learning, and product
-                    judgment meet.
-                  </p>
-                  <p>
-                    I like difficult systems with visible stakes: steering model behavior, testing
-                    frontier agents, and shipping cross-platform products whose performance can be
-                    measured—not merely described.
-                  </p>
-                </div>
+            <SkillWorkbench logos={skillLogos} />
+            <noscript>
+              <div className="skill-workbench__noscript">
+                <SkillLogoGrid logos={skillLogos} />
               </div>
-            </div>
-          </div>
-          <SkillSphere logos={skillLogos} />
-          <noscript>
-            <div className="skill-sphere-noscript">
-              <SkillLogoGrid logos={skillLogos} />
-            </div>
-          </noscript>
-          <div
-            className="craft-marquee"
-            data-craft-marquee
-            role="region"
-            aria-label="Technology logo ticker; focus to pause"
-            tabIndex={0}
-          >
-            <div className="craft-marquee__track">
-              <SkillLogoSequence logos={skillLogos} />
-              <SkillLogoSequence logos={skillLogos} duplicate />
-            </div>
-          </div>
+            </noscript>
           </section>
         )}
 

@@ -1,6 +1,6 @@
 @import './styles/base.css';
+@import './styles/editorial-base.css';
 @import './styles/header.css';
-@import './styles/hero.css';
 @import './styles/portfolio-gateway.css';
 @import './styles/page-transition.css';
 @import './styles/craft.css';
@@ -11,6 +11,6 @@
 @import './styles/micro-craft.css';
 @import './styles/phase-one.css';
 @import './styles/phase-two.css';
-@import './styles/phase-three.css';
+@import './styles/sun-badge.css';
 @import './styles/phase-five.css';
 @import './styles/page-flow.css';

@@ -8,7 +8,7 @@ import type {
   ProjectFlightMotionState,
   ProjectPlaneLayout,
 } from '@/components/projects/project-flight-types'
-import { getTextureCoverScale } from '@/lib/atlas-motion/hero-overdrive'
+import { getTextureCoverScale } from '@/lib/atlas-motion/texture-cover'
 import { getProjectFlightFrame } from '@/lib/atlas-motion/project-flight-path'
 
 import {

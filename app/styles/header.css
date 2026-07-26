@@ -1,3 +1,7 @@
+:root {
+  --site-header-height: 59px;
+}
+
 .site-header {
   position: sticky;
   z-index: 100;
@@ -133,4 +137,14 @@
 .nav-links a[aria-current]:hover::after,
 .nav-links a[aria-current]:focus-visible::after {
   transform: scaleX(1);
+}
+
+@media (max-width: 720px) {
+  :root {
+    --site-header-height: 55px;
+  }
+
+  .site-nav {
+    min-height: 54px;
+  }
 }

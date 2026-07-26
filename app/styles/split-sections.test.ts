@@ -27,52 +27,31 @@ function declarationsFor(
   return declarations
 }
 
-describe('Experience and Skills split boards', () => {
-  it('gives artwork and copy equal desktop columns with inset plates', () => {
+describe('Experience split board', () => {
+  it('gives artwork and copy equal desktop columns with an inset plate', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
-    const craftStyles = readFileSync(resolve(process.cwd(), 'app/styles/craft.css'), 'utf8')
 
     expect(declarationsFor(experienceStyles, '.experience-board')).toMatchObject({
       display: 'grid',
       'grid-template-columns': 'repeat(2, minmax(0, 1fr))',
     })
-    expect(declarationsFor(craftStyles, '.craft-board')).toMatchObject({
-      display: 'grid',
-      'grid-template-areas': '"copy artwork"',
-      'grid-template-columns': 'repeat(2, minmax(0, 1fr))',
-    })
-    expect(declarationsFor(craftStyles, '.craft-panel')).toMatchObject({
-      'grid-area': 'copy',
-    })
-    expect(declarationsFor(craftStyles, '.craft-plate')).toMatchObject({
-      'grid-area': 'artwork',
-    })
     expect(declarationsFor(experienceStyles, '.experience-plate--inset')).toMatchObject({
-      margin: 'clamp(1rem, 1.5vw, 1.75rem)',
-      'border-radius': 'clamp(1rem, 1.8vw, 1.6rem)',
-    })
-    expect(declarationsFor(craftStyles, '.craft-plate--inset')).toMatchObject({
       margin: 'clamp(1rem, 1.5vw, 1.75rem)',
       'border-radius': 'clamp(1rem, 1.8vw, 1.6rem)',
     })
   })
 
-  it('stacks each image above its copy on narrow screens', () => {
+  it('stacks the image above its copy on narrow screens', () => {
     const mediaQuery = '(max-width: 720px)'
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
-    const craftStyles = readFileSync(resolve(process.cwd(), 'app/styles/craft.css'), 'utf8')
 
     expect(declarationsFor(experienceStyles, '.experience-board', mediaQuery)).toMatchObject({
-      'grid-template-columns': '1fr',
-    })
-    expect(declarationsFor(craftStyles, '.craft-board', mediaQuery)).toMatchObject({
-      'grid-template-areas': '"artwork" "copy"',
       'grid-template-columns': '1fr',
     })
   })

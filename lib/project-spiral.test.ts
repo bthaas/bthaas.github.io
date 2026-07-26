@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getFrontProjectIndex,
+  getDefaultProjectView,
   getProjectSpiralFrame,
   getProjectSpiralLayout,
   getProjectSpiralPhase,
@@ -9,6 +10,11 @@ import {
 } from './project-spiral'
 
 describe('project spiral choreography', () => {
+  it('prefers the readable index when reduced motion is requested', () => {
+    expect(getDefaultProjectView(false)).toBe('spiral')
+    expect(getDefaultProjectView(true)).toBe('index')
+  })
+
   it('places the active slot front and center', () => {
     const frame = getProjectSpiralFrame({
       phase: 0,
