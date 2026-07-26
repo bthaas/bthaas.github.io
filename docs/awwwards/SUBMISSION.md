@@ -58,9 +58,9 @@ The flight narrative controls every escalation. Sparse paper-white feathers
 become a gold-rimmed fall over the dusk career path, react to scroll wind and
 pointer gusts, thin through the field studies, then settle at the horizon.
 Experience turns three overlapping roles and education into a date-derived
-editorial ledger. Every company and role stays visible while native grouped
-disclosures reveal one focused set of evidence at a time, including without
-JavaScript. The three
+horizontal rail with four upright career columns. Every company and role stays
+visible while native grouped disclosures reveal one focused set of evidence at
+a time, including without JavaScript. The three
 accepted project paintings travel through a second native-scroll horizontal pin;
 shared WebGL planes bend and skew with velocity while ghost numerals mark the
 cases. The next chapter prints itself in through a reversible halftone mask, and

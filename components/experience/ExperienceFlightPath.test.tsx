@@ -27,16 +27,19 @@ describe('ExperienceFlightPath', () => {
   })
 
   it('keeps every company and role visible while descriptions stay collapsed', () => {
-    render(
+    const { container } = render(
       <ExperienceFlightPath
         education={siteContent.education}
         experience={siteContent.experience}
       />,
     )
 
+    const rail = container.querySelector('.experience-timeline__rail')
     const timeline = screen.getByRole('list', {
       name: 'Professional experience and education',
     })
+    expect(rail).toContainElement(timeline)
+    expect(timeline).toHaveStyle('--experience-stop-count: 4')
     expect(timeline.children).toHaveLength(4)
 
     for (const entry of siteContent.experience) {

@@ -419,6 +419,26 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(disclosures).toHaveCount(4)
   await expect(careerPath).not.toHaveAttribute('data-experience-flight-enhanced')
   for (const stop of await stops.all()) await expect(stop).toBeVisible()
+  const stopRects = await stops.evaluateAll((elements) => elements.map((element) => {
+    const rect = element.getBoundingClientRect()
+    return {
+      left: Math.round(rect.left),
+      top: Math.round(rect.top),
+    }
+  }))
+  if (isMobile) {
+    expect(new Set(stopRects.map(({ left }) => left))).toHaveProperty('size', 1)
+    expect(new Set(stopRects.map(({ top }) => top))).toHaveProperty('size', 4)
+    expect(stopRects.map(({ top }) => top)).toEqual(
+      [...stopRects.map(({ top }) => top)].sort((a, b) => a - b),
+    )
+  } else {
+    expect(new Set(stopRects.map(({ top }) => top))).toHaveProperty('size', 1)
+    expect(new Set(stopRects.map(({ left }) => left))).toHaveProperty('size', 4)
+    expect(stopRects.map(({ left }) => left)).toEqual(
+      [...stopRects.map(({ left }) => left)].sort((a, b) => a - b),
+    )
+  }
   for (const disclosure of await disclosures.all()) {
     await expect(disclosure).not.toHaveAttribute('open')
   }

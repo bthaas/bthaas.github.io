@@ -28,7 +28,7 @@ function declarationsFor(
 }
 
 describe('Experience timeline', () => {
-  it('lays every career stop out as one clean editorial ledger', () => {
+  it('lays career stops across a horizontal rail as upright columns', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
@@ -40,11 +40,36 @@ describe('Experience timeline', () => {
     })
     expect(declarationsFor(
       experienceStyles,
+      '.experience-timeline__rail',
+      '(min-width: 960px)',
+    )).toMatchObject({
+      'overflow-x': 'auto',
+      'scroll-snap-type': 'x proximity',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__list',
+      '(min-width: 960px)',
+    )).toMatchObject({
+      'grid-template-columns': 'repeat(var(--experience-stop-count), minmax(0, 1fr))',
+      'min-width': 'calc(var(--experience-stop-count) * 15rem)',
+    })
+    expect(declarationsFor(
+      experienceStyles,
       '.experience-timeline__stop-header',
       '(min-width: 960px)',
     )).toMatchObject({
       display: 'grid',
-      'grid-template-columns': '4rem minmax(16rem, 1.25fr) minmax(13rem, 0.8fr) minmax(10rem, 0.65fr) auto',
+      'grid-template-columns': 'minmax(0, 1fr)',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__stop::before',
+      '(min-width: 960px)',
+    )).toMatchObject({
+      height: '1px',
+      left: '0',
+      right: '0',
     })
     expect(declarationsFor(
       experienceStyles,
@@ -55,7 +80,6 @@ describe('Experience timeline', () => {
   })
 
   it('uses an intentional stacked route at 390px', () => {
-    const mediaQuery = '(max-width: 640px)'
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
@@ -63,8 +87,26 @@ describe('Experience timeline', () => {
 
     expect(declarationsFor(
       experienceStyles,
+      '.experience-timeline__rail',
+      '(max-width: 959px)',
+    )).toMatchObject({
+      'overflow-x': 'visible',
+      'scroll-snap-type': 'none',
+    })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__list',
+      '(max-width: 959px)',
+    )).toMatchObject({
+      'grid-auto-flow': 'row',
+      'grid-template-columns': '1fr',
+      'overflow-x': 'visible',
+      'scroll-snap-type': 'none',
+    })
+    expect(declarationsFor(
+      experienceStyles,
       '.experience-timeline__stop-header',
-      mediaQuery,
+      '(max-width: 640px)',
     )).toMatchObject({
       'grid-template-columns': '3rem minmax(0, 1fr) auto',
     })
