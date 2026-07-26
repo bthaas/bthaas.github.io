@@ -154,6 +154,12 @@ describe('SkillWorkbench', () => {
 
   it('supports bounded pointer throwing and restores a token on reset', () => {
     let animate: FrameRequestCallback | undefined
+    vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(((
+      values: Uint32Array,
+    ) => {
+      values[0] = 1
+      return values
+    }) as Crypto['getRandomValues'])
     vi.stubGlobal('requestAnimationFrame', vi.fn((callback: FrameRequestCallback) => {
       animate = callback
       return 1
