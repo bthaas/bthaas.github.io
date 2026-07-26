@@ -17,6 +17,7 @@ import {
   type SkillRigidBodySnapshot,
   type SkillRigidBodyWorld,
 } from '@/lib/skill-workbench-rigidbody'
+import { getSkillTokenSize } from '@/lib/skill-token-size'
 
 import {
   SkillLogoGrid,
@@ -412,6 +413,7 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
                   aria-label={`${logo.label}, ${logo.category}`}
                   aria-disabled={physicsMode === 'stuck'}
                   data-cursor={physicsMode === 'dropped' ? 'move' : undefined}
+                  data-skill-size={getSkillTokenSize(logo.label)}
                   onKeyDown={(event) => handleKeyDown(index, event)}
                   onPointerCancel={(event) => handlePointerEnd(index, event)}
                   onPointerDown={(event) => handlePointerDown(index, event)}

@@ -706,6 +706,22 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     const readTransforms = () => tools.getByRole('button').evaluateAll(
       (tokens) => tokens.map((token) => (token as HTMLElement).style.transform),
     )
+    const readSizeMetrics = () => tools.getByRole('button').evaluateAll((tokens) => (
+      tokens.map((token) => {
+        const element = token as HTMLElement
+        const size = element.dataset.skillSize
+        if (!size) {
+          throw new Error(`Missing skill size for ${element.getAttribute('aria-label')}`)
+        }
+
+        return {
+          height: element.offsetHeight,
+          label: element.getAttribute('aria-label') ?? '',
+          size,
+          width: element.offsetWidth,
+        }
+      })
+    ))
     const readRectangles = () => tools.getByRole('button').evaluateAll((tokens) => (
       tokens.map((token) => {
         const element = token as HTMLElement
@@ -777,6 +793,40 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
 
     await expect(workbench).toHaveAttribute('data-physics', 'stuck')
     await expect(workbench.getByRole('button', { name: 'Drop skills' })).toBeVisible()
+    const sizeMetrics = await readSizeMetrics()
+    const sizeTiers = ['compact', 'small', 'medium', 'large'] as const
+    expect(new Set(sizeMetrics.map(({ size }) => size))).toEqual(new Set(sizeTiers))
+
+    for (const [size, expectedWidth, expectedHeight] of [
+      ['compact', 112, 40],
+      ['small', 126, 43],
+      ['medium', 141, 46],
+      ['large', 155, 48],
+    ] as const) {
+      const tier = sizeMetrics.filter((metric) => metric.size === size)
+      expect(tier.length, `Missing ${size} skill tokens`).toBeGreaterThan(0)
+
+      for (const metric of tier) {
+        expect(metric.width, `${metric.label} width`).toBeGreaterThanOrEqual(expectedWidth - 2)
+        expect(metric.width, `${metric.label} width`).toBeLessThanOrEqual(expectedWidth + 2)
+        expect(metric.height, `${metric.label} height`)
+          .toBeGreaterThanOrEqual(expectedHeight - 1)
+        expect(metric.height, `${metric.label} height`)
+          .toBeLessThanOrEqual(expectedHeight + 1)
+      }
+    }
+
+    const widthFor = (label: string) => {
+      const metric = sizeMetrics.find((candidate) => candidate.label === label)
+      if (!metric) throw new Error(`Missing skill size metrics for ${label}`)
+      return metric.width
+    }
+    expect(widthFor('Go, Languages')).toBeLessThan(widthFor('Python, Languages'))
+    expect(widthFor('Python, Languages'))
+      .toBeLessThan(widthFor('TypeScript, Languages'))
+    expect(widthFor('TypeScript, Languages'))
+      .toBeLessThan(widthFor('Amazon Web Services, Cloud & DevOps'))
+
     const firstVisitHomes = await readTransforms()
     expect(new Set(firstVisitHomes).size).toBeGreaterThan(14)
     await expectScatteredNonOverlappingLayout()

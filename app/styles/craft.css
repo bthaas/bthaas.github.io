@@ -181,11 +181,20 @@
 }
 
 .skill-workbench__token {
+  --skill-token-gap: clamp(0.42rem, 0.75vw, 0.72rem);
+  --skill-token-glyph: clamp(1.25rem, 1.7vw, 1.7rem);
+  --skill-token-height: 48px;
+  --skill-token-padding-block: 0.54rem;
+  --skill-token-padding-inline: 0.62rem;
+  --skill-token-width: 9.7rem;
+
   display: grid;
-  width: min(100%, 9.7rem);
+  width: min(100%, var(--skill-token-width));
   min-width: 0;
-  min-height: 48px;
-  padding: 0.54rem 0.62rem;
+  min-height: var(--skill-token-height);
+  padding:
+    var(--skill-token-padding-block)
+    var(--skill-token-padding-inline);
   border: 1.5px solid var(--skill-category-color);
   border-radius: 0.7rem;
   align-items: center;
@@ -199,14 +208,39 @@
   font: inherit;
   font-size: clamp(0.56rem, 0.72vw, 0.72rem);
   font-weight: 750;
-  gap: clamp(0.42rem, 0.75vw, 0.72rem);
-  grid-template-columns: clamp(1.25rem, 1.7vw, 1.7rem) minmax(0, 1fr);
+  gap: var(--skill-token-gap);
+  grid-template-columns: var(--skill-token-glyph) minmax(0, 1fr);
   letter-spacing: -0.01em;
   line-height: 1.05;
   text-align: left;
   transform-origin: center;
   user-select: none;
   will-change: transform;
+}
+
+.skill-workbench__token[data-skill-size="compact"] {
+  --skill-token-gap: 0.38rem;
+  --skill-token-glyph: 1.15rem;
+  --skill-token-height: 40px;
+  --skill-token-padding-block: 0.42rem;
+  --skill-token-padding-inline: 0.52rem;
+  --skill-token-width: 7rem;
+}
+
+.skill-workbench__token[data-skill-size="small"] {
+  --skill-token-gap: 0.42rem;
+  --skill-token-glyph: 1.3rem;
+  --skill-token-height: 43px;
+  --skill-token-padding-block: 0.46rem;
+  --skill-token-padding-inline: 0.56rem;
+  --skill-token-width: 7.9rem;
+}
+
+.skill-workbench__token[data-skill-size="medium"] {
+  --skill-token-glyph: 1.48rem;
+  --skill-token-height: 46px;
+  --skill-token-padding-block: 0.5rem;
+  --skill-token-width: 8.8rem;
 }
 
 .skill-workbench[data-dragging] .skill-workbench__token {
@@ -415,7 +449,7 @@
   }
 
   .skill-workbench__token {
-    min-height: 44px;
+    min-height: min(var(--skill-token-height), 44px);
     padding-block: 0.4rem;
   }
 

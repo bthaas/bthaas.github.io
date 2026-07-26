@@ -53,6 +53,17 @@ describe('SkillWorkbench', () => {
     expect(tokens.map((token) => token.getAttribute('aria-label'))).toEqual(
       logos.map(({ category, label }) => `${label}, ${category}`),
     )
+    expect(new Set(tokens.map((token) => token.getAttribute('data-skill-size'))))
+      .toEqual(new Set(['compact', 'small', 'medium', 'large']))
+    expect(screen.getByRole('button', { name: 'Go, Languages' }))
+      .toHaveAttribute('data-skill-size', 'compact')
+    expect(screen.getByRole('button', { name: 'Python, Languages' }))
+      .toHaveAttribute('data-skill-size', 'small')
+    expect(screen.getByRole('button', { name: 'TypeScript, Languages' }))
+      .toHaveAttribute('data-skill-size', 'medium')
+    expect(screen.getByRole('button', {
+      name: 'Amazon Web Services, Cloud & DevOps',
+    })).toHaveAttribute('data-skill-size', 'large')
 
     for (const logo of logos) {
       const item = screen.getByRole('button', {
