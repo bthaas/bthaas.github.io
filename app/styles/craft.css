@@ -85,7 +85,7 @@
   color: var(--muted);
 }
 
-.skill-workbench__reset {
+.skill-workbench__mode {
   display: inline-flex;
   min-height: 44px;
   padding: 0.7rem 0.95rem;
@@ -108,12 +108,12 @@
     transform 160ms var(--ease-out);
 }
 
-.skill-workbench__reset > span {
+.skill-workbench__mode > span {
   color: currentcolor;
   font-size: 1rem;
 }
 
-.skill-workbench__reset:is(:hover, :focus-visible) {
+.skill-workbench__mode:is(:hover, :focus-visible) {
   background: var(--cream);
   color: var(--ink);
   transform: translateY(-2px);
@@ -185,7 +185,7 @@
   border-radius: 0.7rem;
   align-items: center;
   appearance: none;
-  background: rgb(255 253 245 / 96%);
+  background: color-mix(in srgb, var(--skill-category-color) 12%, #fffef8);
   box-shadow:
     0 0.38rem 0.85rem rgb(17 19 15 / 8%),
     0 1px 0 rgb(255 255 255 / 92%) inset;
@@ -208,9 +208,13 @@
   cursor: grabbing;
 }
 
+.skill-workbench[data-physics="stuck"] .skill-workbench__token {
+  cursor: default;
+}
+
 .skill-workbench__token:is(:hover, :focus-visible) {
   z-index: 2;
-  background: #fffef8;
+  background: color-mix(in srgb, var(--skill-category-color) 18%, #fffef8);
   box-shadow:
     0 0.7rem 1.3rem rgb(17 19 15 / 13%),
     0 0 0 2px color-mix(in srgb, var(--skill-category-color) 24%, transparent);
@@ -351,7 +355,7 @@
   border: 1.5px solid var(--skill-category-color);
   margin: 0;
   align-items: center;
-  background: rgb(255 253 245 / 96%);
+  background: color-mix(in srgb, var(--skill-category-color) 10%, #fffef8);
   gap: 0.4rem;
   grid-template-columns: 1.4rem minmax(0, 1fr);
   transition:
@@ -453,14 +457,8 @@
     display: none;
   }
 
-  .skill-workbench__reset {
-    min-width: 44px;
-    padding-inline: 0.75rem;
-    font-size: 0;
-  }
-
-  .skill-workbench__reset > span {
-    font-size: 1.15rem;
+  .skill-workbench__meta {
+    display: none;
   }
 
   .skill-workbench__interactive {
@@ -498,6 +496,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .skill-workbench__mode {
+    display: none;
+  }
+
   .skill-workbench__interactive {
     display: none;
   }

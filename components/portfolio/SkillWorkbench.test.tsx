@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
 
@@ -9,11 +9,25 @@ import { SkillWorkbench } from './SkillWorkbench'
 describe('SkillWorkbench', () => {
   const logos = getSkillLogos(siteContent.skills)
 
+  beforeEach(() => {
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      dispatchEvent: () => false,
+    }))
+  })
+
   afterEach(() => {
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
-  it('renders every supported logo as an outlined, categorized tool', () => {
+  it('renders every supported logo as a solid, categorized tool', () => {
     const { container } = render(<SkillWorkbench logos={logos} />)
     const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
     const tools = within(workbench).getByRole('list', { name: 'Movable technology tools' })
@@ -35,7 +49,7 @@ describe('SkillWorkbench', () => {
     }
   })
 
-  it('filters by category and clears the filter from reset', () => {
+  it('filters by category', () => {
     render(<SkillWorkbench logos={logos} />)
     const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
     const filters = within(workbench).getByRole('group', { name: 'Filter skills by category' })
@@ -49,10 +63,67 @@ describe('SkillWorkbench', () => {
     expect(workbench).not.toHaveAttribute('data-active-category')
     expect(frameworks).toHaveAttribute('aria-pressed', 'false')
 
-    fireEvent.click(frameworks)
-    fireEvent.click(screen.getByRole('button', { name: 'Reset workbench' }))
-    expect(workbench).not.toHaveAttribute('data-active-category')
-    expect(frameworks).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('starts stuck, drops automatically, and offers a persistent stick/drop control', () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('requestAnimationFrame', vi.fn(() => 1))
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+
+    render(<SkillWorkbench logos={logos} />)
+    const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
+
+    expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    expect(screen.getByRole('button', { name: 'Drop skills' })).toBeVisible()
+
+    act(() => vi.advanceTimersByTime(1_000))
+
+    expect(workbench).toHaveAttribute('data-physics', 'dropped')
+    expect(screen.getByRole('button', { name: 'Stick skills' })).toBeVisible()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Stick skills' }))
+    expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    expect(screen.getByRole('button', { name: 'Drop skills' })).toBeVisible()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
+    expect(workbench).toHaveAttribute('data-physics', 'dropped')
+  })
+
+  it('does not auto-drop when the visitor prefers reduced motion', () => {
+    vi.useFakeTimers()
+    vi.mocked(window.matchMedia).mockImplementation((query) => ({
+      matches: query === '(prefers-reduced-motion: reduce)',
+      media: query,
+      onchange: null,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      dispatchEvent: () => false,
+    }))
+
+    render(<SkillWorkbench logos={logos} />)
+    const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
+
+    act(() => vi.advanceTimersByTime(1_000))
+
+    expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    expect(screen.getByRole('button', { name: 'Drop skills' })).toBeVisible()
+  })
+
+  it('preserves the selected physics mode when the arena resizes', () => {
+    vi.stubGlobal('requestAnimationFrame', vi.fn(() => 1))
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+
+    render(<SkillWorkbench logos={logos} />)
+    const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
+
+    fireEvent(window, new Event('resize'))
+    expect(workbench).toHaveAttribute('data-physics', 'stuck')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
+    fireEvent(window, new Event('resize'))
+    expect(workbench).toHaveAttribute('data-physics', 'dropped')
   })
 
   it('supports bounded pointer throwing and restores a token on reset', () => {
@@ -64,6 +135,7 @@ describe('SkillWorkbench', () => {
     vi.stubGlobal('cancelAnimationFrame', vi.fn())
 
     render(<SkillWorkbench logos={logos} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
     const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
     const token = screen.getByRole('button', { name: 'TypeScript, Languages' })
     const capture = vi.fn()
@@ -107,6 +179,7 @@ describe('SkillWorkbench', () => {
     expect(workbench).toHaveAttribute('data-dragging', 'TypeScript')
     expect(capture).toHaveBeenCalledWith(7)
     expect(token.style.transform).toContain('translate3d(44px, 26px, 0)')
+    act(() => animate?.(performance.now() + 8))
 
     fireEvent.pointerUp(token, {
       clientX: 144,
@@ -119,9 +192,11 @@ describe('SkillWorkbench', () => {
 
     act(() => animate?.(performance.now() + 16))
     act(() => animate?.(performance.now() + 32))
-    fireEvent.click(screen.getByRole('button', { name: 'Reset workbench' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stick skills' }))
     expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    act(() => animate?.(performance.now() + 40))
 
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
     fireEvent.pointerDown(token, {
       button: 0,
       clientX: 100,
@@ -143,11 +218,12 @@ describe('SkillWorkbench', () => {
     })
     expect(release).toHaveBeenCalledWith(9)
     act(() => animate?.(performance.now() + 48))
-    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    expect(token.style.transform).not.toContain('translate3d(0px, 0px, 0)')
   })
 
   it('offers keyboard nudging and Escape-to-home without hiding the fallback grid', () => {
     render(<SkillWorkbench logos={logos} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
     const token = screen.getByRole('button', { name: 'Python, Languages' })
 
     fireEvent.keyDown(token, { key: 'ArrowRight' })

@@ -37,9 +37,10 @@ describe('Skill Workbench presentation contract', () => {
     })
   })
 
-  it('uses the category color as a persistent token outline', () => {
+  it('uses the category color for a solid token with a persistent outline', () => {
     expect(declarationsFor('.skill-workbench__token')).toMatchObject({
       border: '1.5px solid var(--skill-category-color)',
+      background: 'color-mix(in srgb, var(--skill-category-color) 12%, #fffef8)',
       'will-change': 'transform',
     })
   })
