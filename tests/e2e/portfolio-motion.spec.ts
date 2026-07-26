@@ -601,6 +601,11 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     sessionStorage.setItem('atlas-gateway-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
+  if (!isMobile) {
+    const clockStart = new Date('2026-07-26T12:00:00Z')
+    await page.clock.install({ time: clockStart })
+    await page.clock.pauseAt(clockStart.getTime() + 1_000)
+  }
   await page.goto('/skills', { waitUntil: 'networkidle' })
 
   const workbench = page.getByRole('region', { name: 'Interactive skill workbench' })
@@ -615,25 +620,99 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     const tools = workbench.getByRole('list', { name: 'Movable technology tools' })
     await expect(tools.getByRole('button')).toHaveCount(28)
     const typeScript = tools.getByRole('button', { name: 'TypeScript, Languages' })
+    const javaScript = tools.getByRole('button', { name: 'JavaScript, Languages' })
+    const react = tools.getByRole('button', { name: 'React, Frameworks' })
+    const readTranslation = (token: typeof typeScript) => token.evaluate((element) => {
+      const match = element.style.transform.match(
+        /translate3d\((-?[\d.]+)px, (-?[\d.]+)px, 0\)/,
+      )
+      if (!match) throw new Error(`Missing token translation: ${element.style.transform}`)
+      return { x: Number(match[1]), y: Number(match[2]) }
+    })
+
+    await expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    await expect(workbench.getByRole('button', { name: 'Drop skills' })).toBeVisible()
+    await expect(typeScript).toHaveAttribute('aria-disabled', 'true')
+    expect(await tools.getByRole('button').evaluateAll((tokens) => tokens.every(
+      (token) => (token as HTMLElement).style.transform.includes(
+        'translate3d(0px, 0px, 0)',
+      ),
+    ))).toBe(true)
+    const hydrationProbe = workbench.getByRole('button', {
+      name: 'Frameworks',
+      exact: true,
+    })
+    await hydrationProbe.click()
+    await expect(workbench).toHaveAttribute('data-active-category', 'frameworks')
+    await hydrationProbe.click()
+    await expect(workbench).not.toHaveAttribute('data-active-category')
+
+    const [languageAppearance, frameworkAppearance] = await Promise.all([
+      typeScript.evaluate((token) => {
+        const styles = getComputedStyle(token)
+        return {
+          background: styles.backgroundColor,
+          border: styles.borderTopColor,
+          borderStyle: styles.borderTopStyle,
+        }
+      }),
+      react.evaluate((token) => {
+        const styles = getComputedStyle(token)
+        return {
+          background: styles.backgroundColor,
+          border: styles.borderTopColor,
+        }
+      }),
+    ])
+    expect(languageAppearance.background).not.toBe('rgba(0, 0, 0, 0)')
+    expect(languageAppearance.borderStyle).toBe('solid')
+    expect(languageAppearance.background).not.toBe(frameworkAppearance.background)
+    expect(languageAppearance.border).not.toBe(frameworkAppearance.border)
+
+    await page.clock.runFor(849)
+    await expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    await page.clock.runFor(1)
+    await expect(workbench).toHaveAttribute('data-physics', 'dropped')
+    await expect(workbench.getByRole('button', { name: 'Stick skills' })).toBeVisible()
+    await expect(typeScript).toHaveAttribute('aria-disabled', 'false')
 
     await typeScript.focus()
+    const beforeKeyboardNudge = await readTranslation(typeScript)
     await typeScript.press('ArrowRight')
-    await expect(typeScript).toHaveAttribute('style', /translate3d\(12px, 0px, 0\)/)
+    const afterKeyboardNudge = await readTranslation(typeScript)
+    expect(afterKeyboardNudge.x - beforeKeyboardNudge.x).toBeCloseTo(12, 2)
+    expect(afterKeyboardNudge.y).toBeCloseTo(beforeKeyboardNudge.y, 2)
     await typeScript.press('Escape')
     await expect(typeScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
 
-    const tokenBox = await typeScript.boundingBox()
+    const collisionTargetBefore = await readTranslation(javaScript)
+    const [tokenBox, collisionTargetBox] = await Promise.all([
+      typeScript.boundingBox(),
+      javaScript.boundingBox(),
+    ])
     expect(tokenBox).not.toBeNull()
+    expect(collisionTargetBox).not.toBeNull()
     const startX = tokenBox!.x + tokenBox!.width / 2
     const startY = tokenBox!.y + tokenBox!.height / 2
+    const targetX = collisionTargetBox!.x + collisionTargetBox!.width / 2
+    const targetY = collisionTargetBox!.y + collisionTargetBox!.height / 2
     await page.mouse.move(startX, startY)
     await page.mouse.down()
     await expect(workbench).toHaveAttribute('data-dragging', 'TypeScript')
-    await page.mouse.move(startX + 48, startY + 24, { steps: 5 })
+    await page.mouse.move(targetX, targetY, { steps: 5 })
+    const collisionTranslation = await readTranslation(javaScript)
+    expect(Math.hypot(
+      collisionTranslation.x - collisionTargetBefore.x,
+      collisionTranslation.y - collisionTargetBefore.y,
+    )).toBeGreaterThan(1)
     await page.mouse.up()
     await expect(workbench).not.toHaveAttribute('data-dragging')
-    await workbench.getByRole('button', { name: 'Reset workbench' }).click()
+    await workbench.getByRole('button', { name: 'Stick skills' }).click()
+    await expect(workbench).toHaveAttribute('data-physics', 'stuck')
     await expect(typeScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
+    await expect(javaScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
+    await workbench.getByRole('button', { name: 'Drop skills' }).click()
+    await expect(workbench).toHaveAttribute('data-physics', 'dropped')
   }
 
   const frameworks = workbench.getByRole('button', { name: 'Frameworks', exact: true })

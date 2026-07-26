@@ -16,14 +16,13 @@ import {
   type SkillCategory,
   type SkillLogo,
 } from './SkillLogos'
+import {
+  constrainSkillBody,
+  resolveSkillCollisions,
+  type SkillArenaBody,
+} from '@/lib/skill-workbench-physics'
 
-interface TokenMotion {
-  bounds: {
-    minX: number
-    maxX: number
-    minY: number
-    maxY: number
-  }
+interface TokenMotion extends SkillArenaBody {
   dragging: boolean
   lastPointerX: number
   lastPointerY: number
@@ -45,22 +44,43 @@ const EMPTY_BOUNDS = {
 const FRAME_MS = 1000 / 60
 const GRAVITY = 0.54
 const AIR_DRAG = 0.986
-const BOUNCE = 0.54
 const KEYBOARD_NUDGE = 12
+const AUTO_DROP_DELAY_MS = 850
+const COLLISION_PASSES = 4
+const SETTLED_HORIZONTAL_SPEED = 0.08
+const SETTLED_VERTICAL_SPEED = 0.22
+
+type PhysicsMode = 'dropped' | 'stuck'
 
 function createMotion(): TokenMotion {
   return {
     bounds: EMPTY_BOUNDS,
     dragging: false,
+    height: 0,
+    homeLeft: 0,
+    homeTop: 0,
     lastPointerX: 0,
     lastPointerY: 0,
     lastPointerTime: 0,
     pointerId: null,
     velocityX: 0,
     velocityY: 0,
+    width: 0,
     x: 0,
     y: 0,
   }
+}
+
+function resetMotion(motion: TokenMotion) {
+  motion.dragging = false
+  motion.lastPointerX = 0
+  motion.lastPointerY = 0
+  motion.lastPointerTime = 0
+  motion.pointerId = null
+  motion.velocityX = 0
+  motion.velocityY = 0
+  motion.x = 0
+  motion.y = 0
 }
 
 function tokenAngle(index: number) {
@@ -92,9 +112,13 @@ function categoriesFrom(logos: readonly SkillLogo[]): readonly SkillCategory[] {
 export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[] }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [draggingLabel, setDraggingLabel] = useState<string | null>(null)
+  const [physicsMode, setPhysicsMode] = useState<PhysicsMode>('stuck')
   const arenaRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number | null>(null)
+  const autoDropTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const itemRefs = useRef<Array<HTMLLIElement | null>>([])
   const lastFrameTimeRef = useRef(0)
+  const physicsModeRef = useRef<PhysicsMode>('stuck')
   const tokenRefs = useRef<Array<HTMLButtonElement | null>>([])
   const motionsRef = useRef<TokenMotion[]>(logos.map(() => createMotion()))
   const categories = useMemo(() => categoriesFrom(logos), [logos])
@@ -106,61 +130,67 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     if (token && motion) token.style.transform = tokenTransform(motion)
   }, [])
 
-  const measureBounds = useCallback((index: number) => {
+  const measureAll = useCallback(() => {
     const arena = arenaRef.current
-    const token = tokenRefs.current[index]
-    const motion = motionsRef.current[index]
-
-    if (!arena || !token || !motion) return
+    if (!arena) return
 
     const arenaRect = arena.getBoundingClientRect()
-    const tokenRect = token.getBoundingClientRect()
-    motion.bounds = {
-      minX: arenaRect.left - tokenRect.left + motion.x,
-      maxX: arenaRect.right - tokenRect.right + motion.x,
-      minY: arenaRect.top - tokenRect.top + motion.y,
-      maxY: arenaRect.bottom - tokenRect.bottom + motion.y,
-    }
+    tokenRefs.current.forEach((token, index) => {
+      const item = itemRefs.current[index]
+      const motion = motionsRef.current[index]
+      if (!item || !motion || !token) return
+
+      const itemRect = item.getBoundingClientRect()
+      const tokenRect = token.getBoundingClientRect()
+      const width = tokenRect.width || token.offsetWidth
+      const height = tokenRect.height || token.offsetHeight
+      const homeLeft = itemRect.left - arenaRect.left + (itemRect.width - width) / 2
+      const homeTop = itemRect.top - arenaRect.top + (itemRect.height - height) / 2
+
+      motion.width = width
+      motion.height = height
+      motion.homeLeft = homeLeft
+      motion.homeTop = homeTop
+      motion.bounds = {
+        minX: -homeLeft,
+        maxX: arenaRect.width - homeLeft - width,
+        minY: -homeTop,
+        maxY: arenaRect.height - homeTop - height,
+      }
+    })
   }, [])
 
   const animate = useCallback((timestamp: number) => {
     animationFrameRef.current = null
+    if (physicsModeRef.current === 'stuck') return
+
     const elapsed = lastFrameTimeRef.current
       ? Math.min((timestamp - lastFrameTimeRef.current) / FRAME_MS, 2)
       : 1
     lastFrameTimeRef.current = timestamp
     let hasMovingToken = false
 
-    motionsRef.current.forEach((motion, index) => {
+    motionsRef.current.forEach((motion) => {
       if (motion.dragging) return
-      if (Math.abs(motion.velocityX) < 0.01 && Math.abs(motion.velocityY) < 0.01) return
 
       motion.velocityY += GRAVITY * elapsed
       motion.velocityX *= Math.pow(AIR_DRAG, elapsed)
       motion.velocityY *= Math.pow(AIR_DRAG, elapsed)
       motion.x += motion.velocityX * elapsed
       motion.y += motion.velocityY * elapsed
+      constrainSkillBody(motion)
+    })
 
-      if (motion.x < motion.bounds.minX) {
-        motion.x = motion.bounds.minX
-        motion.velocityX = Math.abs(motion.velocityX) * BOUNCE
-      } else if (motion.x > motion.bounds.maxX) {
-        motion.x = motion.bounds.maxX
-        motion.velocityX = -Math.abs(motion.velocityX) * BOUNCE
-      }
+    for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
+      resolveSkillCollisions(motionsRef.current)
+    }
 
-      if (motion.y < motion.bounds.minY) {
-        motion.y = motion.bounds.minY
-        motion.velocityY = Math.abs(motion.velocityY) * BOUNCE
-      } else if (motion.y > motion.bounds.maxY) {
-        motion.y = motion.bounds.maxY
-        motion.velocityY = -Math.abs(motion.velocityY) * BOUNCE
-      }
-
+    motionsRef.current.forEach((motion, index) => {
+      if (motion.dragging) return
+      constrainSkillBody(motion)
       if (
-        Math.abs(motion.velocityX) < 0.08
-        && Math.abs(motion.velocityY) < 0.3
-        && Math.abs(motion.y - motion.bounds.maxY) < 0.5
+        Math.abs(motion.velocityX) < SETTLED_HORIZONTAL_SPEED
+        && Math.abs(motion.velocityY) < SETTLED_VERTICAL_SPEED
       ) {
         motion.velocityX = 0
         motion.velocityY = 0
@@ -184,40 +214,81 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     const motion = motionsRef.current[index]
     if (!motion) return
 
-    Object.assign(motion, createMotion())
+    resetMotion(motion)
     applyTransform(index)
   }, [applyTransform])
 
-  const resetAll = useCallback(() => {
+  const cancelAutoDrop = useCallback(() => {
+    if (autoDropTimerRef.current === null) return
+    clearTimeout(autoDropTimerRef.current)
+    autoDropTimerRef.current = null
+  }, [])
+
+  const stickSkills = useCallback(() => {
+    cancelAutoDrop()
     if (animationFrameRef.current !== null) {
-      cancelAnimationFrame(animationFrameRef.current)
+      window.cancelAnimationFrame?.(animationFrameRef.current)
       animationFrameRef.current = null
     }
 
     motionsRef.current.forEach((_, index) => resetToken(index))
-    setActiveCategory(null)
+    physicsModeRef.current = 'stuck'
+    setPhysicsMode('stuck')
     setDraggingLabel(null)
-  }, [resetToken])
+  }, [cancelAutoDrop, resetToken])
+
+  const dropSkills = useCallback(() => {
+    cancelAutoDrop()
+    measureAll()
+    motionsRef.current.forEach((motion, index) => {
+      if (motion.dragging) return
+      motion.velocityX = (((index * 17) % 11) - 5) * 0.075
+      motion.velocityY = 0
+    })
+    physicsModeRef.current = 'dropped'
+    setPhysicsMode('dropped')
+    startAnimation()
+  }, [cancelAutoDrop, measureAll, startAnimation])
 
   useEffect(() => {
-    const handleResize = () => resetAll()
+    measureAll()
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+
+    if (!prefersReducedMotion) {
+      autoDropTimerRef.current = setTimeout(dropSkills, AUTO_DROP_DELAY_MS)
+    }
+
+    return cancelAutoDrop
+  }, [cancelAutoDrop, dropSkills, measureAll])
+
+  useEffect(() => {
+    const handleResize = () => {
+      const shouldDrop = physicsModeRef.current === 'dropped'
+      stickSkills()
+      measureAll()
+      if (shouldDrop) dropSkills()
+    }
     window.addEventListener('resize', handleResize)
 
     return () => {
       window.removeEventListener('resize', handleResize)
+      cancelAutoDrop()
       if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current)
+        window.cancelAnimationFrame?.(animationFrameRef.current)
       }
     }
-  }, [resetAll])
+  }, [cancelAutoDrop, dropSkills, measureAll, stickSkills])
 
   function handlePointerDown(index: number, event: PointerEvent<HTMLButtonElement>) {
     if (event.pointerType === 'mouse' && event.button !== 0) return
+    if (physicsModeRef.current === 'stuck') return
 
     const motion = motionsRef.current[index]
     if (!motion) return
 
-    measureBounds(index)
+    measureAll()
     motion.dragging = true
     motion.pointerId = event.pointerId
     motion.lastPointerX = event.clientX
@@ -243,7 +314,17 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     motion.lastPointerX = event.clientX
     motion.lastPointerY = event.clientY
     motion.lastPointerTime = event.timeStamp
+    constrainSkillBody(motion)
+    for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
+      resolveSkillCollisions(motionsRef.current)
+    }
     applyTransform(index)
+    motionsRef.current.forEach((candidate, candidateIndex) => {
+      if (candidateIndex === index) return
+      constrainSkillBody(candidate)
+      applyTransform(candidateIndex)
+    })
+    startAnimation()
   }
 
   function handlePointerEnd(index: number, event: PointerEvent<HTMLButtonElement>) {
@@ -259,7 +340,7 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
 
   function handleKeyDown(index: number, event: KeyboardEvent<HTMLButtonElement>) {
     const motion = motionsRef.current[index]
-    if (!motion) return
+    if (!motion || physicsModeRef.current === 'stuck') return
 
     const nudges: Readonly<Record<string, readonly [number, number]>> = {
       ArrowDown: [0, KEYBOARD_NUDGE],
@@ -271,6 +352,14 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     if (event.key === 'Escape') {
       event.preventDefault()
       resetToken(index)
+      for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
+        resolveSkillCollisions(motionsRef.current)
+      }
+      motionsRef.current.forEach((candidate, candidateIndex) => {
+        constrainSkillBody(candidate)
+        applyTransform(candidateIndex)
+      })
+      startAnimation()
       return
     }
 
@@ -282,7 +371,17 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     motion.y += nudge[1]
     motion.velocityX = 0
     motion.velocityY = 0
+    constrainSkillBody(motion)
+    for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
+      resolveSkillCollisions(motionsRef.current)
+    }
     applyTransform(index)
+    motionsRef.current.forEach((candidate, candidateIndex) => {
+      if (candidateIndex === index) return
+      constrainSkillBody(candidate)
+      applyTransform(candidateIndex)
+    })
+    startAnimation()
   }
 
   return (
@@ -290,6 +389,7 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
       className="skill-workbench"
       data-active-category={activeCategory ?? undefined}
       data-dragging={draggingLabel ?? undefined}
+      data-physics={physicsMode}
       aria-label="Interactive skill workbench"
       role="region"
     >
@@ -301,11 +401,17 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
         <div className="skill-workbench__meta">
           <p>
             <strong>{logos.length}</strong>
-            <span>movable tools</span>
+            <span aria-live="polite">
+              {physicsMode === 'stuck' ? 'tools · held' : 'tools · colliding'}
+            </span>
           </p>
-          <button className="skill-workbench__reset" type="button" onClick={resetAll}>
-            <span aria-hidden="true">↺</span>
-            Reset workbench
+          <button
+            className="skill-workbench__mode"
+            type="button"
+            onClick={physicsMode === 'stuck' ? dropSkills : stickSkills}
+          >
+            <span aria-hidden="true">{physicsMode === 'stuck' ? '↓' : '⌁'}</span>
+            {physicsMode === 'stuck' ? 'Drop skills' : 'Stick skills'}
           </button>
         </div>
       </div>
@@ -315,6 +421,9 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
           <ul className="skill-workbench__list" aria-label="Movable technology tools">
             {logos.map((logo, index) => (
               <li
+                ref={(node) => {
+                  itemRefs.current[index] = node
+                }}
                 className="skill-workbench__item"
                 data-skill-category={logo.categorySlug}
                 key={logo.label}
@@ -330,7 +439,8 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
                   className="skill-workbench__token"
                   type="button"
                   aria-label={`${logo.label}, ${logo.category}`}
-                  data-cursor="move"
+                  aria-disabled={physicsMode === 'stuck'}
+                  data-cursor={physicsMode === 'dropped' ? 'move' : undefined}
                   onKeyDown={(event) => handleKeyDown(index, event)}
                   onPointerCancel={(event) => handlePointerEnd(index, event)}
                   onPointerDown={(event) => handlePointerDown(index, event)}
@@ -353,7 +463,9 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
             ))}
           </ul>
           <p className="skill-workbench__hint" aria-hidden="true">
-            Drag · toss · use arrow keys
+            {physicsMode === 'stuck'
+              ? 'Drop to release gravity'
+              : 'Collision on · drag · toss · arrow keys'}
           </p>
         </div>
       </div>
