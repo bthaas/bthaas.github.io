@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
+import { TransitionLink } from '@/components/motion/PageTransitionProvider'
 import {
   GATEWAY_CATEGORIES,
   GATEWAY_CYLINDER_SEGMENTS,
@@ -47,6 +48,7 @@ function GatewayCylinderSlices() {
 }
 
 export function PortfolioGateway() {
+  const portalSourceRef = useRef<HTMLSpanElement>(null)
   const dragRef = useRef<GatewayDragState>({
     captured: false,
     deltaX: 0,
@@ -190,7 +192,13 @@ export function PortfolioGateway() {
               <GatewayCylinderSlices />
             </div>
           </div>
-          <a
+          <span
+            aria-hidden="true"
+            className="portfolio-gateway__portal-source"
+            data-testid="portfolio-gateway-portal-source"
+            ref={portalSourceRef}
+          />
+          <TransitionLink
             className="portfolio-gateway__surface-link"
             href={activeCategory.href}
             aria-label={`Open ${activeCategory.label} screen`}
@@ -199,18 +207,30 @@ export function PortfolioGateway() {
               event.preventDefault()
               suppressSurfaceClickRef.current = false
             }}
+            portal={{
+              image: activeCategory.image,
+              label: activeCategory.label,
+              sourceRef: portalSourceRef,
+            }}
+            transition="portal"
           >
             <span className="portfolio-gateway__surface-link-text" aria-hidden="true">
               {activeCategory.label}
             </span>
-          </a>
+          </TransitionLink>
         </div>
 
         <div className="portfolio-gateway__controls">
-          <a
+          <TransitionLink
             className="portfolio-gateway__active-link"
             href={activeCategory.href}
             aria-label={`Open ${activeCategory.label}`}
+            portal={{
+              image: activeCategory.image,
+              label: activeCategory.label,
+              sourceRef: portalSourceRef,
+            }}
+            transition="portal"
           >
             <span className="portfolio-gateway__thumbnail" aria-hidden="true">
               <img
@@ -223,7 +243,7 @@ export function PortfolioGateway() {
               />
             </span>
             <span>{activeCategory.label}</span>
-          </a>
+          </TransitionLink>
           <div className="portfolio-gateway__arrows">
             <button type="button" aria-label="Previous category" onClick={selectPrevious}>←</button>
             <button type="button" aria-label="Next category" onClick={selectNext}>→</button>

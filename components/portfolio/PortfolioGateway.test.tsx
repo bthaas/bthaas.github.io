@@ -45,10 +45,16 @@ describe('PortfolioGateway', () => {
       ),
     ).toHaveLength(48)
     expect(container.querySelector('.portfolio-gateway__face-label')).toBeNull()
+    expect(screen.getByTestId('portfolio-gateway-portal-source')).toBeInTheDocument()
     const surfaceLink = screen.getByRole('link', { name: 'Open Experience screen' })
     expect(surfaceLink).toHaveClass('portfolio-gateway__surface-link')
+    expect(surfaceLink).toHaveAttribute('data-transition-kind', 'portal')
     expect(surfaceLink.querySelector('.portfolio-gateway__surface-link-text')).toHaveTextContent(
       'Experience',
+    )
+    expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
+      'data-transition-kind',
+      'portal',
     )
     expect(
       container.querySelectorAll('[data-gateway-category="experience"]'),

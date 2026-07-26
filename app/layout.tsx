@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 
+import { PageTransitionProvider } from '@/components/motion/PageTransitionProvider'
 import { WebGLActivationGate } from '@/components/motion/WebGLActivationGate'
 
 import './globals.css'
@@ -71,7 +72,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <head>
         <link
           rel="preload"
@@ -87,7 +88,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </noscript>
       </head>
       <body>
-        {children}
+        <PageTransitionProvider>{children}</PageTransitionProvider>
         <WebGLActivationGate />
         <Script src="/atlas.js" strategy="lazyOnload" />
       </body>

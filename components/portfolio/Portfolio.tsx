@@ -2,6 +2,7 @@ import { atlasVisuals } from '@/content/editorial-visuals'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { FlightTiltSurface } from '@/components/motion/FlightTiltSurface'
 import { HeroMasthead } from '@/components/motion/HeroMasthead'
+import { TransitionLink } from '@/components/motion/PageTransitionProvider'
 import { SunBadge } from '@/components/motion/SunBadge'
 import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
 import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
@@ -134,7 +135,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
 
       <header className="site-header">
         <nav className="site-nav atlas-shell" aria-label="Primary navigation">
-          <a className="nav-name" href="/">
+          <TransitionLink className="nav-name" href="/">
             <img
               className="nav-name__mark"
               src="/original-wing-filled.png"
@@ -144,21 +145,33 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
               aria-hidden="true"
             />
             Brett Haas
-          </a>
+          </TransitionLink>
           <SunBadge />
           <div className="nav-links">
-            <a href="/experience" aria-current={screen === 'experience' ? 'page' : undefined}>
+            <TransitionLink
+              href="/experience"
+              aria-current={screen === 'experience' ? 'page' : undefined}
+            >
               Experience
-            </a>
-            <a href="/projects" aria-current={screen === 'projects' ? 'page' : undefined}>
+            </TransitionLink>
+            <TransitionLink
+              href="/projects"
+              aria-current={screen === 'projects' ? 'page' : undefined}
+            >
               Projects
-            </a>
-            <a href="/skills" aria-current={screen === 'skills' ? 'page' : undefined}>
+            </TransitionLink>
+            <TransitionLink
+              href="/skills"
+              aria-current={screen === 'skills' ? 'page' : undefined}
+            >
               Skills
-            </a>
-            <a href="/contact" aria-current={screen === 'contact' ? 'page' : undefined}>
+            </TransitionLink>
+            <TransitionLink
+              href="/contact"
+              aria-current={screen === 'contact' ? 'page' : undefined}
+            >
               Contact
-            </a>
+            </TransitionLink>
           </div>
         </nav>
       </header>
@@ -189,10 +202,10 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
                 aria-label="Portfolio roles and projects"
               >
                 <p className="eyebrow">Engineer · Researcher · Builder</p>
-                <a className="hero-projects-link" href="/projects">
+                <TransitionLink className="hero-projects-link" href="/projects">
                   <span>Explore projects</span>
                   <span className="hero-projects-link__arrow" aria-hidden="true">↓</span>
-                </a>
+                </TransitionLink>
               </div>
             </div>
           </div>
@@ -455,9 +468,9 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
                 >
                   Bellevue, WA
                 </p>
-                <a href="/">
+                <TransitionLink href="/">
                   Back to top <span aria-hidden="true">↑</span>
-                </a>
+                </TransitionLink>
               </footer>
             </div>
           </div>

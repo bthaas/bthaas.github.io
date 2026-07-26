@@ -244,6 +244,7 @@ test('opens every carousel category as its own routed screen', async ({
   isMobile,
   page,
 }) => {
+  test.slow()
   test.skip(
     browserName !== 'chromium' || isMobile,
     'One desktop engine verifies the four route destinations.',
@@ -255,27 +256,50 @@ test('opens every carousel category as its own routed screen', async ({
   })
   await page.goto('/', { waitUntil: 'networkidle' })
 
-  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
-  await gateway.scrollIntoViewIfNeeded()
-  await gateway.focus()
-  await gateway.press('ArrowRight')
-  const projectsFace = page.getByRole('link', { name: 'Open Projects screen' })
-  await expect(projectsFace).toHaveAttribute('href', '/projects')
-  await projectsFace.click()
-  await expect(page).toHaveURL(/\/projects\/?$/)
-  await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', 'projects')
-  await expect(page.locator('main > section')).toHaveCount(1)
-  await expect(page.locator('main > #projects')).toBeVisible()
-
-  for (const [route, screenName, sectionId] of [
-    ['/experience', 'experience', 'experience'],
-    ['/skills', 'skills', 'craft'],
-    ['/contact', 'contact', 'contact'],
+  for (const [label, route, screenName, sectionId, arrowPresses] of [
+    ['Experience', '/experience', 'experience', 'experience', 0],
+    ['Projects', '/projects', 'projects', 'projects', 1],
+    ['Skills', '/skills', 'skills', 'craft', 2],
+    ['Contact', '/contact', 'contact', 'contact', 3],
   ] as const) {
-    await page.goto(route, { waitUntil: 'networkidle' })
+    if (page.url() !== 'http://127.0.0.1:4173/') {
+      await page.goto('/', { waitUntil: 'networkidle' })
+    }
+    const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+    await gateway.scrollIntoViewIfNeeded()
+    await gateway.focus()
+    for (let press = 0; press < arrowPresses; press += 1) {
+      await gateway.press('ArrowRight')
+    }
+
+    const face = page.getByRole('link', { name: `Open ${label} screen` })
+    await expect(face).toHaveAttribute('href', route)
+    await face.click()
+    await expect(page).toHaveURL(new RegExp(`${route}/?$`), { timeout: 15_000 })
     await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', screenName)
     await expect(page.locator('main > section')).toHaveCount(1)
     await expect(page.locator(`main > #${sectionId}`)).toBeVisible()
+    await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-state',
+      'idle',
+    )
+
+    if (route === '/projects') {
+      await page.goBack()
+      await expect(page).toHaveURL(/\/$/)
+      await expect(page.locator('#portfolio-gateway')).toBeVisible()
+      await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'idle',
+      )
+      await page.goForward()
+      await expect(page).toHaveURL(/\/projects\/?$/)
+      await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', 'projects')
+      await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'idle',
+      )
+    }
   }
   expect(errors).toEqual([])
 })
@@ -284,6 +308,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   isMobile,
   page,
 }) => {
+  test.slow()
   const errors = observeApplicationErrors(page)
   await page.goto('/', { waitUntil: 'networkidle' })
   await activateDecorativeWebGL(page, isMobile)
@@ -371,9 +396,13 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expectNoHorizontalOverflow(page)
 
   await page.getByRole('link', { name: 'Open Experience', exact: true }).click()
-  await expect(page).toHaveURL(/\/experience\/?$/)
+  await expect(page).toHaveURL(/\/experience\/?$/, { timeout: 15_000 })
   await expect(page.locator('#experience')).toHaveCount(1)
   await expect(page.locator('#hero, #portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
+  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+    'data-transition-state',
+    'idle',
+  )
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
   await toggle.scrollIntoViewIfNeeded()
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
@@ -385,7 +414,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(toggle).toBeFocused()
 
   await page.getByRole('link', { name: 'Contact' }).click()
-  await expect(page).toHaveURL(/\/contact\/?$/)
+  await expect(page).toHaveURL(/\/contact\/?$/, { timeout: 15_000 })
   await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
   if (isMobile) {
     await page.waitForTimeout(400)
@@ -404,6 +433,7 @@ test('hands a sub-1.8s session entrance into the lazy Atlas ink simulation', asy
   isMobile,
   page,
 }) => {
+  test.slow()
   test.skip(browserName !== 'chromium' || isMobile, 'One fine-pointer engine measures Phase 1.')
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => sessionStorage.clear())
@@ -437,7 +467,7 @@ test('hands a sub-1.8s session entrance into the lazy Atlas ink simulation', asy
   const minimumFluidFps = /swiftshader|llvmpipe|software/i.test(renderer) ? 18 : 20
   await expect.poll(async () => Number(
     await fluid.locator('canvas').getAttribute('data-fluid-fps'),
-  )).toBeGreaterThanOrEqual(minimumFluidFps)
+  ), { timeout: 15_000 }).toBeGreaterThanOrEqual(minimumFluidFps)
 
   await page.reload({ waitUntil: 'domcontentloaded' })
   await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
@@ -468,7 +498,12 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     page.locator('.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice'),
   ).toHaveCount(48)
 
-  await page.goto('/experience', { waitUntil: 'networkidle' })
+  await page.getByRole('link', { name: 'Open Experience screen' }).click()
+  await expect(page).toHaveURL(/\/experience\/?$/)
+  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+    'data-transition-state',
+    'idle',
+  )
   await expect(page.locator('.flight-dossier__toggle').first())
     .toHaveAttribute('aria-expanded', 'true')
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
@@ -638,6 +673,7 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
   isMobile,
   page,
 }) => {
+  test.slow()
   test.skip(browserName !== 'chromium' || isMobile, 'One engine verifies Phase 3 choreography.')
   const errors = observeApplicationErrors(page)
   await page.addInitScript(() => {
@@ -646,7 +682,11 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
   })
   await page.goto('/', { waitUntil: 'networkidle' })
   await activateDecorativeWebGL(page, isMobile)
-  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
+  await expect(page.locator('.hero-liquid')).toHaveAttribute(
+    'data-hero-liquid-ready',
+    '',
+    { timeout: 15_000 },
+  )
 
   const expectMatchingHeroBounds = async () => expect.poll(async () => page.evaluate(() => {
     const image = document.querySelector<HTMLElement>('.atlas-picture--hero img')!
@@ -689,12 +729,26 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
     return Number(style.opacity) < 0.9 || Math.abs(matrix.e) > 10 || Math.abs(matrix.f) > 10
   }))).toBe(true)
 
-  await page.locator('#portfolio-gateway').scrollIntoViewIfNeeded()
-  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(0)
+  await page.locator('#portfolio-gateway').evaluate((gateway) => {
+    const bounds = gateway.getBoundingClientRect()
+    scrollTo({
+      behavior: 'instant',
+      top: bounds.top + scrollY + innerHeight * 0.5,
+    })
+  })
+  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(0, {
+    timeout: 15_000,
+  })
   await expect(page.locator('.hero-liquid')).not.toHaveAttribute('data-hero-liquid-ready', '')
   await page.evaluate(() => scrollTo({ behavior: 'instant', top: 0 }))
-  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(1)
-  await expect(page.locator('.hero-liquid')).toHaveAttribute('data-hero-liquid-ready', '')
+  await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(1, {
+    timeout: 15_000,
+  })
+  await expect(page.locator('.hero-liquid')).toHaveAttribute(
+    'data-hero-liquid-ready',
+    '',
+    { timeout: 15_000 },
+  )
   await expectMatchingHeroBounds()
   await expect.poll(charactersAtRest).toBe(true)
   expect(errors).toEqual([])

@@ -184,6 +184,18 @@
   white-space: nowrap;
 }
 
+.portfolio-gateway__portal-source {
+  position: absolute;
+  z-index: 2;
+  top: 2%;
+  left: 50%;
+  width: min(36.36rem, 65.76vw);
+  height: 62%;
+  border-radius: 50% / 8%;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
 .portfolio-gateway__surface-link-text {
   opacity: 0;
 }
@@ -345,6 +357,12 @@
     top: 26%;
     padding: 0.5rem 0.7rem;
     font-size: clamp(2.25rem, 11vw, 3.4rem);
+  }
+
+  .portfolio-gateway__portal-source {
+    top: 1%;
+    width: min(17.28rem, 70.8vw);
+    height: 50%;
   }
 
   .portfolio-gateway__controls {
