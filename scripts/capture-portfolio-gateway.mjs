@@ -19,7 +19,7 @@ const context = await browser.newContext({
 const page = await context.newPage()
 
 await page.addInitScript(() => {
-  sessionStorage.setItem('atlas-preloader-entered', '1')
+  sessionStorage.setItem('atlas-gateway-entered', '1')
   sessionStorage.setItem('atlas-entered', '1')
 })
 await page.goto(origin, { waitUntil: 'networkidle' })
@@ -64,7 +64,7 @@ const proportions = await gateway.evaluate((element) => {
     floatingLabelCount: element.querySelectorAll('.portfolio-gateway__face-label').length,
     reflectionCount: element.querySelectorAll('.portfolio-gateway__fallback-reflection').length,
     surfaceLabelCount: element.querySelectorAll(
-      '.portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+      '.portfolio-gateway__fallback-slice-body > .portfolio-gateway__surface-label',
     ).length,
     upperHeight: Number(upper.height.toFixed(1)),
     upperWidth: Number(upper.width.toFixed(1)),
@@ -96,7 +96,7 @@ const shadowlessContext = await browser.newContext({
 })
 const shadowlessPage = await shadowlessContext.newPage()
 await shadowlessPage.addInitScript(() => {
-  sessionStorage.setItem('atlas-preloader-entered', '1')
+  sessionStorage.setItem('atlas-gateway-entered', '1')
   sessionStorage.setItem('atlas-entered', '1')
 })
 await shadowlessPage.goto(`${origin}/?ground-shadow=1#portfolio-gateway`, {
@@ -153,7 +153,7 @@ const fallbackAudit = await fallbackPage.evaluate(() => ({
     '#portfolio-gateway .portfolio-gateway__fallback-reflection',
   ).length,
   surfaceLabels: document.querySelectorAll(
-    '#portfolio-gateway .portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+    '#portfolio-gateway .portfolio-gateway__fallback-slice-body > .portfolio-gateway__surface-label',
   ).length,
 }))
 if (

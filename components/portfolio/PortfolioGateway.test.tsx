@@ -1,18 +1,36 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
 
 import { PortfolioGateway } from './PortfolioGateway'
 
+const gatewayEntrance = vi.hoisted(() => ({
+  state: 'settled' as 'entering' | 'pending' | 'settled',
+}))
+
+vi.mock('./useGatewayEntrance', () => ({
+  useGatewayEntrance: () => gatewayEntrance.state,
+}))
+
 const renderGateway = () => render(<PortfolioGateway identity={siteContent.identity} />)
 
 describe('PortfolioGateway', () => {
+  beforeEach(() => {
+    gatewayEntrance.state = 'settled'
+    sessionStorage.clear()
+    sessionStorage.setItem('atlas-gateway-entered', '1')
+  })
+
   it('starts on Experience with semantic carousel controls and destinations', () => {
     const { container } = renderGateway()
 
     expect(screen.getByRole('heading', { name: 'Explore the portfolio' })).toBeInTheDocument()
-    expect(screen.getByText('BRETT HAAS')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.portfolio-gateway__word')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    )
+    expect(container.querySelector('.portfolio-gateway__word')).toHaveTextContent('BRETT HAAS')
     expect(screen.getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
     const introduction = screen.getByRole('group', { name: 'Portfolio introduction' })
     expect(within(introduction).getByText('Portfolio / 2026')).toBeInTheDocument()
@@ -32,6 +50,14 @@ describe('PortfolioGateway', () => {
       'aria-roledescription',
       'carousel',
     )
+    expect(container.querySelector('#portfolio-gateway')).toHaveAttribute(
+      'data-gateway-entrance',
+      'settled',
+    )
+    expect(screen.getByRole('region', { name: 'Portfolio category carousel' }))
+      .not.toHaveAttribute('aria-disabled')
+    expect(screen.getByRole('region', { name: 'Portfolio category carousel' }))
+      .toHaveAttribute('tabindex', '0')
     expect(screen.getByRole('status')).toHaveTextContent('Experience category selected')
     expect(
       container.querySelectorAll(
@@ -49,7 +75,7 @@ describe('PortfolioGateway', () => {
     expect(container.querySelectorAll('.portfolio-gateway__fallback-face')).toHaveLength(0)
     expect(
       container.querySelectorAll(
-        '.portfolio-gateway__fallback-slice > .portfolio-gateway__surface-label',
+        '.portfolio-gateway__fallback-slice-body > .portfolio-gateway__surface-label',
       ),
     ).toHaveLength(48)
     expect(container.querySelector('.portfolio-gateway__face-label')).toBeNull()
@@ -79,6 +105,51 @@ describe('PortfolioGateway', () => {
         ).map((label) => label.textContent),
       ).toEqual(Array(12).fill(category))
     }
+  })
+
+  it('locks every interaction while an unseen entrance waits for the viewport', () => {
+    sessionStorage.clear()
+    gatewayEntrance.state = 'pending'
+
+    const { container } = renderGateway()
+    const gateway = container.querySelector('#portfolio-gateway')
+    const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
+
+    expect(gateway).toHaveAttribute('data-gateway-entrance', 'pending')
+    expect(carousel).toHaveAttribute('aria-disabled', 'true')
+    expect(carousel).toHaveAttribute('tabindex', '-1')
+    expect(screen.getByRole('button', { name: 'Previous category' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Next category' })).toBeDisabled()
+    expect(screen.getByRole('link', { name: 'Open Experience' }))
+      .toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByRole('link', { name: 'Open Experience' }))
+      .toHaveAttribute('tabindex', '-1')
+    expect(fireEvent.click(screen.getByRole('link', { name: 'Open Experience' }))).toBe(false)
+    expect(
+      fireEvent.click(screen.getByRole('link', { name: 'Open Experience screen' })),
+    ).toBe(false)
+
+    fireEvent.keyDown(carousel, { key: 'ArrowRight' })
+    fireEvent.pointerDown(screen.getByTestId('portfolio-gateway-drag-surface'), {
+      button: 0,
+      clientX: 400,
+      pointerId: 19,
+    })
+    expect(carousel).toHaveAttribute('data-active-index', '0')
+    expect(carousel).toHaveAttribute('data-dragging', 'false')
+  })
+
+  it('keeps the reduced-motion settled result interactive', () => {
+    sessionStorage.clear()
+    const { container } = renderGateway()
+
+    expect(container.querySelector('#portfolio-gateway')).toHaveAttribute(
+      'data-gateway-entrance',
+      'settled',
+    )
+    expect(screen.getByRole('region', { name: 'Portfolio category carousel' }))
+      .not.toHaveAttribute('aria-disabled')
+    expect(screen.getByRole('button', { name: 'Next category' })).toBeEnabled()
   })
 
   it('cycles categories with buttons and arrow keys while wrapping', () => {
@@ -150,6 +221,42 @@ describe('PortfolioGateway', () => {
       '/projects',
     )
     expect(release).toHaveBeenCalledWith(7)
+
+    fireEvent.pointerDown(dragSurface, { button: 1, clientX: 600, pointerId: 8 })
+    expect(carousel).toHaveAttribute('data-dragging', 'false')
+  })
+
+  it('cancels an active drag without changing the selected category', () => {
+    renderGateway()
+    const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
+    const dragSurface = screen.getByTestId('portfolio-gateway-drag-surface')
+    const release = vi.fn()
+    Object.defineProperties(dragSurface, {
+      getBoundingClientRect: {
+        configurable: true,
+        value: () => ({
+          bottom: 500,
+          height: 400,
+          left: 0,
+          right: 800,
+          top: 100,
+          width: 800,
+          x: 0,
+          y: 100,
+          toJSON: () => ({}),
+        }),
+      },
+      releasePointerCapture: { configurable: true, value: release },
+      setPointerCapture: { configurable: true, value: vi.fn() },
+    })
+
+    fireEvent.pointerDown(dragSurface, { button: 0, clientX: 600, pointerId: 13 })
+    fireEvent.pointerMove(dragSurface, { clientX: 280, pointerId: 13 })
+    fireEvent.pointerCancel(dragSurface, { pointerId: 13 })
+
+    expect(carousel).toHaveAttribute('data-active-index', '0')
+    expect(carousel).toHaveAttribute('data-dragging', 'false')
+    expect(release).toHaveBeenCalledWith(13)
   })
 
   it('starts a drag over the invisible surface link without following it', () => {
