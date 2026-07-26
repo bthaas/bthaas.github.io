@@ -1,7 +1,3 @@
-import { initializeAtlas } from './runtime'
+import { installAtlasRouteRuntime } from './route-runtime'
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => initializeAtlas(), { once: true })
-} else {
-  initializeAtlas()
-}
+installAtlasRouteRuntime()

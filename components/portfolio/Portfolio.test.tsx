@@ -2,7 +2,6 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
-import { spreadSkillSphereOrder } from '@/lib/atlas-motion/skill-sphere'
 
 import { Portfolio } from './Portfolio'
 import { getSkillLogos } from './SkillLogos'
@@ -16,33 +15,17 @@ describe('Portfolio', () => {
       screen.queryByText('I build intelligent systems that hold up in the real world.'),
     ).not.toBeInTheDocument()
     expect(screen.queryByText(siteContent.identity.descriptor)).not.toBeInTheDocument()
-    const heroActions = screen.getByRole('group', { name: 'Portfolio roles and projects' })
-    expect(within(heroActions).getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
+    const introduction = screen.getByRole('group', { name: 'Portfolio introduction' })
+    expect(within(introduction).getByText('Portfolio / 2026')).toBeInTheDocument()
+    expect(within(introduction).getByText(siteContent.identity.title)).toBeInTheDocument()
+    expect(within(introduction).getByText(siteContent.identity.location)).toBeInTheDocument()
+    expect(screen.getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Experience' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
-    expect(within(heroActions).getByRole('link', { name: 'Explore projects' })).toHaveAttribute(
-      'href',
-      '/projects',
-    )
     expect(screen.getByText('03 / Skills')).toBeInTheDocument()
-    const craftGhost = container.querySelector<HTMLElement>('[data-craft-ghost]')
-    expect(craftGhost).toHaveAttribute('data-craft-ghost', '03')
-    expect(craftGhost).toBeEmptyDOMElement()
-    expect(screen.getByRole('heading', { name: 'The skills behind the flight.' })).toBeInTheDocument()
+    expect(container.querySelector('[data-craft-ghost]')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Pick up the stack.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connect with me.' })).toBeInTheDocument()
-    expect(
-      container.querySelector('.atlas-picture--hero source[type="image/avif"]'),
-    ).toHaveAttribute(
-      'srcset',
-      expect.stringContaining('/icarus-atlas/hero-flight-640.avif 640w'),
-    )
-    expect(
-      container.querySelector('.atlas-picture--hero source[type="image/avif"]'),
-    ).toHaveAttribute(
-      'srcset',
-      expect.stringContaining('/icarus-atlas/hero-flight-768.avif 768w'),
-    )
-    expect(container.querySelector('.hero-art')).not.toHaveAttribute('data-atlas-velocity-plate')
     expect(container.querySelector('.sun-badge__orbit .circular-text')).not.toBeInTheDocument()
     expect(container.querySelector('[data-atlas-sun-trigger]')).toHaveAccessibleName(
       'Release the sun spectacle',
@@ -53,7 +36,7 @@ describe('Portfolio', () => {
     const ids = Array.from(container.querySelectorAll('main > section[id]')).map(
       (section) => section.id,
     )
-    expect(ids).toEqual(['hero', 'portfolio-gateway', 'experience', 'projects', 'craft', 'contact'])
+    expect(ids).toEqual(['portfolio-gateway', 'experience', 'projects', 'craft', 'contact'])
     expect(container.querySelector('[data-chapter-wipe]')).not.toBeInTheDocument()
     expect(container.querySelector('[data-experience-light-step]')).not.toBeInTheDocument()
   })
@@ -96,9 +79,8 @@ describe('Portfolio', () => {
 
     expect(screen.getByRole('group', { name: 'Portfolio introduction' })).toBeInTheDocument()
 
-    expect(
-      screen.getByRole('region', { name: 'Technology logo ticker; focus to pause' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Interactive skill workbench' }))
+      .toBeInTheDocument()
 
     const flightLog = screen.getByRole('list', {
       name: 'Professional experience and education',
@@ -115,19 +97,17 @@ describe('Portfolio', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders resume technologies as an accessible skill sphere with an unchanged marquee', () => {
+  it('renders resume technologies as one accessible categorized workbench', () => {
     const { container } = render(<Portfolio />)
     const logos = getSkillLogos(siteContent.skills)
-    const sphere = screen.getByRole('region', { name: 'Interactive skill sphere' })
-    const skillList = within(sphere).getByRole('list', {
-      name: 'Skills on the sphere',
+    const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
+    const skillList = within(workbench).getByRole('list', {
+      name: 'Movable technology tools',
     })
-    const marquee = container.querySelector<HTMLElement>('[data-craft-marquee]')
-    const sequences = marquee?.querySelectorAll('.craft-marquee__sequence')
 
     expect(within(skillList).getAllByRole('listitem')).toHaveLength(logos.length)
     expect(within(skillList).getAllByRole('button').map((item) => item.getAttribute('aria-label')))
-      .toEqual(spreadSkillSphereOrder(logos.length).map((index) => logos[index].label))
+      .toEqual(logos.map(({ category, label }) => `${label}, ${category}`))
     within(skillList).getAllByRole('button').forEach((item) => {
       expect(item).toHaveAttribute('type', 'button')
     })
@@ -144,18 +124,14 @@ describe('Portfolio', () => {
       ]),
     )
     expect(logos.map(({ label }) => label)).not.toContain('REST APIs')
-    expect(marquee).toHaveAttribute('tabindex', '0')
-    expect(sequences).toHaveLength(2)
-    expect(sequences?.[0]).toHaveAttribute('aria-hidden', 'true')
-    expect(sequences?.[1]).toHaveAttribute('aria-hidden', 'true')
-    expect(sequences?.[0].querySelectorAll('svg')).toHaveLength(logos.length)
-    expect(sequences?.[1].querySelectorAll('svg')).toHaveLength(logos.length)
+    expect(within(workbench).getByRole('group', {
+      name: 'Filter skills by category',
+    })).toBeInTheDocument()
+    expect(container.querySelector('[data-craft-marquee]')).not.toBeInTheDocument()
+    expect(container.querySelector('.skill-sphere')).not.toBeInTheDocument()
     expect(container.querySelector('noscript')).toBeInTheDocument()
-    expect(container.querySelector('.craft-notes .craft-logo-grid')).not.toBeInTheDocument()
-    const board = container.querySelector('.craft-board')
-    expect(board?.nextElementSibling).toBe(sphere)
-    expect(sphere.compareDocumentPosition(marquee as Node) & Node.DOCUMENT_POSITION_FOLLOWING)
-      .toBeTruthy()
+    expect(container.querySelector('.craft-board')).not.toBeInTheDocument()
+    expect(container.querySelector('#craft')?.firstElementChild).toBe(workbench)
   })
 
   it('server-renders every career chapter from the unchanged content source', () => {
@@ -195,12 +171,14 @@ describe('Portfolio', () => {
 
     siteContent.projects.forEach((project, index) => {
       const trigger = panelTriggers[index]
+      const projectItem = trigger.closest('li')
 
       expect(trigger).toHaveAttribute('href', `/projects/${project.id}`)
       expect(trigger).not.toHaveAttribute('aria-controls')
       expect(trigger).not.toHaveAttribute('aria-expanded')
-      expect(within(trigger).getByText(project.name)).toBeInTheDocument()
-      expect(within(trigger).getByText(project.description)).toBeInTheDocument()
+      expect(projectItem).not.toBeNull()
+      expect(within(projectItem as HTMLElement).getByText(project.name)).toBeInTheDocument()
+      expect(within(projectItem as HTMLElement).getByText(project.description)).toBeInTheDocument()
     })
 
     expect(screen.queryByText('View project results')).not.toBeInTheDocument()
@@ -210,17 +188,28 @@ describe('Portfolio', () => {
   it('server-renders the project spiral with its complete static fallback', () => {
     render(<Portfolio />)
 
-    const panelList = screen.getByRole('navigation', { name: 'Select a project' })
+    const panelList = screen.getByRole('list', { name: 'Projects' })
     const panels = screen.getAllByTestId('project-spiral-fallback-link')
 
-    expect(panelList).toHaveClass('project-spiral__fallback')
+    expect(panelList).toHaveClass('project-spiral__projects')
     expect(panelList).toHaveAttribute('data-project-spiral-fallback')
     panels.forEach((panel, index) => {
+      const projectItem = panel.closest('li')
       expect(panel).toHaveAttribute('id', `project-${siteContent.projects[index].id}`)
-      expect(within(panel).getByText(siteContent.projects[index].name)).toBeInTheDocument()
+      expect(projectItem).not.toBeNull()
+      expect(within(projectItem as HTMLElement).getByText(siteContent.projects[index].name))
+        .toBeInTheDocument()
     })
     expect(document.querySelector('[data-project-spiral-stage]')).toBeInTheDocument()
     expect(document.querySelector('[data-project-flight-stage]')).not.toBeInTheDocument()
+  })
+
+  it('lets the project spiral own the page without explanatory intro copy', () => {
+    render(<Portfolio />)
+
+    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
+    expect(screen.getByText('02 / Field studies')).toBeInTheDocument()
+    expect(screen.queryByText(/Three builds across computer vision/i)).not.toBeInTheDocument()
   })
 
   it('contains no legacy cinematic or modal presentation surfaces', () => {
@@ -287,10 +276,9 @@ describe('Portfolio', () => {
     ).toBeInTheDocument()
   })
 
-  it('gives Experience an atmospheric flight path while Skills keeps its split board', () => {
+  it('gives Experience an atmospheric flight path while Skills uses its workbench', () => {
     const { container } = render(<Portfolio />)
     const experienceFlight = container.querySelector<HTMLElement>('[data-experience-flight]')
-    const craftBoard = container.querySelector<HTMLElement>('.craft-board')
 
     expect(
       within(experienceFlight as HTMLElement).getByRole('img', {
@@ -305,19 +293,10 @@ describe('Portfolio', () => {
         name: 'Career timeline',
       }),
     ).toBeInTheDocument()
-
-    expect(craftBoard?.children).toHaveLength(2)
-    expect(craftBoard?.firstElementChild).toHaveClass('craft-plate', 'craft-plate--inset')
-    expect(craftBoard?.lastElementChild).toHaveClass('craft-panel')
-    expect(
-      within(craftBoard as HTMLElement).getByRole('img', {
-        name: 'A cliffside workshop with sculptural wings',
-      }),
-    ).toBeInTheDocument()
-    expect(
-      within(craftBoard as HTMLElement).getByRole('heading', {
-        name: 'The skills behind the flight.',
-      }),
-    ).toBeInTheDocument()
+    expect(container.querySelector('.craft-board')).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', {
+      name: 'A cliffside workshop with sculptural wings',
+    })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Pick up the stack.' })).toBeInTheDocument()
   })
 })

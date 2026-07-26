@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { setupChapterWipes } from './chapter-wipe'
-import { setupCraftChapter } from './craft'
 import type { AtlasEngine } from './engine'
 import { setupMetricCountUps } from './hero'
 import { setupSunArc, SUN_PROGRESS_EVENT } from './sun-arc'
@@ -135,82 +134,6 @@ describe('GSAP Atlas choreography', () => {
     )
     cleanup()
     expect(document.querySelectorAll('.chapter-wipe__layer')).toHaveLength(0)
-  })
-
-  it('pins the Craft heading on fine pointers while scrubbing its plate and ghost numeral', () => {
-    document.body.innerHTML = `
-      <section class="craft-section">
-        <div class="craft-panel"><div class="craft-narrative">
-          <div class="craft-heading"><span class="craft-ghost"></span></div>
-          <div class="craft-copy"></div>
-        </div></div>
-        <picture class="craft-art"><img /></picture>
-      </section>
-    `
-    const harness = createMotionHarness()
-    const panel = document.querySelector<HTMLElement>('.craft-panel')!
-    const headingElement = document.querySelector<HTMLElement>('.craft-heading')!
-    const copyElement = document.querySelector<HTMLElement>('.craft-copy')!
-    Object.defineProperty(headingElement, 'offsetHeight', {
-      configurable: true,
-      value: 300,
-    })
-    Object.defineProperty(headingElement, 'offsetTop', { configurable: true, value: 100 })
-    Object.defineProperty(copyElement, 'offsetTop', { configurable: true, value: 448 })
-    const cleanup = setupCraftChapter(document, window, harness.engine)
-    const heading = document.querySelector('.craft-heading')
-    const plate = document.querySelector('.craft-art')
-    const ghost = document.querySelector('.craft-ghost')
-    const plateTimeline = harness.timelines.find(({ vars }) => (
-      (vars as { scrollTrigger?: { trigger?: Element } }).scrollTrigger?.trigger === plate
-    ))!
-    const ghostTimeline = harness.timelines.find(({ vars }) => (
-      (vars as { scrollTrigger?: { trigger?: Element } }).scrollTrigger?.trigger === document.querySelector('.craft-section')
-    ))!
-
-    expect(harness.create).toHaveBeenCalledWith(expect.objectContaining({
-      pin: heading,
-      pinSpacing: false,
-      refreshPriority: -1,
-      trigger: panel,
-    }))
-    const pinVars = harness.create.mock.calls[0][0]
-    expect((pinVars.end as () => string)()).toBe('+=24')
-    expect(plateTimeline.fromTo).toHaveBeenCalledWith(
-      plate,
-      { clipPath: 'inset(0 0 100%)' },
-      expect.objectContaining({ clipPath: 'inset(0 0 0%)', ease: 'none' }),
-      0,
-    )
-    expect(plateTimeline.vars).toMatchObject({ scrollTrigger: { refreshPriority: 1 } })
-    expect(ghostTimeline.vars).toMatchObject({ scrollTrigger: { refreshPriority: 1 } })
-    expect(ghostTimeline.fromTo).toHaveBeenCalledWith(
-      ghost,
-      { y: 28 },
-      expect.objectContaining({ ease: 'none', y: -28 }),
-      0,
-    )
-    cleanup()
-    expect(harness.triggers[0].kill).toHaveBeenCalledOnce()
-  })
-
-  it('keeps the Craft scrub but skips pin accounting at the mobile layout breakpoint', () => {
-    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(390)
-    document.body.innerHTML = `
-      <section class="craft-section">
-        <div class="craft-panel"><div class="craft-narrative">
-          <div class="craft-heading"><span class="craft-ghost"></span></div>
-        </div></div>
-        <picture class="craft-art"><img /></picture>
-      </section>
-    `
-    const harness = createMotionHarness()
-
-    const cleanup = setupCraftChapter(document, window, harness.engine)
-
-    expect(harness.create).not.toHaveBeenCalled()
-    expect(harness.timelines).toHaveLength(2)
-    cleanup()
   })
 
   it('draws the real SVG arc and moves the sun along the same path', () => {

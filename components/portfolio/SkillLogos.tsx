@@ -26,21 +26,33 @@ import {
   siTensorflow,
   siTypescript,
 } from 'simple-icons'
+import type { CSSProperties } from 'react'
 
 interface IconData {
   readonly hex: string
   readonly path: string
 }
 
+export interface SkillCategory {
+  readonly label: string
+  readonly slug: string
+  readonly color: string
+}
+
 export interface SkillLogo {
   readonly label: string
   readonly hex: string
   readonly path: string
+  readonly category: string
+  readonly categorySlug: string
+  readonly categoryColor: string
 }
 
 type SkillGroups = Readonly<Record<string, readonly string[]>>
 
-function logo(label: string, icon: IconData): SkillLogo {
+type CatalogLogo = Pick<SkillLogo, 'label' | 'hex' | 'path'>
+
+function logo(label: string, icon: IconData): CatalogLogo {
   return { label, hex: icon.hex, path: icon.path }
 }
 
@@ -49,7 +61,7 @@ const claudeCodeIcon: IconData = {
   path: 'M21 10.5h3v3h-3v3h-1.5v3H18v-3h-1.5v3H15v-3H9v3H7.5v-3H6v3H4.5v-3H3v-3H0v-3h3v-6h18Zm-15 0h1.5v-3H6Zm10.5 0H18v-3h-1.5z',
 }
 
-const skillLogoCatalog: Readonly<Partial<Record<string, readonly SkillLogo[]>>> = {
+const skillLogoCatalog: Readonly<Partial<Record<string, readonly CatalogLogo[]>>> = {
   TypeScript: [logo('TypeScript', siTypescript)],
   JavaScript: [logo('JavaScript', siJavascript)],
   Python: [logo('Python', siPython)],
@@ -79,18 +91,46 @@ const skillLogoCatalog: Readonly<Partial<Record<string, readonly SkillLogo[]>>> 
   'OpenAI API': [logo('OpenAI API', siOpenai)],
 }
 
+const skillCategoryCatalog: Readonly<Record<string, Omit<SkillCategory, 'label'>>> = {
+  Languages: { slug: 'languages', color: '#9A6F00' },
+  Frameworks: { slug: 'frameworks', color: '#276F9F' },
+  'Cloud & DevOps': { slug: 'cloud-devops', color: '#7251A4' },
+  Databases: { slug: 'databases', color: '#3F7C46' },
+  'AI / ML': { slug: 'ai-ml', color: '#B65324' },
+}
+
+function categoryFor(label: string): SkillCategory {
+  const category = skillCategoryCatalog[label]
+
+  if (category) return { label, ...category }
+
+  return {
+    label,
+    slug: label.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)/g, ''),
+    color: '#52564F',
+  }
+}
+
 export function getSkillLogos(skills: SkillGroups): readonly SkillLogo[] {
   const seen = new Set<string>()
 
-  return Object.values(skills).flatMap((group) =>
-    group.flatMap((skill) =>
-      (skillLogoCatalog[skill] ?? []).filter((entry) => {
-        if (seen.has(entry.label)) return false
+  return Object.entries(skills).flatMap(([categoryLabel, group]) => {
+    const category = categoryFor(categoryLabel)
+
+    return group.flatMap((skill) =>
+      (skillLogoCatalog[skill] ?? []).flatMap((entry) => {
+        if (seen.has(entry.label)) return []
         seen.add(entry.label)
-        return true
+
+        return [{
+          ...entry,
+          category: category.label,
+          categorySlug: category.slug,
+          categoryColor: category.color,
+        }]
       }),
-    ),
-  )
+    )
+  })
 }
 
 function SkillLogoGlyph({ logoEntry }: { readonly logoEntry: SkillLogo }) {
@@ -115,9 +155,13 @@ export function SkillLogoGrid({ logos }: { readonly logos: readonly SkillLogo[] 
       {logos.map((logoEntry) => (
         <li
           className="skill-logo"
+          data-skill-category={logoEntry.categorySlug}
           data-skill-logo={logoEntry.label}
           key={logoEntry.label}
-          style={{ color: `#${logoEntry.hex}` }}
+          style={{
+            '--skill-category-color': logoEntry.categoryColor,
+            color: `#${logoEntry.hex}`,
+          } as CSSProperties}
           tabIndex={0}
         >
           <SkillLogoGlyph logoEntry={logoEntry} />
@@ -125,31 +169,5 @@ export function SkillLogoGrid({ logos }: { readonly logos: readonly SkillLogo[] 
         </li>
       ))}
     </ul>
-  )
-}
-
-export function SkillLogoSequence({
-  logos,
-  duplicate = false,
-}: {
-  readonly logos: readonly SkillLogo[]
-  readonly duplicate?: boolean
-}) {
-  return (
-    <div
-      className="craft-marquee__sequence"
-      aria-hidden="true"
-      data-duplicate={duplicate || undefined}
-    >
-      {logos.map((logoEntry) => (
-        <span
-          className="craft-marquee__logo"
-          key={logoEntry.label}
-          style={{ color: `#${logoEntry.hex}` }}
-        >
-          <SkillLogoGlyph logoEntry={logoEntry} />
-        </span>
-      ))}
-    </div>
   )
 }

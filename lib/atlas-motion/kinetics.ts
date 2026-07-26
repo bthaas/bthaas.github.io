@@ -3,11 +3,6 @@ export interface PlateVelocityFrame {
   readonly skewY: number
 }
 
-export interface MarqueeVelocityFrame {
-  readonly skewX: number
-  readonly timeScale: number
-}
-
 export interface MagneticOffsetInput {
   readonly centerX: number
   readonly centerY: number
@@ -29,13 +24,6 @@ export function getPlateVelocityFrame(velocity: number): PlateVelocityFrame {
   return {
     scale: round(1 + Math.min(Math.abs(velocity) / 300_000, 0.012)),
     skewY: round(clamp(velocity / 2_000, -1.5, 1.5)),
-  }
-}
-
-export function getMarqueeVelocityFrame(velocity: number): MarqueeVelocityFrame {
-  return {
-    skewX: round(clamp(velocity / 1_500, -2, 2)),
-    timeScale: round(1 + Math.min(Math.abs(velocity) / 2_000, 1.2)),
   }
 }
 

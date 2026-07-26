@@ -1,13 +1,11 @@
 import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
-import { setupCraftChapter } from './craft'
 import { setupCursor } from './cursor'
 import { initializeAtlasEngine, type AtlasEngine } from './engine'
 import { setupMetricCountUps } from './hero'
 import { setupHorizonLoader } from './horizon-loader'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
-import { setupMarquee } from './marquee'
 import { setupPrintReveals, setupVelocityPlates } from './plates'
 import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
@@ -20,13 +18,11 @@ interface AtlasRuntimeOptions {
   readonly createEngine?: () => AtlasEngine | null
   readonly document?: Document
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
-  readonly prepareCraft?: (document: Document, window: Window) => () => void
   readonly prepareContact?: (document: Document, window: Window) => () => void
   readonly prepareCursor?: (document: Document) => () => void
   readonly prepareHorizon?: (document: Document) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareMagnetic?: (document: Document) => () => void
-  readonly prepareMarquee?: (document: Document) => () => void
   readonly prepareLocalTime?: (document: Document) => () => void
   readonly prepareProjects?: (document: Document, window: Window) => () => void
   readonly preparePrintReveals?: (document: Document, window: Window) => () => void
@@ -44,13 +40,11 @@ export function initializeAtlas({
   createEngine,
   document: runtimeDocument = document,
   matchMedia = (query) => window.matchMedia(query),
-  prepareCraft = setupCraftChapter,
   prepareContact = setupContactFinale,
   prepareCursor = setupCursor,
   prepareHorizon = setupHorizonLoader,
   prepareMetrics = setupMetricCountUps,
   prepareMagnetic = setupMagnetic,
-  prepareMarquee = setupMarquee,
   prepareLocalTime = setupLocalTime,
   prepareProjects = setupProjectPans,
   preparePrintReveals = setupPrintReveals,
@@ -77,13 +71,11 @@ export function initializeAtlas({
 
   const cleanupWayfinding = prepareWayfinding(runtimeDocument)
   const cleanupLocalTime = prepareLocalTime(runtimeDocument)
-  const cleanupCraft = prepareCraft(runtimeDocument, runtimeWindow)
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
   const cleanupCursor = prepareCursor(runtimeDocument)
   const cleanupHorizon = prepareHorizon(runtimeDocument)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupMagnetic = prepareMagnetic(runtimeDocument)
-  const cleanupMarquee = prepareMarquee(runtimeDocument)
   const cleanupProjects = prepareProjects(runtimeDocument, runtimeWindow)
   const cleanupPrintReveals = preparePrintReveals(runtimeDocument, runtimeWindow)
   const cleanupScramble = prepareScramble(runtimeDocument)
@@ -132,13 +124,11 @@ export function initializeAtlas({
     runtimeWindow.removeEventListener('load', handleLoad)
     layoutObserver?.disconnect()
     unsubscribe()
-    cleanupCraft()
     cleanupContact()
     cleanupCursor()
     cleanupHorizon()
     cleanupMetrics()
     cleanupMagnetic()
-    cleanupMarquee()
     cleanupProjects()
     cleanupPrintReveals()
     cleanupScramble()

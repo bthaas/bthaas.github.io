@@ -1123,3 +1123,91 @@ portfolio's existing Experience, Projects, Skills, and Contact artwork.
 - No-WebGL and `prefers-reduced-motion` use a normal-flow list of the three
   project cards with the same images, titles, and links. No essential content or
   route is exclusive to WebGL.
+
+# Homepage Entrance — Skyfall Assembly
+
+Source: `video/03-uiwd-loading-reference.mp4` (918×656, 5.1 seconds, 30 fps).
+Curated source frames are `frames/entrance-uiwd-type-lockup.png`,
+`frames/entrance-uiwd-collage-building.png`, and
+`frames/entrance-uiwd-collage-settled.png`. The approved adaptation is
+`frames/entrance-skyfall-storyboard.png`.
+
+## Reference composition and adaptation
+
+- UIWD keeps the page chrome and central type lockup fixed while rectangular
+  portfolio images accumulate into an overlapping central collage. The image
+  assembly supplies the motion; the background, navigation, and typography do
+  not reflow.
+- The adaptation preserves that stable-page principle. The existing gateway
+  paints at its final size on the first frame, with the `BRETT HAAS` word,
+  introduction, cylinder ring, shadow, and controls occupying their settled
+  layout boxes before GSAP applies transform-only entrance states.
+- The desktop cylinder remains centered on the viewport at the existing gateway
+  camera height: its upper edge sits below the name baseline and its fitted
+  shadow anchors the lower third. The existing CSS perspective is the camera;
+  there is no new WebGL camera or field of view.
+- The approved storyboard exaggerates the cylinder height and simplifies the
+  controls. It is motion ground truth, not a request to replace the production
+  proportions, category labels, navigation, or artwork.
+
+## Light, color, and environment
+
+- Retain the production paper background, ink typography, muted photographic
+  facets, and the existing soft black ground shadow. The entrance adds no color
+  wash, full-screen curtain, or second lighting system.
+- The reference uses neutral high-key daylight with low-contrast image edges.
+  The adaptation therefore relies on opacity, blur, and restrained transform
+  offsets rather than glow, bloom, neon, or hard directional shadows.
+- There are no clouds, haze layers, fog, particles, or environmental depth
+  planes in this sequence. Depth comes only from the cylinder's existing CSS
+  perspective, slice ordering, scale, and the fitted ground shadow.
+
+## Repeated parts and motion order
+
+- The subject is the existing 48-facet ring: four categories with 12 narrow
+  vertical slices each. Every slice remains a separate DOM animation unit and
+  retains its exact final `rotateY(...) translateZ(...)` transform.
+- Assembly is deterministic and silhouette-first. The 48 pieces are divided by
+  angular depth into rear, side, and front groups; the rear arc lands first,
+  sides follow, and the camera-facing facets complete the ring last.
+- Initial offsets use a deterministic per-index pattern: alternating small
+  horizontal drift, graded fall distance, bounded Y rotation, slight Z rotation,
+  and a small scale range. Variation must never make a slice leave the viewport
+  horizontally or obscure the fixed introduction.
+- Falling begins with accelerated vertical movement, then each piece catches
+  with a restrained overshoot before settling exactly. The final ring receives
+  one shallow collective settle; it does not bounce repeatedly.
+- The `BRETT HAAS` word starts slightly above and blurred with reduced opacity,
+  then resolves behind the assembling ring. The introduction and controls enter
+  after the silhouette is readable. The shadow begins soft and broad, then
+  compresses to its existing final dimensions.
+
+## Negative space, integrity, and interaction
+
+- This is assembly, not damage. No facet is removed, fractured, or permanently
+  displaced, and no detached part remains after the final frame.
+- During the middle state, the central and front-arc gaps are intentional
+  negative spaces that make the build order legible. They close completely
+  before pointer, keyboard, or link interaction becomes available.
+- While entering, the carousel exposes `aria-disabled="true"`, is removed from
+  the tab order, ignores arrow keys and pointer drag, and makes category links
+  non-interactive. Completion restores the existing accessibility and
+  interaction contract without moving focus.
+
+## Implementation targets
+
+- Replace the standalone Atlas overlay with a gateway-owned GSAP timeline; do
+  not chain two loaders. The home content and its LCP image remain discoverable
+  immediately, and the entrance waits on no asset-load promise.
+- Target approximately 2.6 seconds on the first home visit per tab. Record
+  completion in `sessionStorage`; repeat visits render the settled interactive
+  state immediately.
+- Use `gsap.context`/`useGSAP` scoped to the gateway and animate only transform,
+  opacity, filter, and CSS variables. Avoid layout reads inside the timeline and
+  clear all inline entrance properties on completion.
+- `prefers-reduced-motion: reduce`, unavailable storage, unmount, or a runtime
+  media-query change must resolve immediately to the settled state.
+- Keep the existing 48 DOM facets, CSS perspective, textures, and final layout.
+  This creates no modeled asset, mesh, material, GLB, Draco payload, or R3F
+  scene, so the repository's Blender, turntable, and GLB budget gates do not
+  apply. Browser screenshots and automated interaction verification do apply.

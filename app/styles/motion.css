@@ -53,27 +53,6 @@
     will-change: transform;
   }
 
-  .atlas-picture--hero img {
-    position: absolute;
-    top: -6%;
-    left: 0;
-    width: 100%;
-    height: 112%;
-    max-width: none;
-  }
-
-  .hero-copy-release {
-    padding-bottom: 8vh;
-  }
-
-  .hero-copy {
-    position: sticky;
-    z-index: 1;
-    top: clamp(4.5rem, 9vh, 7rem);
-    align-items: start;
-    background: var(--cream);
-  }
-
   html.atlas-js [data-contact-ready] [data-contact-word] {
     opacity: var(--atlas-contact-word-reveal, 0);
     transform: translate3d(
@@ -124,110 +103,6 @@
     will-change: transform;
   }
 
-  html.atlas-js .atlas-picture--hero,
-  html.atlas-js .atlas-picture--hero img,
-  html.atlas-js .art-caption--light {
-    will-change: transform;
-  }
-
-  html.atlas-js .craft-narrative {
-    min-height: 0;
-  }
-
-  html.atlas-js .craft-heading {
-    position: relative;
-    z-index: 2;
-    top: auto;
-    align-self: start;
-  }
-
-  html.atlas-js .craft-heading .eyebrow {
-    position: relative;
-    z-index: 1;
-  }
-
-  html.atlas-js .craft-ghost {
-    position: absolute;
-    z-index: 0;
-    top: -0.46em;
-    left: -0.08em;
-    display: block;
-    color: transparent;
-    font-family: var(--serif);
-    font-size: clamp(9rem, 20vw, 20rem);
-    font-weight: 500;
-    letter-spacing: -0.08em;
-    line-height: 0.8;
-    pointer-events: none;
-  }
-
-  .craft-ghost::before {
-    color: rgb(17 19 15 / 8%);
-    content: attr(data-craft-ghost);
-  }
-
-  html.atlas-js .craft-art img {
-    position: absolute;
-    top: -4%;
-    left: 0;
-    width: 100%;
-    height: 108%;
-    max-width: none;
-    will-change: transform;
-  }
-
-  html.atlas-js .craft-art,
-  html.atlas-js .craft-ghost {
-    will-change: clip-path, transform;
-  }
-
-  html.atlas-js .craft-marquee {
-    display: block;
-    overflow: hidden;
-    margin-top: 0;
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-    outline-offset: -5px;
-  }
-
-  html.atlas-js .craft-marquee__track {
-    display: flex;
-    width: max-content;
-    will-change: transform;
-  }
-
-  html.atlas-js .craft-marquee__sequence {
-    display: flex;
-    min-width: 100vw;
-    padding: 0.8rem clamp(1rem, 2vw, 2rem);
-    align-items: center;
-    gap: clamp(1.75rem, 3vw, 3rem);
-    white-space: nowrap;
-  }
-
-  html.atlas-js .craft-marquee__logo {
-    display: grid;
-    width: 2.25rem;
-    height: 2.25rem;
-    flex: 0 0 auto;
-    place-items: center;
-  }
-
-  html.atlas-js .craft-marquee__logo .skill-logo__glyph {
-    width: 1.75rem;
-  }
-
-}
-
-@media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
-  .hero-art {
-    height: clamp(28rem, 48vh, 34rem);
-  }
-
-  .atlas-picture--hero {
-    height: 100%;
-    aspect-ratio: auto;
-  }
 }
 
 @keyframes atlas-live-grain {
@@ -286,20 +161,12 @@
     --shell: min(100vw - 40px, 1440px);
   }
 
-  .hero-identity {
-    grid-column: 1 / span 6;
-  }
-
-  .hero-actions {
-    grid-column: 7 / -1;
-  }
-
-  .craft-heading,
+  .experience-intro .section-heading,
   .projects-intro .section-heading {
     grid-column: 1 / span 7;
   }
 
-  .craft-copy,
+  .experience-kicker,
   .projects-intro > p {
     grid-column: 8 / -1;
   }
@@ -337,11 +204,8 @@
     scroll-padding-top: 7rem;
   }
 
-  .site-nav {
-    min-height: 54px;
-  }
-
   .nav-links {
+    z-index: 4;
     max-width: 74vw;
     gap: 0.8rem;
     overflow-x: auto;
@@ -376,60 +240,6 @@
     display: block;
   }
 
-  .hero-section {
-    padding-top: 0.8rem;
-  }
-
-  .board-meta {
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
-    font-size: 0.54rem;
-  }
-
-  .board-meta p:nth-child(2) {
-    display: none;
-  }
-
-  .atlas-picture--hero {
-    aspect-ratio: 4 / 4.5;
-  }
-
-  .atlas-picture--hero img {
-    object-position: 55% center;
-  }
-
-  .art-caption {
-    right: 0.8rem;
-    bottom: 0.8rem;
-    left: 0.8rem;
-    font-size: 0.53rem;
-  }
-
-  .hero-copy {
-    padding: 1.8rem 0 2.5rem;
-  }
-
-  .hero-identity {
-    margin-bottom: 2rem;
-  }
-
-  .hero-identity h1 {
-    font-size: clamp(4.7rem, 24vw, 7rem);
-    line-height: 0.78;
-  }
-
-  .hero-actions {
-    width: min(100%, 22rem);
-    align-items: stretch;
-    margin-left: auto;
-    padding-bottom: 0;
-  }
-
-  .hero-actions .eyebrow {
-    margin-bottom: 1rem;
-  }
-
-  .craft-copy,
   .projects-intro > p {
     margin-top: 2rem;
   }
@@ -438,15 +248,12 @@
     font-size: clamp(3.5rem, 17vw, 6rem);
   }
 
-  .craft-art,
+  .experience-art,
   .project-art {
     aspect-ratio: 4 / 3;
   }
 
-  .craft-notes {
-    margin-top: 1rem;
-  }
-
+  .experience-intro,
   .projects-intro {
     margin-bottom: 0;
   }
@@ -477,19 +284,6 @@
   .project-chapter--2 .repository-link {
     display: inline-block;
     margin: 0.5rem 0 0;
-  }
-
-}
-
-@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
-  html.atlas-js .craft-narrative {
-    min-height: auto;
-    padding-bottom: 0;
-  }
-
-  html.atlas-js .craft-heading {
-    position: relative;
-    top: auto;
   }
 }
 

@@ -15,21 +15,6 @@ export interface AtlasVisual {
 }
 
 export const atlasVisuals = {
-  hero: {
-    src: '/icarus-atlas/hero-flight-1600.avif',
-    fallback: '/icarus-atlas/hero-flight-1600.webp',
-    smallSrc: '/icarus-atlas/hero-flight-960.avif',
-    smallFallback: '/icarus-atlas/hero-flight-960.webp',
-    tinySrc: '/icarus-atlas/hero-flight-640.avif',
-    tinyFallback: '/icarus-atlas/hero-flight-640.webp',
-    mediumSrc: '/icarus-atlas/hero-flight-768.avif',
-    mediumFallback: '/icarus-atlas/hero-flight-768.webp',
-    width: 1600,
-    height: 1130,
-    smallWidth: 960,
-    tinyWidth: 640,
-    mediumWidth: 768,
-  },
   craft: {
     src: '/icarus-atlas/craft-workshop-1600.avif',
     fallback: '/icarus-atlas/craft-workshop-1600.webp',

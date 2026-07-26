@@ -297,12 +297,10 @@ describe('atlas DOM capabilities', () => {
     const createBus = vi.fn()
     const createEngine = vi.fn()
     const prepareHorizon = vi.fn()
-    const prepareCraft = vi.fn()
     const prepareContact = vi.fn()
     const prepareCursor = vi.fn()
     const prepareMetrics = vi.fn()
     const prepareMagnetic = vi.fn()
-    const prepareMarquee = vi.fn()
     const prepareLocalTime = vi.fn()
     const prepareProjects = vi.fn()
     const preparePrintReveals = vi.fn()
@@ -320,12 +318,10 @@ describe('atlas DOM capabilities', () => {
       document,
       matchMedia,
       prepareHorizon,
-      prepareCraft,
       prepareContact,
       prepareCursor,
       prepareMetrics,
       prepareMagnetic,
-      prepareMarquee,
       prepareLocalTime,
       prepareProjects,
       preparePrintReveals,
@@ -343,12 +339,10 @@ describe('atlas DOM capabilities', () => {
     expect(createBus).not.toHaveBeenCalled()
     expect(createEngine).not.toHaveBeenCalled()
     expect(prepareHorizon).not.toHaveBeenCalled()
-    expect(prepareCraft).not.toHaveBeenCalled()
     expect(prepareContact).not.toHaveBeenCalled()
     expect(prepareCursor).not.toHaveBeenCalled()
     expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareMagnetic).not.toHaveBeenCalled()
-    expect(prepareMarquee).not.toHaveBeenCalled()
     expect(prepareLocalTime).not.toHaveBeenCalled()
     expect(prepareProjects).not.toHaveBeenCalled()
     expect(preparePrintReveals).not.toHaveBeenCalled()
@@ -376,13 +370,11 @@ describe('atlas DOM capabilities', () => {
     const createEngine = vi.fn(() => engine)
     const cleanupReveals = vi.fn()
     const cleanupHorizon = vi.fn()
-    const cleanupCraft = vi.fn()
     const cleanupContact = vi.fn()
     const cleanupCursor = vi.fn()
     const cleanupMetrics = vi.fn()
     const cleanupSun = vi.fn()
     const cleanupMagnetic = vi.fn()
-    const cleanupMarquee = vi.fn()
     const cleanupLocalTime = vi.fn()
     const cleanupProjects = vi.fn()
     const cleanupPrintReveals = vi.fn()
@@ -405,12 +397,10 @@ describe('atlas DOM capabilities', () => {
       document,
       matchMedia: () => ({ matches: false }),
       prepareHorizon: () => cleanupHorizon,
-      prepareCraft: () => cleanupCraft,
       prepareContact: () => cleanupContact,
       prepareCursor: () => cleanupCursor,
       prepareMetrics: () => cleanupMetrics,
       prepareMagnetic: () => cleanupMagnetic,
-      prepareMarquee: () => cleanupMarquee,
       prepareLocalTime: () => cleanupLocalTime,
       prepareProjects: () => cleanupProjects,
       preparePrintReveals: () => cleanupPrintReveals,
@@ -434,13 +424,11 @@ describe('atlas DOM capabilities', () => {
     expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'atlas:scroll' }))
     expect(unsubscribe).toHaveBeenCalledOnce()
     expect(cleanupHorizon).toHaveBeenCalledOnce()
-    expect(cleanupCraft).toHaveBeenCalledOnce()
     expect(cleanupContact).toHaveBeenCalledOnce()
     expect(cleanupCursor).toHaveBeenCalledOnce()
     expect(cleanupMetrics).toHaveBeenCalledOnce()
     expect(cleanupSun).toHaveBeenCalledOnce()
     expect(cleanupMagnetic).toHaveBeenCalledOnce()
-    expect(cleanupMarquee).toHaveBeenCalledOnce()
     expect(cleanupLocalTime).toHaveBeenCalledOnce()
     expect(cleanupProjects).toHaveBeenCalledOnce()
     expect(cleanupPrintReveals).toHaveBeenCalledOnce()

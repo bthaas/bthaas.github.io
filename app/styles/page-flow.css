@@ -8,7 +8,6 @@ main {
   background: var(--page-surface);
 }
 
-.hero-section,
 .portfolio-gateway,
 .projects-section,
 .craft-section,
@@ -36,16 +35,6 @@ main > section + section {
   border-top: 1px solid var(--page-rule);
 }
 
-.hero-copy,
-.craft-board {
-  border-bottom-color: var(--page-rule);
-}
-
-.craft-plate--inset {
-  border-color: var(--page-rule);
-}
-
-.craft-panel,
 .contact-panel {
   border-inline-color: transparent;
 }
@@ -53,25 +42,6 @@ main > section + section {
 .craft-section {
   --chapter-wipe-base: var(--page-surface);
   --chapter-wipe-color: var(--page-surface);
-}
-
-.skill-sphere {
-  border-bottom-color: var(--page-rule);
-  background-color: var(--page-surface);
-}
-
-.skill-sphere__scene {
-  border-color: var(--page-rule);
-}
-
-.skill-sphere__scene::after {
-  background:
-    radial-gradient(circle at 50% 48%, rgb(17 19 15 / 4%), transparent 36%),
-    linear-gradient(135deg, rgb(255 255 255 / 28%), transparent 42%);
-}
-
-html.atlas-js .craft-marquee {
-  border-color: var(--page-rule);
 }
 
 .contact-board {
@@ -83,7 +53,6 @@ html.atlas-js .craft-marquee {
 }
 
 @media (max-width: 720px) {
-  .hero-section,
   .portfolio-gateway,
   .projects-section,
   .craft-section,
@@ -91,7 +60,6 @@ html.atlas-js .craft-marquee {
     --page-flow-line-x: 14px;
   }
 
-  .craft-panel,
   .contact-panel {
     border-top-color: var(--page-rule);
   }

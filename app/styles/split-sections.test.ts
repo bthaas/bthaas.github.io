@@ -27,13 +27,12 @@ function declarationsFor(
   return declarations
 }
 
-describe('Experience flight path and Skills split board', () => {
+describe('Experience flight path', () => {
   it('keeps the experience chapters readable by default and horizontal only when enhanced', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
-    const craftStyles = readFileSync(resolve(process.cwd(), 'app/styles/craft.css'), 'utf8')
 
     expect(declarationsFor(experienceStyles, '.experience-flight__chapters')).toMatchObject({
       display: 'grid',
@@ -47,38 +46,18 @@ describe('Experience flight path and Skills split board', () => {
       display: 'flex',
       width: 'max-content',
     })
-    expect(declarationsFor(craftStyles, '.craft-board')).toMatchObject({
-      display: 'grid',
-      'grid-template-areas': '"copy artwork"',
-      'grid-template-columns': 'repeat(2, minmax(0, 1fr))',
-    })
-    expect(declarationsFor(craftStyles, '.craft-panel')).toMatchObject({
-      'grid-area': 'copy',
-    })
-    expect(declarationsFor(craftStyles, '.craft-plate')).toMatchObject({
-      'grid-area': 'artwork',
-    })
-    expect(declarationsFor(craftStyles, '.craft-plate--inset')).toMatchObject({
-      margin: 'clamp(1rem, 1.5vw, 1.75rem)',
-      'border-radius': 'clamp(1rem, 1.8vw, 1.6rem)',
-    })
   })
 
-  it('keeps skills stacked and experience in normal document flow on narrow screens', () => {
+  it('keeps experience in normal document flow on narrow screens', () => {
     const mediaQuery = '(max-width: 720px)'
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
-    const craftStyles = readFileSync(resolve(process.cwd(), 'app/styles/craft.css'), 'utf8')
 
     expect(declarationsFor(experienceStyles, '.experience-flight__viewport')).toMatchObject({
       position: 'relative',
       width: 'var(--shell)',
-    })
-    expect(declarationsFor(craftStyles, '.craft-board', mediaQuery)).toMatchObject({
-      'grid-template-areas': '"artwork" "copy"',
-      'grid-template-columns': '1fr',
     })
   })
 })

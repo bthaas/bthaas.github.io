@@ -14,4 +14,11 @@ describe('portfolio gateway scene framing', () => {
     expect(bounds.topClearance).toBeGreaterThanOrEqual(0.05)
     expect(bounds.bottomClearance).toBeGreaterThanOrEqual(0.05)
   })
+
+  it('frames the assembly below center to match the CSS gateway composition', () => {
+    const bounds = getGatewayVerticalNdcBounds(GATEWAY_SCENE_LAYOUT)
+
+    expect((bounds.top + bounds.bottom) / 2).toBeLessThan(-0.05)
+    expect(GATEWAY_SCENE_LAYOUT.cameraZ).toBeGreaterThan(6.2)
+  })
 })

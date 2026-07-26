@@ -13,9 +13,9 @@ export interface GatewaySceneLayout {
 
 export const GATEWAY_SCENE_LAYOUT = {
   cameraFovDegrees: 38,
-  cameraY: 0.42,
-  cameraZ: 6.2,
-  modelY: 0.85,
+  cameraY: 0.5,
+  cameraZ: 6.5,
+  modelY: 0.8,
   panelHalfHeight: 0.75,
   panelRadius: 2.42,
   pointerPitchRadians: 0.018,
