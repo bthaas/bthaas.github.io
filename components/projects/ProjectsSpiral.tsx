@@ -323,9 +323,9 @@ export function ProjectsSpiral({ projects }: ProjectsSpiralProps) {
             <div
               className="project-spiral__view-toggle"
               role="group"
-              aria-label="Project view"
+              aria-label="Toggle view"
             >
-              <span aria-hidden="true">Project view</span>
+              <span aria-hidden="true">Toggle view</span>
               <button
                 aria-pressed={view === 'spiral'}
                 aria-label="Spiral view"
