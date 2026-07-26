@@ -50,14 +50,18 @@
 }
 
 .page-transition__portal {
+  contain: layout paint;
   overflow: hidden;
-  background: #171713;
-  box-shadow:
-    0 0 0 1px rgb(255 252 243 / 16%),
-    0 2rem 7rem rgb(10 11 8 / 36%);
+  background: color-mix(
+    in srgb,
+    var(--page-transition-accent) 9%,
+    rgb(18 19 16 / 94%)
+  );
+  box-shadow: 0 0 0 1px rgb(255 252 243 / 14%);
+  isolation: isolate;
   opacity: 0;
   perspective: 1100px;
-  transform-origin: center;
+  transform-origin: top left;
 }
 
 .page-transition__portal-image,
@@ -78,6 +82,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   transform-origin: center;
+  will-change: opacity, transform;
 }
 
 .page-transition__portal-aperture {
@@ -85,10 +90,10 @@
   background:
     radial-gradient(
       circle at center,
-      rgb(5 6 5 / 98%) 0 8%,
-      rgb(12 13 11 / 88%) 24%,
-      color-mix(in srgb, var(--page-transition-accent) 22%, transparent) 42%,
-      transparent 69%
+      rgb(5 6 5 / 86%) 0 5%,
+      rgb(12 13 11 / 72%) 20%,
+      color-mix(in srgb, var(--page-transition-accent) 24%, transparent) 38%,
+      transparent 62%
     );
   opacity: 0;
   pointer-events: none;
@@ -129,7 +134,6 @@
     inset 1px 0 rgb(255 255 255 / 18%),
     inset -2px 0 color-mix(in srgb, var(--page-transition-accent) 62%, transparent);
   backface-visibility: hidden;
-  filter: brightness(1.04);
   transform-origin: center;
   transform-style: preserve-3d;
   will-change: opacity, transform;

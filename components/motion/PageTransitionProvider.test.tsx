@@ -5,12 +5,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const navigation = vi.hoisted(() => ({
   pathname: '/',
+  prefetch: vi.fn(),
   push: vi.fn(),
 }))
 
 const motion = vi.hoisted(() => ({
   calls: [] as Array<{
     method: string
+    position?: number | string
     target?: unknown
     vars?: Record<string, unknown>
   }>,
@@ -20,7 +22,10 @@ const motion = vi.hoisted(() => ({
 
 vi.mock('next/navigation', () => ({
   usePathname: () => navigation.pathname,
-  useRouter: () => ({ push: navigation.push }),
+  useRouter: () => ({
+    prefetch: navigation.prefetch,
+    push: navigation.push,
+  }),
 }))
 
 vi.mock('next/link', async () => {
@@ -70,17 +75,39 @@ vi.mock('gsap', () => ({
           _target: unknown,
           _fromVars: Record<string, unknown>,
           vars: Record<string, unknown>,
+          position?: number | string,
         ) => {
-          motion.calls.push({ method: 'fromTo', target: _target, vars })
+          motion.calls.push({
+            method: 'fromTo',
+            position,
+            target: _target,
+            vars,
+          })
+          return timeline
+        },
+        call: (
+          callback: () => void,
+          _params?: unknown[],
+          position?: number | string,
+        ) => {
+          motion.calls.push({ method: 'call', position, target: callback })
           return timeline
         },
         kill: motion.kills,
-        set: (_target: unknown, vars: Record<string, unknown>) => {
-          motion.calls.push({ method: 'set', target: _target, vars })
+        set: (
+          _target: unknown,
+          vars: Record<string, unknown>,
+          position?: number | string,
+        ) => {
+          motion.calls.push({ method: 'set', position, target: _target, vars })
           return timeline
         },
-        to: (_target: unknown, vars: Record<string, unknown>) => {
-          motion.calls.push({ method: 'to', target: _target, vars })
+        to: (
+          _target: unknown,
+          vars: Record<string, unknown>,
+          position?: number | string,
+        ) => {
+          motion.calls.push({ method: 'to', position, target: _target, vars })
           return timeline
         },
       }
@@ -181,6 +208,7 @@ function MissingSourcePortalFixture() {
 describe('PageTransitionProvider', () => {
   beforeEach(() => {
     navigation.pathname = '/'
+    navigation.prefetch.mockClear()
     navigation.push.mockClear()
     motion.calls.length = 0
     motion.completions.length = 0
@@ -188,46 +216,59 @@ describe('PageTransitionProvider', () => {
     vi.spyOn(window, 'matchMedia').mockImplementation(() => mediaQuery(false))
   })
 
-  it('dives through the selected artwork, locks rapid clicks, then reveals the routed page', async () => {
+  it('dives through the selected artwork, locks rapid clicks, then reveals the routed page', () => {
     const { rerender } = render(<PortalLinkFixture />)
     const link = screen.getByRole('link', { name: 'Projects' })
 
     fireEvent.click(link)
     fireEvent.click(link)
 
-    await waitFor(() => {
-      expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
-        'data-transition-state',
-        'exiting',
-      )
-    })
+    expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-state',
+      'exiting',
+    )
     expect(screen.getByTestId('page-transition-overlay')).toHaveStyle({
       '--page-transition-image': 'url("/icarus-atlas/project-courtvision-640.avif")',
     })
-    expect(motion.completions).toHaveLength(1)
-
-    act(() => motion.completions[0]?.())
+    expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-handoff',
+      'requested',
+    )
     expect(navigation.push).toHaveBeenCalledOnce()
     expect(navigation.push).toHaveBeenCalledWith('/projects')
+    expect(motion.completions).toHaveLength(1)
 
     navigation.pathname = '/projects'
     rerender(<PortalLinkFixture />)
-    await waitFor(() => {
-      expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
-        'data-transition-state',
-        'entering',
-      )
-    })
+    expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-state',
+      'entering',
+    )
     expect(motion.completions).toHaveLength(2)
 
     act(() => motion.completions[1]?.())
-    await waitFor(() => {
-      expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
-        'data-transition-state',
-        'idle',
-      )
-    })
+    expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-state',
+      'idle',
+    )
     expect(screen.getByTestId('page-transition-overlay')).not.toBeVisible()
+    expect(screen.getByTestId('page-transition-overlay')).not.toHaveAttribute(
+      'data-transition-handoff',
+    )
+  })
+
+  it('prewarms every gateway destination before a face is selected', async () => {
+    render(<PortalLinkFixture />)
+
+    await waitFor(() => {
+      expect(navigation.prefetch).toHaveBeenCalledTimes(4)
+    })
+    expect(navigation.prefetch.mock.calls.map(([href]) => href)).toEqual([
+      '/experience',
+      '/projects',
+      '/skills',
+      '/contact',
+    ])
   })
 
   it('unspools the selected cylinder face into twelve center-out artwork ribbons', async () => {
@@ -262,8 +303,8 @@ describe('PageTransitionProvider', () => {
       ))
     ))
     expect(ribbonTween?.vars).toMatchObject({
-      duration: 0.72,
-      stagger: { amount: 0.16, from: 'center' },
+      duration: 0.56,
+      stagger: { amount: 0.1, from: 'center' },
     })
     expect(ribbonTween?.vars?.rotateY).toBeTypeOf('function')
     expect(ribbonTween?.vars?.xPercent).toBeTypeOf('function')
@@ -323,11 +364,66 @@ describe('PageTransitionProvider', () => {
       && vars?.opacity === 1
     ))
     expect(portalSetup?.vars).toMatchObject({
-      height: window.innerHeight * 0.48,
-      left: window.innerWidth * 0.17,
-      top: window.innerHeight * 0.2,
-      width: window.innerWidth * 0.66,
+      height: window.innerHeight,
+      left: 0,
+      scaleX: 0.66,
+      scaleY: 0.48,
+      top: 0,
+      transformOrigin: '0 0',
+      width: window.innerWidth,
+      x: window.innerWidth * 0.17,
+      y: window.innerHeight * 0.2,
     })
+  })
+
+  it('uses transform-only portal geometry and avoids viewport filter animation', async () => {
+    render(<PortalLinkFixture />)
+
+    fireEvent.click(screen.getByRole('link', { name: 'Projects' }))
+    await waitFor(() => {
+      expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'exiting',
+      )
+    })
+
+    const portalSetup = motion.calls.find(({ method, target, vars }) => (
+      method === 'set'
+      && target instanceof HTMLElement
+      && target.classList.contains('page-transition__portal')
+      && vars?.opacity === 1
+    ))
+    expect(portalSetup?.vars).toMatchObject({
+      height: window.innerHeight,
+      left: 0,
+      scaleX: 560 / window.innerWidth,
+      scaleY: 320 / window.innerHeight,
+      top: 0,
+      transformOrigin: '0 0',
+      width: window.innerWidth,
+      x: 240,
+      y: 120,
+    })
+
+    const portalExpansion = motion.calls.find(({ method, target }) => (
+      method === 'to'
+      && target instanceof HTMLElement
+      && target.classList.contains('page-transition__portal')
+    ))
+    expect(portalExpansion?.vars).toMatchObject({
+      scaleX: 1,
+      scaleY: 1,
+      x: 0,
+      y: 0,
+    })
+    expect(portalExpansion?.vars).not.toHaveProperty('height')
+    expect(portalExpansion?.vars).not.toHaveProperty('left')
+    expect(portalExpansion?.vars).not.toHaveProperty('top')
+    expect(portalExpansion?.vars).not.toHaveProperty('width')
+    expect(motion.calls.some(({ vars }) => vars && 'filter' in vars)).toBe(false)
+    expect(motion.calls.some(({ vars }) => (
+      vars?.repeat === -1 && vars.yoyo === true
+    ))).toBe(true)
   })
 
   it('uses the compact veil for standard links and suppresses same-route navigation', async () => {
@@ -411,5 +507,41 @@ describe('PageTransitionProvider', () => {
     expect(routeChange).toHaveBeenCalledOnce()
     expect(motion.calls.some(({ method }) => method === 'fromTo')).toBe(true)
     window.removeEventListener('atlas:route-change', routeChange)
+  })
+
+  it('releases the arrival lock when animation frames are throttled', () => {
+    vi.useFakeTimers()
+    try {
+      navigation.pathname = '/projects'
+      const { rerender } = render(
+        <PageTransitionProvider>
+          <main>Projects route</main>
+        </PageTransitionProvider>,
+      )
+
+      navigation.pathname = '/'
+      rerender(
+        <PageTransitionProvider>
+          <main>Home route</main>
+        </PageTransitionProvider>,
+      )
+      expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'entering',
+      )
+
+      act(() => vi.advanceTimersByTime(899))
+      expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'entering',
+      )
+      act(() => vi.advanceTimersByTime(1))
+      expect(screen.getByTestId('page-transition-overlay')).toHaveAttribute(
+        'data-transition-state',
+        'idle',
+      )
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

@@ -2,6 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { siteContent } from '../../content/site-content'
 
+const PORTAL_ROUTE_HANDOFF_TIMEOUT_MS = 900
+
 function observeApplicationErrors(page: Page) {
   const errors: string[] = []
   const isApplicationURL = (url: string) => url.startsWith('http://127.0.0.1:')
@@ -283,7 +285,16 @@ test('opens every carousel category as its own routed screen', async ({
       'data-transition-category',
       label.toLowerCase(),
     )
-    await expect(page).toHaveURL(new RegExp(`${route}/?$`), { timeout: 15_000 })
+    await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+      'data-transition-handoff',
+      'requested',
+      {
+        timeout: PORTAL_ROUTE_HANDOFF_TIMEOUT_MS,
+      },
+    )
+    await expect(page).toHaveURL(new RegExp(`${route}/?$`), {
+      timeout: 15_000,
+    })
     await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', screenName)
     await expect(page.locator('main > section')).toHaveCount(1)
     await expect(page.locator(`main > #${sectionId}`)).toBeVisible()
