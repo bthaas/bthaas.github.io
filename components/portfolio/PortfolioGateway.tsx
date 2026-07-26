@@ -204,11 +204,11 @@ export function PortfolioGateway() {
       >
         <div
           className="portfolio-gateway__visual"
-          aria-hidden="true"
           data-testid="portfolio-gateway-drag-surface"
           onDragStart={(event) => event.preventDefault()}
           onPointerDown={(event) => {
             if (event.button !== 0) return
+            if (event.target instanceof Element && event.target.closest('a')) return
             const bounds = event.currentTarget.getBoundingClientRect()
             dragRef.current = {
               deltaX: 0,
@@ -234,7 +234,7 @@ export function PortfolioGateway() {
           onPointerCancel={(event) => finishDrag(event, false)}
           onPointerUp={(event) => finishDrag(event, true)}
         >
-          <div className="portfolio-gateway__fallback">
+          <div className="portfolio-gateway__fallback" aria-hidden="true">
             <div
               className="portfolio-gateway__fallback-ring"
               style={{
@@ -255,7 +255,7 @@ export function PortfolioGateway() {
             </div>
           </div>
           {mounted && (
-            <div className="portfolio-gateway__canvas">
+            <div className="portfolio-gateway__canvas" aria-hidden="true">
               <GatewayBoundary>
                 <PortfolioGatewayScene
                   activeIndex={activeIndex}
@@ -268,7 +268,13 @@ export function PortfolioGateway() {
               </GatewayBoundary>
             </div>
           )}
-          <p className="portfolio-gateway__face-label">{activeCategory.label}</p>
+          <a
+            className="portfolio-gateway__face-label"
+            href={activeCategory.href}
+            aria-label={`Open ${activeCategory.label} screen`}
+          >
+            {activeCategory.label}
+          </a>
         </div>
 
         <div className="portfolio-gateway__controls">

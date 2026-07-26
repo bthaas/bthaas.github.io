@@ -125,12 +125,12 @@
   transform-origin: left;
 }
 
-.nav-links a[aria-current="true"]::after {
+.nav-links a[aria-current]::after {
   transform: scaleX(0.5);
   transform-origin: left;
 }
 
-.nav-links a[aria-current="true"]:hover::after,
-.nav-links a[aria-current="true"]:focus-visible::after {
+.nav-links a[aria-current]:hover::after,
+.nav-links a[aria-current]:focus-visible::after {
   transform: scaleX(1);
 }

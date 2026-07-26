@@ -23,7 +23,7 @@ describe('Portfolio', () => {
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
     expect(within(heroActions).getByRole('link', { name: 'Explore projects' })).toHaveAttribute(
       'href',
-      '#projects',
+      '/projects',
     )
     expect(screen.getByText('03 / Skills')).toBeInTheDocument()
     const craftGhost = container.querySelector<HTMLElement>('[data-craft-ghost]')
@@ -59,29 +59,29 @@ describe('Portfolio', () => {
     expect(container.querySelector('[data-experience-light-step]')).not.toBeInTheDocument()
   })
 
-  it('keeps navigation visible, concise, and anchored to the editorial sections', () => {
+  it('keeps navigation visible, concise, and routed to the standalone screens', () => {
     render(<Portfolio />)
 
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
     const brandLink = within(navigation).getByRole('link', { name: 'Brett Haas' })
-    expect(brandLink).toHaveAttribute('href', '#hero')
+    expect(brandLink).toHaveAttribute('href', '/')
     expect(brandLink.querySelector('img')).toHaveAttribute('src', '/original-wing-filled.png')
     expect(brandLink.querySelector('img')).toHaveAttribute('alt', '')
     expect(within(navigation).getByRole('link', { name: 'Experience' })).toHaveAttribute(
       'href',
-      '#experience',
+      '/experience',
     )
     expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
       'href',
-      '#projects',
+      '/projects',
     )
     expect(within(navigation).getByRole('link', { name: 'Skills' })).toHaveAttribute(
       'href',
-      '#craft',
+      '/skills',
     )
     expect(within(navigation).getByRole('link', { name: 'Contact' })).toHaveAttribute(
       'href',
-      '#contact',
+      '/contact',
     )
   })
 

@@ -27,6 +27,7 @@ PANEL_NAMES = (
     "carousel_experience_panel",
     "carousel_projects_panel",
     "carousel_skills_panel",
+    "carousel_contact_panel",
 )
 
 
@@ -34,7 +35,7 @@ def create_panel(name: str, degrees: float):
     template = make_curved_panel_template(
         radius=2.42,
         height=1.50,
-        sweep_degrees=118.5,
+        sweep_degrees=88.0,
         segments=24,
         thickness=0.065,
     )
@@ -55,9 +56,9 @@ def create_panel(name: str, degrees: float):
 def create_reflector_shell():
     template = make_curved_panel_template(
         radius=2.48,
-        height=0.72,
+        height=0.54,
         sweep_degrees=360.0,
-        segments=48,
+        segments=64,
         thickness=0.07,
     )
     accumulator = MeshAccumulator()
@@ -72,14 +73,14 @@ def create_reflector_shell():
         ),
         template.loop_uvs,
     )
-    shell.location += Vector((0.0, 0.0, -1.22))
+    shell.location += Vector((0.0, 0.0, -1.07))
     return shell
 
 
 def main() -> None:
     reset_scene()
     objects = [
-        create_panel(name, index * 120.0)
+        create_panel(name, index * 90.0)
         for index, name in enumerate(PANEL_NAMES)
     ]
     objects.append(create_reflector_shell())

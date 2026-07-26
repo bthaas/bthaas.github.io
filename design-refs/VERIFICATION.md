@@ -463,6 +463,61 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   activation-test skips across Chromium, Firefox, desktop WebKit, and iPhone
   WebKit.
 
+### 2026-07-25 four-screen routes and reference proportions
+
+- The follow-up production capture is retained as
+  `frames/carousel-four-screen-proportion-feedback.png`. The live reference was
+  reopened at 1280×720 and measured at approximately 592×333 px for the upper
+  drum. The final production capture measures 586.3×330.6 px, with a 10.6 px
+  static paper gap and a 106.6 px fallback reflector. Once WebGL is active, the
+  clipped physical reflector is the intentionally quieter 45–60 px strip seen
+  in the five-state comparison.
+- Four 88° panels now occupy 90° category slots, leaving a real 2° seam between
+  Experience, Projects, Skills, and Contact. The CSS fallback mirrors the same
+  geometry with 48 radial facets per ring rather than visually curved flat
+  cards. The centered face and category chip both link to the active standalone
+  route.
+- Three deterministic build/render/review passes are retained under
+  `blender-renders/carousel-four-iteration-01/` through `-03/`. Iteration 01
+  established the four-panel silhouette, iteration 02 tightened the vertical
+  gap, and iteration 03 restored enough reflector body for the runtime clip
+  without returning to the oversized shadow. The accepted six-view render is
+  mirrored in `blender-renders/carousel-accepted/`.
+- The final `public/models/portfolio-gateway.glb` is 5,132 bytes and 1,296
+  triangles. It uses and requires `KHR_draco_mesh_compression`, has no embedded
+  textures, and headless Blender 5.1.2 re-import confirms
+  `carousel_experience_panel`, `carousel_projects_panel`,
+  `carousel_skills_panel`, `carousel_contact_panel`, and
+  `carousel_reflector_shell`. The shared Blender contract passes 9/9 tests.
+- `carousel-four-comparison.png` was opened at 1920×720 with the live reference
+  and the real production Experience, Projects, Skills, Contact, and full-cycle
+  return states. All five states preserve the restored scale, physical seams,
+  small lower gap, face crop, and quiet reflector. The individual captures and
+  clean no-canvas reduced-motion fallback are retained under
+  `site-screenshots/carousel-four-*`.
+- `/experience`, `/projects`, `/skills`, and `/contact` are statically generated
+  standalone screens with one main chapter each and the global navigation.
+  Carousel face links, chips, header navigation, sitemap entries, and project
+  case-study back links use those routes. The homepage remains the complete
+  long-form portfolio.
+- Final unit/component results: 244/244 assertions across 59 files; 90.22%
+  statements, 80.88% branches, 83.33% functions, and 93.52% lines. TypeScript,
+  the 12-route production build, deployment preparation, GLB inspection, and
+  `git diff --check` pass. The non-timing Playwright regression matrix passes 21
+  applicable journeys with 23 intentional project/device skips across Chromium,
+  Firefox, desktop WebKit, and iPhone WebKit. The focused reference-proportion,
+  activation-continuity, and four-route journey passes 3/3 in Chromium.
+- Isolated Chromium SwiftShader page pacing passes at 11.5–14.6 fps; WebKit
+  desktop's successful retry measures 29.4–30.4 fps and iPhone WebKit measures
+  29.9–30.1 fps. The previously recorded hardware in-app gateway result remains
+  67–103 fps. The unfiltered suite still reproduces three existing timing-only
+  gates: the Chromium fluid-cursor floor, the sun-spectacle wall-clock ceiling,
+  and the latest production baseline's Firefox mid-page pacing floor
+  (6.9–7.6 fps). The latest baseline was rebuilt in a clean detached worktree
+  and reproduced the Firefox result; the checked-out production baseline
+  reproduced the sun test at approximately 4.98 seconds. No application-origin
+  console or route errors occurred in the passing journeys.
+
 ---
 
 # Project spiral verification

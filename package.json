@@ -8,6 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "build:atlas": "node scripts/build-atlas.mjs",
+    "capture:gateway": "node scripts/capture-portfolio-gateway.mjs",
     "prepare:deployment": "node scripts/prepare-deployment-assets.mjs",
     "serve:deployment": "node scripts/serve-deployment.mjs",
     "start": "next start",

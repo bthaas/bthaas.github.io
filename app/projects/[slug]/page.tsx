@@ -59,7 +59,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             />
             Brett Haas
           </a>
-          <a className="project-back-link" href="/#projects">
+          <a className="project-back-link" href="/projects">
             Back to projects
           </a>
         </nav>
@@ -67,7 +67,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <main className="project-page" id="project-case-study">
         <ProjectCaseStudy project={project} projectIndex={projectIndex} />
         <nav className="project-page__footer atlas-shell" aria-label="More projects">
-          <a href="/#projects">
+          <a href="/projects">
             <span aria-hidden="true">←</span> All projects
           </a>
           <a href={`/projects/${nextProject.id}`}>

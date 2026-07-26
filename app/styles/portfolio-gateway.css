@@ -66,8 +66,8 @@
   position: absolute;
   top: clamp(7rem, 14vh, 9rem);
   left: 50%;
-  width: min(47rem, 72vw);
-  height: min(31rem, 68svh);
+  width: min(56.5rem, 82vw);
+  height: min(35.5rem, 74svh);
   cursor: grab;
   touch-action: pan-y;
   transform: translateX(-50%);
@@ -96,14 +96,14 @@
 
 .portfolio-gateway__fallback-ring,
 .portfolio-gateway__fallback-reflection-ring {
-  --gateway-cylinder-radius: min(19rem, 36vw);
-  --gateway-cylinder-slice-width: min(3.36rem, 6.35vw);
+  --gateway-cylinder-radius: min(23.5rem, 42.5vw);
+  --gateway-cylinder-slice-width: min(3.03rem, 5.48vw);
 
   position: absolute;
-  top: 3%;
+  top: 2%;
   left: 50%;
   width: 0;
-  height: 58%;
+  height: 62%;
   transform-style: preserve-3d;
   transition: transform 860ms var(--ease-out);
 }
@@ -129,10 +129,10 @@
 
 .portfolio-gateway__fallback-reflection {
   position: absolute;
-  top: 65%;
-  left: 8%;
-  width: 84%;
-  height: 27%;
+  top: 66%;
+  left: 7%;
+  width: 86%;
+  height: 20%;
   mask-image: linear-gradient(to bottom, rgb(0 0 0 / 58%), transparent 94%);
   perspective: 72rem;
   transition: opacity 240ms ease;
@@ -143,8 +143,8 @@
 }
 
 .portfolio-gateway__fallback-reflection-ring {
-  --gateway-cylinder-radius: min(17.8rem, 34vw);
-  --gateway-cylinder-slice-width: min(3.15rem, 6vw);
+  --gateway-cylinder-radius: min(22.2rem, 40.25vw);
+  --gateway-cylinder-slice-width: min(2.86rem, 5.2vw);
 
   top: 0;
   height: 100%;
@@ -172,12 +172,13 @@
 
 .portfolio-gateway-canvas {
   pointer-events: none;
+  transform: translateY(0.9rem);
 }
 
 .portfolio-gateway__face-label {
   position: absolute;
   z-index: 3;
-  top: 29%;
+  top: 33%;
   left: 50%;
   margin: 0;
   color: rgb(255 253 245 / 72%);
@@ -190,13 +191,14 @@
     0 0 1.5rem rgb(255 253 245 / 24%);
   transform: translate(-50%, -50%);
   transition: opacity 180ms ease;
+  text-decoration: none;
   white-space: nowrap;
 }
 
 .portfolio-gateway__controls {
   position: absolute;
   z-index: 5;
-  bottom: clamp(6.5rem, 16vh, 7.5rem);
+  bottom: clamp(1.5rem, 5vh, 2.25rem);
   left: 50%;
   display: flex;
   align-items: center;
@@ -320,25 +322,25 @@
   }
 
   .portfolio-gateway__fallback-ring {
-    --gateway-cylinder-radius: min(10.8rem, 44vw);
-    --gateway-cylinder-slice-width: min(1.92rem, 7.8vw);
+    --gateway-cylinder-radius: min(11.2rem, 46vw);
+    --gateway-cylinder-slice-width: min(1.44rem, 5.9vw);
 
     top: 1%;
     left: 50%;
     width: 0;
-    height: 47%;
+    height: 50%;
   }
 
   .portfolio-gateway__fallback-reflection {
-    top: 52%;
+    top: 54%;
     left: 7%;
     width: 86%;
-    height: 27%;
+    height: 17%;
   }
 
   .portfolio-gateway__fallback-reflection-ring {
-    --gateway-cylinder-radius: min(10.3rem, 42vw);
-    --gateway-cylinder-slice-width: min(1.83rem, 7.45vw);
+    --gateway-cylinder-radius: min(10.7rem, 44vw);
+    --gateway-cylinder-slice-width: min(1.38rem, 5.65vw);
 
     top: 0;
     left: 50%;
@@ -347,7 +349,7 @@
   }
 
   .portfolio-gateway__face-label {
-    top: 24%;
+    top: 26%;
     font-size: clamp(2.25rem, 11vw, 3.4rem);
   }
 
