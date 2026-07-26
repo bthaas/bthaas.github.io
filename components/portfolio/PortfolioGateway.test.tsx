@@ -18,7 +18,11 @@ describe('PortfolioGateway', () => {
     expect(screen.getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
       'href',
-      '#experience',
+      '/experience',
+    )
+    expect(screen.getByRole('link', { name: 'Open Experience screen' })).toHaveAttribute(
+      'href',
+      '/experience',
     )
     expect(screen.getByRole('button', { name: 'Previous category' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Next category' })).toBeInTheDocument()
@@ -31,12 +35,12 @@ describe('PortfolioGateway', () => {
       container.querySelectorAll(
         '.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice',
       ),
-    ).toHaveLength(36)
+    ).toHaveLength(48)
     expect(
       container.querySelectorAll(
         '.portfolio-gateway__fallback-reflection-ring > .portfolio-gateway__fallback-slice',
       ),
-    ).toHaveLength(36)
+    ).toHaveLength(48)
     expect(container.querySelectorAll('.portfolio-gateway__fallback-face')).toHaveLength(0)
     expect(
       container.querySelectorAll('[data-gateway-category="experience"]'),
@@ -47,6 +51,9 @@ describe('PortfolioGateway', () => {
     expect(
       container.querySelectorAll('[data-gateway-category="skills"]'),
     ).toHaveLength(24)
+    expect(
+      container.querySelectorAll('[data-gateway-category="contact"]'),
+    ).toHaveLength(24)
   })
 
   it('cycles categories with buttons and arrow keys while wrapping', () => {
@@ -55,21 +62,24 @@ describe('PortfolioGateway', () => {
     const next = screen.getByRole('button', { name: 'Next category' })
 
     fireEvent.click(next)
-    expect(screen.getByRole('link', { name: 'Open Projects' })).toHaveAttribute('href', '#projects')
+    expect(screen.getByRole('link', { name: 'Open Projects' })).toHaveAttribute('href', '/projects')
     expect(carousel).toHaveAttribute('data-active-index', '1')
     expect(screen.getByRole('status')).toHaveTextContent('Projects category selected')
 
     fireEvent.keyDown(carousel, { key: 'ArrowRight' })
-    expect(screen.getByRole('link', { name: 'Open Skills' })).toHaveAttribute('href', '#craft')
+    expect(screen.getByRole('link', { name: 'Open Skills' })).toHaveAttribute('href', '/skills')
+
+    fireEvent.keyDown(carousel, { key: 'ArrowRight' })
+    expect(screen.getByRole('link', { name: 'Open Contact' })).toHaveAttribute('href', '/contact')
 
     fireEvent.keyDown(carousel, { key: 'ArrowRight' })
     expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
       'href',
-      '#experience',
+      '/experience',
     )
 
     fireEvent.keyDown(carousel, { key: 'ArrowLeft' })
-    expect(screen.getByRole('link', { name: 'Open Skills' })).toHaveAttribute('href', '#craft')
+    expect(screen.getByRole('link', { name: 'Open Contact' })).toHaveAttribute('href', '/contact')
   })
 
   it('tracks a captured horizontal drag and snaps to the nearest category', () => {
@@ -112,7 +122,7 @@ describe('PortfolioGateway', () => {
     expect(carousel).toHaveAttribute('data-active-index', '1')
     expect(screen.getByRole('link', { name: 'Open Projects' })).toHaveAttribute(
       'href',
-      '#projects',
+      '/projects',
     )
     expect(release).toHaveBeenCalledWith(7)
   })

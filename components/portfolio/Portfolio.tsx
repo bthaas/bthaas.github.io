@@ -20,6 +20,11 @@ import { SkillSphere } from './SkillSphere'
 import { PortfolioGateway } from './PortfolioGateway'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
+export type PortfolioScreenName = 'experience' | 'projects' | 'skills' | 'contact'
+
+interface PortfolioProps {
+  readonly screen?: PortfolioScreenName
+}
 
 function ContactIcon({ name }: { readonly name: ContactIconName }) {
   if (name === 'github') {
@@ -116,7 +121,7 @@ function FlightRule() {
   )
 }
 
-export function Portfolio() {
+export function Portfolio({ screen }: PortfolioProps = {}) {
   const { identity, contact, experience, education, projects, skills } = siteContent
   const skillLogos = getSkillLogos(skills)
 
@@ -129,7 +134,7 @@ export function Portfolio() {
 
       <header className="site-header">
         <nav className="site-nav atlas-shell" aria-label="Primary navigation">
-          <a className="nav-name" href="#hero">
+          <a className="nav-name" href="/">
             <img
               className="nav-name__mark"
               src="/original-wing-filled.png"
@@ -142,16 +147,29 @@ export function Portfolio() {
           </a>
           <SunBadge />
           <div className="nav-links">
-            <a href="#experience">Experience</a>
-            <a href="#projects">Projects</a>
-            <a href="#craft">Skills</a>
-            <a href="#contact">Contact</a>
+            <a href="/experience" aria-current={screen === 'experience' ? 'page' : undefined}>
+              Experience
+            </a>
+            <a href="/projects" aria-current={screen === 'projects' ? 'page' : undefined}>
+              Projects
+            </a>
+            <a href="/skills" aria-current={screen === 'skills' ? 'page' : undefined}>
+              Skills
+            </a>
+            <a href="/contact" aria-current={screen === 'contact' ? 'page' : undefined}>
+              Contact
+            </a>
           </div>
         </nav>
       </header>
 
-      <main id="main-content">
-        <section className="hero-section atlas-shell" id="hero" aria-labelledby="hero-name">
+      <main
+        id="main-content"
+        data-portfolio-screen={screen}
+      >
+        {!screen && (
+          <>
+            <section className="hero-section atlas-shell" id="hero" aria-labelledby="hero-name">
           <div className="board-meta hero-meta" role="group" aria-label="Portfolio introduction">
             <p>Portfolio / 2026</p>
             <p>{identity.title}</p>
@@ -171,7 +189,7 @@ export function Portfolio() {
                 aria-label="Portfolio roles and projects"
               >
                 <p className="eyebrow">Engineer · Researcher · Builder</p>
-                <a className="hero-projects-link" href="#projects">
+                <a className="hero-projects-link" href="/projects">
                   <span>Explore projects</span>
                   <span className="hero-projects-link__arrow" aria-hidden="true">↓</span>
                 </a>
@@ -179,11 +197,14 @@ export function Portfolio() {
             </div>
           </div>
 
-        </section>
+            </section>
 
-        <PortfolioGateway />
+            <PortfolioGateway />
+          </>
+        )}
 
-        <section className="experience-section" id="experience" aria-labelledby="experience-title">
+        {(!screen || screen === 'experience') && (
+          <section className="experience-section" id="experience" aria-labelledby="experience-title">
           <div className="experience-board">
             <div
               className="experience-plate experience-plate--inset frame-reveal"
@@ -265,9 +286,11 @@ export function Portfolio() {
               ))}
             </ol>
           </div>
-        </section>
+          </section>
+        )}
 
-        <section className="projects-section" id="projects" aria-labelledby="projects-title">
+        {(!screen || screen === 'projects') && (
+          <section className="projects-section" id="projects" aria-labelledby="projects-title">
           <div className="atlas-shell projects-intro editorial-grid">
             <div className="section-heading">
               <p className="eyebrow">02 / Field studies</p>
@@ -281,13 +304,15 @@ export function Portfolio() {
 
           <ProjectsSpiral projects={projects} />
 
-        </section>
+          </section>
+        )}
 
-        <section
-          className="craft-section"
-          id="craft"
-          aria-labelledby="craft-title"
-        >
+        {(!screen || screen === 'skills') && (
+          <section
+            className="craft-section"
+            id="craft"
+            aria-labelledby="craft-title"
+          >
           <div className="craft-board">
             <div
               className="craft-plate craft-plate--inset"
@@ -342,14 +367,16 @@ export function Portfolio() {
               <SkillLogoSequence logos={skillLogos} duplicate />
             </div>
           </div>
-        </section>
+          </section>
+        )}
 
-        <section
-          className="contact-section"
-          id="contact"
-          aria-labelledby="contact-title"
-          data-contact-finale
-        >
+        {(!screen || screen === 'contact') && (
+          <section
+            className="contact-section"
+            id="contact"
+            aria-labelledby="contact-title"
+            data-contact-finale
+          >
           <div className="contact-board">
             <div className="contact-plate contact-plate--inset" data-atlas-plate-sheen>
               <AtlasPicture
@@ -428,13 +455,14 @@ export function Portfolio() {
                 >
                   Bellevue, WA
                 </p>
-                <a href="#hero">
+                <a href="/">
                   Back to top <span aria-hidden="true">↑</span>
                 </a>
               </footer>
             </div>
           </div>
-        </section>
+          </section>
+        )}
       </main>
     </>
   )

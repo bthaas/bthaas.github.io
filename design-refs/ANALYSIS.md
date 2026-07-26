@@ -749,7 +749,7 @@ frames are `frames/carousel-composition-journey.png`,
 `carousel-category-work.png`, `carousel-category-fashion.png`,
 `carousel-category-journey.png`, and `carousel-motion-contact-sheet.png`.
 The reference imagery is analysis-only; the shipped carousel uses the
-portfolio's existing Experience, Projects, and Skills artwork.
+portfolio's existing Experience, Projects, Skills, and Contact artwork.
 
 ## Composition and camera
 
@@ -758,8 +758,9 @@ portfolio's existing Experience, Projects, and Skills artwork.
   `Engineer · Researcher · Builder` sits at the top center in an italic
   editorial serif. An oversized high-contrast serif `BRETT HAAS` spans beyond
   both viewport edges behind the object.
-- At 1280×720 the visible upper drum is about 594×337 px, centered near x=640
-  and y=359. Its top sits around 27% of the viewport and its bottom around 73%.
+- At 1280×720 the live reference's visible upper drum is about 592×333 px,
+  centered near x=640 and y=360. Its top sits around 27% of the viewport and its
+  bottom around 73%.
   The background word occupies y=58–280, so the drum occludes the middle third.
 - The camera is level with the center of the upper drum with no visible horizon.
   A restrained 34–40° perspective field of view shows the curved face and
@@ -774,21 +775,27 @@ portfolio's existing Experience, Projects, and Skills artwork.
 
 ## Geometry, repetition, and materials
 
-- Three semantically named curved panels form a complete radial carousel:
-  `carousel_experience_panel`, `carousel_projects_panel`, and
-  `carousel_skills_panel`. Each covers 120°, uses 24 horizontal segments, and
-  overlaps its neighbor by a visually negligible seam allowance. The active
-  face spans roughly 78–82° of the camera view; adjacent faces appear only as
-  10–18 px slivers at the sides.
+- Four semantically named curved panels form a complete radial carousel:
+  `carousel_experience_panel`, `carousel_projects_panel`,
+  `carousel_skills_panel`, and `carousel_contact_panel`. Each category owns a
+  90° sector, uses 18–24 horizontal segments, and sweeps 88° so a real 2° open
+  seam remains between neighboring panels. At the front of the 1280×720
+  composition this reads as a restrained 6–9 px paper gap, matching the live
+  reference's visible separation rather than merging every category into one
+  continuous texture.
 - Each panel has a centered local pivot, deterministic dimensions, usable UVs,
   and a slight outward thickness so rotations do not reveal a paper-thin edge.
   Runtime textures map the existing Experience trajectory, first Projects case
-  study, and Skills workshop images onto those panels.
-- A second, shallower lower shell sits 0.12–0.18 drum-heights below the carousel.
+  study, Skills workshop, and Contact horizon images onto those panels.
+- A second, shallower lower shell sits behind a small 8–12 px visible paper gap
+  below the carousel.
   It is a single semantically named `carousel_reflector_shell` object with a
   softly faceted surface. In R3F it receives the same active texture at low
-  opacity, vertically mirrored and washed toward warm white. It is decorative
-  and may be omitted on constrained mobile hardware if frame pacing requires it.
+  opacity, vertically mirrored and washed toward warm white. The user-confirmed
+  correction caps its visible height near 28–32% of the upper drum so it reads
+  as a quiet reflection rather than a second equally weighted object. It is
+  decorative and may be omitted on constrained mobile hardware if frame pacing
+  requires it.
 - The reference has no fracture, damage, detached parts, or negative structural
   gaps. Visual separation comes only from the small vertical gap between the
   upper drum and lower shell and the fine seams between radial panels.
@@ -817,16 +824,17 @@ portfolio's existing Experience, Projects, and Skills artwork.
 ## Motion, interaction, and fallbacks
 
 - Previous/next buttons and ArrowLeft/ArrowRight rotate the panel group exactly
-  120° per action. Next moves Experience → Projects → Skills → Experience;
-  previous reverses the order. Each input advances the continuous ring by one
-  120° step with a damped 760–900 ms ease; additional input queues another
+  90° per action. Next moves Experience → Projects → Skills → Contact →
+  Experience; previous reverses the order. Each input advances the continuous
+  ring by one 90° step with a damped 760–900 ms ease; additional input queues another
   same-direction step instead of snapping backward when the category wraps.
 - Pointer movement adds at most ±2° yaw and ±1° pitch around the selected angle.
   Idle motion is a sub-degree breathing drift. Buttons, the active category
-  chip, and the centered panel are real links to `#experience`, `#projects`, and
-  `#craft`; the canvas is decorative and pointer-transparent.
+  chip, and the centered panel are real links to `/experience`, `/projects`,
+  `/skills`, and `/contact`; the canvas is decorative and
+  pointer-transparent.
 - Horizontal pointer drag rotates the CSS and R3F rings continuously, captures
-  the active pointer, and snaps to the nearest 120° category on release. A drag
+  the active pointer, and snaps to the nearest 90° category on release. A drag
   across more than one step may advance multiple faces. The drag surface uses a
   grab/grabbing cursor and `touch-action: pan-y`, so vertical page movement
   remains owned by Lenis/native document flow while horizontal intent spins the
@@ -836,34 +844,57 @@ portfolio's existing Experience, Projects, and Skills artwork.
   accepted or a drag is released while the decorative ring settles toward the
   same category.
 - Reduced motion, no WebGL, loading, and scene failure preserve the cylinder as
-  36 narrow CSS 3D facets: 12 contiguous 10° slices for each of Experience,
-  Projects, and Skills. The image is distributed across the facets and rear
-  faces are culled, so this fallback has real radial depth rather than three
-  flat rounded cards that only suggest curvature. A second 36-facet ring
-  supplies the mirrored lower reflection. All three category links and both
+  48 narrow CSS 3D facets: 12 slices across an 88° face for each of Experience,
+  Projects, Skills, and Contact, separated by the same 2° physical seams as the
+  procedural asset. The image is distributed across the facets and rear faces
+  are culled, so this fallback has real radial depth rather than four
+  flat rounded cards that only suggest curvature. A second 48-facet ring
+  supplies the mirrored lower reflection. All four category links and both
   controls remain keyboard accessible at a minimum 44×44 px target size.
   Mobile keeps the real 3D scene when WebGL is available, with DPR 1 and a
   30 fps invalidation cap.
-- The 36-facet CSS ring is also the canonical upper surface after WebGL
+- The 48-facet CSS ring is also the canonical upper surface after WebGL
   activation. Its silhouette and crop must not change on the first pointer or
   wheel input. Once the canvas is ready, the CSS reflection fades out and the
   canvas is clipped below 63% of the visual stage so WebGL replaces only the
   lower reflector. This preserves physical radial depth, drag rotation, and the
   richer reflected material without an interaction-triggered composition swap.
 
+## July 25 four-screen and proportion correction
+
+- The supplied follow-up is preserved as
+  `frames/carousel-four-screen-proportion-feedback.png`. It shows the interaction
+  framing fix working, while also establishing three remaining differences:
+  the active drum is roughly 15–20% smaller than the live reference, category
+  boundaries lack the reference's paper gaps, and the lower reflection carries
+  too much visual weight.
+- The corrected desktop target restores the live reference's approximately
+  592×333 px upper drum at 1280×720, keeps at least 5% projection clearance
+  through the full pointer-pitch range, introduces 2° open category seams, and
+  keeps the static fallback reflector at approximately 95–110 px. After WebGL
+  activation, the visible physical reflector is clipped to a quieter 45–60 px
+  strip with an 8–14 px paper gap.
+- The carousel face label and category chip are both navigation affordances.
+  Experience, Projects, Skills, and Contact resolve to `/experience`,
+  `/projects`, `/skills`, and `/contact` respectively. Each destination is a
+  standalone screen containing that chapter's existing content and global
+  navigation; project case studies remain nested under `/projects/[slug]`.
+
 ## Implementation targets
 
 - Build the texture-free named-node GLB headlessly from a deterministic Blender
   script, export via `export_and_compress_glb()`, retain Draco compression and
-  all four required node names, and stay well below 3 MiB/150,000 triangles.
-- Render and inspect two six-view warm turntable iterations. Iteration 1 verifies
-  silhouette, panel seams, side thickness, and pivots; iteration 2 refines the
-  lower shell gap and active-face camera presentation before acceptance.
+  all five required node names, and stay well below 3 MiB/150,000 triangles.
+- Render and inspect at least two six-view warm turntable iterations. Iteration 1
+  verifies silhouette, panel seams, side thickness, and pivots; later iterations
+  refine the lower-shell gap and active-face camera presentation before
+  acceptance.
 - Load and clone the GLB with `useGLTF`/local Draco in a lazily mounted R3F
   scene. Reuse textures/materials, render on demand, expose `?stats=1`, and keep
   the static DOM composition visible until the first textured frame is ready.
-  Once ready, the physical GLB fully replaces the faceted fallback; do not
-  retain a flat shading overlay or translucent card layer over the model.
+  Once ready, retain the physical CSS upper ring for activation continuity and
+  reveal only the GLB reflector through the lower canvas clip. Do not retain a
+  flat shading overlay or translucent card layer over the model.
 
 ---
 

@@ -47,11 +47,11 @@ describe('project detail pages', () => {
     expect(brandLink.querySelector('img')).toHaveAttribute('alt', '')
     expect(screen.getByRole('link', { name: 'Back to projects' })).toHaveAttribute(
       'href',
-      '/#projects',
+      '/projects',
     )
     expect(screen.getByRole('link', { name: 'All projects' })).toHaveAttribute(
       'href',
-      '/#projects',
+      '/projects',
     )
     expect(screen.getByRole('link', { name: 'View Court Vision repository' })).toHaveAttribute(
       'href',

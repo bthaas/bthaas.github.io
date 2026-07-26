@@ -24,6 +24,7 @@ const panelNames = [
   'carousel_experience_panel',
   'carousel_projects_panel',
   'carousel_skills_panel',
+  'carousel_contact_panel',
 ] as const
 
 function GatewayModel({

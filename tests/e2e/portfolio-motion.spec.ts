@@ -107,6 +107,111 @@ test('keeps the upper gateway surface unchanged when interaction activates WebGL
   )
 })
 
+test('matches the reference drum size, paper seams, and restrained reflection', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(
+    browserName !== 'chromium' || isMobile,
+    'One desktop engine verifies the reference proportions.',
+  )
+  await page.setViewportSize({ height: 720, width: 1280 })
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+  await gateway.scrollIntoViewIfNeeded()
+  await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  const proportions = await gateway.evaluate((element) => {
+    const union = (selector: string) => {
+      const bounds = Array.from(element.querySelectorAll<HTMLElement>(selector))
+        .filter((node) => {
+          const angle = Number.parseFloat(
+            getComputedStyle(node).getPropertyValue('--gateway-segment-angle'),
+          )
+          const normalized = ((angle + 180) % 360 + 360) % 360 - 180
+          return Math.abs(normalized) < 90
+        })
+        .map((node) => node.getBoundingClientRect())
+      return {
+        bottom: Math.max(...bounds.map((bound) => bound.bottom)),
+        height: Math.max(...bounds.map((bound) => bound.bottom))
+          - Math.min(...bounds.map((bound) => bound.top)),
+        top: Math.min(...bounds.map((bound) => bound.top)),
+        width: Math.max(...bounds.map((bound) => bound.right))
+          - Math.min(...bounds.map((bound) => bound.left)),
+      }
+    }
+
+    const upper = union(
+      '.portfolio-gateway__fallback-ring .portfolio-gateway__fallback-slice',
+    )
+    const reflection = union(
+      '.portfolio-gateway__fallback-reflection-ring .portfolio-gateway__fallback-slice',
+    )
+    return {
+      gap: reflection.top - upper.bottom,
+      reflectionHeight: reflection.height,
+      upperHeight: upper.height,
+      upperWidth: upper.width,
+    }
+  })
+
+  expect(proportions.upperWidth).toBeGreaterThanOrEqual(565)
+  expect(proportions.upperWidth).toBeLessThanOrEqual(620)
+  expect(proportions.upperHeight).toBeGreaterThanOrEqual(305)
+  expect(proportions.upperHeight).toBeLessThanOrEqual(350)
+  expect(proportions.gap).toBeGreaterThanOrEqual(8)
+  expect(proportions.gap).toBeLessThanOrEqual(16)
+  expect(proportions.reflectionHeight).toBeGreaterThanOrEqual(90)
+  expect(proportions.reflectionHeight).toBeLessThanOrEqual(120)
+})
+
+test('opens every carousel category as its own routed screen', async ({
+  browserName,
+  isMobile,
+  page,
+}) => {
+  test.skip(
+    browserName !== 'chromium' || isMobile,
+    'One desktop engine verifies the four route destinations.',
+  )
+  const errors = observeApplicationErrors(page)
+  await page.addInitScript(() => {
+    sessionStorage.setItem('atlas-preloader-entered', '1')
+    sessionStorage.setItem('atlas-entered', '1')
+  })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
+  await gateway.scrollIntoViewIfNeeded()
+  await gateway.focus()
+  await gateway.press('ArrowRight')
+  const projectsFace = page.getByRole('link', { name: 'Open Projects screen' })
+  await expect(projectsFace).toHaveAttribute('href', '/projects')
+  await projectsFace.click()
+  await expect(page).toHaveURL(/\/projects\/?$/)
+  await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', 'projects')
+  await expect(page.locator('main > section')).toHaveCount(1)
+  await expect(page.locator('main > #projects')).toBeVisible()
+
+  for (const [route, screenName, sectionId] of [
+    ['/experience', 'experience', 'experience'],
+    ['/skills', 'skills', 'craft'],
+    ['/contact', 'contact', 'contact'],
+  ] as const) {
+    await page.goto(route, { waitUntil: 'networkidle' })
+    await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', screenName)
+    await expect(page.locator('main > section')).toHaveCount(1)
+    await expect(page.locator(`main > #${sectionId}`)).toBeVisible()
+  }
+  expect(errors).toEqual([])
+})
+
 test('ships clean cross-browser choreography and an accessible dossier', async ({
   isMobile,
   page,
@@ -147,36 +252,43 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
     gateway.locator(
       '.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice',
     ),
-  ).toHaveCount(36)
+  ).toHaveCount(48)
   await expect(
     gateway.locator(
       '.portfolio-gateway__fallback-reflection-ring > .portfolio-gateway__fallback-slice',
     ),
-  ).toHaveCount(36)
+  ).toHaveCount(48)
   await expect(gateway).toHaveAttribute('data-canvas-ready', '', { timeout: 10_000 })
   await expect(gateway.locator('.portfolio-gateway-canvas')).toHaveCount(1)
   await expect(page.locator('#portfolio-gateway').getByText('BRETT HAAS')).toBeVisible()
   await expect(
     page.locator('#portfolio-gateway').getByText('Engineer · Researcher · Builder', { exact: true }),
   ).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Open Experience', exact: true })).toHaveAttribute(
     'href',
-    '#experience',
+    '/experience',
   )
   await gateway.focus()
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '1')
-  await expect(page.getByRole('link', { name: 'Open Projects' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Open Projects', exact: true })).toHaveAttribute(
     'href',
-    '#projects',
+    '/projects',
   )
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '2')
-  await expect(page.getByRole('link', { name: 'Open Skills' })).toHaveAttribute('href', '#craft')
+  await expect(page.getByRole('link', { name: 'Open Skills', exact: true }))
+    .toHaveAttribute('href', '/skills')
+  await gateway.press('ArrowRight')
+  await expect(gateway).toHaveAttribute('data-active-index', '3')
+  await expect(page.getByRole('link', { name: 'Open Contact', exact: true })).toHaveAttribute(
+    'href',
+    '/contact',
+  )
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await gateway.press('ArrowLeft')
-  await expect(gateway).toHaveAttribute('data-active-index', '2')
+  await expect(gateway).toHaveAttribute('data-active-index', '3')
   const gatewayDragSurface = gateway.getByTestId('portfolio-gateway-drag-surface')
   const gatewayBox = await gatewayDragSurface.boundingBox()
   expect(gatewayBox).not.toBeNull()
@@ -283,7 +395,7 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
   await expect(
     page.locator('.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice'),
-  ).toHaveCount(36)
+  ).toHaveCount(48)
   await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
   await page.locator('[data-skill-sphere]').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-motion', 'reduced')
