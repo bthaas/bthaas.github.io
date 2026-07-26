@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
 import {
+  createDragSweep,
   createScatteredLayout,
   createSkillRigidBodyWorld,
   type SkillRigidBodyWorld,
+  type SkillTokenPlacement,
   type SkillTokenSize,
 } from './skill-workbench-rigidbody'
 
@@ -96,6 +98,105 @@ describe('skill workbench rigid-body layout', () => {
     })
 
     expect(second).not.toEqual(first)
+  })
+
+  it('sweeps a fast drag through collision-sized waypoints', () => {
+    const from = { angle: -0.1, x: 112, y: 482 }
+    const to = { angle: 0.34, x: 998, y: 74 }
+    const sweep = createDragSweep(from, to)
+    let previous = from
+
+    expect(sweep.length).toBeGreaterThan(20)
+    expect(sweep.length).toBeLessThan(40)
+    sweep.forEach((waypoint) => {
+      expect(Math.hypot(
+        waypoint.x - previous.x,
+        waypoint.y - previous.y,
+      )).toBeLessThanOrEqual(32)
+      expect(waypoint.angle).toBeGreaterThan(previous.angle)
+      previous = waypoint
+    })
+    expect(sweep.at(-1)).toEqual(to)
+  })
+
+  it('wakes and pushes a sleeping body during a fast drag', () => {
+    const tokenSizes = Array.from({ length: 12 }, () => ({
+      height: 40,
+      width: 80,
+    }))
+    world = createSkillRigidBodyWorld({
+      arenaHeight: 400,
+      arenaWidth: 800,
+      seed: 8_112,
+      tokenSizes,
+    })
+    world.drop()
+    for (let frame = 0; frame < 1_800; frame += 1) {
+      if (world.getSnapshots().every(({ isSleeping }) => isSleeping)) break
+      world.step(1_000 / 60)
+    }
+    const settled = world.getSnapshots()
+    expect(settled.every(({ isSleeping }) => isSleeping)).toBe(true)
+    let route: {
+      obstacleIndex: number
+      sourceIndex: number
+      target: SkillTokenPlacement
+    } | undefined
+
+    for (
+      let sourceIndex = 0;
+      sourceIndex < settled.length && !route;
+      sourceIndex += 1
+    ) {
+      for (
+        let obstacleIndex = 0;
+        obstacleIndex < settled.length && !route;
+        obstacleIndex += 1
+      ) {
+        if (sourceIndex === obstacleIndex) continue
+        const source = settled[sourceIndex]
+        const obstacle = settled[obstacleIndex]
+        const deltaX = obstacle.x - source.x
+        const deltaY = obstacle.y - source.y
+        const distance = Math.hypot(deltaX, deltaY)
+        if (distance < 120) continue
+        const target = {
+          angle: 0,
+          x: obstacle.x + (deltaX / distance) * 90,
+          y: obstacle.y + (deltaY / distance) * 90,
+        }
+        if (
+          target.x < 40
+          || target.x > 760
+          || target.y < 20
+          || target.y > 380
+        ) continue
+
+        route = { obstacleIndex, sourceIndex, target }
+      }
+    }
+
+    expect(route).toBeDefined()
+    if (!route) return
+
+    const obstacleBefore = world.getSnapshots()[route.obstacleIndex]
+    world.beginDrag(route.sourceIndex)
+    world.dragBody(
+      route.sourceIndex,
+      route.target.x,
+      route.target.y,
+      route.target.angle,
+    )
+    const snapshots = world.getSnapshots()
+    const obstacleAfter = snapshots[route.obstacleIndex]
+    const draggedAfter = snapshots[route.sourceIndex]
+
+    expect(Math.hypot(
+      obstacleAfter.x - obstacleBefore.x,
+      obstacleAfter.y - obstacleBefore.y,
+    )).toBeGreaterThan(1)
+    expect(draggedAfter.x).toBeCloseTo(route.target.x, 4)
+    expect(draggedAfter.y).toBeCloseTo(route.target.y, 4)
   })
 
   it.each([1, 7, 31, 101, 509, 4_294_967_295])(

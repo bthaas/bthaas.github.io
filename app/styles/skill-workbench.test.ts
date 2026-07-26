@@ -45,6 +45,14 @@ describe('Skill Workbench presentation contract', () => {
     })
   })
 
+  it('keeps the actively dragged rigid body above the rest of the pile', () => {
+    expect(
+      declarationsFor('.skill-workbench__item[data-dragging="true"]'),
+    ).toMatchObject({
+      'z-index': '4',
+    })
+  })
+
   it('retains the static logo-grid fallback for reduced motion and mobile', () => {
     expect(stylesheet).toContain('@media (prefers-reduced-motion: reduce)')
     expect(stylesheet).toContain('.skill-workbench__fallback')

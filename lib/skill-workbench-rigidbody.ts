@@ -5,6 +5,7 @@ const {
   Body,
   Composite,
   Engine,
+  Query,
   Sleeping,
 } = Matter
 
@@ -12,6 +13,8 @@ const LAYOUT_EDGE_GAP = 8
 const LAYOUT_TOKEN_GAP = 9
 const LAYOUT_HEIGHT_RATIO = 0.72
 const MAX_LAYOUT_ATTEMPTS = 4_000
+const MAX_DRAG_SWEEP_STEP_PX = 32
+const MIN_DRAG_SWEEP_STEP_PX = 16
 const MAX_PHYSICS_STEP_MS = 1000 / 60
 const WALL_THICKNESS = 120
 
@@ -38,6 +41,10 @@ interface SkillRigidBodyWorldOptions {
   readonly tokenSizes: readonly SkillTokenSize[]
 }
 
+interface SolverBody extends Matter.Body {
+  readonly positionImpulse: Matter.Vector
+}
+
 export interface SkillRigidBodyWorld {
   beginDrag(index: number): void
   destroy(): void
@@ -56,6 +63,27 @@ export interface SkillRigidBodyWorld {
   resetBody(index: number): void
   step(deltaMs: number): void
   stick(): void
+}
+
+export function createDragSweep(
+  from: SkillTokenPlacement,
+  to: SkillTokenPlacement,
+  maxStep = MAX_DRAG_SWEEP_STEP_PX,
+): readonly SkillTokenPlacement[] {
+  const distance = Math.hypot(to.x - from.x, to.y - from.y)
+  const stepCount = Math.max(1, Math.ceil(distance / Math.max(1, maxStep)))
+
+  return Array.from({ length: stepCount }, (_, index) => {
+    if (index === stepCount - 1) return { ...to }
+
+    const progress = (index + 1) / stepCount
+
+    return {
+      angle: from.angle + (to.angle - from.angle) * progress,
+      x: from.x + (to.x - from.x) * progress,
+      y: from.y + (to.y - from.y) * progress,
+    }
+  })
 }
 
 function createRandom(seed: number) {
@@ -223,6 +251,13 @@ export function createSkillRigidBodyWorld({
     tokenSizes,
   })
   const random = createRandom(seed ^ 0xa53c9e17)
+  const shortestTokenSide = Math.min(
+    ...tokenSizes.map(({ height, width }) => Math.min(height, width)),
+  )
+  const dragSweepStep = Math.max(
+    MIN_DRAG_SWEEP_STEP_PX,
+    Math.min(MAX_DRAG_SWEEP_STEP_PX, shortestTokenSide * 0.75),
+  )
   const bodies = homes.map((home, index) => {
     const size = tokenSizes[index]
     const body = Bodies.rectangle(home.x, home.y, size.width, size.height, {
@@ -277,6 +312,12 @@ export function createSkillRigidBodyWorld({
     Sleeping.set(body, false)
   }
 
+  function clearPositionImpulse(body: Matter.Body) {
+    const positionImpulse = (body as SolverBody).positionImpulse
+    positionImpulse.x = 0
+    positionImpulse.y = 0
+  }
+
   function resetBody(index: number) {
     const body = bodies[index]
     const home = homes[index]
@@ -299,6 +340,7 @@ export function createSkillRigidBodyWorld({
       const body = bodies[index]
       if (!body) return
       wake(body)
+      clearPositionImpulse(body)
       Body.setStatic(body, true)
     },
 
@@ -314,12 +356,36 @@ export function createSkillRigidBodyWorld({
 
       const halfWidth = size.width / 2
       const halfHeight = size.height / 2
-      Body.setPosition(body, {
+      const target = {
+        angle,
         x: Math.max(halfWidth, Math.min(arenaWidth - halfWidth, x)),
         y: Math.max(halfHeight, Math.min(arenaHeight - halfHeight, y)),
+      }
+      const sweep = createDragSweep({
+        angle: body.angle,
+        x: body.position.x,
+        y: body.position.y,
+      }, target, dragSweepStep)
+      const otherBodies = bodies.filter((_, bodyIndex) => bodyIndex !== index)
+
+      sweep.forEach((waypoint) => {
+        Body.setPosition(body, waypoint)
+        Body.setAngle(body, waypoint.angle)
+        wake(body)
+
+        const collisions = Query.collides(body, otherBodies)
+        if (collisions.length === 0) return
+
+        collisions.forEach(({ parentA, parentB }) => {
+          if (parentA !== body) wake(parentA)
+          if (parentB !== body) wake(parentB)
+        })
+
+        // Resolve only occupied waypoints without advancing gravity. This wakes
+        // settled obstacles while keeping a long pointer jump off the hot path
+        // when it crosses empty space.
+        Engine.update(engine, 0)
       })
-      Body.setAngle(body, angle)
-      wake(body)
     },
 
     drop() {
