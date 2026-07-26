@@ -6,6 +6,19 @@ import { siteContent } from '@/content/site-content'
 import { getSkillLogos } from './SkillLogos'
 import { SkillWorkbench } from './SkillWorkbench'
 
+function readTransform(token: HTMLElement) {
+  const match = token.style.transform.match(
+    /translate3d\((-?[\d.]+)px, (-?[\d.]+)px, 0\) rotate\((-?[\d.]+)rad\)/,
+  )
+  if (!match) throw new Error(`Missing rigid-body transform: ${token.style.transform}`)
+
+  return {
+    angle: Number(match[3]),
+    x: Number(match[1]),
+    y: Number(match[2]),
+  }
+}
+
 describe('SkillWorkbench', () => {
   const logos = getSkillLogos(siteContent.skills)
 
@@ -34,6 +47,8 @@ describe('SkillWorkbench', () => {
     const tokens = within(tools).getAllByRole('button')
 
     expect(tokens).toHaveLength(logos.length)
+    expect(new Set(tokens.map((token) => token.style.transform)).size)
+      .toBeGreaterThan(logos.length / 2)
     expect(container.querySelectorAll('.skill-workbench__glyph path')).toHaveLength(logos.length)
     expect(tokens.map((token) => token.getAttribute('aria-label'))).toEqual(
       logos.map(({ category, label }) => `${label}, ${category}`),
@@ -138,6 +153,8 @@ describe('SkillWorkbench', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
     const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
     const token = screen.getByRole('button', { name: 'TypeScript, Languages' })
+    const homeTransform = token.style.transform
+    const home = readTransform(token)
     const capture = vi.fn()
     const release = vi.fn()
     Object.defineProperties(token, {
@@ -168,7 +185,7 @@ describe('SkillWorkbench', () => {
       pointerId: 8,
       pointerType: 'mouse',
     })
-    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    expect(token.style.transform).toBe(homeTransform)
     fireEvent.pointerMove(token, {
       clientX: 144,
       clientY: 126,
@@ -178,7 +195,8 @@ describe('SkillWorkbench', () => {
 
     expect(workbench).toHaveAttribute('data-dragging', 'TypeScript')
     expect(capture).toHaveBeenCalledWith(7)
-    expect(token.style.transform).toContain('translate3d(44px, 26px, 0)')
+    expect(readTransform(token).x - home.x).toBeCloseTo(44, 1)
+    expect(readTransform(token).y - home.y).toBeCloseTo(26, 1)
     act(() => animate?.(performance.now() + 8))
 
     fireEvent.pointerUp(token, {
@@ -193,7 +211,7 @@ describe('SkillWorkbench', () => {
     act(() => animate?.(performance.now() + 16))
     act(() => animate?.(performance.now() + 32))
     fireEvent.click(screen.getByRole('button', { name: 'Stick skills' }))
-    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    expect(token.style.transform).toBe(homeTransform)
     act(() => animate?.(performance.now() + 40))
 
     fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
@@ -218,28 +236,32 @@ describe('SkillWorkbench', () => {
     })
     expect(release).toHaveBeenCalledWith(9)
     act(() => animate?.(performance.now() + 48))
-    expect(token.style.transform).not.toContain('translate3d(0px, 0px, 0)')
+    expect(token.style.transform).not.toBe(homeTransform)
   })
 
   it('offers keyboard nudging and Escape-to-home without hiding the fallback grid', () => {
     render(<SkillWorkbench logos={logos} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
     const token = screen.getByRole('button', { name: 'Python, Languages' })
+    const homeTransform = token.style.transform
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
+    const home = readTransform(token)
 
     fireEvent.keyDown(token, { key: 'ArrowRight' })
-    expect(token.style.transform).toContain('translate3d(12px, 0px, 0)')
+    expect(readTransform(token).x).toBeGreaterThan(home.x)
 
     fireEvent.keyDown(token, { key: 'ArrowLeft' })
-    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    const afterLeft = readTransform(token)
     fireEvent.keyDown(token, { key: 'ArrowUp' })
-    expect(token.style.transform).toContain('translate3d(0px, -12px, 0)')
+    expect(readTransform(token).y).toBeLessThan(afterLeft.y)
+    const afterUp = readTransform(token)
     fireEvent.keyDown(token, { key: 'ArrowDown' })
-    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    expect(readTransform(token).y).toBeGreaterThan(afterUp.y)
+    const afterArrows = token.style.transform
     fireEvent.keyDown(token, { key: 'Enter' })
-    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    expect(token.style.transform).toBe(afterArrows)
 
     fireEvent.keyDown(token, { key: 'Escape' })
-    expect(token.style.transform).toContain('translate3d(0px, 0px, 0)')
+    expect(token.style.transform).toBe(homeTransform)
 
     const fallback = screen.getByTestId('skill-workbench-fallback')
     expect(within(fallback).getAllByRole('listitem')).toHaveLength(logos.length)

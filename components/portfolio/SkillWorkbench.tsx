@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -12,86 +13,52 @@ import {
 } from 'react'
 
 import {
+  createSkillRigidBodyWorld,
+  type SkillRigidBodySnapshot,
+  type SkillRigidBodyWorld,
+} from '@/lib/skill-workbench-rigidbody'
+
+import {
   SkillLogoGrid,
   type SkillCategory,
   type SkillLogo,
 } from './SkillLogos'
-import {
-  constrainSkillBody,
-  resolveSkillCollisions,
-  type SkillArenaBody,
-} from '@/lib/skill-workbench-physics'
-
-interface TokenMotion extends SkillArenaBody {
-  dragging: boolean
-  lastPointerX: number
-  lastPointerY: number
-  lastPointerTime: number
-  pointerId: number | null
-  velocityX: number
-  velocityY: number
-  x: number
-  y: number
-}
-
-const EMPTY_BOUNDS = {
-  minX: Number.NEGATIVE_INFINITY,
-  maxX: Number.POSITIVE_INFINITY,
-  minY: Number.NEGATIVE_INFINITY,
-  maxY: Number.POSITIVE_INFINITY,
-}
 
 const FRAME_MS = 1000 / 60
-const GRAVITY = 0.54
-const AIR_DRAG = 0.986
 const KEYBOARD_NUDGE = 12
 const AUTO_DROP_DELAY_MS = 850
-const COLLISION_PASSES = 4
-const SETTLED_HORIZONTAL_SPEED = 0.08
-const SETTLED_VERTICAL_SPEED = 0.22
+const FALLBACK_ARENA_WIDTH = 1_280
+const FALLBACK_ARENA_HEIGHT = 520
+const FALLBACK_TOKEN_WIDTH = 150
+const FALLBACK_TOKEN_HEIGHT = 48
 
 type PhysicsMode = 'dropped' | 'stuck'
 
-function createMotion(): TokenMotion {
-  return {
-    bounds: EMPTY_BOUNDS,
-    dragging: false,
-    height: 0,
-    homeLeft: 0,
-    homeTop: 0,
-    lastPointerX: 0,
-    lastPointerY: 0,
-    lastPointerTime: 0,
-    pointerId: null,
-    velocityX: 0,
-    velocityY: 0,
-    width: 0,
-    x: 0,
-    y: 0,
-  }
+interface TokenOrigin {
+  readonly x: number
+  readonly y: number
 }
 
-function resetMotion(motion: TokenMotion) {
-  motion.dragging = false
-  motion.lastPointerX = 0
-  motion.lastPointerY = 0
-  motion.lastPointerTime = 0
-  motion.pointerId = null
-  motion.velocityX = 0
-  motion.velocityY = 0
-  motion.x = 0
-  motion.y = 0
+interface DragState {
+  angularVelocity: number
+  index: number
+  lastPointerTime: number
+  lastPointerX: number
+  lastPointerY: number
+  pointerId: number
+  velocityX: number
+  velocityY: number
 }
 
-function tokenAngle(index: number) {
-  return `${((index * 7) % 9 - 4) * 0.32}deg`
-}
+function tokenTransform(
+  snapshot: Pick<SkillRigidBodySnapshot, 'angle' | 'x' | 'y'>,
+  origin: TokenOrigin,
+) {
+  const x = Math.round((snapshot.x - origin.x) * 100) / 100
+  const y = Math.round((snapshot.y - origin.y) * 100) / 100
+  const angle = Math.round(snapshot.angle * 10_000) / 10_000
 
-function tokenTransform(motion: Pick<TokenMotion, 'x' | 'y'>) {
-  const x = Math.round(motion.x * 100) / 100
-  const y = Math.round(motion.y * 100) / 100
-
-  return `translate3d(${x}px, ${y}px, 0) rotate(var(--skill-angle))`
+  return `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad)`
 }
 
 function categoriesFrom(logos: readonly SkillLogo[]): readonly SkillCategory[] {
@@ -109,114 +76,111 @@ function categoriesFrom(logos: readonly SkillLogo[]): readonly SkillCategory[] {
   return [...categories.values()]
 }
 
+function createPageSeed() {
+  const values = new Uint32Array(1)
+  globalThis.crypto?.getRandomValues?.(values)
+
+  return values[0] || (Date.now() ^ Math.round(performance.now() * 1_000))
+}
+
 export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[] }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [draggingLabel, setDraggingLabel] = useState<string | null>(null)
+  const [isReady, setIsReady] = useState(false)
   const [physicsMode, setPhysicsMode] = useState<PhysicsMode>('stuck')
-  const arenaRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number | null>(null)
+  const arenaRef = useRef<HTMLDivElement>(null)
   const autoDropTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dragRef = useRef<DragState | null>(null)
   const itemRefs = useRef<Array<HTMLLIElement | null>>([])
   const lastFrameTimeRef = useRef(0)
+  const originsRef = useRef<TokenOrigin[]>([])
   const physicsModeRef = useRef<PhysicsMode>('stuck')
+  const seedRef = useRef<number | null>(null)
   const tokenRefs = useRef<Array<HTMLButtonElement | null>>([])
-  const motionsRef = useRef<TokenMotion[]>(logos.map(() => createMotion()))
+  const worldRef = useRef<SkillRigidBodyWorld | null>(null)
   const categories = useMemo(() => categoriesFrom(logos), [logos])
 
-  const applyTransform = useCallback((index: number) => {
-    const token = tokenRefs.current[index]
-    const motion = motionsRef.current[index]
+  const applySnapshots = useCallback(() => {
+    const snapshots = worldRef.current?.getSnapshots()
+    if (!snapshots) return
 
-    if (token && motion) token.style.transform = tokenTransform(motion)
+    snapshots.forEach((snapshot, index) => {
+      const token = tokenRefs.current[index]
+      const origin = originsRef.current[index]
+      if (token && origin) token.style.transform = tokenTransform(snapshot, origin)
+    })
   }, [])
 
-  const measureAll = useCallback(() => {
+  const initializeWorld = useCallback((mode: PhysicsMode) => {
     const arena = arenaRef.current
     if (!arena) return
 
     const arenaRect = arena.getBoundingClientRect()
-    tokenRefs.current.forEach((token, index) => {
-      const item = itemRefs.current[index]
-      const motion = motionsRef.current[index]
-      if (!item || !motion || !token) return
+    const arenaWidth = arenaRect.width || arena.clientWidth || FALLBACK_ARENA_WIDTH
+    const arenaHeight = arenaRect.height || arena.clientHeight || FALLBACK_ARENA_HEIGHT
+    const tokenSizes = tokenRefs.current.map((token) => {
+      const tokenRect = token?.getBoundingClientRect()
 
-      const itemRect = item.getBoundingClientRect()
-      const tokenRect = token.getBoundingClientRect()
-      const width = tokenRect.width || token.offsetWidth
-      const height = tokenRect.height || token.offsetHeight
-      const homeLeft = itemRect.left - arenaRect.left + (itemRect.width - width) / 2
-      const homeTop = itemRect.top - arenaRect.top + (itemRect.height - height) / 2
-
-      motion.width = width
-      motion.height = height
-      motion.homeLeft = homeLeft
-      motion.homeTop = homeTop
-      motion.bounds = {
-        minX: -homeLeft,
-        maxX: arenaRect.width - homeLeft - width,
-        minY: -homeTop,
-        maxY: arenaRect.height - homeTop - height,
+      return {
+        height: token?.offsetHeight || tokenRect?.height || FALLBACK_TOKEN_HEIGHT,
+        width: token?.offsetWidth || tokenRect?.width || FALLBACK_TOKEN_WIDTH,
       }
     })
-  }, [])
+
+    originsRef.current = itemRefs.current.map((item, index) => {
+      const itemRect = item?.getBoundingClientRect()
+      if (itemRect?.width || itemRect?.height) {
+        return {
+          x: itemRect.left - arenaRect.left + itemRect.width / 2,
+          y: itemRect.top - arenaRect.top + itemRect.height / 2,
+        }
+      }
+
+      const column = index % 7
+      const row = Math.floor(index / 7)
+
+      return {
+        x: (column + 0.5) * (arenaWidth / 7),
+        y: (row + 0.5) * (arenaHeight / 4),
+      }
+    })
+
+    worldRef.current?.destroy()
+    seedRef.current ??= createPageSeed()
+    worldRef.current = createSkillRigidBodyWorld({
+      arenaHeight,
+      arenaWidth,
+      seed: seedRef.current,
+      tokenSizes,
+    })
+    if (mode === 'dropped') worldRef.current.drop()
+    applySnapshots()
+    setIsReady(true)
+  }, [applySnapshots])
 
   const animate = useCallback((timestamp: number) => {
     animationFrameRef.current = null
-    if (physicsModeRef.current === 'stuck') return
+    const world = worldRef.current
+    if (!world || physicsModeRef.current === 'stuck') return
 
     const elapsed = lastFrameTimeRef.current
-      ? Math.min((timestamp - lastFrameTimeRef.current) / FRAME_MS, 2)
-      : 1
+      ? timestamp - lastFrameTimeRef.current
+      : FRAME_MS
     lastFrameTimeRef.current = timestamp
-    let hasMovingToken = false
+    world.step(elapsed)
+    applySnapshots()
 
-    motionsRef.current.forEach((motion) => {
-      if (motion.dragging) return
-
-      motion.velocityY += GRAVITY * elapsed
-      motion.velocityX *= Math.pow(AIR_DRAG, elapsed)
-      motion.velocityY *= Math.pow(AIR_DRAG, elapsed)
-      motion.x += motion.velocityX * elapsed
-      motion.y += motion.velocityY * elapsed
-      constrainSkillBody(motion)
-    })
-
-    for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
-      resolveSkillCollisions(motionsRef.current)
+    if (world.isMoving() || dragRef.current) {
+      animationFrameRef.current = requestAnimationFrame(animate)
     }
-
-    motionsRef.current.forEach((motion, index) => {
-      if (motion.dragging) return
-      constrainSkillBody(motion)
-      if (
-        Math.abs(motion.velocityX) < SETTLED_HORIZONTAL_SPEED
-        && Math.abs(motion.velocityY) < SETTLED_VERTICAL_SPEED
-      ) {
-        motion.velocityX = 0
-        motion.velocityY = 0
-      } else {
-        hasMovingToken = true
-      }
-
-      applyTransform(index)
-    })
-
-    if (hasMovingToken) animationFrameRef.current = requestAnimationFrame(animate)
-  }, [applyTransform])
+  }, [applySnapshots])
 
   const startAnimation = useCallback(() => {
     if (animationFrameRef.current !== null) return
     lastFrameTimeRef.current = 0
     animationFrameRef.current = requestAnimationFrame(animate)
   }, [animate])
-
-  const resetToken = useCallback((index: number) => {
-    const motion = motionsRef.current[index]
-    if (!motion) return
-
-    resetMotion(motion)
-    applyTransform(index)
-  }, [applyTransform])
 
   const cancelAutoDrop = useCallback(() => {
     if (autoDropTimerRef.current === null) return
@@ -231,27 +195,34 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
       animationFrameRef.current = null
     }
 
-    motionsRef.current.forEach((_, index) => resetToken(index))
+    dragRef.current = null
+    worldRef.current?.stick()
+    applySnapshots()
     physicsModeRef.current = 'stuck'
     setPhysicsMode('stuck')
     setDraggingLabel(null)
-  }, [cancelAutoDrop, resetToken])
+  }, [applySnapshots, cancelAutoDrop])
 
   const dropSkills = useCallback(() => {
     cancelAutoDrop()
-    measureAll()
-    motionsRef.current.forEach((motion, index) => {
-      if (motion.dragging) return
-      motion.velocityX = (((index * 17) % 11) - 5) * 0.075
-      motion.velocityY = 0
-    })
+    if (!worldRef.current) initializeWorld('stuck')
+    worldRef.current?.drop()
     physicsModeRef.current = 'dropped'
     setPhysicsMode('dropped')
+    applySnapshots()
     startAnimation()
-  }, [cancelAutoDrop, measureAll, startAnimation])
+  }, [
+    applySnapshots,
+    cancelAutoDrop,
+    initializeWorld,
+    startAnimation,
+  ])
+
+  useLayoutEffect(() => {
+    initializeWorld('stuck')
+  }, [initializeWorld])
 
   useEffect(() => {
-    measureAll()
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches
@@ -261,14 +232,17 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     }
 
     return cancelAutoDrop
-  }, [cancelAutoDrop, dropSkills, measureAll])
+  }, [cancelAutoDrop, dropSkills])
 
   useEffect(() => {
     const handleResize = () => {
-      const shouldDrop = physicsModeRef.current === 'dropped'
-      stickSkills()
-      measureAll()
-      if (shouldDrop) dropSkills()
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame?.(animationFrameRef.current)
+        animationFrameRef.current = null
+      }
+      dragRef.current = null
+      initializeWorld(physicsModeRef.current)
+      if (physicsModeRef.current === 'dropped') startAnimation()
     }
     window.addEventListener('resize', handleResize)
 
@@ -278,69 +252,83 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
       if (animationFrameRef.current !== null) {
         window.cancelAnimationFrame?.(animationFrameRef.current)
       }
+      worldRef.current?.destroy()
+      worldRef.current = null
     }
-  }, [cancelAutoDrop, dropSkills, measureAll, stickSkills])
+  }, [
+    cancelAutoDrop,
+    initializeWorld,
+    startAnimation,
+  ])
 
   function handlePointerDown(index: number, event: PointerEvent<HTMLButtonElement>) {
     if (event.pointerType === 'mouse' && event.button !== 0) return
     if (physicsModeRef.current === 'stuck') return
 
-    const motion = motionsRef.current[index]
-    if (!motion) return
+    const snapshot = worldRef.current?.getSnapshots()[index]
+    if (!snapshot) return
 
-    measureAll()
-    motion.dragging = true
-    motion.pointerId = event.pointerId
-    motion.lastPointerX = event.clientX
-    motion.lastPointerY = event.clientY
-    motion.lastPointerTime = event.timeStamp
-    motion.velocityX = 0
-    motion.velocityY = 0
+    worldRef.current?.beginDrag(index)
+    dragRef.current = {
+      angularVelocity: 0,
+      index,
+      lastPointerX: event.clientX,
+      lastPointerY: event.clientY,
+      lastPointerTime: event.timeStamp,
+      pointerId: event.pointerId,
+      velocityX: 0,
+      velocityY: 0,
+    }
     event.currentTarget.setPointerCapture?.(event.pointerId)
     setDraggingLabel(logos[index].label)
+    startAnimation()
   }
 
   function handlePointerMove(index: number, event: PointerEvent<HTMLButtonElement>) {
-    const motion = motionsRef.current[index]
-    if (!motion?.dragging || motion.pointerId !== event.pointerId) return
+    const drag = dragRef.current
+    if (!drag || drag.index !== index || drag.pointerId !== event.pointerId) return
 
-    const deltaX = event.clientX - motion.lastPointerX
-    const deltaY = event.clientY - motion.lastPointerY
-    const elapsed = Math.max(event.timeStamp - motion.lastPointerTime, 8)
-    motion.x += deltaX
-    motion.y += deltaY
-    motion.velocityX = (deltaX / elapsed) * FRAME_MS
-    motion.velocityY = (deltaY / elapsed) * FRAME_MS
-    motion.lastPointerX = event.clientX
-    motion.lastPointerY = event.clientY
-    motion.lastPointerTime = event.timeStamp
-    constrainSkillBody(motion)
-    for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
-      resolveSkillCollisions(motionsRef.current)
-    }
-    applyTransform(index)
-    motionsRef.current.forEach((candidate, candidateIndex) => {
-      if (candidateIndex === index) return
-      constrainSkillBody(candidate)
-      applyTransform(candidateIndex)
-    })
+    const snapshot = worldRef.current?.getSnapshots()[index]
+    if (!snapshot) return
+
+    const deltaX = event.clientX - drag.lastPointerX
+    const deltaY = event.clientY - drag.lastPointerY
+    const elapsed = Math.max(event.timeStamp - drag.lastPointerTime, 8)
+    drag.velocityX = (deltaX / elapsed) * FRAME_MS
+    drag.velocityY = (deltaY / elapsed) * FRAME_MS
+    drag.angularVelocity = (deltaX / elapsed) * 0.018
+    drag.lastPointerX = event.clientX
+    drag.lastPointerY = event.clientY
+    drag.lastPointerTime = event.timeStamp
+    worldRef.current?.dragBody(
+      index,
+      snapshot.x + deltaX,
+      snapshot.y + deltaY,
+      snapshot.angle + deltaX * 0.004,
+    )
+    worldRef.current?.step(FRAME_MS)
+    applySnapshots()
     startAnimation()
   }
 
   function handlePointerEnd(index: number, event: PointerEvent<HTMLButtonElement>) {
-    const motion = motionsRef.current[index]
-    if (!motion?.dragging || motion.pointerId !== event.pointerId) return
+    const drag = dragRef.current
+    if (!drag || drag.index !== index || drag.pointerId !== event.pointerId) return
 
-    motion.dragging = false
-    motion.pointerId = null
+    worldRef.current?.endDrag(
+      index,
+      drag.velocityX,
+      drag.velocityY,
+      drag.angularVelocity,
+    )
+    dragRef.current = null
     event.currentTarget.releasePointerCapture?.(event.pointerId)
     setDraggingLabel(null)
     startAnimation()
   }
 
   function handleKeyDown(index: number, event: KeyboardEvent<HTMLButtonElement>) {
-    const motion = motionsRef.current[index]
-    if (!motion || physicsModeRef.current === 'stuck') return
+    if (!worldRef.current || physicsModeRef.current === 'stuck') return
 
     const nudges: Readonly<Record<string, readonly [number, number]>> = {
       ArrowDown: [0, KEYBOARD_NUDGE],
@@ -351,14 +339,8 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
 
     if (event.key === 'Escape') {
       event.preventDefault()
-      resetToken(index)
-      for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
-        resolveSkillCollisions(motionsRef.current)
-      }
-      motionsRef.current.forEach((candidate, candidateIndex) => {
-        constrainSkillBody(candidate)
-        applyTransform(candidateIndex)
-      })
+      worldRef.current.resetBody(index)
+      applySnapshots()
       startAnimation()
       return
     }
@@ -367,20 +349,9 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     if (!nudge) return
 
     event.preventDefault()
-    motion.x += nudge[0]
-    motion.y += nudge[1]
-    motion.velocityX = 0
-    motion.velocityY = 0
-    constrainSkillBody(motion)
-    for (let pass = 0; pass < COLLISION_PASSES; pass += 1) {
-      resolveSkillCollisions(motionsRef.current)
-    }
-    applyTransform(index)
-    motionsRef.current.forEach((candidate, candidateIndex) => {
-      if (candidateIndex === index) return
-      constrainSkillBody(candidate)
-      applyTransform(candidateIndex)
-    })
+    worldRef.current.nudge(index, nudge[0], nudge[1])
+    worldRef.current.step(FRAME_MS)
+    applySnapshots()
     startAnimation()
   }
 
@@ -390,6 +361,7 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
       data-active-category={activeCategory ?? undefined}
       data-dragging={draggingLabel ?? undefined}
       data-physics={physicsMode}
+      data-ready={isReady || undefined}
       aria-label="Interactive skill workbench"
       role="region"
     >
@@ -429,7 +401,6 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
                 key={logo.label}
                 style={{
                   '--skill-category-color': logo.categoryColor,
-                  '--skill-angle': tokenAngle(index),
                 } as CSSProperties}
               >
                 <button
@@ -446,7 +417,9 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
                   onPointerDown={(event) => handlePointerDown(index, event)}
                   onPointerMove={(event) => handlePointerMove(index, event)}
                   onPointerUp={(event) => handlePointerEnd(index, event)}
-                  style={{ transform: tokenTransform(motionsRef.current[index]) }}
+                  style={{
+                    transform: 'translate3d(0px, 0px, 0) rotate(0rad)',
+                  }}
                 >
                   <svg
                     className="skill-workbench__glyph"
@@ -465,7 +438,7 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
           <p className="skill-workbench__hint" aria-hidden="true">
             {physicsMode === 'stuck'
               ? 'Drop to release gravity'
-              : 'Collision on · drag · toss · arrow keys'}
+              : 'Rigid bodies · drag · toss · arrow keys'}
           </p>
         </div>
       </div>
