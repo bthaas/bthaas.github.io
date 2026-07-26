@@ -4,15 +4,16 @@ import { siteContent } from '../../content/site-content'
 
 function observeApplicationErrors(page: Page) {
   const errors: string[] = []
+  const isApplicationURL = (url: string) => url.startsWith('http://127.0.0.1:')
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
   page.on('console', (message) => {
     const source = message.location().url
-    if (message.type() === 'error' && (!source || source.startsWith('http://127.0.0.1:4173'))) {
+    if (message.type() === 'error' && (!source || isApplicationURL(source))) {
       errors.push(`console: ${message.text()}`)
     }
   })
   page.on('response', (response) => {
-    if (response.url().startsWith('http://127.0.0.1:4173') && response.status() >= 400) {
+    if (isApplicationURL(response.url()) && response.status() >= 400) {
       errors.push(`response ${response.status()}: ${response.url()}`)
     }
   })

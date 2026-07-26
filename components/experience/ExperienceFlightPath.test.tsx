@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-import { siteContent } from '@/content/site-content'
+import { siteContent, type ExperienceEntry } from '@/content/site-content'
 
 import { ExperienceFlightPath } from './ExperienceFlightPath'
 
@@ -103,5 +103,24 @@ describe('ExperienceFlightPath', () => {
 
     expect(secondDisclosure).not.toHaveAttribute('open')
     expect(screen.getByText(second.summary)).not.toBeVisible()
+  })
+
+  it('keeps a readable stop when optional logo and location data are absent', () => {
+    const entry: ExperienceEntry = {
+      ...siteContent.experience[0],
+      id: 'minimal-role',
+      location: null,
+      logo: null,
+    }
+
+    const { container } = render(
+      <ExperienceFlightPath education={[]} experience={[entry]} />,
+    )
+
+    const stop = document.getElementById('experience-stop-minimal-role')
+    expect(stop).not.toBeNull()
+    expect(within(stop!).getByText(entry.organization)).toBeVisible()
+    expect(within(stop!).getByText('—')).toBeVisible()
+    expect(container.querySelector('.experience-timeline__node-mark')).toBeInTheDocument()
   })
 })

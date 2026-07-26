@@ -46,6 +46,12 @@ describe('Experience timeline', () => {
       display: 'grid',
       'grid-template-columns': '4rem minmax(16rem, 1.25fr) minmax(13rem, 0.8fr) minmax(10rem, 0.65fr) auto',
     })
+    expect(declarationsFor(
+      experienceStyles,
+      '.experience-timeline__stop details:not([open]) > .experience-timeline__details',
+    )).toMatchObject({
+      display: 'none',
+    })
   })
 
   it('uses an intentional stacked route at 390px', () => {

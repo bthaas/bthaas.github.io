@@ -367,6 +367,10 @@
   grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
 }
 
+.experience-timeline__stop details:not([open]) > .experience-timeline__details {
+  display: none;
+}
+
 .experience-timeline__summary {
   padding-top: 1.5rem;
 }

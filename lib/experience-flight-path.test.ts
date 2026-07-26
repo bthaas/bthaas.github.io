@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { siteContent } from '@/content/site-content'
+import { siteContent, type ExperienceEntry } from '@/content/site-content'
 
 import {
   buildExperienceTimeline,
@@ -45,5 +45,28 @@ describe('experience flight-path chronology', () => {
     expect(refraction.end).toBeCloseTo(2 / 11)
     expect(education.start).toBe(1)
     expect(education.end).toBe(1)
+  })
+
+  it('returns an empty chronology when no roles or education are supplied', () => {
+    expect(buildExperienceTimeline([], [])).toEqual({
+      endLabel: '',
+      items: [],
+      markers: [],
+      startLabel: '',
+    })
+  })
+
+  it('rejects unsupported role periods and month labels', () => {
+    const entry: ExperienceEntry = {
+      ...siteContent.experience[0],
+      period: 'Current',
+    }
+    expect(() => buildExperienceTimeline([entry], [])).toThrow(
+      'Unsupported experience period: "Current"',
+    )
+
+    expect(() => buildExperienceTimeline([
+      { ...entry, period: 'Foo 2025 – May 2026' },
+    ], [])).toThrow('Unsupported experience date: "Foo 2025"')
   })
 })
