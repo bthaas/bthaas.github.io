@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { setupDossiers } from './experience'
 import type { AtlasEngine } from './engine'
 import { setupMagnetic } from './magnetic'
 import { setupPrintReveals, setupVelocityPlates } from './plates'
@@ -195,41 +194,4 @@ describe('Phase C signature motion', () => {
     cursorCleanup()
   })
 
-  it('opens dossiers with Flip and reveals SVG rules plus odometer indices', () => {
-    document.body.innerHTML = `
-      <ol class="flight-log"><li class="flight-entry">
-        <p class="flight-index">01</p>
-        <svg><line data-flight-rule x1="0" x2="100"></line></svg>
-        <div data-dossier data-state="open" class="flight-dossier">
-          <button class="flight-dossier__toggle" aria-controls="notes" aria-expanded="true">Notes</button>
-          <div class="flight-dossier__panel" id="notes"><div class="flight-dossier__inner">Detail</div></div>
-        </div>
-      </li></ol>
-    `
-    const harness = createSignatureHarness()
-    const cleanup = setupDossiers(document, harness.engine)
-    const toggle = document.querySelector<HTMLButtonElement>('.flight-dossier__toggle')!
-
-    expect(toggle).toHaveAttribute('aria-expanded', 'false')
-    expect(harness.splitCreate).toHaveBeenCalledWith(
-      document.querySelector('.flight-index'),
-      expect.objectContaining({ aria: 'none', type: 'chars' }),
-    )
-    expect(harness.triggers).toHaveLength(2)
-    ;(harness.triggers[0].vars.onEnter as () => void)()
-    expect(harness.fromTo).toHaveBeenCalledWith(
-      document.querySelector('[data-flight-rule]'),
-      { drawSVG: '0%' },
-      expect.objectContaining({ drawSVG: '100%' }),
-    )
-    toggle.click()
-    expect(harness.flipGetState).toHaveBeenCalled()
-    expect(harness.flipFrom).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ duration: 0.48, ease: 'power3.inOut' }),
-    )
-    expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    cleanup()
-    expect(harness.flipAnimation.kill).toHaveBeenCalled()
-  })
 })

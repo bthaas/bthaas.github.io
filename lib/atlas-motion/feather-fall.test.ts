@@ -10,7 +10,7 @@ import {
 } from './feather-fall'
 
 describe('feather-fall choreography', () => {
-  it('builds from a sparse hero to the flight-log fall, then settles at contact', () => {
+  it('builds from a sparse hero to the career-path fall, then settles at contact', () => {
     const frame = createFeatherFrame()
 
     writeFeatherFrame(0.04, 0, frame)

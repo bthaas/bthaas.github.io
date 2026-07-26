@@ -2,7 +2,6 @@ import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
 import { setupCursor } from './cursor'
 import { initializeAtlasEngine, type AtlasEngine } from './engine'
-import { setupDossiers, setupExperienceChapter } from './experience'
 import { setupMetricCountUps } from './hero'
 import { setupHorizonLoader } from './horizon-loader'
 import { setupLocalTime } from './local-time'
@@ -21,9 +20,7 @@ interface AtlasRuntimeOptions {
   readonly matchMedia?: (query: string) => Pick<MediaQueryList, 'matches'>
   readonly prepareContact?: (document: Document, window: Window) => () => void
   readonly prepareCursor?: (document: Document) => () => void
-  readonly prepareDossiers?: (document: Document) => () => void
   readonly prepareHorizon?: (document: Document) => () => void
-  readonly prepareExperience?: (document: Document, window: Window) => () => void
   readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareMagnetic?: (document: Document) => () => void
   readonly prepareLocalTime?: (document: Document) => () => void
@@ -45,9 +42,7 @@ export function initializeAtlas({
   matchMedia = (query) => window.matchMedia(query),
   prepareContact = setupContactFinale,
   prepareCursor = setupCursor,
-  prepareDossiers = setupDossiers,
   prepareHorizon = setupHorizonLoader,
-  prepareExperience = setupExperienceChapter,
   prepareMetrics = setupMetricCountUps,
   prepareMagnetic = setupMagnetic,
   prepareLocalTime = setupLocalTime,
@@ -78,8 +73,6 @@ export function initializeAtlas({
   const cleanupLocalTime = prepareLocalTime(runtimeDocument)
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
   const cleanupCursor = prepareCursor(runtimeDocument)
-  const cleanupDossiers = prepareDossiers(runtimeDocument)
-  const cleanupExperience = prepareExperience(runtimeDocument, runtimeWindow)
   const cleanupHorizon = prepareHorizon(runtimeDocument)
   const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupMagnetic = prepareMagnetic(runtimeDocument)
@@ -133,8 +126,6 @@ export function initializeAtlas({
     unsubscribe()
     cleanupContact()
     cleanupCursor()
-    cleanupDossiers()
-    cleanupExperience()
     cleanupHorizon()
     cleanupMetrics()
     cleanupMagnetic()

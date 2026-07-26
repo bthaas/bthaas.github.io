@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getChapterDissolveFrame,
-  getFlightLogTilt,
   getProjectAnchorScrollY,
   getProjectFlightFrame,
   getProjectPanelProgress,
@@ -57,23 +56,11 @@ describe('project flight path choreography', () => {
   })
 })
 
-describe('print dissolve and dossier tilt choreography', () => {
+describe('print dissolve choreography', () => {
   it('grows a reversible dot screen without a rectangular wipe edge', () => {
     expect(getChapterDissolveFrame(0, 1)).toEqual({ dotRadius: 0, offsetX: 12 })
     expect(getChapterDissolveFrame(0.5, -1)).toEqual({ dotRadius: 4.5, offsetX: -6 })
     expect(getChapterDissolveFrame(1, 1)).toEqual({ dotRadius: 9, offsetX: 0 })
     expect(getChapterDissolveFrame(4, 1)).toEqual({ dotRadius: 9, offsetX: 0 })
-  })
-
-  it('caps the held-dossier response at six degrees on either axis', () => {
-    expect(getFlightLogTilt({ x: 0, y: 0 })).toEqual({ rotateX: -0, rotateY: 0 })
-    expect(getFlightLogTilt({ x: 0.5, y: -0.5 })).toEqual({
-      rotateX: 3,
-      rotateY: 3,
-    })
-    expect(getFlightLogTilt({ x: 4, y: -4 })).toEqual({
-      rotateX: 6,
-      rotateY: 6,
-    })
   })
 })

@@ -9,7 +9,6 @@ main {
 }
 
 .portfolio-gateway,
-.experience-section,
 .projects-section,
 .craft-section,
 .contact-section {
@@ -26,56 +25,18 @@ main {
   color: var(--ink);
 }
 
+.experience-section {
+  background-color: var(--dusk-deep);
+  background-image: none;
+  color: var(--paper);
+}
+
 main > section + section {
   border-top: 1px solid var(--page-rule);
 }
 
-.experience-board {
-  border-bottom-color: var(--page-rule);
-}
-
-.experience-section::before {
-  content: none;
-}
-
-.experience-intro .section-heading h2 {
-  color: var(--ink);
-}
-
-.experience-kicker,
-.flight-role,
-.flight-period,
-.flight-summary,
-.flight-highlights,
-.flight-technologies li {
-  color: var(--muted);
-}
-
-.experience-plate--inset {
-  border-color: var(--page-rule);
-}
-
-.experience-panel,
 .contact-panel {
   border-inline-color: transparent;
-}
-
-.flight-log {
-  border-top-color: var(--page-rule);
-}
-
-.flight-rule line {
-  stroke: var(--page-rule);
-}
-
-.flight-index,
-.flight-dossier__toggle,
-.flight-highlights li::marker {
-  color: var(--page-accent);
-}
-
-.flight-technologies li {
-  border-color: var(--page-rule);
 }
 
 .craft-section {
@@ -93,14 +54,12 @@ main > section + section {
 
 @media (max-width: 720px) {
   .portfolio-gateway,
-  .experience-section,
   .projects-section,
   .craft-section,
   .contact-section {
     --page-flow-line-x: 14px;
   }
 
-  .experience-panel,
   .contact-panel {
     border-top-color: var(--page-rule);
   }

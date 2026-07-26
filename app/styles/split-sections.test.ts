@@ -27,32 +27,37 @@ function declarationsFor(
   return declarations
 }
 
-describe('Experience split board', () => {
-  it('gives artwork and copy equal desktop columns with an inset plate', () => {
+describe('Experience flight path', () => {
+  it('keeps the experience chapters readable by default and horizontal only when enhanced', () => {
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
 
-    expect(declarationsFor(experienceStyles, '.experience-board')).toMatchObject({
+    expect(declarationsFor(experienceStyles, '.experience-flight__chapters')).toMatchObject({
       display: 'grid',
-      'grid-template-columns': 'repeat(2, minmax(0, 1fr))',
+      gap: '1rem',
     })
-    expect(declarationsFor(experienceStyles, '.experience-plate--inset')).toMatchObject({
-      margin: 'clamp(1rem, 1.5vw, 1.75rem)',
-      'border-radius': 'clamp(1rem, 1.8vw, 1.6rem)',
+    expect(declarationsFor(
+      experienceStyles,
+      '[data-experience-flight-enhanced] .experience-flight__chapters',
+      '(min-width: 960px)',
+    )).toMatchObject({
+      display: 'flex',
+      width: 'max-content',
     })
   })
 
-  it('stacks the image above its copy on narrow screens', () => {
+  it('keeps experience in normal document flow on narrow screens', () => {
     const mediaQuery = '(max-width: 720px)'
     const experienceStyles = readFileSync(
       resolve(process.cwd(), 'app/styles/experience.css'),
       'utf8',
     )
 
-    expect(declarationsFor(experienceStyles, '.experience-board', mediaQuery)).toMatchObject({
-      'grid-template-columns': '1fr',
+    expect(declarationsFor(experienceStyles, '.experience-flight__viewport')).toMatchObject({
+      position: 'relative',
+      width: 'var(--shell)',
     })
   })
 })
