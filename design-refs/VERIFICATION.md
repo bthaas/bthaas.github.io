@@ -518,6 +518,35 @@ The mobile LCP is below the 2.5-second acceptance target, and both Lighthouse pe
   reproduced the sun test at approximately 4.98 seconds. No application-origin
   console or route errors occurred in the passing journeys.
 
+### 2026-07-26 solid ground shadow
+
+- The supplied 2014×1302 production capture is retained as
+  `frames/carousel-active-reflector-regression.png`. The final direction removes
+  the mirrored lower surface and replaces it with a fitted black oval.
+- The 48-facet upper CSS drum remains the sole carousel artwork surface. Its
+  approved dimensions, typography, four-category sequence, drag behavior,
+  keyboard controls, and standalone route destinations are unchanged.
+- One filled `#0a0b08` CSS ellipse now grounds the drum. Its width remains
+  inside the upper artwork, with restrained opacity and a soft edge; the same
+  shape is present on desktop, mobile, hover, and reduced-motion states. At
+  1280×720 it measures 528×37.6 px beneath a 586.3 px drum (90.0% width); at
+  390×844 it measures 296.4×27.3 px.
+- Both mirrored implementations remain removed: no reflected CSS facet ring
+  exists and the gateway never mounts its clipped WebGL canvas. The production
+  JavaScript does not contain or preload the gateway GLB path.
+- `site-screenshots/carousel-ground-shadow.png` captures the hovered state at
+  1007×651. `carousel-ground-shadow-comparison.png` and
+  `carousel-ground-shadow-states.png` document the fitted oval across
+  Experience, Projects, Skills, Contact, and the full-cycle return.
+- Component and production-browser regressions assert exactly one ground
+  shadow, zero reflection layers, and zero gateway canvases before interaction,
+  after hover, and under reduced motion while preserving the upper dimensions.
+- Final verification passes 244/244 assertions across 59 files with 90.49%
+  statements, 81.59% branches, 83.97% functions, and 93.75% lines. TypeScript,
+  the 12-route production build, deployment preparation, `git diff --check`,
+  the two focused shadow-removal journeys, and the complete Chromium portfolio
+  journey all pass without application-origin console errors.
+
 ---
 
 # Project spiral verification

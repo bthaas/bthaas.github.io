@@ -71,7 +71,7 @@ test('keeps the gateway name fitted and individually legible across responsive v
   }
 })
 
-test('keeps the upper gateway surface unchanged when interaction activates WebGL', async ({
+test('renders one fitted ground shadow and no reflection before or after interaction', async ({
   browserName,
   isMobile,
   page,
@@ -88,26 +88,24 @@ test('keeps the upper gateway surface unchanged when interaction activates WebGL
 
   const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
   const fallback = gateway.locator('.portfolio-gateway__fallback')
-  const reflection = gateway.locator('.portfolio-gateway__fallback-reflection')
   await gateway.scrollIntoViewIfNeeded()
   await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
   await expect(page.locator('html')).not.toHaveAttribute('data-atlas-webgl-activated')
   await expect(fallback).toHaveCSS('opacity', '1')
-  await expect(reflection).toHaveCSS('opacity', '1')
+  await expect(gateway.locator('.portfolio-gateway__fallback-reflection')).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway__canvas')).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway__ground-shadow')).toHaveCount(1)
 
   await page.mouse.move(100, 100)
   await expect(page.locator('html')).toHaveAttribute('data-atlas-webgl-activated', '')
-  await expect(gateway).toHaveAttribute('data-canvas-ready', '', { timeout: 10_000 })
   await page.waitForTimeout(500)
   await expect(fallback).toHaveCSS('opacity', '1')
-  await expect(reflection).toHaveCSS('opacity', '0')
-  await expect(gateway.locator('.portfolio-gateway__canvas')).toHaveCSS(
-    'clip-path',
-    'inset(63% 0px 0px)',
-  )
+  await expect(gateway.locator('.portfolio-gateway__fallback-reflection')).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway__canvas')).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway__ground-shadow')).toHaveCount(1)
 })
 
-test('matches the reference drum size, paper seams, and restrained reflection', async ({
+test('matches the reference drum with a solid fitted shadow and no reflection', async ({
   browserName,
   isMobile,
   page,
@@ -150,12 +148,16 @@ test('matches the reference drum size, paper seams, and restrained reflection', 
     const upper = union(
       '.portfolio-gateway__fallback-ring .portfolio-gateway__fallback-slice',
     )
-    const reflection = union(
-      '.portfolio-gateway__fallback-reflection-ring .portfolio-gateway__fallback-slice',
-    )
+    const shadow = element
+      .querySelector<HTMLElement>('.portfolio-gateway__ground-shadow')
+      ?.getBoundingClientRect()
+    if (!shadow) throw new Error('Missing gateway ground shadow')
     return {
-      gap: reflection.top - upper.bottom,
-      reflectionHeight: reflection.height,
+      shadowColor: getComputedStyle(
+        element.querySelector<HTMLElement>('.portfolio-gateway__ground-shadow')!,
+      ).backgroundColor,
+      shadowHeight: shadow.height,
+      shadowWidth: shadow.width,
       upperHeight: upper.height,
       upperWidth: upper.width,
     }
@@ -165,10 +167,13 @@ test('matches the reference drum size, paper seams, and restrained reflection', 
   expect(proportions.upperWidth).toBeLessThanOrEqual(620)
   expect(proportions.upperHeight).toBeGreaterThanOrEqual(305)
   expect(proportions.upperHeight).toBeLessThanOrEqual(350)
-  expect(proportions.gap).toBeGreaterThanOrEqual(8)
-  expect(proportions.gap).toBeLessThanOrEqual(16)
-  expect(proportions.reflectionHeight).toBeGreaterThanOrEqual(90)
-  expect(proportions.reflectionHeight).toBeLessThanOrEqual(120)
+  expect(proportions.shadowWidth / proportions.upperWidth).toBeGreaterThanOrEqual(0.84)
+  expect(proportions.shadowWidth / proportions.upperWidth).toBeLessThanOrEqual(0.94)
+  expect(proportions.shadowHeight).toBeGreaterThanOrEqual(30)
+  expect(proportions.shadowHeight).toBeLessThanOrEqual(46)
+  expect(proportions.shadowColor).toMatch(/^rgba?\(10, 11, 8/)
+  await expect(gateway.locator('.portfolio-gateway__fallback-reflection')).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway__canvas')).toHaveCount(0)
 })
 
 test('opens every carousel category as its own routed screen', async ({
@@ -255,9 +260,10 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     gateway.locator(
       '.portfolio-gateway__fallback-reflection-ring > .portfolio-gateway__fallback-slice',
     ),
-  ).toHaveCount(48)
-  await expect(gateway).toHaveAttribute('data-canvas-ready', '', { timeout: 10_000 })
-  await expect(gateway.locator('.portfolio-gateway-canvas')).toHaveCount(1)
+  ).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway__fallback-reflection')).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway-canvas')).toHaveCount(0)
+  await expect(gateway.locator('.portfolio-gateway__ground-shadow')).toHaveCount(1)
   await expect(page.locator('#portfolio-gateway').getByText('BRETT HAAS')).toBeVisible()
   await expect(
     page.locator('#portfolio-gateway').getByText('Engineer · Researcher · Builder', { exact: true }),

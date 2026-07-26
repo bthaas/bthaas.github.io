@@ -1,14 +1,8 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import { Component, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
-import {
-  WEBGL_ACTIVATED_ATTRIBUTE,
-  WEBGL_ACTIVATION_EVENT,
-} from '@/components/motion/WebGLActivationGate'
-import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
 import {
   GATEWAY_CATEGORIES,
   GATEWAY_CYLINDER_SEGMENTS,
@@ -17,15 +11,6 @@ import {
   getGatewayStepDeltaFromDrag,
   getWrappedGatewayIndex,
 } from '@/lib/portfolio-gateway'
-
-const PortfolioGatewayScene = dynamic(
-  () => import('../scenes/AtlasWebGLScenes').then((module) => module.PortfolioGatewayScene),
-  { ssr: false },
-)
-
-interface GatewayBoundaryState {
-  readonly failed: boolean
-}
 
 interface GatewayDragState {
   deltaX: number
@@ -54,21 +39,7 @@ function GatewayCylinderSlices() {
   })
 }
 
-class GatewayBoundary extends Component<React.PropsWithChildren, GatewayBoundaryState> {
-  state: GatewayBoundaryState = { failed: false }
-
-  static getDerivedStateFromError(): GatewayBoundaryState {
-    return { failed: true }
-  }
-
-  render() {
-    return this.state.failed ? null : this.props.children
-  }
-}
-
 export function PortfolioGateway() {
-  const rootRef = useRef<HTMLElement>(null)
-  const pointerRef = useRef({ x: 0, y: 0 })
   const dragRef = useRef<GatewayDragState>({
     deltaX: 0,
     pointerId: null,
@@ -78,64 +49,12 @@ export function PortfolioGateway() {
   const [step, setStep] = useState(0)
   const [dragRotation, setDragRotation] = useState(0)
   const [dragging, setDragging] = useState(false)
-  const [canvasReady, setCanvasReady] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const [isConstrained, setIsConstrained] = useState(false)
-  const [isActive, setIsActive] = useState(false)
-  const [showStats, setShowStats] = useState(false)
   const activeIndex = getWrappedGatewayIndex(step)
   const activeCategory = GATEWAY_CATEGORIES[activeIndex]
   const carouselRotation = getGatewayRotation(step) + dragRotation
-  const handleReady = useCallback(() => setCanvasReady(true), [])
-
-  useEffect(() => {
-    const root = rootRef.current
-    if (!root || typeof IntersectionObserver === 'undefined') return
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsActive(entry.isIntersecting),
-      { rootMargin: '-10% 0px' },
-    )
-    observer.observe(root)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => {
-      const profile = detectWebGLProfile()
-      const eligible = shouldRenderWebGL({
-        reducedMotion: reducedMotion.matches,
-        webGLAvailable: profile.available,
-        width: window.innerWidth,
-      })
-      setIsConstrained(profile.constrained || window.innerWidth < 768)
-      setShowStats(new URLSearchParams(window.location.search).get('stats') === '1')
-      setMounted(
-        eligible
-        && isActive
-        && document.documentElement.hasAttribute(WEBGL_ACTIVATED_ATTRIBUTE),
-      )
-      if (!eligible || !isActive) setCanvasReady(false)
-    }
-
-    update()
-    reducedMotion.addEventListener('change', update)
-    window.addEventListener('resize', update, { passive: true })
-    window.addEventListener(WEBGL_ACTIVATION_EVENT, update)
-    return () => {
-      reducedMotion.removeEventListener('change', update)
-      window.removeEventListener('resize', update)
-      window.removeEventListener(WEBGL_ACTIVATION_EVENT, update)
-    }
-  }, [isActive])
 
   const selectPrevious = useCallback(() => setStep((current) => current - 1), [])
   const selectNext = useCallback(() => setStep((current) => current + 1), [])
-  const updatePointerPosition = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    pointerRef.current.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1
-    pointerRef.current.y = -(((event.clientY - bounds.top) / bounds.height) * 2 - 1)
-  }
   const finishDrag = (
     event: ReactPointerEvent<HTMLDivElement>,
     shouldSelectCategory: boolean,
@@ -151,8 +70,6 @@ export function PortfolioGateway() {
     drag.deltaX = 0
     setDragRotation(0)
     setDragging(false)
-    pointerRef.current.x = 0
-    pointerRef.current.y = 0
     try {
       event.currentTarget.releasePointerCapture(event.pointerId)
     } catch {
@@ -162,7 +79,6 @@ export function PortfolioGateway() {
 
   return (
     <section
-      ref={rootRef}
       className="portfolio-gateway"
       id="portfolio-gateway"
       aria-labelledby="portfolio-gateway-title"
@@ -188,7 +104,6 @@ export function PortfolioGateway() {
         aria-roledescription="carousel"
         aria-describedby="portfolio-gateway-instructions"
         data-active-index={activeIndex}
-        data-canvas-ready={canvasReady ? '' : undefined}
         data-dragging={dragging ? 'true' : 'false'}
         onKeyDown={(event) => {
           if (event.key === 'ArrowLeft') {
@@ -220,20 +135,15 @@ export function PortfolioGateway() {
             event.currentTarget.setPointerCapture?.(event.pointerId)
           }}
           onPointerMove={(event) => {
-            updatePointerPosition(event)
             const drag = dragRef.current
             if (drag.pointerId !== event.pointerId) return
             drag.deltaX = event.clientX - drag.startX
             setDragRotation(getGatewayDragRotation(drag.deltaX, drag.width))
           }}
-          onPointerLeave={() => {
-            if (dragRef.current.pointerId !== null) return
-            pointerRef.current.x = 0
-            pointerRef.current.y = 0
-          }}
           onPointerCancel={(event) => finishDrag(event, false)}
           onPointerUp={(event) => finishDrag(event, true)}
         >
+          <div className="portfolio-gateway__ground-shadow" aria-hidden="true" />
           <div className="portfolio-gateway__fallback" aria-hidden="true">
             <div
               className="portfolio-gateway__fallback-ring"
@@ -243,31 +153,7 @@ export function PortfolioGateway() {
             >
               <GatewayCylinderSlices />
             </div>
-            <div className="portfolio-gateway__fallback-reflection">
-              <div
-                className="portfolio-gateway__fallback-reflection-ring"
-                style={{
-                  transform: `translateZ(calc(-1 * var(--gateway-cylinder-radius))) rotateY(${carouselRotation}deg)`,
-                }}
-              >
-                <GatewayCylinderSlices />
-              </div>
-            </div>
           </div>
-          {mounted && (
-            <div className="portfolio-gateway__canvas" aria-hidden="true">
-              <GatewayBoundary>
-                <PortfolioGatewayScene
-                  activeIndex={activeIndex}
-                  isConstrained={isConstrained}
-                  pointerRef={pointerRef}
-                  rotationDegrees={carouselRotation}
-                  showStats={showStats}
-                  onReady={handleReady}
-                />
-              </GatewayBoundary>
-            </div>
-          )}
           <a
             className="portfolio-gateway__face-label"
             href={activeCategory.href}
