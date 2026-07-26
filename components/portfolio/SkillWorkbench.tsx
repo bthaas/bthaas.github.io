@@ -370,23 +370,24 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
           <p className="eyebrow">03 / Skills</p>
           <h2 id="craft-title">Pick up the stack.</h2>
         </div>
-        <div className="skill-workbench__meta">
-          <p>
-            <strong>{logos.length}</strong>
-            <span aria-live="polite">
-              {physicsMode === 'stuck' ? 'tools · held' : 'tools · colliding'}
-            </span>
-          </p>
-          <button
-            className="skill-workbench__mode"
-            type="button"
-            onClick={physicsMode === 'stuck' ? dropSkills : stickSkills}
-          >
-            <span aria-hidden="true">{physicsMode === 'stuck' ? '↓' : '⌁'}</span>
-            {physicsMode === 'stuck' ? 'Drop skills' : 'Stick skills'}
-          </button>
-        </div>
+        <button
+          className="skill-workbench__mode"
+          type="button"
+          onClick={physicsMode === 'stuck' ? dropSkills : stickSkills}
+        >
+          <span aria-hidden="true">{physicsMode === 'stuck' ? '↓' : '⌁'}</span>
+          {physicsMode === 'stuck' ? 'Drop skills' : 'Stick skills'}
+        </button>
       </div>
+      <p
+        className="skill-workbench__status"
+        role="status"
+        aria-live="polite"
+      >
+        {physicsMode === 'stuck'
+          ? 'Skills fixed in their starting positions.'
+          : 'Skills released; drag, toss, or use arrow keys.'}
+      </p>
 
       <div className="skill-workbench__interactive">
         <div className="skill-workbench__arena" ref={arenaRef}>
