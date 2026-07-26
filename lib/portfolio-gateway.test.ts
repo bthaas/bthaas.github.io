@@ -59,6 +59,9 @@ describe('portfolio gateway choreography', () => {
       expect(categorySegments).toHaveLength(12)
       expect(categorySegments[0].angle).toBeCloseTo(categoryIndex * 90 - 40.333, 3)
       expect(categorySegments.at(-1)?.angle).toBeCloseTo(categoryIndex * 90 + 40.333, 3)
+      expect(categorySegments.map((segment) => segment.segmentIndex)).toEqual(
+        Array.from({ length: GATEWAY_SEGMENTS_PER_CATEGORY }, (_, index) => index),
+      )
       expect(categorySegments[0].imagePosition).toBe(0)
       expect(categorySegments.at(-1)?.imagePosition).toBe(100)
     }

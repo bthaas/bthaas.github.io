@@ -894,6 +894,31 @@ portfolio's existing Experience, Projects, Skills, and Contact artwork.
   Keep the 48-facet upper CSS drum, approved typography, drag behavior, category
   sequence, and routes unchanged. Do not remount the clipped WebGL canvas.
 
+## July 26 surface-bound label correction
+
+- The category word currently sits on an independent flat layer above the
+  cylinder. During a partial drag the imagery rotates underneath while the word
+  remains camera-facing, breaking the physical connection between label and
+  artwork.
+- Experience, Projects, Skills, and Contact must instead be divided across the
+  same 12 CSS facets as their corresponding image. Every clipped word fragment
+  inherits its facet's `rotateY`/`translateZ` transform, so letterforms curve
+  around the cylinder and move continuously with the image during drag and snap.
+- Preserve the approved centered scale and paper-white color. For reliable
+  contrast across the pale sky and dark architecture in every scene, use
+  near-opaque ink with a fine charcoal edge and a tight, local relief shadow.
+  The edge must follow each clipped glyph fragment and stay substantially
+  smaller than the letterforms, so the word reads as printed into the image
+  rather than as a glowing overlay. Adjacent category words may appear only on
+  their own radial sectors; no active label is re-rendered above the rotating
+  ring.
+- Navigation remains semantic. A transparent centered anchor follows the active
+  destination and retains the existing accessible name and focus treatment,
+  while its visually hidden text is the only non-surface copy inside the visual.
+- The upper drum dimensions, facet count, crops, physical category gaps, solid
+  ground shadow, category controls, routes, and drag thresholds remain
+  unchanged on desktop, mobile, and reduced-motion paths.
+
 ## Implementation targets
 
 - Build the texture-free named-node GLB headlessly from a deterministic Blender
