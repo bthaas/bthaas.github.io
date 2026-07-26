@@ -665,25 +665,108 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
   } else {
     const tools = workbench.getByRole('list', { name: 'Movable technology tools' })
     await expect(tools.getByRole('button')).toHaveCount(28)
-    const typeScript = tools.getByRole('button', { name: 'TypeScript, Languages' })
-    const javaScript = tools.getByRole('button', { name: 'JavaScript, Languages' })
-    const react = tools.getByRole('button', { name: 'React, Frameworks' })
-    const readTranslation = (token: typeof typeScript) => token.evaluate((element) => {
+    await expect(workbench).toHaveAttribute('data-ready', 'true')
+    const readPose = (token: ReturnType<typeof tools.getByRole>) => token.evaluate((element) => {
       const match = element.style.transform.match(
-        /translate3d\((-?[\d.]+)px, (-?[\d.]+)px, 0\)/,
+        /translate3d\((-?[\d.]+)px, (-?[\d.]+)px, 0(?:px)?\) rotate\((-?[\d.]+)rad\)/,
       )
-      if (!match) throw new Error(`Missing token translation: ${element.style.transform}`)
-      return { x: Number(match[1]), y: Number(match[2]) }
+      if (!match) throw new Error(`Missing rigid-body transform: ${element.style.transform}`)
+      return {
+        angle: Number(match[3]),
+        transform: element.style.transform,
+        x: Number(match[1]),
+        y: Number(match[2]),
+      }
     })
+    const readTransforms = () => tools.getByRole('button').evaluateAll(
+      (tokens) => tokens.map((token) => (token as HTMLElement).style.transform),
+    )
+    const readRectangles = () => tools.getByRole('button').evaluateAll((tokens) => (
+      tokens.map((token) => {
+        const element = token as HTMLElement
+        const bounds = element.getBoundingClientRect()
+        const angleMatch = element.style.transform.match(/rotate\((-?[\d.]+)rad\)/)
+        if (!angleMatch) {
+          throw new Error(`Missing token rotation: ${element.style.transform}`)
+        }
+
+        return {
+          angle: Number(angleMatch[1]),
+          height: element.offsetHeight,
+          label: element.getAttribute('aria-label') ?? '',
+          x: bounds.left + bounds.width / 2,
+          y: bounds.top + bounds.height / 2,
+          width: element.offsetWidth,
+        }
+      })
+    ))
+    const expectScatteredNonOverlappingLayout = async () => {
+      const rectangles = await readRectangles()
+      const roundedX = new Set(rectangles.map(({ x }) => Math.round(x / 4)))
+      const roundedY = new Set(rectangles.map(({ y }) => Math.round(y / 4)))
+      expect(roundedX.size).toBeGreaterThan(14)
+      expect(roundedY.size).toBeGreaterThan(8)
+
+      for (let firstIndex = 0; firstIndex < rectangles.length; firstIndex += 1) {
+        const first = rectangles[firstIndex]
+        const firstAxes = [
+          { x: Math.cos(first.angle), y: Math.sin(first.angle) },
+          { x: -Math.sin(first.angle), y: Math.cos(first.angle) },
+        ]
+
+        for (
+          let secondIndex = firstIndex + 1;
+          secondIndex < rectangles.length;
+          secondIndex += 1
+        ) {
+          const second = rectangles[secondIndex]
+          const secondAxes = [
+            { x: Math.cos(second.angle), y: Math.sin(second.angle) },
+            { x: -Math.sin(second.angle), y: Math.cos(second.angle) },
+          ]
+          const delta = { x: second.x - first.x, y: second.y - first.y }
+          const overlaps = [...firstAxes, ...secondAxes].every((axis) => {
+            const distance = Math.abs(delta.x * axis.x + delta.y * axis.y)
+            const firstRadius = (
+              first.width / 2 * Math.abs(firstAxes[0].x * axis.x + firstAxes[0].y * axis.y)
+              + first.height / 2
+                * Math.abs(firstAxes[1].x * axis.x + firstAxes[1].y * axis.y)
+            )
+            const secondRadius = (
+              second.width / 2
+                * Math.abs(secondAxes[0].x * axis.x + secondAxes[0].y * axis.y)
+              + second.height / 2
+                * Math.abs(secondAxes[1].x * axis.x + secondAxes[1].y * axis.y)
+            )
+
+            return distance < firstRadius + secondRadius - 0.5
+          })
+
+          expect(
+            overlaps,
+            `${first.label} and ${second.label} overlap in the scattered home layout`,
+          ).toBe(false)
+        }
+      }
+    }
 
     await expect(workbench).toHaveAttribute('data-physics', 'stuck')
     await expect(workbench.getByRole('button', { name: 'Drop skills' })).toBeVisible()
+    const firstVisitHomes = await readTransforms()
+    expect(new Set(firstVisitHomes).size).toBeGreaterThan(14)
+    await expectScatteredNonOverlappingLayout()
+
+    await page.reload({ waitUntil: 'networkidle' })
+    await expect(workbench).toHaveAttribute('data-ready', 'true')
+    await expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    const homeTransforms = await readTransforms()
+    expect(homeTransforms).not.toEqual(firstVisitHomes)
+    await expectScatteredNonOverlappingLayout()
+
+    const typeScript = tools.getByRole('button', { name: 'TypeScript, Languages' })
+    const javaScript = tools.getByRole('button', { name: 'JavaScript, Languages' })
+    const react = tools.getByRole('button', { name: 'React, Frameworks' })
     await expect(typeScript).toHaveAttribute('aria-disabled', 'true')
-    expect(await tools.getByRole('button').evaluateAll((tokens) => tokens.every(
-      (token) => (token as HTMLElement).style.transform.includes(
-        'translate3d(0px, 0px, 0)',
-      ),
-    ))).toBe(true)
     const hydrationProbe = workbench.getByRole('button', {
       name: 'Frameworks',
       exact: true,
@@ -722,16 +805,44 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     await expect(workbench.getByRole('button', { name: 'Stick skills' })).toBeVisible()
     await expect(typeScript).toHaveAttribute('aria-disabled', 'false')
 
-    await typeScript.focus()
-    const beforeKeyboardNudge = await readTranslation(typeScript)
-    await typeScript.press('ArrowRight')
-    const afterKeyboardNudge = await readTranslation(typeScript)
-    expect(afterKeyboardNudge.x - beforeKeyboardNudge.x).toBeCloseTo(12, 2)
-    expect(afterKeyboardNudge.y).toBeCloseTo(beforeKeyboardNudge.y, 2)
-    await typeScript.press('Escape')
-    await expect(typeScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
+    await page.clock.runFor(2_200)
+    const fallenPoses = await tools.getByRole('button').evaluateAll((tokens) => (
+      tokens.map((token) => {
+        const angle = (token as HTMLElement).style.transform.match(
+          /rotate\((-?[\d.]+)rad\)/,
+        )?.[1]
+        if (!angle) throw new Error('Missing rigid-body angle after gravity')
+        return Number(angle)
+      })
+    ))
+    const homeAngles = homeTransforms.map((transform) => {
+      const angle = transform.match(/rotate\((-?[\d.]+)rad\)/)?.[1]
+      if (!angle) throw new Error(`Missing rigid-body angle at home: ${transform}`)
+      return Number(angle)
+    })
+    const angularChanges = fallenPoses.map((angle, index) => (
+      Math.abs(angle - homeAngles[index])
+    ))
+    expect(angularChanges.filter((change) => change > 0.05).length).toBeGreaterThan(6)
+    expect(Math.max(...angularChanges)).toBeGreaterThan(0.18)
 
-    const collisionTargetBefore = await readTranslation(javaScript)
+    await workbench.getByRole('button', { name: 'Stick skills' }).click()
+    await expect(workbench).toHaveAttribute('data-physics', 'stuck')
+    expect(await readTransforms()).toEqual(homeTransforms)
+    await workbench.getByRole('button', { name: 'Drop skills' }).click()
+    await expect(workbench).toHaveAttribute('data-physics', 'dropped')
+
+    await typeScript.focus()
+    const beforeKeyboardNudge = await readPose(typeScript)
+    await typeScript.press('ArrowRight')
+    const afterKeyboardNudge = await readPose(typeScript)
+    expect(afterKeyboardNudge.x - beforeKeyboardNudge.x).toBeGreaterThan(6)
+    expect(Math.abs(afterKeyboardNudge.x - beforeKeyboardNudge.x))
+      .toBeGreaterThan(Math.abs(afterKeyboardNudge.y - beforeKeyboardNudge.y))
+    await typeScript.press('Escape')
+    expect((await readPose(typeScript)).transform).toBe(homeTransforms[0])
+
+    const collisionTargetBefore = await readPose(javaScript)
     const [tokenBox, collisionTargetBox] = await Promise.all([
       typeScript.boundingBox(),
       javaScript.boundingBox(),
@@ -746,7 +857,7 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     await page.mouse.down()
     await expect(workbench).toHaveAttribute('data-dragging', 'TypeScript')
     await page.mouse.move(targetX, targetY, { steps: 5 })
-    const collisionTranslation = await readTranslation(javaScript)
+    const collisionTranslation = await readPose(javaScript)
     expect(Math.hypot(
       collisionTranslation.x - collisionTargetBefore.x,
       collisionTranslation.y - collisionTargetBefore.y,
@@ -755,8 +866,7 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     await expect(workbench).not.toHaveAttribute('data-dragging')
     await workbench.getByRole('button', { name: 'Stick skills' }).click()
     await expect(workbench).toHaveAttribute('data-physics', 'stuck')
-    await expect(typeScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
-    await expect(javaScript).toHaveAttribute('style', /translate3d\(0px, 0px, 0\)/)
+    expect(await readTransforms()).toEqual(homeTransforms)
     await workbench.getByRole('button', { name: 'Drop skills' }).click()
     await expect(workbench).toHaveAttribute('data-physics', 'dropped')
   }
