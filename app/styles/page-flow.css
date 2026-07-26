@@ -8,7 +8,6 @@ main {
   background: var(--page-surface);
 }
 
-.hero-section,
 .portfolio-gateway,
 .experience-section,
 .projects-section,
@@ -31,7 +30,6 @@ main > section + section {
   border-top: 1px solid var(--page-rule);
 }
 
-.hero-copy,
 .experience-board,
 .craft-board {
   border-bottom-color: var(--page-rule);
@@ -116,7 +114,6 @@ html.atlas-js .craft-marquee {
 }
 
 @media (max-width: 720px) {
-  .hero-section,
   .portfolio-gateway,
   .experience-section,
   .projects-section,

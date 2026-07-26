@@ -1,10 +1,8 @@
 import { atlasVisuals } from '@/content/editorial-visuals'
 import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { FlightTiltSurface } from '@/components/motion/FlightTiltSurface'
-import { HeroMasthead } from '@/components/motion/HeroMasthead'
 import { SunBadge } from '@/components/motion/SunBadge'
 import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
-import { HeroLiquidPlate } from '@/components/scenes/HeroLiquidPlate'
 import {
   siteContent,
   type ExperienceEntry,
@@ -168,39 +166,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
         data-portfolio-screen={screen}
       >
         {(!screen || screen === 'home') && (
-          <>
-            <section className="hero-section atlas-shell" id="hero" aria-labelledby="hero-name">
-          <div className="board-meta hero-meta" role="group" aria-label="Portfolio introduction">
-            <p>Portfolio / 2026</p>
-            <p>{identity.title}</p>
-            <p>{identity.location}</p>
-          </div>
-
-          <HeroLiquidPlate />
-
-          <div className="hero-copy-release">
-            <div className="hero-copy editorial-grid">
-              <div className="hero-identity">
-                <HeroMasthead name={identity.name} />
-              </div>
-              <div
-                className="hero-actions"
-                role="group"
-                aria-label="Portfolio roles and projects"
-              >
-                <p className="eyebrow">Engineer · Researcher · Builder</p>
-                <a className="hero-projects-link" href="/projects">
-                  <span>Explore projects</span>
-                  <span className="hero-projects-link__arrow" aria-hidden="true">↓</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-            </section>
-
-            <PortfolioGateway />
-          </>
+          <PortfolioGateway identity={identity} />
         )}
 
         {(!screen || screen === 'experience') && (

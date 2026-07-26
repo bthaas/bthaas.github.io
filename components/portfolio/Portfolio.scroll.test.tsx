@@ -6,20 +6,14 @@ import { atlasVisuals } from '@/content/editorial-visuals'
 import { Portfolio } from './Portfolio'
 
 describe('Portfolio responsive media contract', () => {
-  it('eagerly loads only the hero and exposes an AVIF/WebP picture pair', () => {
+  it('removes the superseded hero artwork from the portfolio journey', () => {
     const { container } = render(<Portfolio />)
-    const hero = screen.getByRole('img', {
-      name: 'A geometric Aegean city aligned with a rising sun',
-    })
-    const picture = hero.closest('picture')
 
-    expect(hero).toHaveAttribute('src', atlasVisuals.hero.fallback)
-    expect(hero).toHaveAttribute('fetchpriority', 'high')
-    expect(hero).not.toHaveAttribute('loading', 'lazy')
-    expect(picture?.querySelector('source[type="image/avif"]')).toHaveAttribute(
-      'srcset',
-      expect.stringContaining(atlasVisuals.hero.src),
-    )
+    expect(atlasVisuals).not.toHaveProperty('hero')
+    expect(container.querySelector('.hero-section')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('img', { name: 'A geometric Aegean city aligned with a rising sun' }),
+    ).not.toBeInTheDocument()
   })
 
   it('lazy loads every offscreen editorial artwork', () => {

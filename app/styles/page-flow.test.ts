@@ -32,7 +32,7 @@ describe('continuous page color system', () => {
     })
 
     for (const selector of [
-      '.hero-section',
+      '.portfolio-gateway',
       '.experience-section',
       '.projects-section',
       '.craft-section',

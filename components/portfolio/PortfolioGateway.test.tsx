@@ -1,15 +1,23 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
+import { siteContent } from '@/content/site-content'
 
 import { PortfolioGateway } from './PortfolioGateway'
 
+const renderGateway = () => render(<PortfolioGateway identity={siteContent.identity} />)
+
 describe('PortfolioGateway', () => {
   it('starts on Experience with semantic carousel controls and destinations', () => {
-    const { container } = render(<PortfolioGateway />)
+    const { container } = renderGateway()
 
     expect(screen.getByRole('heading', { name: 'Explore the portfolio' })).toBeInTheDocument()
     expect(screen.getByText('BRETT HAAS')).toHaveAttribute('aria-hidden', 'true')
     expect(screen.getByText('Engineer · Researcher · Builder')).toBeInTheDocument()
+    const introduction = screen.getByRole('group', { name: 'Portfolio introduction' })
+    expect(within(introduction).getByText('Portfolio / 2026')).toBeInTheDocument()
+    expect(within(introduction).getByText('Software Engineer')).toBeInTheDocument()
+    expect(within(introduction).getByText('Bellevue, Washington')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
       'href',
       '/experience',
@@ -74,7 +82,7 @@ describe('PortfolioGateway', () => {
   })
 
   it('cycles categories with buttons and arrow keys while wrapping', () => {
-    render(<PortfolioGateway />)
+    renderGateway()
     const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
     const next = screen.getByRole('button', { name: 'Next category' })
 
@@ -100,7 +108,7 @@ describe('PortfolioGateway', () => {
   })
 
   it('tracks a captured horizontal drag and snaps to the nearest category', () => {
-    render(<PortfolioGateway />)
+    renderGateway()
     const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
     const dragSurface = screen.getByTestId('portfolio-gateway-drag-surface')
     const ring = dragSurface.querySelector('.portfolio-gateway__fallback-ring')
@@ -145,7 +153,7 @@ describe('PortfolioGateway', () => {
   })
 
   it('starts a drag over the invisible surface link without following it', () => {
-    render(<PortfolioGateway />)
+    renderGateway()
     const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
     const dragSurface = screen.getByTestId('portfolio-gateway-drag-surface')
     const surfaceLink = screen.getByRole('link', { name: 'Open Experience screen' })
