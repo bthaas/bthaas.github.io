@@ -20,7 +20,6 @@ describe('Portfolio responsive media contract', () => {
     render(<Portfolio />)
 
     const offscreen = [
-      screen.getByRole('img', { name: 'A cliffside workshop with sculptural wings' }),
       screen.getByRole('img', { name: 'A rising coastal city and lighthouse at dusk' }),
       screen.getByRole('img', { name: 'A geometric arena with analytical trajectory arcs' }),
       screen.getByRole('img', { name: 'Coastal architecture crossed by rhythmic signal ribbons' }),

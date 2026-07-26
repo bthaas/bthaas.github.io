@@ -9,7 +9,7 @@ describe('PortfolioScreen', () => {
   it.each([
     ['experience', 'Experience', 'experience'],
     ['projects', 'Projects', 'projects'],
-    ['skills', 'The skills behind the flight.', 'craft'],
+    ['skills', 'Pick up the stack.', 'craft'],
     ['contact', 'Connect with me.', 'contact'],
   ] as const)('renders %s as one standalone screen', (screenName, heading, sectionId) => {
     const { container } = render(

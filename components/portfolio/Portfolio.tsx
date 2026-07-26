@@ -9,12 +9,8 @@ import {
 } from '@/content/site-content'
 
 import { AtlasPicture } from './AtlasPicture'
-import {
-  getSkillLogos,
-  SkillLogoGrid,
-  SkillLogoSequence,
-} from './SkillLogos'
-import { SkillSphere } from './SkillSphere'
+import { getSkillLogos, SkillLogoGrid } from './SkillLogos'
+import { SkillWorkbench } from './SkillWorkbench'
 import { PortfolioGateway } from './PortfolioGateway'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
@@ -275,60 +271,12 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
             id="craft"
             aria-labelledby="craft-title"
           >
-          <div className="craft-board">
-            <div
-              className="craft-plate craft-plate--inset"
-              data-atlas-plate-sheen
-              data-atlas-velocity-plate
-            >
-              <AtlasPicture
-                visual={atlasVisuals.craft}
-                alt="A cliffside workshop with sculptural wings"
-                className="atlas-picture craft-art"
-                cursor="read"
-                printReveal
-                sizes="(max-width: 720px) 100vw, 50vw"
-              />
-            </div>
-            <div className="craft-panel">
-              <div className="craft-narrative">
-                <div className="section-heading craft-heading">
-                  <span className="craft-ghost" data-craft-ghost="03" aria-hidden="true" />
-                  <p className="eyebrow">03 / Skills</p>
-                  <h2 id="craft-title">The skills behind the flight.</h2>
-                </div>
-                <div className="craft-copy">
-                  <p className="lede">
-                    My work sits where software engineering, machine learning, and product
-                    judgment meet.
-                  </p>
-                  <p>
-                    I like difficult systems with visible stakes: steering model behavior, testing
-                    frontier agents, and shipping cross-platform products whose performance can be
-                    measured—not merely described.
-                  </p>
-                </div>
+            <SkillWorkbench logos={skillLogos} />
+            <noscript>
+              <div className="skill-workbench__noscript">
+                <SkillLogoGrid logos={skillLogos} />
               </div>
-            </div>
-          </div>
-          <SkillSphere logos={skillLogos} />
-          <noscript>
-            <div className="skill-sphere-noscript">
-              <SkillLogoGrid logos={skillLogos} />
-            </div>
-          </noscript>
-          <div
-            className="craft-marquee"
-            data-craft-marquee
-            role="region"
-            aria-label="Technology logo ticker; focus to pause"
-            tabIndex={0}
-          >
-            <div className="craft-marquee__track">
-              <SkillLogoSequence logos={skillLogos} />
-              <SkillLogoSequence logos={skillLogos} duplicate />
-            </div>
-          </div>
+            </noscript>
           </section>
         )}
 

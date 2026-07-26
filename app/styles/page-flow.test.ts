@@ -67,12 +67,10 @@ describe('continuous page color system', () => {
     expect(existsSync(stylesheetPath)).toBe(true)
     const stylesheet = readFileSync(stylesheetPath, 'utf8')
 
-    expect(declarationsFor(stylesheet, '.skill-sphere')).toMatchObject({
+    expect(declarationsFor(stylesheet, '.craft-section')).toMatchObject({
+      '--chapter-wipe-base': 'var(--page-surface)',
+      '--chapter-wipe-color': 'var(--page-surface)',
       'background-color': 'var(--page-surface)',
-      'border-bottom-color': 'var(--page-rule)',
-    })
-    expect(declarationsFor(stylesheet, '.craft-board')).toMatchObject({
-      'border-bottom-color': 'var(--page-rule)',
     })
     expect(declarationsFor(stylesheet, '.contact-board')).toMatchObject({
       'border-top-color': 'var(--page-rule)',
