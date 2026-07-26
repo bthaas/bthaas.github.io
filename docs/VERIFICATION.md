@@ -10,8 +10,8 @@ interaction works at 390 px, with reduced motion, and without JavaScript.
 
 | Gate | Result |
 | --- | --- |
-| `npm run verify` | Passed: 63 files / 233 tests, typecheck, and production build |
-| `npm run test:coverage` | Passed: 63 files / 233 tests; 90.26% statements, 80.17% branches, 86.18% functions, 93.82% lines |
+| `npm run verify` | Passed: 64 files / 248 tests, typecheck, and production build |
+| `npm run test:coverage` | Passed: 64 files / 248 tests; 90.91% statements, 81.60% branches, 86.72% functions, 94.23% lines |
 | Focused Playwright | Passed: four desktop Chromium / iPhone WebKit experience and no-JavaScript journeys |
 | Desktop engine | Chromium 1600 × 1200: four scannable stops, exclusive native disclosures, keyboard toggling, dark editorial field, and zero horizontal document overflow passed |
 | Mobile engine | iPhone WebKit and a 390 × 844 live walk: deliberate vertical route, touch disclosures, and zero horizontal overflow passed |
