@@ -11,8 +11,8 @@ reduced motion or without JavaScript.
 
 | Gate | Result |
 | --- | --- |
-| `npm run verify` | Passed: 64 files / 248 tests, typecheck, and production build |
-| `npm run test:coverage` | Passed: 64 files / 248 tests; 90.91% statements, 81.60% branches, 86.72% functions, 94.23% lines |
+| `npm run verify` | Passed: 64 files / 253 tests, typecheck, and production build |
+| `npm run test:coverage -- --maxWorkers=4` | Passed: 64 files / 253 tests; 90.99% statements, 81.86% branches, 86.87% functions, 94.28% lines |
 | Focused Playwright | Passed: four desktop Chromium / iPhone WebKit experience and no-JavaScript journeys |
 | Desktop engine | Chromium 1600 × 1200: four upright columns on one horizontal rail, exclusive native disclosures, keyboard toggling, and zero document overflow passed |
 | Mobile engine | iPhone WebKit and a 390 × 844 live walk: deliberate vertical route, touch disclosures, and zero horizontal overflow passed |
