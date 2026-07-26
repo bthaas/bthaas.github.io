@@ -212,7 +212,7 @@ test('opens every carousel category as its own routed screen', async ({
   expect(errors).toEqual([])
 })
 
-test('ships clean cross-browser choreography and an accessible dossier', async ({
+test('ships clean cross-browser routing, gateway choreography, and an accessible dossier', async ({
   isMobile,
   page,
 }) => {
@@ -223,15 +223,13 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(page.locator('script[src*="/_next/static/"]')).not.toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-atlas', 'ready')
   await expect(page.locator('html')).toHaveClass(/atlas-js/)
-  await expect(page.locator('#hero, #portfolio-gateway, #experience, #projects, #craft, #contact'))
-    .toHaveCount(6)
+  await expect(page.locator('#hero, #portfolio-gateway')).toHaveCount(2)
+  await expect(page.locator('#experience, #projects, #craft, #contact')).toHaveCount(0)
   await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
   const sectionBackgrounds = await page
-    .locator('#hero, #portfolio-gateway, #experience, #projects, #craft, #contact')
+    .locator('#hero, #portfolio-gateway')
     .evaluateAll((sections) => sections.map((section) => getComputedStyle(section).backgroundColor))
   expect(new Set(sectionBackgrounds)).toEqual(new Set(['rgb(243, 239, 227)']))
-  await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
-  await expect(page.locator('script[data-atlas-horizon]')).toHaveCount(0)
   await expect(page.locator('[data-feather-fall-layer]')).toHaveCount(1)
   await expect(page.locator('.feather-fall-canvas')).toHaveCount(1)
   await expect(page.locator('[data-feather-fall-layer]')).toHaveAttribute(
@@ -302,6 +300,10 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await expectNoHorizontalOverflow(page)
 
+  await page.getByRole('link', { name: 'Open Experience', exact: true }).click()
+  await expect(page).toHaveURL(/\/experience\/?$/)
+  await expect(page.locator('#experience')).toHaveCount(1)
+  await expect(page.locator('#hero, #portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
   const toggle = page.getByRole('button', { name: 'Field notes +' }).first()
   await toggle.scrollIntoViewIfNeeded()
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
@@ -312,7 +314,9 @@ test('ships clean cross-browser choreography and an accessible dossier', async (
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
   await expect(toggle).toBeFocused()
 
-  await page.locator('#contact').scrollIntoViewIfNeeded()
+  await page.getByRole('link', { name: 'Contact' }).click()
+  await expect(page).toHaveURL(/\/contact\/?$/)
+  await expect(page.locator('[data-contact-finale]')).toHaveAttribute('data-contact-scroll-ready', '')
   if (isMobile) {
     await page.waitForTimeout(400)
     await expect(page.locator('script[data-atlas-horizon], canvas[data-atlas-horizon-canvas]'))
@@ -390,12 +394,19 @@ test('keeps reduced motion identical to the static render', async ({ browserName
     'script[data-atlas-horizon]',
   ].join(', ')))
     .toHaveCount(0)
-  await expect(page.locator('.flight-dossier__toggle').first())
-    .toHaveAttribute('aria-expanded', 'true')
-  await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
   await expect(
     page.locator('.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice'),
   ).toHaveCount(48)
+
+  await page.goto('/experience', { waitUntil: 'networkidle' })
+  await expect(page.locator('.flight-dossier__toggle').first())
+    .toHaveAttribute('aria-expanded', 'true')
+  await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
+  expect(await page.locator('[data-atlas-plate-sheen]').first().evaluate((node) => (
+    getComputedStyle(node, '::before').display
+  ))).toBe('none')
+
+  await page.goto('/skills', { waitUntil: 'networkidle' })
   await expect(page.locator('.craft-marquee__track')).not.toHaveAttribute('style')
   await page.locator('[data-skill-sphere]').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-skill-sphere]')).toHaveAttribute('data-motion', 'reduced')
@@ -407,10 +418,9 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(page.locator('[data-skill-sphere-scene] canvas')).toHaveCount(0)
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveCSS('display', 'none')
   await expect(page.locator('[data-atlas-sun-trigger]')).toHaveCSS('display', 'none')
+
+  await page.goto('/contact', { waitUntil: 'networkidle' })
   await expect(page.locator('[data-golden-feather-target]')).toHaveCSS('display', 'none')
-  expect(await page.locator('[data-atlas-plate-sheen]').first().evaluate((node) => (
-    getComputedStyle(node, '::before').display
-  ))).toBe('none')
   await expect.poll(() => page.evaluate(() => document.getAnimations().filter(
     (animation) => animation.playState === 'running',
   ).length)).toBe(0)
@@ -429,7 +439,7 @@ test('spins and labels the accessible skill sphere on keyboard and touch', async
     sessionStorage.setItem('atlas-preloader-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
-  await page.goto('/', { waitUntil: 'networkidle' })
+  await page.goto('/skills', { waitUntil: 'networkidle' })
 
   const sphere = page.getByRole('region', { name: 'Interactive skill sphere' })
   await sphere.scrollIntoViewIfNeeded()
@@ -474,7 +484,7 @@ test('spins and labels the accessible skill sphere on keyboard and touch', async
   expect(errors).toEqual([])
 })
 
-test('releases one four-second sun spectacle and leaves the golden feather at contact', async ({
+test('releases one four-second sun spectacle on the homepage', async ({
   browserName,
   isMobile,
   page,
@@ -516,9 +526,6 @@ test('releases one four-second sun spectacle and leaves the golden feather at co
   await expect.poll(() => page.locator('[data-atlas-sun-flare]').evaluate((node) => (
     Number.parseFloat(getComputedStyle(node).opacity)
   ))).toBeGreaterThan(0)
-  await expect.poll(() => page.locator('[data-golden-feather-target]').evaluate((node) => (
-    Number.parseFloat(getComputedStyle(node).opacity)
-  ))).toBeGreaterThan(0)
   await expect(page.locator('[data-testid="atlas-spectacle"]')).toHaveAttribute(
     'data-state',
     'settled',
@@ -527,8 +534,6 @@ test('releases one four-second sun spectacle and leaves the golden feather at co
   expect(Number(await page.locator('[data-testid="atlas-spectacle"]')
     .getAttribute('data-duration'))).toBeLessThanOrEqual(4_200)
   await expect(page.locator('html')).not.toHaveAttribute('data-atlas-spectacle-start')
-  await page.locator('#contact').scrollIntoViewIfNeeded()
-  await expect(page.locator('[data-golden-feather-target]')).toHaveCSS('opacity', '1')
 
   await page.reload({ waitUntil: 'networkidle' })
   for (let index = 0; index < 5; index += 1) await sun.click()
@@ -614,7 +619,7 @@ test('reverses the feather-like masthead scatter and restores the hero at the to
     return Number(style.opacity) < 0.9 || Math.abs(matrix.e) > 10 || Math.abs(matrix.f) > 10
   }))).toBe(true)
 
-  await page.locator('#projects').scrollIntoViewIfNeeded()
+  await page.locator('#portfolio-gateway').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-hero-liquid-canvas]')).toHaveCount(0)
   await expect(page.locator('.hero-liquid')).not.toHaveAttribute('data-hero-liquid-ready', '')
   await page.evaluate(() => scrollTo({ behavior: 'instant', top: 0 }))
@@ -633,7 +638,7 @@ test('spins the project helix and keeps a complete static fallback', async ({
     sessionStorage.setItem('atlas-preloader-entered', '1')
     sessionStorage.setItem('atlas-entered', '1')
   })
-  await page.goto('/?stats=1', { waitUntil: 'networkidle' })
+  await page.goto('/projects?stats=1', { waitUntil: 'networkidle' })
 
   const spiral = page.locator('.project-spiral')
   const stage = page.locator('[data-project-spiral-stage]')
@@ -691,8 +696,7 @@ test('spins the project helix and keeps a complete static fallback', async ({
     .toHaveAttribute('href', '/projects/vision-bias-steering')
 
   await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
-  await page.locator('#craft').scrollIntoViewIfNeeded()
-  const chapterBackgrounds = await page.locator('#projects, #craft').evaluateAll(
+  const chapterBackgrounds = await page.locator('#projects').evaluateAll(
     (chapters) => chapters.map((chapter) => getComputedStyle(chapter).backgroundColor),
   )
   expect(new Set(chapterBackgrounds)).toEqual(new Set(['rgb(243, 239, 227)']))
@@ -700,7 +704,7 @@ test('spins the project helix and keeps a complete static fallback', async ({
   expect(errors).toEqual([])
 })
 
-test('preserves the complete no-JS document', async ({ browser, isMobile }) => {
+test('preserves every focused route without JavaScript', async ({ browser, isMobile }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,
     viewport: isMobile ? { height: 844, width: 390 } : { height: 1200, width: 1600 },
@@ -708,18 +712,25 @@ test('preserves the complete no-JS document', async ({ browser, isMobile }) => {
   const page = await context.newPage()
   await page.goto('http://127.0.0.1:4173/')
 
-  await expect(page.locator('#hero, #portfolio-gateway, #experience, #projects, #craft, #contact'))
-    .toHaveCount(6)
+  await expect(page.locator('#hero, #portfolio-gateway')).toHaveCount(2)
+  await expect(page.locator('#experience, #projects, #craft, #contact')).toHaveCount(0)
   await expect(page.locator('html')).not.toHaveClass(/atlas-js/)
   await expect(page.locator('[data-atlas-cursor], script[data-atlas-horizon], canvas')).toHaveCount(0)
+
+  await page.goto('http://127.0.0.1:4173/experience')
   await expect(page.locator('.flight-dossier__toggle').first())
     .toHaveAttribute('aria-expanded', 'true')
   await expect(page.locator('.flight-dossier__panel').first()).toBeVisible()
+
+  for (const route of ['/projects', '/skills', '/contact']) {
+    await page.goto(`http://127.0.0.1:4173${route}`)
+    await expect(page.locator('main > section')).toHaveCount(1)
+  }
   await expectNoHorizontalOverflow(page)
   await context.close()
 })
 
-test('samples frame pacing through the complete page', async ({
+test('samples frame pacing through the complete homepage', async ({
   browserName,
   isMobile,
   page,
@@ -733,8 +744,7 @@ test('samples frame pacing through the complete page', async ({
     images.forEach((image) => { image.loading = 'eager' })
     await Promise.all(images.map((image) => image.decode().catch(() => undefined)))
   })
-  await page.locator('#contact').scrollIntoViewIfNeeded()
-  if (!isMobile) await expect(page.locator('[data-horizon-flock] canvas')).toHaveCount(1)
+  await page.locator('#portfolio-gateway').scrollIntoViewIfNeeded()
   await page.waitForTimeout(750)
   await page.evaluate(() => scrollTo({ behavior: 'instant', top: 0 }))
   await page.waitForTimeout(350)
@@ -766,20 +776,6 @@ test('samples frame pacing through the complete page', async ({
       const duration = timestamps.at(-1)! - timestamps[0]
       return Number((((timestamps.length - 1) * 1000) / duration).toFixed(1))
     }, progress)
-  }
-
-  if (!isMobile) {
-    const softwareRenderer = /swiftshader|llvmpipe|software/i.test(renderer)
-    const minimumHorizonFps = browserName === 'webkit'
-      ? 28
-      : browserName === 'firefox'
-        ? 10
-        : softwareRenderer
-          ? 10
-          : 55
-    await expect.poll(async () => Number(
-      await page.locator('[data-horizon-flock]').getAttribute('data-horizon-fps'),
-    )).toBeGreaterThanOrEqual(minimumHorizonFps)
   }
 
   testInfo.annotations.push({

@@ -20,7 +20,7 @@ import { SkillSphere } from './SkillSphere'
 import { PortfolioGateway } from './PortfolioGateway'
 
 type ContactIconName = 'email' | 'github' | 'linkedin'
-export type PortfolioScreenName = 'experience' | 'projects' | 'skills' | 'contact'
+export type PortfolioScreenName = 'home' | 'experience' | 'projects' | 'skills' | 'contact'
 
 interface PortfolioProps {
   readonly screen?: PortfolioScreenName
@@ -167,7 +167,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
         id="main-content"
         data-portfolio-screen={screen}
       >
-        {!screen && (
+        {(!screen || screen === 'home') && (
           <>
             <section className="hero-section atlas-shell" id="hero" aria-labelledby="hero-name">
           <div className="board-meta hero-meta" role="group" aria-label="Portfolio introduction">
