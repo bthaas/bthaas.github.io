@@ -460,6 +460,12 @@
   border-radius: 0.3rem;
 }
 
+@media (max-width: 720px) {
+  .experience-timeline__intro {
+    padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
+  }
+}
+
 @media (min-width: 720px) {
   .experience-timeline__intro {
     align-items: end;
@@ -710,7 +716,7 @@
   }
 
   .experience-timeline__intro {
-    padding-top: 3.25rem;
+    padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4rem));
     padding-bottom: 2.75rem;
   }
 

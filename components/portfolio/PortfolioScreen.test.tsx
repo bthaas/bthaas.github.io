@@ -25,8 +25,23 @@ describe('PortfolioScreen', () => {
     expect(container.querySelector(`main > #${sectionId}`)).toBeInTheDocument()
   })
 
-  it('keeps every screen reachable from the persistent navigation', () => {
-    render(<PortfolioScreen screen="projects" />)
+  it.each(['experience', 'projects', 'contact'] as const)(
+    'keeps only a compact Home control on the %s screen',
+    (screenName) => {
+      render(<PortfolioScreen screen={screenName} />)
+      const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+      const home = within(navigation).getByRole('link', { name: 'Home' })
+
+      expect(within(navigation).getAllByRole('link')).toEqual([home])
+      expect(home).toHaveAttribute('href', '/')
+      expect(home).toHaveTextContent('←Home')
+      expect(within(navigation).queryByRole('link', { name: 'Experience' }))
+        .not.toBeInTheDocument()
+    },
+  )
+
+  it('keeps the full route index where it fits cleanly on Skills', () => {
+    render(<PortfolioScreen screen="skills" />)
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
 
     expect(within(navigation).getByRole('link', { name: 'Home' }))
@@ -35,7 +50,7 @@ describe('PortfolioScreen', () => {
       .toHaveAttribute('href', '/experience')
     expect(within(navigation).getByRole('link', { name: 'Projects' }))
       .toHaveAttribute('href', '/projects')
-    expect(within(navigation).getByRole('link', { name: 'Projects' }))
+    expect(within(navigation).getByRole('link', { name: 'Skills' }))
       .toHaveAttribute('aria-current', 'page')
     expect(within(navigation).getByRole('link', { name: 'Skills' }))
       .toHaveAttribute('href', '/skills')

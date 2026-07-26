@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
+import { ATLAS_GATEWAY_SELECTION_EVENT } from '@/lib/atlas-events'
 
 import { PortfolioGateway } from './PortfolioGateway'
 
@@ -182,6 +183,23 @@ describe('PortfolioGateway', () => {
 
     fireEvent.keyDown(carousel, { key: 'ArrowLeft' })
     expect(screen.getByRole('link', { name: 'Open Contact' })).toHaveAttribute('href', '/contact')
+  })
+
+  it('announces its selected destination to the Home route index', () => {
+    const selections: string[] = []
+    const handleSelection = (event: Event) => {
+      selections.push((event as CustomEvent<{ route: string }>).detail.route)
+    }
+    window.addEventListener(ATLAS_GATEWAY_SELECTION_EVENT, handleSelection)
+
+    const { unmount } = renderGateway()
+    expect(selections).toEqual(['experience'])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next category' }))
+    expect(selections).toEqual(['experience', 'projects'])
+
+    unmount()
+    window.removeEventListener(ATLAS_GATEWAY_SELECTION_EVENT, handleSelection)
   })
 
   it('tracks a captured horizontal drag and snaps to the nearest category', () => {
