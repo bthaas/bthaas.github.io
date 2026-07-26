@@ -1,9 +1,13 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
+import {
+  ATLAS_GATEWAY_SELECTION_EVENT,
+  type AtlasGatewaySelectionDetail,
+} from '@/lib/atlas-events'
 import {
   GATEWAY_CATEGORIES,
   GATEWAY_CYLINDER_SEGMENTS,
@@ -85,6 +89,13 @@ export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
   const activeIndex = getWrappedGatewayIndex(step)
   const activeCategory = GATEWAY_CATEGORIES[activeIndex]
   const carouselRotation = getGatewayRotation(step) + dragRotation
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent<AtlasGatewaySelectionDetail>(
+      ATLAS_GATEWAY_SELECTION_EVENT,
+      { detail: { route: activeCategory.id } },
+    ))
+  }, [activeCategory.id])
 
   const selectPrevious = useCallback(() => {
     if (!interactive) return

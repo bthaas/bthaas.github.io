@@ -286,6 +286,16 @@ test('opens every carousel category as its own routed screen', async ({
       'data-transition-state',
       'idle',
     )
+    const primaryNavigation = page.getByRole('navigation', { name: 'Primary navigation' })
+    if (route === '/skills') {
+      await expect(primaryNavigation.getByRole('link')).toHaveCount(5)
+      await expect(primaryNavigation.getByRole('link', { name: 'Skills' }))
+        .toHaveAttribute('aria-current', 'page')
+    } else {
+      await expect(primaryNavigation.getByRole('link')).toHaveCount(1)
+    }
+    await expect(primaryNavigation.getByRole('link', { name: 'Home' }))
+      .toContainText('←')
 
     if (route === '/projects') {
       await page.goBack()
@@ -340,6 +350,11 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await gateway.evaluate((element) => element.scrollIntoView({ block: 'center' }))
   await expect(gateway).not.toHaveAttribute('aria-disabled', 'true')
   await expect(gateway).toHaveAttribute('data-active-index', '0')
+  const homeRouteIndex = page.getByRole('navigation', { name: 'Primary navigation' })
+  await expect(homeRouteIndex.getByRole('link')).toHaveCount(4)
+  await expect(homeRouteIndex.getByRole('link', { name: 'Home' })).toHaveCount(0)
+  await expect(homeRouteIndex.getByRole('link', { name: 'Experience' }))
+    .toHaveAttribute('data-active-destination', 'true')
   await expect(
     gateway.locator(
       '.portfolio-gateway__fallback-ring > .portfolio-gateway__fallback-slice',
@@ -366,6 +381,10 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await gateway.focus()
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '1')
+  await expect(homeRouteIndex.getByRole('link', { name: 'Projects' }))
+    .toHaveAttribute('data-active-destination', 'true')
+  await expect(homeRouteIndex.getByRole('link', { name: 'Experience' }))
+    .not.toHaveAttribute('data-active-destination')
   await expect(page.getByRole('link', { name: 'Open Projects', exact: true })).toHaveAttribute(
     'href',
     '/projects',
@@ -441,7 +460,16 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(page.locator('#experience')).toHaveCSS('background-color', 'rgb(25, 25, 43)')
   await expectNoHorizontalOverflow(page)
 
-  const contactLink = page.getByRole('link', { name: 'Contact' })
+  const homeLink = page.getByRole('link', { name: 'Home' })
+  await homeLink.focus()
+  await homeLink.press('Enter')
+  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 })
+  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
+    'data-transition-state',
+    'idle',
+  )
+  const contactLink = page.getByRole('navigation', { name: 'Primary navigation' })
+    .getByRole('link', { name: 'Contact' })
   await contactLink.focus()
   await contactLink.press('Enter')
   await expect(page).toHaveURL(/\/contact\/?$/, { timeout: 15_000 })

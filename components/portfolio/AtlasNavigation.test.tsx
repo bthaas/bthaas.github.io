@@ -1,10 +1,11 @@
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+
+import { ATLAS_GATEWAY_SELECTION_EVENT } from '@/lib/atlas-events'
 
 import { AtlasNavigation } from './AtlasNavigation'
 
-const routes = [
-  ['Home', '/'],
+const destinations = [
   ['Experience', '/experience'],
   ['Projects', '/projects'],
   ['Skills', '/skills'],
@@ -12,52 +13,86 @@ const routes = [
 ] as const
 
 describe('AtlasNavigation', () => {
-  it('keeps all five routes directly reachable with concise accessible names', () => {
-    render(<AtlasNavigation current="projects" />)
+  it('keeps the four destinations on Home and follows the cylinder selection', () => {
+    render(<AtlasNavigation current="home" />)
 
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
     const links = within(navigation).getAllByRole('link')
 
-    expect(links).toHaveLength(routes.length)
-    routes.forEach(([name, href]) => {
+    expect(links).toHaveLength(destinations.length)
+    expect(within(navigation).queryByRole('link', { name: 'Home' })).not.toBeInTheDocument()
+    destinations.forEach(([name, href]) => {
       const link = within(navigation).getByRole('link', { name })
       expect(link).toHaveAttribute('href', href)
       expect(link).toHaveAttribute('data-transition-kind', 'standard')
     })
+    expect(within(navigation).getByRole('link', { name: 'Experience' }))
+      .toHaveAttribute('data-active-destination', 'true')
+    expect(within(navigation).getAllByRole('link').some((link) => (
+      link.hasAttribute('aria-current')
+    ))).toBe(false)
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent(ATLAS_GATEWAY_SELECTION_EVENT, {
+        detail: { route: 'projects' },
+      }))
+    })
+
+    expect(within(navigation).getByRole('link', { name: 'Projects' }))
+      .toHaveAttribute('data-active-destination', 'true')
+    expect(within(navigation).getByRole('link', { name: 'Experience' }))
+      .not.toHaveAttribute('data-active-destination')
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent(ATLAS_GATEWAY_SELECTION_EVENT, {
+        detail: { route: 'unknown' },
+      }))
+    })
+
+    expect(within(navigation).getByRole('link', { name: 'Projects' }))
+      .toHaveAttribute('data-active-destination', 'true')
     expect(within(navigation).queryByText('Brett Haas')).not.toBeInTheDocument()
   })
 
-  it('exposes exactly one current route to assistive technology', () => {
-    const { rerender } = render(<AtlasNavigation current="projects" />)
+  it('shows only a back-to-home control when the full index would crowd a screen', () => {
+    const { container } = render(<AtlasNavigation current="projects" />)
+    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+    const home = within(navigation).getByRole('link', { name: 'Home' })
 
-    expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute(
+    expect(within(navigation).getAllByRole('link')).toEqual([home])
+    expect(home).toHaveAttribute('href', '/')
+    expect(home).toHaveAttribute('data-transition-kind', 'standard')
+    expect(home).toHaveTextContent('←Home')
+    expect(home.querySelector('[aria-hidden="true"]')).toHaveTextContent('←')
+    expect(container.querySelector('.atlas-route-index')).not.toBeInTheDocument()
+  })
+
+  it('keeps the complete route index on Skills and marks its current page', () => {
+    render(<AtlasNavigation current="skills" />)
+    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+
+    expect(within(navigation).getAllByRole('link')).toHaveLength(5)
+    expect(within(navigation).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/')
+    destinations.forEach(([name, href]) => {
+      expect(within(navigation).getByRole('link', { name })).toHaveAttribute('href', href)
+    })
+    expect(within(navigation).getByRole('link', { name: 'Skills' })).toHaveAttribute(
       'aria-current',
       'page',
     )
-    expect(screen.getAllByRole('link').filter((link) => link.hasAttribute('aria-current')))
-      .toHaveLength(1)
-
-    rerender(<AtlasNavigation current="home" />)
-
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
-    expect(screen.getAllByRole('link').filter((link) => link.hasAttribute('aria-current')))
+    expect(within(navigation).getAllByRole('link').filter((link) => (
+      link.hasAttribute('aria-current')
+    )))
       .toHaveLength(1)
   })
 
-  it('keeps the route index and wing mark decorative', () => {
-    const { container } = render(<AtlasNavigation current="experience" />)
+  it('keeps route numbers decorative without changing link names', () => {
+    const { container } = render(<AtlasNavigation current="home" />)
 
     expect(screen.getByRole('link', { name: 'Experience' })).toHaveTextContent(
       '01Experience',
     )
     expect(screen.queryByRole('link', { name: '01 Experience' })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Home' }).querySelector('img')).toHaveAttribute(
-      'alt',
-      '',
-    )
     expect(container.querySelectorAll('[aria-hidden="true"]')).not.toHaveLength(0)
   })
 })

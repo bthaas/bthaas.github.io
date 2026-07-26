@@ -19,7 +19,7 @@ function declarations(source: Root | AtRule, selector: string) {
 }
 
 describe('Atlas Corners navigation', () => {
-  it('floats the home mark and route index without a persistent top bar', () => {
+  it('floats the Home control and optional route index without a persistent top bar', () => {
     expect(declarations(root, '.site-header')).toMatchObject({
       position: 'fixed',
       'pointer-events': 'none',
@@ -27,7 +27,10 @@ describe('Atlas Corners navigation', () => {
     expect(declarations(root, '.atlas-home-link')).toMatchObject({
       position: 'fixed',
       'min-height': '44px',
-      'min-width': '44px',
+      'min-width': '5.5rem',
+    })
+    expect(declarations(root, '.atlas-home-link__arrow')).toMatchObject({
+      'font-size': '1.15rem',
     })
     expect(declarations(root, '.atlas-route-index')).toMatchObject({
       position: 'fixed',
@@ -38,8 +41,18 @@ describe('Atlas Corners navigation', () => {
       bottom: 'clamp(7rem, 14vh, 9rem)',
     })
     expect(declarations(root, '.site-header[data-current="skills"] .atlas-route-index')).toMatchObject({
+      position: 'relative',
       'grid-template-columns': 'repeat(4, max-content)',
       'min-width': '0',
+    })
+    expect(declarations(root, '.site-header[data-current="skills"] .site-nav')).toMatchObject({
+      position: 'fixed',
+      display: 'flex',
+    })
+    expect(declarations(root, '.site-header[data-current="skills"] .atlas-home-link')).toMatchObject({
+      position: 'relative',
+      width: '44px',
+      'min-width': '44px',
     })
     expect(declarations(root, '.site-header[data-current="skills"] .atlas-route-link')).toMatchObject({
       'grid-template-columns': 'max-content max-content',
@@ -49,14 +62,17 @@ describe('Atlas Corners navigation', () => {
     expect(stylesheet).not.toContain('.sun-arc')
   })
 
-  it('uses a one-pixel solar marker for the current route', () => {
-    expect(declarations(root, '.atlas-route-link[aria-current]::before')).toMatchObject({
+  it('uses the same solar marker for the current page and selected Home destination', () => {
+    expect(declarations(
+      root,
+      '.atlas-route-link[aria-current]::before,\n.atlas-route-link[data-active-destination="true"]::before',
+    )).toMatchObject({
       background: 'var(--solar)',
       opacity: '1',
     })
   })
 
-  it('becomes a five-destination bottom index at phone width', () => {
+  it('keeps Home destination-only, Skills complete, and other screens minimal at phone width', () => {
     let mobile: AtRule | undefined
     root.walkAtRules('media', (rule) => {
       if (rule.params.includes('max-width: 720px')) mobile = rule
@@ -78,10 +94,20 @@ describe('Atlas Corners navigation', () => {
     expect(
       declarations(
         mobile as AtRule,
-        '.site-header[data-current="home"] .atlas-route-index',
+        '.site-header[data-current="home"] .site-nav',
       ),
     ).toMatchObject({
-      bottom: 'auto',
+      'grid-template-columns': 'minmax(0, 1fr)',
+    })
+    expect(
+      declarations(
+        mobile as AtRule,
+        '.site-header[data-current="skills"] .site-nav',
+      ),
+    ).toMatchObject({
+      position: 'absolute',
+      display: 'grid',
+      'grid-template-columns': '44px minmax(0, 1fr)',
     })
     expect(
       declarations(
@@ -90,6 +116,22 @@ describe('Atlas Corners navigation', () => {
       ),
     ).toMatchObject({
       'grid-template-columns': 'repeat(4, minmax(0, 1fr))',
+    })
+    expect(
+      declarations(mobile as AtRule, '.site-header[data-index-visible="false"]'),
+    ).toMatchObject({
+      top: '0',
+      bottom: 'auto',
+      height: '0',
+      background: 'none',
+    })
+    expect(
+      declarations(
+        mobile as AtRule,
+        '.site-header[data-index-visible="false"] .atlas-home-link',
+      ),
+    ).toMatchObject({
+      position: 'fixed',
     })
   })
 })

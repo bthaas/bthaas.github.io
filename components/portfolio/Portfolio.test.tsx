@@ -42,16 +42,15 @@ describe('Portfolio', () => {
     render(<Portfolio />)
 
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
-    const homeLink = within(navigation).getByRole('link', { name: 'Home' })
-    expect(homeLink).toHaveAttribute('href', '/')
-    expect(homeLink).toHaveAttribute('aria-current', 'page')
-    expect(homeLink.querySelector('img')).toHaveAttribute('src', '/original-wing-filled.png')
-    expect(homeLink.querySelector('img')).toHaveAttribute('alt', '')
+    expect(within(navigation).queryByRole('link', { name: 'Home' })).not.toBeInTheDocument()
+    expect(within(navigation).getAllByRole('link')).toHaveLength(4)
     expect(within(navigation).queryByText('Brett Haas')).not.toBeInTheDocument()
     expect(within(navigation).getByRole('link', { name: 'Experience' })).toHaveAttribute(
       'href',
       '/experience',
     )
+    expect(within(navigation).getByRole('link', { name: 'Experience' }))
+      .toHaveAttribute('data-active-destination', 'true')
     expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
       'href',
       '/projects',
