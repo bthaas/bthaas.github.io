@@ -57,12 +57,13 @@ sun begins its route through Experience, Projects, Craft, and Contact.
 The flight narrative controls every escalation. Sparse paper-white feathers
 become a gold-rimmed fall over the dusk career path, react to scroll wind and
 pointer gusts, thin through the field studies, then settle at the horizon.
-Experience turns three overlapping roles and education into a multilayer date
-map, with one proportional line per role and a dedicated graduation line for
-the UVA B.S. in Computer Science. Four upright career columns sit directly
-beneath it. Every company and role stays visible while native grouped
-disclosures reveal one focused set of evidence at a time, including without
-JavaScript. The three
+Experience turns three overlapping roles and education into one dominant date
+spine. The UVA B.S. in Computer Science lands as a gold star above the route;
+three proportional tenure lines sit tightly underneath and disclose their
+labels on hover or keyboard focus. Four upright career columns sit directly
+beneath the map, where every company and role stays visible while native
+grouped disclosures reveal one focused set of evidence at a time, including
+without JavaScript. The three
 accepted project paintings travel through a second native-scroll horizontal pin;
 shared WebGL planes bend and skew with velocity while ghost numerals mark the
 cases. The next chapter prints itself in through a reversible halftone mask, and

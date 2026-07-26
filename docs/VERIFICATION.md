@@ -1,33 +1,35 @@
 # Awwwards portfolio verification
 
-Verified on 2026-07-26 from `codex/experience-duration-lanes`. The standalone
-Experience screen now pairs a four-line proportional tenure map with four
-upright career columns. The map gives each overlapping role and the UVA B.S. in
-Computer Science its own line. Company, role, dates, and location remain
-visible; summaries, highlights, and technologies appear only when a column is
-opened. The columns become a vertical route at 390 px while the compact date
-map retains all four lines, including with reduced motion or without JavaScript.
+Verified on 2026-07-26 from `codex/experience-spine-timeline`. The standalone
+Experience screen now leads with one dominant date spine. The UVA B.S. in
+Computer Science appears as a gold star above it, while three proportional job
+lines sit tightly underneath. Hover and keyboard focus reveal a line’s company,
+role, and period; the four upright columns below keep every company, role, date,
+and location visible. Summaries, highlights, and technologies appear only when
+a column is opened. The columns become a vertical route at 390 px while the
+compact spine keeps the same above/below hierarchy.
 
 ## Experience redesign gates
 
 | Gate | Result |
 | --- | --- |
-| `npm run verify` | Passed: 65 files / 269 tests, typecheck, and production build |
-| `npm run test:coverage -- --maxWorkers=4` | Passed: 65 files / 269 tests; 91.42% statements, 82.33% branches, 87.39% functions, 94.85% lines |
+| `npm run verify` | Passed: 65 files / 275 tests, typecheck, and production build |
+| `npm run test:coverage -- --maxWorkers=4` | Passed: 65 files / 275 tests; 91.44% statements, 81.79% branches, 87.50% functions, 94.88% lines |
 | Focused Playwright | Passed: four desktop Chromium / iPhone WebKit experience and no-JavaScript journeys |
-| Desktop engine | Chromium 1600 × 1200: four proportional duration lines above four upright columns, exclusive native disclosures, keyboard toggling, and zero document overflow passed |
-| Mobile engine | iPhone WebKit and a 390 × 844 live walk: compact four-line date map, deliberate vertical card route, touch disclosures, and zero horizontal overflow passed |
+| Desktop engine | Chromium 1600 × 1200: one date spine, education star above, three job lines below, hover/focus labels, four upright columns, and zero document overflow passed |
+| Mobile engine | iPhone WebKit and a 390 × 844 live walk: compact spine hierarchy, deliberate vertical card route, touch disclosures, and zero horizontal overflow passed |
 | Reduced motion | Native disclosure layout remains intact with no scroll pinning or enhancement attribute |
 | No JavaScript | Four native `<details>` controls remain operable in the static export on desktop and mobile |
 
-The date range and lane proportions are computed from the unchanged periods in
-`content/site-content.ts`. The map makes the three overlapping roles legible at
-a glance and renders the May 2026 UVA graduation as a short dedicated milestone
-line. Desktop distributes every stop across a continuous left-to-right rail,
-then gives each role its own vertical column; mobile keeps the multilayer map
-and turns the card list into a vertical route. Grouped native disclosures keep
-only one description open at a time when JavaScript is available, while the
-underlying controls remain functional without it.
+The date range and line proportions are computed from the unchanged periods in
+`content/site-content.ts`. The map makes the three overlapping roles legible
+without permanently duplicating their labels and places the May 2026 UVA
+graduation star above the shared spine. Every map mark is a native in-page link:
+hover or keyboard focus reveals its label and activation jumps to the complete
+column below. Desktop distributes those columns across a continuous
+left-to-right rail; mobile turns them into a vertical route. Grouped native
+disclosures keep only one description open at a time when JavaScript is
+available, while the underlying controls remain functional without it.
 
 Verified on 2026-07-18 from `codex/phase-6-resubmission-polish`. Phase 6
 hardens the complete maximalist atlas for submission: heavy WebGL now waits for

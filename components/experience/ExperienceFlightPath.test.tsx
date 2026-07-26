@@ -69,7 +69,7 @@ describe('ExperienceFlightPath', () => {
     expect(within(educationStop!).getByText(`GPA ${education.gpa}`)).not.toBeVisible()
   })
 
-  it('maps every role and the UVA degree onto its own proportional duration lane', () => {
+  it('maps three job lines below one axis and the UVA degree star above it', () => {
     const { container } = render(
       <ExperienceFlightPath
         education={siteContent.education}
@@ -80,45 +80,48 @@ describe('ExperienceFlightPath', () => {
       siteContent.experience,
       siteContent.education,
     )
-    const lanes = screen.getByRole('list', {
-      name: 'Experience duration lanes',
+    const map = screen.getByRole('navigation', {
+      name: 'Experience date map',
     })
+    const durationLines = within(map).getByRole('list', {
+      name: 'Professional duration lines',
+    })
+    const links = within(map).getAllByRole('link')
 
-    expect(lanes.children).toHaveLength(4)
+    expect(durationLines.children).toHaveLength(3)
+    expect(links).toHaveLength(4)
+    expect(container.querySelectorAll('.experience-timeline__spine-line'))
+      .toHaveLength(1)
 
-    timeline.items.forEach((item, index) => {
-      const stop = [
-        ...siteContent.experience.map((entry) => ({
-          label: entry.organization,
-          period: entry.period,
-          role: entry.role,
-        })),
-        ...siteContent.education.map((entry) => ({
-          label: entry.institution,
-          period: entry.graduation,
-          role: entry.degree,
-        })),
-      ][index]
-      const lane = within(lanes).getByLabelText(
-        `${stop.role} at ${stop.label}, ${stop.period}`,
+    siteContent.experience.forEach((entry, index) => {
+      const item = timeline.items[index]
+      const line = within(durationLines).getByLabelText(
+        `${entry.role} at ${entry.organization}, ${entry.period}`,
       )
-      const bar = lane.querySelector('.experience-timeline__lane-bar')
 
-      expect(lane).toHaveAttribute('data-kind', item.kind)
-      expect(lane).toHaveStyle({
+      expect(line).toHaveAttribute('href', `#experience-stop-${entry.id}`)
+      expect(line.closest('li')).toHaveStyle({
         '--experience-lane-end': `${item.end * 100}%`,
+        '--experience-lane-index': `${index}`,
         '--experience-lane-start': `${item.start * 100}%`,
       })
-      expect(bar).not.toBeNull()
+      expect(line.querySelector('.experience-timeline__duration-bar')).not.toBeNull()
     })
 
-    const educationLane = container.querySelector(
-      '.experience-timeline__lane[data-kind="education"]',
+    const [education] = siteContent.education
+    const educationItem = timeline.items[siteContent.experience.length]
+    const educationStar = within(map).getByLabelText(
+      `${education.degree} at ${education.institution}, ${education.graduation}`,
     )
-    expect(educationLane).toHaveTextContent('B.S. in Computer Science')
-    expect(educationLane).toHaveTextContent('University of Virginia')
-    expect(educationLane?.querySelector('.experience-timeline__lane-bar'))
-      .toHaveAttribute('data-milestone', 'true')
+    expect(educationStar).toHaveAttribute(
+      'href',
+      '#experience-stop-education-university-of-virginia',
+    )
+    expect(educationStar).toHaveStyle(
+      `--experience-position: ${educationItem.end * 100}%`,
+    )
+    expect(educationStar.querySelector('.experience-timeline__milestone-star'))
+      .toHaveTextContent('✦')
   })
 
   it('opens only the pressed role and collapses it when pressed again', () => {
