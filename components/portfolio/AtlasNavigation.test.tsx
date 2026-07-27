@@ -24,7 +24,7 @@ describe('AtlasNavigation', () => {
     destinations.forEach(([name, href]) => {
       const link = within(navigation).getByRole('link', { name })
       expect(link).toHaveAttribute('href', href)
-      expect(link).toHaveAttribute('data-transition-kind', 'standard')
+      expect(link).not.toHaveAttribute('data-transition-kind')
     })
     expect(within(navigation).getByRole('link', { name: 'Experience' }))
       .toHaveAttribute('data-active-destination', 'true')
@@ -61,7 +61,7 @@ describe('AtlasNavigation', () => {
 
     expect(within(navigation).getAllByRole('link')).toEqual([home])
     expect(home).toHaveAttribute('href', '/')
-    expect(home).toHaveAttribute('data-transition-kind', 'standard')
+    expect(home).not.toHaveAttribute('data-transition-kind')
     expect(home).toHaveTextContent('←Home')
     expect(home.querySelector('[aria-hidden="true"]')).toHaveTextContent('←')
     expect(container.querySelector('.atlas-route-index')).not.toBeInTheDocument()

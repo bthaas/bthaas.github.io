@@ -39,7 +39,13 @@ vi.mock('gsap', () => ({
   },
 }))
 
-function HookHarness({ complete = true }: { readonly complete?: boolean }) {
+function HookHarness({
+  complete = true,
+  sideControls = false,
+}: {
+  readonly complete?: boolean
+  readonly sideControls?: boolean
+}) {
   const rootRef = useRef<HTMLElement>(null)
   const state = useGatewayEntrance(rootRef)
 
@@ -49,7 +55,13 @@ function HookHarness({ complete = true }: { readonly complete?: boolean }) {
         <span data-gateway-word-character>B</span>
       </p>
       <p className="portfolio-gateway__introduction">Introduction</p>
-      {complete ? <div className="portfolio-gateway__controls" /> : null}
+      {complete && sideControls ? (
+        <>
+          <button className="portfolio-gateway__side-arrow" type="button">Previous</button>
+          <button className="portfolio-gateway__side-arrow" type="button">Next</button>
+        </>
+      ) : null}
+      {complete && !sideControls ? <div className="portfolio-gateway__controls" /> : null}
       <div className="portfolio-gateway__ground-shadow" />
       {Array.from({ length: 48 }, (_, index) => (
         <span data-gateway-entrance-slice key={index} />
@@ -190,5 +202,14 @@ describe('useGatewayEntrance', () => {
     expect(screen.getByTestId('entrance-state')).toHaveTextContent('settled')
     expect(sessionStorage.getItem('atlas-gateway-entered')).toBeNull()
     expect(gsapMock.timeline.kill).toHaveBeenCalled()
+  })
+
+  it('animates the side-arrow controls used by the current gateway', () => {
+    globalThis.IntersectionObserver = undefined as unknown as typeof IntersectionObserver
+
+    render(<HookHarness sideControls />)
+
+    expect(screen.getByTestId('entrance-state')).toHaveTextContent('entering')
+    expect(gsapMock.createTimeline).toHaveBeenCalledOnce()
   })
 })

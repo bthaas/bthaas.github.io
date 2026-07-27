@@ -87,7 +87,7 @@ describe('PortfolioGateway', () => {
     expect(screen.getByTestId('portfolio-gateway-portal-source')).toBeInTheDocument()
     const surfaceLink = screen.getByRole('link', { name: 'Open Experience screen' })
     expect(surfaceLink).toHaveClass('portfolio-gateway__surface-link')
-    expect(surfaceLink).toHaveAttribute('data-transition-kind', 'portal')
+    expect(surfaceLink).not.toHaveAttribute('data-transition-kind')
     expect(surfaceLink.querySelector('.portfolio-gateway__surface-link-text')).toHaveTextContent(
       'Experience',
     )

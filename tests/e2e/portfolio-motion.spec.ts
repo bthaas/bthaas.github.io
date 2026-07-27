@@ -2,8 +2,6 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { siteContent } from '../../content/site-content'
 
-const PORTAL_ROUTE_HANDOFF_TIMEOUT_MS = 900
-
 function observeApplicationErrors(page: Page) {
   const errors: string[] = []
   const isApplicationURL = (url: string) => url.startsWith('http://127.0.0.1:')
@@ -279,29 +277,16 @@ test('opens every carousel category as its own routed screen', async ({
 
     const face = page.getByRole('link', { name: `Open ${label} screen` })
     await expect(face).toHaveAttribute('href', route)
-    await expect(page.locator('[data-page-transition-ribbon]')).toHaveCount(12)
+    await expect(page.locator('[data-page-transition-ribbon]')).toHaveCount(0)
+    await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
     await face.click()
-    await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-      'data-transition-category',
-      label.toLowerCase(),
-    )
-    await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-      'data-transition-handoff',
-      'requested',
-      {
-        timeout: PORTAL_ROUTE_HANDOFF_TIMEOUT_MS,
-      },
-    )
     await expect(page).toHaveURL(new RegExp(`${route}/?$`), {
       timeout: 15_000,
     })
     await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', screenName)
     await expect(page.locator('main > section')).toHaveCount(1)
     await expect(page.locator(`main > #${sectionId}`)).toBeVisible()
-    await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-      'data-transition-state',
-      'idle',
-    )
+    await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
     const primaryNavigation = page.getByRole('navigation', { name: 'Primary navigation' })
     if (route === '/skills') {
       await expect(primaryNavigation.getByRole('link')).toHaveCount(5)
@@ -317,17 +302,11 @@ test('opens every carousel category as its own routed screen', async ({
       await page.goBack()
       await expect(page).toHaveURL(/\/$/)
       await expect(page.locator('#portfolio-gateway')).toBeVisible()
-      await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-        'data-transition-state',
-        'idle',
-      )
+      await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
       await page.goForward()
       await expect(page).toHaveURL(/\/projects\/?$/)
       await expect(page.locator('main')).toHaveAttribute('data-portfolio-screen', 'projects')
-      await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-        'data-transition-state',
-        'idle',
-      )
+      await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
     }
   }
   expect(errors).toEqual([])
@@ -390,10 +369,8 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(
     page.locator('#portfolio-gateway').getByText('Engineer · Researcher · Builder', { exact: true }),
   ).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Open Experience', exact: true })).toHaveAttribute(
-    'href',
-    '/experience',
-  )
+  await expect(page.getByRole('link', { name: 'Open Experience screen' }))
+    .toHaveAttribute('href', '/experience')
   await gateway.focus()
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '1')
@@ -401,20 +378,16 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     .toHaveAttribute('data-active-destination', 'true')
   await expect(homeRouteIndex.getByRole('link', { name: 'Experience' }))
     .not.toHaveAttribute('data-active-destination')
-  await expect(page.getByRole('link', { name: 'Open Projects', exact: true })).toHaveAttribute(
-    'href',
-    '/projects',
-  )
+  await expect(page.getByRole('link', { name: 'Open Projects screen' }))
+    .toHaveAttribute('href', '/projects')
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '2')
-  await expect(page.getByRole('link', { name: 'Open Skills', exact: true }))
+  await expect(page.getByRole('link', { name: 'Open Skills screen' }))
     .toHaveAttribute('href', '/skills')
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '3')
-  await expect(page.getByRole('link', { name: 'Open Contact', exact: true })).toHaveAttribute(
-    'href',
-    '/contact',
-  )
+  await expect(page.getByRole('link', { name: 'Open Contact screen' }))
+    .toHaveAttribute('href', '/contact')
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await gateway.press('ArrowLeft')
@@ -433,14 +406,11 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await expectNoHorizontalOverflow(page)
 
-  await page.getByRole('link', { name: 'Open Experience', exact: true }).click()
+  await page.getByRole('link', { name: 'Open Experience screen' }).click()
   await expect(page).toHaveURL(/\/experience\/?$/, { timeout: 15_000 })
   await expect(page.locator('#experience')).toHaveCount(1)
   await expect(page.locator('#portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
-  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-    'data-transition-state',
-    'idle',
-  )
+  await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
   const careerPath = page.locator('[data-experience-flight]')
   const durationMap = careerPath.getByRole('navigation', {
     name: 'Experience date map',
@@ -538,10 +508,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await homeLink.focus()
   await homeLink.press('Enter')
   await expect(page).toHaveURL(/\/$/, { timeout: 15_000 })
-  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-    'data-transition-state',
-    'idle',
-  )
+  await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
   const contactLink = page.getByRole('navigation', { name: 'Primary navigation' })
     .getByRole('link', { name: 'Contact' })
   await contactLink.focus()
@@ -671,10 +638,7 @@ test('keeps reduced motion identical to the static render', async ({ browserName
 
   await page.getByRole('link', { name: 'Open Experience screen' }).click()
   await expect(page).toHaveURL(/\/experience\/?$/)
-  await expect(page.getByTestId('page-transition-overlay')).toHaveAttribute(
-    'data-transition-state',
-    'idle',
-  )
+  await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
   await expect(page.locator('[data-experience-flight]'))
     .not.toHaveAttribute('data-experience-flight-enhanced')
   await expect(page.locator('[data-experience-chapter]')).toHaveCount(4)

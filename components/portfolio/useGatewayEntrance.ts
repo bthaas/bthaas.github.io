@@ -20,7 +20,7 @@ const PERFORMANCE_MARK = 'atlas-gateway-entrance-start'
 const PERFORMANCE_MEASURE = 'atlas-gateway-entrance-duration'
 
 interface GatewayEntranceTargets {
-  readonly controls: HTMLElement
+  readonly controls: HTMLElement[]
   readonly entranceTargets: HTMLElement[]
   readonly introduction: HTMLElement
   readonly shadow: HTMLElement
@@ -69,20 +69,23 @@ function getEntranceTargets(root: HTMLElement): GatewayEntranceTargets | null {
     '[data-gateway-word-character]',
   ))
   const introduction = root.querySelector<HTMLElement>('.portfolio-gateway__introduction')
-  const controls = root.querySelector<HTMLElement>('.portfolio-gateway__controls')
+  const controls = Array.from(root.querySelectorAll<HTMLElement>([
+    '.portfolio-gateway__controls',
+    '.portfolio-gateway__side-arrow',
+  ].join(',')))
   const shadow = root.querySelector<HTMLElement>('.portfolio-gateway__ground-shadow')
 
   if (
     slices.length !== GATEWAY_CYLINDER_SEGMENTS.length
     || wordCharacters.length === 0
     || !introduction
-    || !controls
+    || controls.length === 0
     || !shadow
   ) return null
 
   return {
     controls,
-    entranceTargets: [...slices, ...wordCharacters, introduction, controls, shadow],
+    entranceTargets: [...slices, ...wordCharacters, introduction, ...controls, shadow],
     introduction,
     shadow,
     slices,
