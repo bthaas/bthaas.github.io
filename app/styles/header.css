@@ -113,19 +113,8 @@
   position: relative;
   top: auto;
   left: auto;
-  width: 44px;
-  min-width: 44px;
-  padding: 0;
-}
-
-.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link__label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
+  min-width: 5.5rem;
+  padding: 0 0.85rem;
 }
 
 .atlas-route-index li {
@@ -234,7 +223,7 @@
   transform-origin: left;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 840px) {
   .site-header {
     --atlas-corner-top: auto;
     top: auto;
@@ -271,7 +260,7 @@
     left: max(0.75rem, env(safe-area-inset-left));
     display: grid;
     gap: 0;
-    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-columns: minmax(5.5rem, auto) minmax(0, 1fr);
   }
 
   .site-header[data-index-visible="false"] {
@@ -304,8 +293,8 @@
 
   .site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link {
     width: auto;
-    min-width: 44px;
-    padding: 0;
+    min-width: 5.5rem;
+    padding: 0 0.35rem;
     border: 0;
     border-radius: 0;
     background: transparent;

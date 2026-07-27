@@ -62,9 +62,13 @@ describe('Atlas Corners navigation', () => {
       '.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link',
     )).toMatchObject({
       position: 'relative',
-      width: '44px',
-      'min-width': '44px',
+      'min-width': '5.5rem',
+      padding: '0 0.85rem',
     })
+    expect(declarations(
+      root,
+      '.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link__label',
+    )).toEqual({})
     expect(declarations(
       root,
       '.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-route-link',
@@ -86,10 +90,10 @@ describe('Atlas Corners navigation', () => {
     })
   })
 
-  it('keeps Home destination-only, Experience, Skills, and Contact complete at phone width', () => {
+  it('keeps Home destination-only and the complete inner index collision-free through tablet width', () => {
     let mobile: AtRule | undefined
     root.walkAtRules('media', (rule) => {
-      if (rule.params.includes('max-width: 720px')) mobile = rule
+      if (rule.params.includes('max-width: 840px')) mobile = rule
     })
 
     expect(mobile).toBeDefined()
@@ -121,7 +125,16 @@ describe('Atlas Corners navigation', () => {
     ).toMatchObject({
       position: 'absolute',
       display: 'grid',
-      'grid-template-columns': '44px minmax(0, 1fr)',
+      'grid-template-columns': 'minmax(5.5rem, auto) minmax(0, 1fr)',
+    })
+    expect(
+      declarations(
+        mobile as AtRule,
+        '.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link',
+      ),
+    ).toMatchObject({
+      'min-width': '5.5rem',
+      padding: '0 0.35rem',
     })
     expect(
       declarations(
