@@ -67,24 +67,30 @@ describe('AtlasNavigation', () => {
     expect(container.querySelector('.atlas-route-index')).not.toBeInTheDocument()
   })
 
-  it('keeps the complete route index on Skills and marks its current page', () => {
-    render(<AtlasNavigation current="skills" />)
-    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+  it.each([
+    ['skills', 'Skills'],
+    ['contact', 'Contact'],
+  ] as const)(
+    'keeps the complete route index on %s and marks its current page',
+    (current, currentLabel) => {
+      render(<AtlasNavigation current={current} />)
+      const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
 
-    expect(within(navigation).getAllByRole('link')).toHaveLength(5)
-    expect(within(navigation).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/')
-    destinations.forEach(([name, href]) => {
-      expect(within(navigation).getByRole('link', { name })).toHaveAttribute('href', href)
-    })
-    expect(within(navigation).getByRole('link', { name: 'Skills' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
-    expect(within(navigation).getAllByRole('link').filter((link) => (
-      link.hasAttribute('aria-current')
-    )))
-      .toHaveLength(1)
-  })
+      expect(within(navigation).getAllByRole('link')).toHaveLength(5)
+      expect(within(navigation).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/')
+      destinations.forEach(([name, href]) => {
+        expect(within(navigation).getByRole('link', { name })).toHaveAttribute('href', href)
+      })
+      expect(within(navigation).getByRole('link', { name: currentLabel })).toHaveAttribute(
+        'aria-current',
+        'page',
+      )
+      expect(within(navigation).getAllByRole('link').filter((link) => (
+        link.hasAttribute('aria-current')
+      )))
+        .toHaveLength(1)
+    },
+  )
 
   it('keeps route numbers decorative without changing link names', () => {
     const { container } = render(<AtlasNavigation current="home" />)

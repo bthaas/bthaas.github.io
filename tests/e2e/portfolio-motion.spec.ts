@@ -288,9 +288,9 @@ test('opens every carousel category as its own routed screen', async ({
     await expect(page.locator(`main > #${sectionId}`)).toBeVisible()
     await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
     const primaryNavigation = page.getByRole('navigation', { name: 'Primary navigation' })
-    if (route === '/skills') {
+    if (route === '/skills' || route === '/contact') {
       await expect(primaryNavigation.getByRole('link')).toHaveCount(5)
-      await expect(primaryNavigation.getByRole('link', { name: 'Skills' }))
+      await expect(primaryNavigation.getByRole('link', { name: label }))
         .toHaveAttribute('aria-current', 'page')
     } else {
       await expect(primaryNavigation.getByRole('link')).toHaveCount(1)

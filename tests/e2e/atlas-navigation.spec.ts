@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
 
 const innerRoutes = [
-  { current: 'experience', href: '/experience' },
-  { current: 'projects', href: '/projects' },
-  { current: 'skills', href: '/skills' },
-  { current: 'contact', href: '/contact' },
+  { current: 'experience', href: '/experience', label: 'Experience' },
+  { current: 'projects', href: '/projects', label: 'Projects' },
+  { current: 'skills', href: '/skills', label: 'Skills' },
+  { current: 'contact', href: '/contact', label: 'Contact' },
 ] as const
 
 test.beforeEach(async ({ page }) => {
@@ -41,9 +41,9 @@ test('keeps Atlas navigation contextual and collision-free on every route', asyn
     await home.focus()
     await expect(home).toBeFocused()
 
-    if (route.current === 'skills') {
+    if (route.current === 'skills' || route.current === 'contact') {
       await expect(navigation.getByRole('link')).toHaveCount(5)
-      await expect(navigation.getByRole('link', { name: 'Skills' }))
+      await expect(navigation.getByRole('link', { name: route.label }))
         .toHaveAttribute('aria-current', 'page')
     } else {
       await expect(navigation.getByRole('link')).toHaveCount(1)

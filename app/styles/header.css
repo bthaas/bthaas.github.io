@@ -89,7 +89,7 @@
   bottom: clamp(7rem, 14vh, 9rem);
 }
 
-.site-header[data-current="skills"] .atlas-route-index {
+.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-route-index {
   position: relative;
   top: auto;
   right: auto;
@@ -98,7 +98,7 @@
   grid-template-columns: repeat(4, max-content);
 }
 
-.site-header[data-current="skills"] .site-nav {
+.site-header[data-index-visible="true"]:not([data-current="home"]) .site-nav {
   position: fixed;
   top: var(--atlas-corner-top);
   right: max(clamp(1rem, 2vw, 2rem), env(safe-area-inset-right));
@@ -108,7 +108,7 @@
   pointer-events: auto;
 }
 
-.site-header[data-current="skills"] .atlas-home-link {
+.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link {
   position: relative;
   top: auto;
   left: auto;
@@ -117,7 +117,7 @@
   padding: 0;
 }
 
-.site-header[data-current="skills"] .atlas-home-link__label {
+.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link__label {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -146,7 +146,7 @@
   text-transform: uppercase;
 }
 
-.site-header[data-current="skills"] .atlas-route-link {
+.site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-route-link {
   gap: 0.3rem;
   grid-template-columns: max-content max-content;
 }
@@ -262,7 +262,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .site-header[data-current="skills"] .site-nav {
+  .site-header[data-index-visible="true"]:not([data-current="home"]) .site-nav {
     position: absolute;
     top: auto;
     right: max(0.75rem, env(safe-area-inset-right));
@@ -301,7 +301,7 @@
     backdrop-filter: none;
   }
 
-  .site-header[data-current="skills"] .atlas-home-link {
+  .site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link {
     width: auto;
     min-width: 44px;
     padding: 0;
@@ -348,7 +348,7 @@
     bottom: auto;
   }
 
-  .site-header[data-current="skills"] .atlas-route-index {
+  .site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-route-index {
     gap: 0;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -365,7 +365,7 @@
     text-align: center;
   }
 
-  .site-header[data-current="skills"] .atlas-route-link {
+  .site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-route-link {
     gap: 0.1rem;
     grid-template-columns: none;
   }

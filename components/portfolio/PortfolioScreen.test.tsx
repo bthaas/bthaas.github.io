@@ -25,7 +25,7 @@ describe('PortfolioScreen', () => {
     expect(container.querySelector(`main > #${sectionId}`)).toBeInTheDocument()
   })
 
-  it.each(['experience', 'projects', 'contact'] as const)(
+  it.each(['experience', 'projects'] as const)(
     'keeps only a compact Home control on the %s screen',
     (screenName) => {
       render(<PortfolioScreen screen={screenName} />)
@@ -40,21 +40,27 @@ describe('PortfolioScreen', () => {
     },
   )
 
-  it('keeps the full route index where it fits cleanly on Skills', () => {
-    render(<PortfolioScreen screen="skills" />)
-    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+  it.each([
+    ['skills', 'Skills'],
+    ['contact', 'Contact'],
+  ] as const)(
+    'keeps the full route index where it fits cleanly on %s',
+    (screenName, currentLabel) => {
+      render(<PortfolioScreen screen={screenName} />)
+      const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
 
-    expect(within(navigation).getByRole('link', { name: 'Home' }))
-      .toHaveAttribute('href', '/')
-    expect(within(navigation).getByRole('link', { name: 'Experience' }))
-      .toHaveAttribute('href', '/experience')
-    expect(within(navigation).getByRole('link', { name: 'Projects' }))
-      .toHaveAttribute('href', '/projects')
-    expect(within(navigation).getByRole('link', { name: 'Skills' }))
-      .toHaveAttribute('aria-current', 'page')
-    expect(within(navigation).getByRole('link', { name: 'Skills' }))
-      .toHaveAttribute('href', '/skills')
-    expect(within(navigation).getByRole('link', { name: 'Contact' }))
-      .toHaveAttribute('href', '/contact')
-  })
+      expect(within(navigation).getByRole('link', { name: 'Home' }))
+        .toHaveAttribute('href', '/')
+      expect(within(navigation).getByRole('link', { name: 'Experience' }))
+        .toHaveAttribute('href', '/experience')
+      expect(within(navigation).getByRole('link', { name: 'Projects' }))
+        .toHaveAttribute('href', '/projects')
+      expect(within(navigation).getByRole('link', { name: currentLabel }))
+        .toHaveAttribute('aria-current', 'page')
+      expect(within(navigation).getByRole('link', { name: 'Skills' }))
+        .toHaveAttribute('href', '/skills')
+      expect(within(navigation).getByRole('link', { name: 'Contact' }))
+        .toHaveAttribute('href', '/contact')
+    },
+  )
 })
