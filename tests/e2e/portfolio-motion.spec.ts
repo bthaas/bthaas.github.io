@@ -732,15 +732,21 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     const readSizeMetrics = () => tools.getByRole('button').evaluateAll((tokens) => (
       tokens.map((token) => {
         const element = token as HTMLElement
-        const size = element.dataset.skillSize
-        if (!size) {
-          throw new Error(`Missing skill size for ${element.getAttribute('aria-label')}`)
-        }
+        const label = element.querySelector('span')
+        if (!label) throw new Error('Missing visible skill label')
+        const labelElement = label as HTMLElement
+        const styles = getComputedStyle(element)
 
         return {
+          endPadding: Number.parseFloat(styles.paddingInlineEnd),
           height: element.offsetHeight,
           label: element.getAttribute('aria-label') ?? '',
-          size,
+          labelClientWidth: labelElement.clientWidth,
+          labelScrollWidth: labelElement.scrollWidth,
+          overflow: getComputedStyle(labelElement).overflow,
+          textOverflow: getComputedStyle(labelElement).textOverflow,
+          tokenClientWidth: element.clientWidth,
+          tokenScrollWidth: element.scrollWidth,
           width: element.offsetWidth,
         }
       })
@@ -817,26 +823,20 @@ test('drags, filters, and keyboard-controls the accessible skill workbench', asy
     await expect(workbench).toHaveAttribute('data-physics', 'stuck')
     await expect(workbench.getByRole('button', { name: 'Drop skills' })).toBeVisible()
     const sizeMetrics = await readSizeMetrics()
-    const sizeTiers = ['compact', 'small', 'medium', 'large'] as const
-    expect(new Set(sizeMetrics.map(({ size }) => size))).toEqual(new Set(sizeTiers))
+    expect(new Set(sizeMetrics.map(({ width }) => Math.round(width))).size)
+      .toBeGreaterThan(16)
 
-    for (const [size, expectedWidth, expectedHeight] of [
-      ['compact', 112, 40],
-      ['small', 126, 43],
-      ['medium', 141, 46],
-      ['large', 155, 48],
-    ] as const) {
-      const tier = sizeMetrics.filter((metric) => metric.size === size)
-      expect(tier.length, `Missing ${size} skill tokens`).toBeGreaterThan(0)
-
-      for (const metric of tier) {
-        expect(metric.width, `${metric.label} width`).toBeGreaterThanOrEqual(expectedWidth - 2)
-        expect(metric.width, `${metric.label} width`).toBeLessThanOrEqual(expectedWidth + 2)
-        expect(metric.height, `${metric.label} height`)
-          .toBeGreaterThanOrEqual(expectedHeight - 1)
-        expect(metric.height, `${metric.label} height`)
-          .toBeLessThanOrEqual(expectedHeight + 1)
-      }
+    for (const metric of sizeMetrics) {
+      expect(metric.height, `${metric.label} height`).toBeGreaterThanOrEqual(47)
+      expect(metric.height, `${metric.label} height`).toBeLessThanOrEqual(49)
+      expect(metric.labelClientWidth, `${metric.label} visible label width`)
+        .toBeGreaterThanOrEqual(metric.labelScrollWidth)
+      expect(metric.tokenClientWidth, `${metric.label} visible token width`)
+        .toBeGreaterThanOrEqual(metric.tokenScrollWidth)
+      expect(metric.overflow, `${metric.label} overflow`).toBe('visible')
+      expect(metric.textOverflow, `${metric.label} text overflow`).toBe('clip')
+      expect(metric.endPadding, `${metric.label} end padding`).toBeGreaterThanOrEqual(8)
+      expect(metric.endPadding, `${metric.label} end padding`).toBeLessThanOrEqual(12)
     }
 
     const widthFor = (label: string) => {

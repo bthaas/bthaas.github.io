@@ -174,10 +174,10 @@
   --skill-token-height: 48px;
   --skill-token-padding-block: 0.54rem;
   --skill-token-padding-inline: 0.62rem;
-  --skill-token-width: 9.7rem;
 
   display: grid;
-  width: min(100%, var(--skill-token-width));
+  width: max-content;
+  max-width: none;
   min-width: 0;
   min-height: var(--skill-token-height);
   padding:
@@ -197,38 +197,13 @@
   font-size: clamp(0.56rem, 0.72vw, 0.72rem);
   font-weight: 750;
   gap: var(--skill-token-gap);
-  grid-template-columns: var(--skill-token-glyph) minmax(0, 1fr);
+  grid-template-columns: var(--skill-token-glyph) max-content;
   letter-spacing: -0.01em;
   line-height: 1.05;
   text-align: left;
   transform-origin: center;
   user-select: none;
   will-change: transform;
-}
-
-.skill-workbench__token[data-skill-size="compact"] {
-  --skill-token-gap: 0.38rem;
-  --skill-token-glyph: 1.15rem;
-  --skill-token-height: 40px;
-  --skill-token-padding-block: 0.42rem;
-  --skill-token-padding-inline: 0.52rem;
-  --skill-token-width: 7rem;
-}
-
-.skill-workbench__token[data-skill-size="small"] {
-  --skill-token-gap: 0.42rem;
-  --skill-token-glyph: 1.3rem;
-  --skill-token-height: 43px;
-  --skill-token-padding-block: 0.46rem;
-  --skill-token-padding-inline: 0.56rem;
-  --skill-token-width: 7.9rem;
-}
-
-.skill-workbench__token[data-skill-size="medium"] {
-  --skill-token-glyph: 1.48rem;
-  --skill-token-height: 46px;
-  --skill-token-padding-block: 0.5rem;
-  --skill-token-width: 8.8rem;
 }
 
 .skill-workbench[data-dragging] .skill-workbench__token {
@@ -262,9 +237,9 @@
 }
 
 .skill-workbench__token > span {
-  overflow: hidden;
+  overflow: visible;
   pointer-events: none;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 

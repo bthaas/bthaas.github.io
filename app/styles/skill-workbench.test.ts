@@ -45,6 +45,20 @@ describe('Skill Workbench presentation contract', () => {
     })
   })
 
+  it('sizes every desktop token to its full label instead of a fixed tier', () => {
+    expect(declarationsFor('.skill-workbench__token')).toMatchObject({
+      width: 'max-content',
+      'max-width': 'none',
+      'grid-template-columns': 'var(--skill-token-glyph) max-content',
+    })
+    expect(declarationsFor('.skill-workbench__token > span')).toMatchObject({
+      overflow: 'visible',
+      'text-overflow': 'clip',
+      'white-space': 'nowrap',
+    })
+    expect(stylesheet).not.toContain('[data-skill-size=')
+  })
+
   it('does not reserve header space for a tool-count readout', () => {
     expect(stylesheet).not.toContain('.skill-workbench__meta')
     expect(declarationsFor('.skill-workbench__status')).toMatchObject({
