@@ -138,6 +138,49 @@ describe('ExperienceFlightPath', () => {
       .toHaveTextContent('✦')
   })
 
+  it('highlights the matching stop while a timeline part is hovered or focused', () => {
+    render(
+      <ExperienceFlightPath
+        education={siteContent.education}
+        experience={siteContent.experience}
+      />,
+    )
+
+    const [firstExperience] = siteContent.experience
+    const firstLine = screen.getByLabelText(
+      `${firstExperience.role} at ${firstExperience.organization}, ${firstExperience.period}`,
+    )
+    const firstStop = document.getElementById(
+      `experience-stop-${firstExperience.id}`,
+    )
+    const [education] = siteContent.education
+    const educationStar = screen.getByLabelText(
+      `${education.degree} at ${education.institution}, ${education.graduation}`,
+    )
+    const educationStop = document.getElementById(
+      'experience-stop-education-university-of-virginia',
+    )
+
+    expect(firstStop).not.toHaveAttribute('data-timeline-highlighted')
+
+    fireEvent.mouseEnter(firstLine)
+    expect(firstStop).toHaveAttribute('data-timeline-highlighted', 'true')
+
+    fireEvent.focus(firstLine)
+    fireEvent.mouseLeave(firstLine)
+    expect(firstStop).toHaveAttribute('data-timeline-highlighted', 'true')
+
+    fireEvent.blur(firstLine)
+    expect(firstStop).not.toHaveAttribute('data-timeline-highlighted')
+
+    fireEvent.mouseEnter(educationStar)
+    expect(educationStop).toHaveAttribute('data-timeline-highlighted', 'true')
+    expect(firstStop).not.toHaveAttribute('data-timeline-highlighted')
+
+    fireEvent.mouseLeave(educationStar)
+    expect(educationStop).not.toHaveAttribute('data-timeline-highlighted')
+  })
+
   it('opens only the pressed role and collapses it when pressed again', () => {
     render(
       <ExperienceFlightPath

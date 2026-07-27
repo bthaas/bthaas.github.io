@@ -1,6 +1,6 @@
 'use client'
 
-import { type CSSProperties, useRef } from 'react'
+import { type CSSProperties, useRef, useState } from 'react'
 
 import { AtlasPicture } from '@/components/portfolio/AtlasPicture'
 import { atlasVisuals } from '@/content/editorial-visuals'
@@ -118,6 +118,9 @@ export function ExperienceFlightPath({
   experience,
 }: ExperienceFlightPathProps) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const [hoveredStopId, setHoveredStopId] = useState<string | null>(null)
+  const [focusedStopId, setFocusedStopId] = useState<string | null>(null)
+  const highlightedStopId = focusedStopId ?? hoveredStopId
   const timeline = buildExperienceTimeline(experience, education)
   const stops: readonly TimelineStop[] = [
     ...experience.map((entry) => ({
@@ -206,6 +209,10 @@ export function ExperienceFlightPath({
                     className="experience-timeline__milestone"
                     href={`#experience-stop-${stop.id}`}
                     key={`milestone-${item.id}`}
+                    onBlur={() => setFocusedStopId(null)}
+                    onFocus={() => setFocusedStopId(stop.id)}
+                    onMouseEnter={() => setHoveredStopId(stop.id)}
+                    onMouseLeave={() => setHoveredStopId(null)}
                     style={{
                       '--experience-position': `${item.end * 100}%`,
                     } as TimelinePositionStyle}
@@ -254,6 +261,10 @@ export function ExperienceFlightPath({
                       aria-label={`${accessibleRole} at ${stop.label}, ${stop.period}`}
                       className="experience-timeline__duration-link"
                       href={`#experience-stop-${stop.id}`}
+                      onBlur={() => setFocusedStopId(null)}
+                      onFocus={() => setFocusedStopId(stop.id)}
+                      onMouseEnter={() => setHoveredStopId(stop.id)}
+                      onMouseLeave={() => setHoveredStopId(null)}
                     >
                       <i
                         aria-hidden="true"
@@ -295,6 +306,9 @@ export function ExperienceFlightPath({
                   className="experience-timeline__stop"
                   data-experience-chapter
                   data-kind={stop.kind}
+                  data-timeline-highlighted={
+                    highlightedStopId === stop.id ? 'true' : undefined
+                  }
                   id={`experience-stop-${stop.id}`}
                   key={stop.id}
                 >

@@ -122,6 +122,14 @@ describe('Experience timeline', () => {
     )).toMatchObject({
       opacity: '1',
     })
+    expect(declarationsFor(
+      experienceStyles,
+      ".experience-timeline__stop[data-timeline-highlighted='true']",
+    )).toMatchObject({
+      'background-color': 'rgb(255 253 245 / 92%)',
+      'box-shadow': expect.stringContaining('var(--experience-gold)'),
+      'z-index': '2',
+    })
   })
 
   it('uses an intentional stacked route at 390px', () => {
