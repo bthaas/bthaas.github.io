@@ -84,3 +84,35 @@ test('keeps Atlas navigation contextual and collision-free on every route', asyn
     expect(layout.bottom).toBeLessThanOrEqual(layout.viewportHeight)
   }
 })
+
+test('extends the desktop Contact canvas while preserving the mobile navigation reservation', async ({
+  isMobile,
+  page,
+}) => {
+  await page.goto('/contact', { waitUntil: 'networkidle' })
+
+  const layout = await page.evaluate(() => {
+    const boardElement = document.querySelector('.contact-board')
+    const board = boardElement?.getBoundingClientRect()
+    const panel = document.querySelector('.contact-panel')?.getBoundingClientRect()
+
+    return {
+      boardBottom: board?.bottom ?? -1,
+      boardMinHeight: boardElement
+        ? Number.parseFloat(getComputedStyle(boardElement).minHeight)
+        : -1,
+      overflow: document.documentElement.scrollWidth > window.innerWidth,
+      panelBottom: panel?.bottom ?? -1,
+      viewportHeight: window.innerHeight,
+    }
+  })
+
+  expect(layout.overflow).toBe(false)
+
+  if (isMobile) {
+    expect(Math.abs(layout.boardMinHeight - (layout.viewportHeight - 55))).toBeLessThan(1)
+  } else {
+    expect(Math.abs(layout.boardBottom - layout.viewportHeight)).toBeLessThan(1)
+    expect(Math.abs(layout.panelBottom - layout.viewportHeight)).toBeLessThan(1)
+  }
+})
