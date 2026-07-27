@@ -8,6 +8,20 @@ import { buildExperienceTimeline } from '@/lib/experience-flight-path'
 import { ExperienceFlightPath } from './ExperienceFlightPath'
 
 describe('ExperienceFlightPath', () => {
+  it('keeps the introduction focused on the Experience heading', () => {
+    const { container } = render(
+      <ExperienceFlightPath
+        education={siteContent.education}
+        experience={siteContent.experience}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Experience' })).toBeVisible()
+    expect(container.querySelector('.experience-timeline__intro-copy')).toBeNull()
+    expect(screen.queryByText(/One shared route/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Every company and role/)).not.toBeInTheDocument()
+  })
+
   it('server-renders every timeline stop with its details collapsed', () => {
     const markup = renderToString(
       <ExperienceFlightPath

@@ -164,13 +164,6 @@ export function ExperienceFlightPath({
           <p className="eyebrow">01 / Career trajectory</p>
           <h2 id="experience-title">Experience</h2>
         </div>
-        <div className="experience-timeline__intro-copy">
-          <p>
-            One shared route, three overlapping tenures, and one academic
-            milestone. Hover or focus a line to identify it.
-          </p>
-          <p>Every company and role remains visible in the columns below.</p>
-        </div>
       </header>
 
       <section
