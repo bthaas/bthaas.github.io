@@ -288,7 +288,7 @@ test('opens every carousel category as its own routed screen', async ({
     await expect(page.locator(`main > #${sectionId}`)).toBeVisible()
     await expect(page.getByTestId('page-transition-overlay')).toHaveCount(0)
     const primaryNavigation = page.getByRole('navigation', { name: 'Primary navigation' })
-    if (route === '/skills' || route === '/contact') {
+    if (route !== '/projects') {
       await expect(primaryNavigation.getByRole('link')).toHaveCount(5)
       await expect(primaryNavigation.getByRole('link', { name: label }))
         .toHaveAttribute('aria-current', 'page')
@@ -504,7 +504,10 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(disclosures.nth(1)).not.toHaveAttribute('open')
   await expect(page.getByText(siteContent.experience[1].summary)).toBeHidden()
   await expect(firstDetails).toBeVisible()
-  await expect(page.locator('#experience')).toHaveCSS('background-color', 'rgb(25, 25, 43)')
+  await expect(page.locator('#experience')).toHaveCSS(
+    'background-color',
+    'rgb(243, 239, 227)',
+  )
   await expectNoHorizontalOverflow(page)
 
   const homeLink = page.getByRole('link', { name: 'Home' })

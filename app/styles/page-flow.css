@@ -9,6 +9,7 @@ main {
 }
 
 .portfolio-gateway,
+.experience-section,
 .projects-section,
 .craft-section,
 .contact-section {
@@ -23,12 +24,6 @@ main {
   );
   background-repeat: no-repeat;
   color: var(--ink);
-}
-
-.experience-section {
-  background-color: var(--dusk-deep);
-  background-image: none;
-  color: var(--paper);
 }
 
 main > section + section {
@@ -54,6 +49,7 @@ main > section + section {
 
 @media (max-width: 720px) {
   .portfolio-gateway,
+  .experience-section,
   .projects-section,
   .craft-section,
   .contact-section {

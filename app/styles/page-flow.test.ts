@@ -33,6 +33,7 @@ describe('continuous page color system', () => {
 
     for (const selector of [
       '.portfolio-gateway',
+      '.experience-section',
       '.projects-section',
       '.craft-section',
       '.contact-section',
@@ -47,15 +48,17 @@ describe('continuous page color system', () => {
     }
   })
 
-  it('gives the experience flight path a deliberate dark editorial field', () => {
+  it('keeps the experience flight path on the shared light editorial field', () => {
     expect(existsSync(stylesheetPath)).toBe(true)
     const stylesheet = readFileSync(stylesheetPath, 'utf8')
 
     expect(declarationsFor(stylesheet, '.experience-section')).toMatchObject({
-      'background-color': 'var(--dusk-deep)',
-      'background-image': 'none',
-      color: 'var(--paper)',
+      'background-color': 'var(--page-surface)',
+      color: 'var(--ink)',
     })
+    expect(
+      declarationsFor(stylesheet, '.experience-section')['background-image'],
+    ).toContain('var(--page-rule)')
   })
 
   it('uses the same cream surface and soft rules through skills and contact', () => {

@@ -32,7 +32,7 @@ export function AtlasNavigation({
     'experience',
   )
   const showHomeControl = current !== 'home'
-  const showRouteIndex = current === 'home' || current === 'skills' || current === 'contact'
+  const showRouteIndex = current !== 'projects'
 
   useEffect(() => {
     if (current !== 'home') return

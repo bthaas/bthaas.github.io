@@ -41,7 +41,7 @@ test('keeps Atlas navigation contextual and collision-free on every route', asyn
     await home.focus()
     await expect(home).toBeFocused()
 
-    if (route.current === 'skills' || route.current === 'contact') {
+    if (route.current !== 'projects') {
       await expect(navigation.getByRole('link')).toHaveCount(5)
       await expect(navigation.getByRole('link', { name: route.label }))
         .toHaveAttribute('aria-current', 'page')

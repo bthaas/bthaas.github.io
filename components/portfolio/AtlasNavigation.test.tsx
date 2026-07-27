@@ -69,6 +69,7 @@ describe('AtlasNavigation', () => {
   })
 
   it.each([
+    ['experience', 'Experience'],
     ['skills', 'Skills'],
     ['contact', 'Contact'],
   ] as const)(
@@ -78,9 +79,11 @@ describe('AtlasNavigation', () => {
       const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
 
       expect(within(navigation).getAllByRole('link')).toHaveLength(5)
-      expect(within(navigation).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/')
+      expect(within(navigation).getByRole('link', { name: 'Home' }))
+        .toHaveAttribute('href', '/')
       destinations.forEach(([name, href]) => {
-        expect(within(navigation).getByRole('link', { name })).toHaveAttribute('href', href)
+        expect(within(navigation).getByRole('link', { name }))
+          .toHaveAttribute('href', href)
       })
       expect(within(navigation).getByRole('link', { name: currentLabel })).toHaveAttribute(
         'aria-current',

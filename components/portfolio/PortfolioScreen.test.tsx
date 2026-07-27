@@ -25,7 +25,7 @@ describe('PortfolioScreen', () => {
     expect(container.querySelector(`main > #${sectionId}`)).toBeInTheDocument()
   })
 
-  it.each(['experience', 'projects'] as const)(
+  it.each(['projects'] as const)(
     'keeps only a compact Home control on the %s screen',
     (screenName) => {
       render(<PortfolioScreen screen={screenName} />)
@@ -42,6 +42,7 @@ describe('PortfolioScreen', () => {
   )
 
   it.each([
+    ['experience', 'Experience'],
     ['skills', 'Skills'],
     ['contact', 'Contact'],
   ] as const)(

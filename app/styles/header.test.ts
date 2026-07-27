@@ -86,7 +86,7 @@ describe('Atlas Corners navigation', () => {
     })
   })
 
-  it('keeps Home destination-only, Skills and Contact complete, and other screens minimal at phone width', () => {
+  it('keeps Home destination-only, Experience, Skills, and Contact complete at phone width', () => {
     let mobile: AtRule | undefined
     root.walkAtRules('media', (rule) => {
       if (rule.params.includes('max-width: 720px')) mobile = rule
