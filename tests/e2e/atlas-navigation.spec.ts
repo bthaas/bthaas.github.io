@@ -37,7 +37,7 @@ test('keeps Atlas navigation contextual and collision-free on every route', asyn
     const home = navigation.getByRole('link', { name: 'Home' })
 
     await expect(home).toHaveAttribute('href', '/')
-    await expect(home).toContainText('←')
+    await expect(home.locator('svg[data-arrow-direction="left"]')).toHaveCount(1)
     await home.focus()
     await expect(home).toBeFocused()
 

@@ -30,7 +30,9 @@ describe('Atlas Corners navigation', () => {
       'min-width': '5.5rem',
     })
     expect(declarations(root, '.atlas-home-link__arrow')).toMatchObject({
-      'font-size': '1.15rem',
+      display: 'block',
+      height: '1.15rem',
+      width: '1.15rem',
     })
     expect(declarations(root, '.atlas-route-index')).toMatchObject({
       position: 'fixed',

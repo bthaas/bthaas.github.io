@@ -83,6 +83,8 @@ describe('ProjectsFlightPath', () => {
     expect(markup).toContain('id="project-beatstream"')
     expect(markup).toContain('id="project-vision-bias-steering"')
     expect(markup).toContain('/icarus-atlas/project-courtvision-1200.webp')
+    expect(markup.match(/data-arrow-direction="up-right"/g)).toHaveLength(3)
+    expect(markup).not.toContain('↗')
     expect(markup).not.toContain('project-flight-scene')
   })
 

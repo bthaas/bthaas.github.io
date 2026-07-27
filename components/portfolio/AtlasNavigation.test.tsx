@@ -62,8 +62,9 @@ describe('AtlasNavigation', () => {
     expect(within(navigation).getAllByRole('link')).toEqual([home])
     expect(home).toHaveAttribute('href', '/')
     expect(home).not.toHaveAttribute('data-transition-kind')
-    expect(home).toHaveTextContent('←Home')
-    expect(home.querySelector('[aria-hidden="true"]')).toHaveTextContent('←')
+    expect(home).toHaveTextContent('Home')
+    expect(home).not.toHaveTextContent('←')
+    expect(home.querySelector('svg')).toHaveAttribute('data-arrow-direction', 'left')
     expect(container.querySelector('.atlas-route-index')).not.toBeInTheDocument()
   })
 

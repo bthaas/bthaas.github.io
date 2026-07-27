@@ -845,9 +845,10 @@
     transform 520ms var(--ease-out);
 }
 
-.project-panel__action span {
-  font-size: 1rem;
-  line-height: 1;
+.project-panel__action svg {
+  display: block;
+  width: 1rem;
+  height: 1rem;
 }
 
 .project-panel:hover .project-panel__art,
