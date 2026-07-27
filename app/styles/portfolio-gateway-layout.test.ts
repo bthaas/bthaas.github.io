@@ -30,7 +30,7 @@ function declarationsFor(
 }
 
 describe('single-screen portfolio gateway layout', () => {
-  it('owns the complete desktop viewport beneath the floating corners', () => {
+  it('owns the complete desktop viewport with a narrow title overlap', () => {
     const stylesheet = readFileSync(gatewayStylesheetPath, 'utf8')
 
     expect(declarationsFor(stylesheet, '.portfolio-gateway')).toMatchObject({
@@ -39,12 +39,13 @@ describe('single-screen portfolio gateway layout', () => {
       overflow: 'hidden',
     })
     expect(declarationsFor(stylesheet, '.portfolio-gateway__visual').top).toBe(
-      'clamp(10.5rem, 22vh, 12.5rem)',
+      'clamp(13rem, 29vh, 16rem)',
     )
     expect(declarationsFor(stylesheet, '.portfolio-gateway__fallback-ring').height).toBe('68%')
+    expect(declarationsFor(stylesheet, '.portfolio-gateway__controls')).toEqual({})
   })
 
-  it('reserves the fixed bottom index on mobile', () => {
+  it('reserves the fixed mobile navigation without restoring the bottom controls', () => {
     const stylesheet = readFileSync(gatewayStylesheetPath, 'utf8')
     const media = '(max-width: 720px)'
 
@@ -52,11 +53,10 @@ describe('single-screen portfolio gateway layout', () => {
       height: 'calc(100svh - 4.75rem - env(safe-area-inset-bottom))',
       'min-height': '0',
     })
-    expect(declarationsFor(stylesheet, '.portfolio-gateway__word', media).top).toBe('28%')
+    expect(declarationsFor(stylesheet, '.portfolio-gateway__word', media).top).toBe('30%')
     expect(declarationsFor(stylesheet, '.portfolio-gateway__visual', media).top).toBe('31%')
-    expect(declarationsFor(stylesheet, '.portfolio-gateway__controls', media).top).toBe(
-      'calc(31% + min(22rem, 42svh))',
-    )
+    expect(declarationsFor(stylesheet, '.portfolio-gateway__side-arrow', media).top).toBe('25%')
+    expect(declarationsFor(stylesheet, '.portfolio-gateway__controls', media)).toEqual({})
   })
 
   it('removes the superseded hero stylesheet', () => {

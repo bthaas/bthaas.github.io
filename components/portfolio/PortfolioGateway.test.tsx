@@ -23,7 +23,7 @@ describe('PortfolioGateway', () => {
     sessionStorage.setItem('atlas-gateway-entered', '1')
   })
 
-  it('starts on Experience with semantic carousel controls and destinations', () => {
+  it('starts on Experience with side arrows and no bottom control strip', () => {
     const { container } = renderGateway()
 
     expect(screen.getByRole('heading', { name: 'Explore the portfolio' })).toBeInTheDocument()
@@ -37,16 +37,20 @@ describe('PortfolioGateway', () => {
     expect(within(introduction).getByText('Portfolio / 2026')).toBeInTheDocument()
     expect(within(introduction).getByText('Software Engineer')).toBeInTheDocument()
     expect(within(introduction).getByText('Bellevue, Washington')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
-      'href',
-      '/experience',
-    )
     expect(screen.getByRole('link', { name: 'Open Experience screen' })).toHaveAttribute(
       'href',
       '/experience',
     )
-    expect(screen.getByRole('button', { name: 'Previous category' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Next category' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Open Experience' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Previous category' })).toHaveClass(
+      'portfolio-gateway__side-arrow',
+      'portfolio-gateway__side-arrow--previous',
+    )
+    expect(screen.getByRole('button', { name: 'Next category' })).toHaveClass(
+      'portfolio-gateway__side-arrow',
+      'portfolio-gateway__side-arrow--next',
+    )
+    expect(container.querySelector('.portfolio-gateway__controls')).toBeNull()
     expect(screen.getByRole('region', { name: 'Portfolio category carousel' })).toHaveAttribute(
       'aria-roledescription',
       'carousel',
@@ -87,10 +91,6 @@ describe('PortfolioGateway', () => {
     expect(surfaceLink.querySelector('.portfolio-gateway__surface-link-text')).toHaveTextContent(
       'Experience',
     )
-    expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
-      'data-transition-kind',
-      'portal',
-    )
     expect(
       container.querySelectorAll('[data-gateway-category="experience"]'),
     ).toHaveLength(12)
@@ -127,11 +127,10 @@ describe('PortfolioGateway', () => {
     expect(carousel).toHaveAttribute('tabindex', '-1')
     expect(screen.getByRole('button', { name: 'Previous category' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Next category' })).toBeDisabled()
-    expect(screen.getByRole('link', { name: 'Open Experience' }))
+    expect(screen.getByRole('link', { name: 'Open Experience screen' }))
       .toHaveAttribute('aria-disabled', 'true')
-    expect(screen.getByRole('link', { name: 'Open Experience' }))
+    expect(screen.getByRole('link', { name: 'Open Experience screen' }))
       .toHaveAttribute('tabindex', '-1')
-    expect(fireEvent.click(screen.getByRole('link', { name: 'Open Experience' }))).toBe(false)
     expect(
       fireEvent.click(screen.getByRole('link', { name: 'Open Experience screen' })),
     ).toBe(false)
@@ -159,30 +158,47 @@ describe('PortfolioGateway', () => {
     expect(screen.getByRole('button', { name: 'Next category' })).toBeEnabled()
   })
 
-  it('cycles categories with buttons and arrow keys while wrapping', () => {
+  it('cycles categories with side buttons and arrow keys while wrapping', () => {
     renderGateway()
     const carousel = screen.getByRole('region', { name: 'Portfolio category carousel' })
+    const previous = screen.getByRole('button', { name: 'Previous category' })
     const next = screen.getByRole('button', { name: 'Next category' })
 
+    fireEvent.pointerDown(previous, { button: 0, pointerId: 2 })
+    fireEvent.pointerDown(next, { button: 0, pointerId: 3 })
+    expect(carousel).toHaveAttribute('data-dragging', 'false')
+
     fireEvent.click(next)
-    expect(screen.getByRole('link', { name: 'Open Projects' })).toHaveAttribute('href', '/projects')
+    expect(screen.getByRole('link', { name: 'Open Projects screen' })).toHaveAttribute(
+      'href',
+      '/projects',
+    )
     expect(carousel).toHaveAttribute('data-active-index', '1')
     expect(screen.getByRole('status')).toHaveTextContent('Projects category selected')
 
     fireEvent.keyDown(carousel, { key: 'ArrowRight' })
-    expect(screen.getByRole('link', { name: 'Open Skills' })).toHaveAttribute('href', '/skills')
+    expect(screen.getByRole('link', { name: 'Open Skills screen' })).toHaveAttribute(
+      'href',
+      '/skills',
+    )
 
     fireEvent.keyDown(carousel, { key: 'ArrowRight' })
-    expect(screen.getByRole('link', { name: 'Open Contact' })).toHaveAttribute('href', '/contact')
+    expect(screen.getByRole('link', { name: 'Open Contact screen' })).toHaveAttribute(
+      'href',
+      '/contact',
+    )
 
     fireEvent.keyDown(carousel, { key: 'ArrowRight' })
-    expect(screen.getByRole('link', { name: 'Open Experience' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Open Experience screen' })).toHaveAttribute(
       'href',
       '/experience',
     )
 
-    fireEvent.keyDown(carousel, { key: 'ArrowLeft' })
-    expect(screen.getByRole('link', { name: 'Open Contact' })).toHaveAttribute('href', '/contact')
+    fireEvent.click(previous)
+    expect(screen.getByRole('link', { name: 'Open Contact screen' })).toHaveAttribute(
+      'href',
+      '/contact',
+    )
   })
 
   it('announces its selected destination to the Home route index', () => {
@@ -240,7 +256,7 @@ describe('PortfolioGateway', () => {
     fireEvent.pointerUp(dragSurface, { clientX: 280, pointerId: 7 })
     expect(carousel).toHaveAttribute('data-dragging', 'false')
     expect(carousel).toHaveAttribute('data-active-index', '1')
-    expect(screen.getByRole('link', { name: 'Open Projects' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Open Projects screen' })).toHaveAttribute(
       'href',
       '/projects',
     )

@@ -252,6 +252,26 @@ export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
             if (interactive) finishDrag(event, true)
           }}
         >
+          <button
+            className="portfolio-gateway__side-arrow portfolio-gateway__side-arrow--previous"
+            type="button"
+            aria-label="Previous category"
+            disabled={!interactive}
+            onClick={selectPrevious}
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <button
+            className="portfolio-gateway__side-arrow portfolio-gateway__side-arrow--next"
+            type="button"
+            aria-label="Next category"
+            disabled={!interactive}
+            onClick={selectNext}
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            <span aria-hidden="true">→</span>
+          </button>
           <div className="portfolio-gateway__ground-shadow" aria-hidden="true" />
           <div className="portfolio-gateway__fallback" aria-hidden="true">
             <div
@@ -295,58 +315,6 @@ export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
               {activeCategory.label}
             </span>
           </TransitionLink>
-        </div>
-
-        <div className="portfolio-gateway__controls">
-          <TransitionLink
-            className="portfolio-gateway__active-link"
-            href={activeCategory.href}
-            aria-label={`Open ${activeCategory.label}`}
-            aria-disabled={interactive ? undefined : 'true'}
-            tabIndex={interactive ? undefined : -1}
-            onClick={(event) => {
-              if (!interactive) event.preventDefault()
-            }}
-            portal={{
-              image: activeCategory.image,
-              label: activeCategory.label,
-              sourceRef: portalSourceRef,
-            }}
-            transition="portal"
-          >
-            <span className="portfolio-gateway__thumbnail" aria-hidden="true">
-              <img
-                src={activeCategory.image}
-                alt=""
-                width="96"
-                height="96"
-                decoding="async"
-                loading="lazy"
-              />
-            </span>
-            <span>{activeCategory.label}</span>
-          </TransitionLink>
-          <div className="portfolio-gateway__arrows">
-            <button
-              type="button"
-              aria-label="Previous category"
-              disabled={!interactive}
-              onClick={selectPrevious}
-            >
-              ←
-            </button>
-            <button
-              type="button"
-              aria-label="Next category"
-              disabled={!interactive}
-              onClick={selectNext}
-            >
-              →
-            </button>
-          </div>
-          <span className="portfolio-gateway__orbit" aria-hidden="true">
-            <span />
-          </span>
         </div>
       </div>
     </section>
