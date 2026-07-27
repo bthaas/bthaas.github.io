@@ -124,7 +124,10 @@ describe('Experience timeline', () => {
     })
     expect(declarationsFor(
       experienceStyles,
-      ".experience-timeline__stop[data-timeline-highlighted='true']",
+      [
+        ".experience-timeline__stop[data-timeline-highlighted='true']",
+        '.experience-timeline__stop:is(:hover, :focus-within)',
+      ].join(',\n'),
     )).toMatchObject({
       'background-color': 'rgb(255 253 245 / 92%)',
       'box-shadow': expect.stringContaining('var(--experience-gold)'),

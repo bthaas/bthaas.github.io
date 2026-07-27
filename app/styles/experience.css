@@ -391,7 +391,8 @@
   background: rgb(255 253 245 / 78%);
 }
 
-.experience-timeline__stop[data-timeline-highlighted='true'] {
+.experience-timeline__stop[data-timeline-highlighted='true'],
+.experience-timeline__stop:is(:hover, :focus-within) {
   z-index: 2;
   background-color: rgb(255 253 245 / 92%);
   box-shadow:
