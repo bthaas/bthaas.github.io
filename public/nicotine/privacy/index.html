@@ -26,8 +26,8 @@
       <h2>Data stored only on your device</h2>
       <p>
         Your profile inputs, quit and taper dates, streak, savings inputs,
-        slips, craving outcomes, notification choices, coach history, and AI
-        consent choice are stored locally on your device. They remain there
+        slips, craving outcomes, notification choices, and coach history are
+        stored locally on your device. They remain there
         until you use “Clear local data,” delete the app, or the operating
         system removes app storage. PouchLess has no account backup and
         cannot recover this data.
@@ -43,37 +43,25 @@
         receive your full payment-card details.
       </p>
 
-      <h3>AI coach</h3>
+      <h3>Coach</h3>
       <p>
-        The AI coach is optional. Before its first network use, PouchLess
-        asks for consent to send recent coach messages and a limited summary
-        of your pouch-use profile through a PouchLess Cloudflare proxy to
-        OpenAI. The proxy rate-limits requests using short-lived,
-        secret-salted hashes of network addresses; the app sends no persistent
-        user or device identifier with coach requests. OpenAI response storage
-        is disabled. If you decline or the service is unavailable, the app uses
-        local, prewritten support. Coach content is never sent to analytics.
+        Coach replies in this version are generated deterministically on your
+        device. Coach messages and your pouch-use profile are not transmitted
+        for coaching.
       </p>
 
       <h3>Product analytics</h3>
       <p>
-        Production and preview builds use PostHog for a short allowlist of
-        anonymous product events, such as onboarding step number, paywall
-        view, purchase outcome, app-life-cycle day bucket, panic-tool use,
-        and coach mode. Events use a random device identifier. Pouch profile
-        fields, reasons, chat text, slips notes, and health details are
-        explicitly excluded. Person profiles, session replay, touch
-        autocapture, console capture, and advertising features are disabled.
+        This version does not configure off-device product analytics.
+        PouchLess does not use advertising trackers, session replay, or touch
+        autocapture.
       </p>
 
       <h3>Crash diagnostics</h3>
       <p>
-        Production and preview builds use Sentry for app and device
-        diagnostics, stack traces, app version, and crash-free-session
-        measurement. Default personally identifying information is disabled.
-        Request bodies, user identity, and breadcrumb payloads are removed
-        before an event is sent. Do not put private information in operating
-        system crash descriptions.
+        This version does not configure a third-party crash-reporting
+        endpoint. Apple may provide system crash and performance information
+        under your device and App Store analytics choices.
       </p>
 
       <h3>Notifications and sharing</h3>
@@ -93,7 +81,7 @@
 
       <h2>Your choices</h2>
       <ul>
-        <li>Use the free, local tools without the AI coach.</li>
+        <li>Use coach and the free tools without sending quit content to us.</li>
         <li>Decline notifications in the app or iOS Settings.</li>
         <li>Clear local data from Settings at any time.</li>
         <li>Manage or cancel subscriptions in Apple Account settings.</li>
@@ -101,10 +89,13 @@
 
       <h2>Service providers and international processing</h2>
       <p>
-        Apple, RevenueCat, Cloudflare, OpenAI, PostHog, and Sentry process
-        data under their own terms and retention controls, potentially in
-        the United States or other countries. We configure each service to
-        minimize collection for the purposes described above.
+        Apple and RevenueCat process subscription data under their own terms
+        and retention controls, potentially in the United States or other
+        countries. We configure subscription processing to minimize
+        collection for the purposes described above. If a future version adds
+        an online coach, product analytics, or third-party crash reporting,
+        this policy and the in-app disclosures will be updated before that
+        data is transmitted.
       </p>
 
       <h2>Contact and changes</h2>
