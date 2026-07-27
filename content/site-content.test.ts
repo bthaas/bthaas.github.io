@@ -56,31 +56,9 @@ describe('siteContent', () => {
     })
   })
 
-  it('keeps contact destinations and missing resume state explicit', () => {
+  it('keeps the public contact destinations', () => {
     expect(siteContent.contact.email).toBe('bthaas15@gmail.com')
     expect(siteContent.contact.github).toBe('https://github.com/bthaas')
     expect(siteContent.contact.linkedin).toBe('https://linkedin.com/in/brett-haas')
-    expect(siteContent.contact.resume).toBeNull()
-  })
-
-  it('records each reusable local asset', () => {
-    expect(siteContent.assets.every(({ path }) => path.startsWith('/assets/'))).toBe(true)
-    expect(siteContent.assets).toHaveLength(8)
-  })
-
-  it('maps the about fragments to content that actually exists', () => {
-    expect(siteContent.about.map(({ label }) => label)).toEqual([
-      'AI Research',
-      'Scale AI',
-      'Refraction',
-      'Projects',
-      'UVA · CS',
-    ])
-    expect(siteContent.about.some(({ label }) => String(label) === 'Amazon')).toBe(false)
-    expect(siteContent.about.every(({ detail }) => detail.length > 30)).toBe(true)
-  })
-
-  it('keeps the ending copy to the requested closing line only', () => {
-    expect(siteContent.editorial).toEqual({ closingLine: 'Connect with me.' })
   })
 })

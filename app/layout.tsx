@@ -3,11 +3,12 @@ import Script from 'next/script'
 
 import { PageTransitionProvider } from '@/components/motion/PageTransitionProvider'
 import { WebGLActivationGate } from '@/components/motion/WebGLActivationGate'
+import { SITE_URL } from '@/lib/site-config'
 
 import './globals.css'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://bthaas.github.io'),
+  metadataBase: new URL(SITE_URL),
   title: 'Brett Haas',
   description:
     'Brett Haas is a software engineer building ambitious products across AI, web, mobile, and intelligent systems.',

@@ -58,7 +58,24 @@ describe('GitHub Pages export', () => {
   it('copies generated Next.js assets into the prefixed deployment path', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy.yml'), 'utf8')
 
-    expect(workflow).toContain('cp -R out/_next out/static-v1/_next')
+    expect(workflow).toContain('npm run verify')
+    expect(workflow).toContain('npm run prepare:deployment')
+    expect(workflow).not.toContain('cp -R out/_next out/static-v1/_next')
+  })
+
+  it('previews the static export with the deployment server', () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'),
+    ) as {
+      engines?: { node?: string }
+      scripts: Record<string, string>
+    }
+
+    expect(packageJson.engines?.node).toBe('22.x')
+    expect(packageJson.scripts.preview).toBe(
+      'npm run build && npm run prepare:deployment && npm run serve:deployment',
+    )
+    expect(packageJson.scripts.start).toBe('npm run preview')
   })
 
   it('starts the Atlas enhancement after hydration without competing with LCP', () => {

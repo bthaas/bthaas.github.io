@@ -7,7 +7,7 @@ export interface ScrollSnapshot {
   readonly velocity: number
 }
 
-export type ScrollSubscriber = (snapshot: ScrollSnapshot) => void
+type ScrollSubscriber = (snapshot: ScrollSnapshot) => void
 
 export interface ScrollBus {
   readonly destroy: () => void

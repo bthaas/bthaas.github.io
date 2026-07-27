@@ -1,8 +1,3 @@
-export interface PlateVelocityFrame {
-  readonly scale: number
-  readonly skewY: number
-}
-
 export interface MagneticOffsetInput {
   readonly centerX: number
   readonly centerY: number
@@ -19,13 +14,6 @@ const clamp = (value: number, minimum: number, maximum: number) => (
   Math.max(minimum, Math.min(maximum, value))
 )
 const round = (value: number) => Number(value.toFixed(3))
-
-export function getPlateVelocityFrame(velocity: number): PlateVelocityFrame {
-  return {
-    scale: round(1 + Math.min(Math.abs(velocity) / 300_000, 0.012)),
-    skewY: round(clamp(velocity / 2_000, -1.5, 1.5)),
-  }
-}
 
 export function getMagneticOffset({
   centerX,

@@ -1,12 +1,9 @@
-import { setupChapterWipes } from './chapter-wipe'
 import { setupContactFinale } from './contact'
 import { setupCursor } from './cursor'
 import { initializeAtlasEngine, type AtlasEngine } from './engine'
-import { setupMetricCountUps } from './hero'
 import { setupHorizonLoader } from './horizon-loader'
 import { setupLocalTime } from './local-time'
 import { setupMagnetic } from './magnetic'
-import { setupPrintReveals, setupVelocityPlates } from './plates'
 import { setupProjectPans } from './projects'
 import { setupReveals } from './reveal'
 import { createScrollBus, type ScrollBus } from './scroll-bus'
@@ -20,15 +17,11 @@ interface AtlasRuntimeOptions {
   readonly prepareContact?: (document: Document, window: Window) => () => void
   readonly prepareCursor?: (document: Document) => () => void
   readonly prepareHorizon?: (document: Document) => () => void
-  readonly prepareMetrics?: (document: Document) => () => void
   readonly prepareMagnetic?: (document: Document) => () => void
   readonly prepareLocalTime?: (document: Document) => () => void
   readonly prepareProjects?: (document: Document, window: Window) => () => void
-  readonly preparePrintReveals?: (document: Document, window: Window) => () => void
   readonly prepareReveals?: () => () => void
   readonly prepareScramble?: (document: Document) => () => void
-  readonly prepareVelocityPlates?: (document: Document) => () => void
-  readonly prepareWipes?: (document: Document) => () => void
   readonly window?: Window
 }
 
@@ -40,15 +33,11 @@ export function initializeAtlas({
   prepareContact = setupContactFinale,
   prepareCursor = setupCursor,
   prepareHorizon = setupHorizonLoader,
-  prepareMetrics = setupMetricCountUps,
   prepareMagnetic = setupMagnetic,
   prepareLocalTime = setupLocalTime,
   prepareProjects = setupProjectPans,
-  preparePrintReveals = setupPrintReveals,
   prepareReveals = setupReveals,
   prepareScramble = setupScrambleWayfinding,
-  prepareVelocityPlates = setupVelocityPlates,
-  prepareWipes = setupChapterWipes,
   window: runtimeWindow = window,
 }: AtlasRuntimeOptions = {}): () => void {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -68,13 +57,9 @@ export function initializeAtlas({
   const cleanupContact = prepareContact(runtimeDocument, runtimeWindow)
   const cleanupCursor = prepareCursor(runtimeDocument)
   const cleanupHorizon = prepareHorizon(runtimeDocument)
-  const cleanupMetrics = prepareMetrics(runtimeDocument)
   const cleanupMagnetic = prepareMagnetic(runtimeDocument)
   const cleanupProjects = prepareProjects(runtimeDocument, runtimeWindow)
-  const cleanupPrintReveals = preparePrintReveals(runtimeDocument, runtimeWindow)
   const cleanupScramble = prepareScramble(runtimeDocument)
-  const cleanupVelocityPlates = prepareVelocityPlates(runtimeDocument)
-  const cleanupWipes = prepareWipes(runtimeDocument)
   const scrollBus = (createBus ?? ((activeEngine) => createScrollBus({
     document: runtimeDocument,
     engine: activeEngine,
@@ -120,13 +105,9 @@ export function initializeAtlas({
     cleanupContact()
     cleanupCursor()
     cleanupHorizon()
-    cleanupMetrics()
     cleanupMagnetic()
     cleanupProjects()
-    cleanupPrintReveals()
     cleanupScramble()
-    cleanupVelocityPlates()
-    cleanupWipes()
     cleanupLocalTime()
     cleanupReveals()
     scrollBus.destroy()

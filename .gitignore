@@ -147,3 +147,19 @@ artifacts/
 playwright-report/
 test-results/
 tmp/
+
+# Local-only visual development and historical planning
+/design-refs/
+/docs/awwwards/
+/docs/AWWWARDS-PLAN.md
+/docs/VERIFICATION.md
+/plans/
+
+# Local tool and operating-system state
+.DS_Store
+.claude/settings.local.json
+.claude/worktrees/
+
+# Keep shareable environment examples while ignoring local variants
+.env.*
+!.env.example

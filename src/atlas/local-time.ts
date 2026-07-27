@@ -3,7 +3,7 @@ const BELLEVUE_TIME_ZONE = 'America/Los_Angeles'
 type IntervalScheduler = (callback: () => void, delay: number) => number
 type IntervalClearer = (handle: number) => void
 
-export function formatBellevueTime(date: Date): string {
+function formatBellevueTime(date: Date): string {
   const parts = new Intl.DateTimeFormat('en-US', {
     hour: '2-digit',
     hourCycle: 'h23',

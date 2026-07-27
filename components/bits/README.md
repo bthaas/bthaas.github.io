@@ -1,39 +1,26 @@
-# React Bits source components
+# Source-vendored interface components
 
-React Bits components are vendored as source into `components/bits`; they are
-not consumed as a runtime package. Use the upstream `jsrepo` registry and choose
-the **TypeScript + CSS** variant so the result matches this repository's strict
-TypeScript setup and existing authored CSS architecture.
+Components in this directory began as React Bits source components and were
+adapted to the portfolio’s TypeScript, accessibility, motion, and visual
+contracts. They are compiled as repository-owned source rather than consumed as
+a runtime package.
 
-React Bits now publishes its generated jsrepo manifest from the repository's
-`public/r` directory. Phase 1 initialized that registry in `jsrepo.config.ts`
-and installed Splash Cursor with:
+The `jsrepo` registry is configured to install TypeScript + CSS variants into
+`components/bits`:
 
 ```sh
-npx jsrepo add SplashCursor-TS-CSS --yes
+npx jsrepo add <ComponentName>-TS-CSS --yes
 ```
 
-Before committing a vendored component:
+Before committing an addition or upstream update:
 
-- move its source and styles into `components/bits/<ComponentName>/` if the CLI
-  uses a different destination;
-- remove demos and unused variants;
-- restyle every color and type choice to the Atlas palette and typography;
-- replace permissive upstream types with the smallest strict public interface;
-- expose animation ownership only through the component's dedicated wrapper;
-- add focused tests for reduced motion, cleanup, and user-visible behavior.
+- review the upstream source and licensing;
+- remove demos, variants, and dependencies that are not used;
+- adapt colors and typography to the Atlas design system;
+- keep the public interface small and strictly typed;
+- preserve reduced-motion behavior and cleanup browser resources on unmount;
+- add focused unit tests and exercise browser-only drawing behavior in
+  Playwright.
 
-Once customized, vendored files are source-owned by this repository. Do not use
-`jsrepo update` over local changes; review upstream changes and port them
-intentionally.
-
-The former dossier-only `TiltedCard` adaptation was retired with the vertical
-flight log. Its PixelTransition reference remains translated into the existing
-Atlas chapter-wipe owner as a CSS dot-screen mask.
-
-Phase 5 installed `LetterGlitch-TS-CSS` through the same registry, then reduced
-it to one ink-on-cream canvas with a strict `message` interface. It derives its
-glyphs from the missing-plate sentence, runs on the shared GSAP ticker, and
-never creates a canvas under reduced motion. The browser-only drawing body is
-verified by Playwright and excluded from V8 coverage like `SplashCursor`; its
-mount gate and semantic 404 fallback remain unit-tested.
+Do not run an automated update over locally customized components. Port and
+review upstream changes intentionally.

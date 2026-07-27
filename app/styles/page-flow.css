@@ -39,11 +39,6 @@ main > section + section {
   border-inline-color: transparent;
 }
 
-.craft-section {
-  --chapter-wipe-base: var(--page-surface);
-  --chapter-wipe-color: var(--page-surface);
-}
-
 .contact-board {
   border-top-color: var(--page-rule);
 }

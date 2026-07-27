@@ -261,14 +261,10 @@ describe('atlas DOM capabilities', () => {
     const prepareHorizon = vi.fn()
     const prepareContact = vi.fn()
     const prepareCursor = vi.fn()
-    const prepareMetrics = vi.fn()
     const prepareMagnetic = vi.fn()
     const prepareLocalTime = vi.fn()
     const prepareProjects = vi.fn()
-    const preparePrintReveals = vi.fn()
     const prepareScramble = vi.fn()
-    const prepareVelocityPlates = vi.fn()
-    const prepareWipes = vi.fn()
     const prepareReveals = vi.fn()
     const matchMedia = vi.fn(() => ({ matches: true }))
 
@@ -280,15 +276,11 @@ describe('atlas DOM capabilities', () => {
       prepareHorizon,
       prepareContact,
       prepareCursor,
-      prepareMetrics,
       prepareMagnetic,
       prepareLocalTime,
       prepareProjects,
-      preparePrintReveals,
       prepareReveals,
       prepareScramble,
-      prepareVelocityPlates,
-      prepareWipes,
       window,
     })
 
@@ -299,14 +291,10 @@ describe('atlas DOM capabilities', () => {
     expect(prepareHorizon).not.toHaveBeenCalled()
     expect(prepareContact).not.toHaveBeenCalled()
     expect(prepareCursor).not.toHaveBeenCalled()
-    expect(prepareMetrics).not.toHaveBeenCalled()
     expect(prepareMagnetic).not.toHaveBeenCalled()
     expect(prepareLocalTime).not.toHaveBeenCalled()
     expect(prepareProjects).not.toHaveBeenCalled()
-    expect(preparePrintReveals).not.toHaveBeenCalled()
     expect(prepareScramble).not.toHaveBeenCalled()
-    expect(prepareVelocityPlates).not.toHaveBeenCalled()
-    expect(prepareWipes).not.toHaveBeenCalled()
     expect(prepareReveals).not.toHaveBeenCalled()
     cleanup()
   })
@@ -328,14 +316,10 @@ describe('atlas DOM capabilities', () => {
     const cleanupHorizon = vi.fn()
     const cleanupContact = vi.fn()
     const cleanupCursor = vi.fn()
-    const cleanupMetrics = vi.fn()
     const cleanupMagnetic = vi.fn()
     const cleanupLocalTime = vi.fn()
     const cleanupProjects = vi.fn()
-    const cleanupPrintReveals = vi.fn()
     const cleanupScramble = vi.fn()
-    const cleanupVelocityPlates = vi.fn()
-    const cleanupWipes = vi.fn()
     const createBus = vi.fn(() => ({
       destroy: destroyBus,
       subscribe: (next: (snapshot: ScrollSnapshot) => void) => {
@@ -353,15 +337,11 @@ describe('atlas DOM capabilities', () => {
       prepareHorizon: () => cleanupHorizon,
       prepareContact: () => cleanupContact,
       prepareCursor: () => cleanupCursor,
-      prepareMetrics: () => cleanupMetrics,
       prepareMagnetic: () => cleanupMagnetic,
       prepareLocalTime: () => cleanupLocalTime,
       prepareProjects: () => cleanupProjects,
-      preparePrintReveals: () => cleanupPrintReveals,
       prepareReveals: () => cleanupReveals,
       prepareScramble: () => cleanupScramble,
-      prepareVelocityPlates: () => cleanupVelocityPlates,
-      prepareWipes: () => cleanupWipes,
       window,
     })
     subscriber?.({ documentProgress: 0.5, scrollY: 500, velocity: 8 })
@@ -378,14 +358,10 @@ describe('atlas DOM capabilities', () => {
     expect(cleanupHorizon).toHaveBeenCalledOnce()
     expect(cleanupContact).toHaveBeenCalledOnce()
     expect(cleanupCursor).toHaveBeenCalledOnce()
-    expect(cleanupMetrics).toHaveBeenCalledOnce()
     expect(cleanupMagnetic).toHaveBeenCalledOnce()
     expect(cleanupLocalTime).toHaveBeenCalledOnce()
     expect(cleanupProjects).toHaveBeenCalledOnce()
-    expect(cleanupPrintReveals).toHaveBeenCalledOnce()
     expect(cleanupScramble).toHaveBeenCalledOnce()
-    expect(cleanupVelocityPlates).toHaveBeenCalledOnce()
-    expect(cleanupWipes).toHaveBeenCalledOnce()
     expect(cleanupReveals).toHaveBeenCalledOnce()
     expect(destroyBus).toHaveBeenCalledOnce()
     expect(destroyEngine).toHaveBeenCalledOnce()

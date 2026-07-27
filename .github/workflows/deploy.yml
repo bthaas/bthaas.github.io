@@ -30,12 +30,11 @@ jobs:
       - name: Set up Pages
         uses: actions/configure-pages@v6
 
-      - name: Install and build
+      - name: Install, verify, and prepare
         run: |
           npm ci
-          npm run build
-          mkdir -p out/static-v1
-          cp -R out/_next out/static-v1/_next
+          npm run verify
+          npm run prepare:deployment
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

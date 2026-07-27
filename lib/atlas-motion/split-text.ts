@@ -1,6 +1,6 @@
 export type SplitTextMode = 'character' | 'word'
 
-export interface SplitTextSegment {
+interface SplitTextSegment {
   readonly index: number
   readonly isWhitespace: boolean
   readonly value: string

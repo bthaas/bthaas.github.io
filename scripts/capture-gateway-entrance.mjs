@@ -2,7 +2,7 @@ import { execFile } from 'node:child_process'
 import { mkdir, rm } from 'node:fs/promises'
 import { promisify } from 'node:util'
 
-import { chromium } from 'playwright'
+import { chromium } from '@playwright/test'
 
 const origin = process.env.ATLAS_CAPTURE_ORIGIN ?? 'http://localhost:3001'
 const root = new URL('..', import.meta.url).pathname

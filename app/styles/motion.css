@@ -19,36 +19,6 @@
     will-change: transform;
   }
 
-  html.atlas-js [data-atlas-velocity-plate] {
-    --atlas-plate-scale: 1;
-    --atlas-plate-skew: 0;
-    transform: skewY(calc(var(--atlas-plate-skew) * 1deg))
-      scale(var(--atlas-plate-scale));
-    transform-origin: center;
-    will-change: transform;
-  }
-
-  html.atlas-js [data-atlas-print-plate] {
-    --atlas-print-dot: 0px;
-    -webkit-mask-image: radial-gradient(
-      circle at center,
-      #000 0 var(--atlas-print-dot),
-      transparent calc(var(--atlas-print-dot) + 0.75px)
-    );
-    -webkit-mask-position: center;
-    -webkit-mask-repeat: repeat;
-    -webkit-mask-size: 14px 14px;
-    mask-image: radial-gradient(
-      circle at center,
-      #000 0 var(--atlas-print-dot),
-      transparent calc(var(--atlas-print-dot) + 0.75px)
-    );
-    mask-position: center;
-    mask-repeat: repeat;
-    mask-size: 14px 14px;
-    will-change: mask-image;
-  }
-
   html.atlas-js [data-magnetic-ready] {
     will-change: transform;
   }

@@ -3,6 +3,9 @@
   "private": true,
   "version": "3.0.0",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "prebuild": "npm run build:atlas",
     "dev": "next dev",
@@ -12,7 +15,8 @@
     "capture:gateway": "node scripts/capture-portfolio-gateway.mjs",
     "prepare:deployment": "node scripts/prepare-deployment-assets.mjs",
     "serve:deployment": "node scripts/serve-deployment.mjs",
-    "start": "next start",
+    "preview": "npm run build && npm run prepare:deployment && npm run serve:deployment",
+    "start": "npm run preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -21,7 +25,8 @@
     "verify": "npm run test && npm run typecheck && npm run build"
   },
   "overrides": {
-    "postcss": "$postcss"
+    "postcss": "$postcss",
+    "sharp": "0.35.3"
   },
   "devDependencies": {
     "@playwright/test": "1.61.1",
@@ -37,8 +42,7 @@
     "esbuild": "^0.28.1",
     "jsdom": "^29.1.1",
     "jsrepo": "^3.8.1",
-    "postcss": "^8.5.16",
-    "tailwindcss": "^3.4.19",
+    "postcss": "^8.5.23",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   },
@@ -49,7 +53,7 @@
     "gsap": "3.15.0",
     "lenis": "1.3.25",
     "matter-js": "0.20.0",
-    "next": "^16.2.10",
+    "next": "^16.2.12",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "simple-icons": "13.21.0",

@@ -14,7 +14,6 @@ describe('Portfolio', () => {
     expect(
       screen.queryByText('I build intelligent systems that hold up in the real world.'),
     ).not.toBeInTheDocument()
-    expect(screen.queryByText(siteContent.identity.descriptor)).not.toBeInTheDocument()
     const introduction = screen.getByRole('group', { name: 'Portfolio introduction' })
     expect(within(introduction).getByText('Portfolio / 2026')).toBeInTheDocument()
     expect(within(introduction).getByText(siteContent.identity.title)).toBeInTheDocument()
@@ -34,7 +33,6 @@ describe('Portfolio', () => {
       (section) => section.id,
     )
     expect(ids).toEqual(['portfolio-gateway', 'experience', 'projects', 'craft', 'contact'])
-    expect(container.querySelector('[data-chapter-wipe]')).not.toBeInTheDocument()
     expect(container.querySelector('[data-experience-light-step]')).not.toBeInTheDocument()
   })
 
@@ -63,13 +61,6 @@ describe('Portfolio', () => {
       'href',
       '/contact',
     )
-  })
-
-  it('removes the standalone metrics strip from the hero', () => {
-    const { container } = render(<Portfolio />)
-
-    expect(container.querySelector('.signal-strip')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('featured-metric')).not.toBeInTheDocument()
   })
 
   it('labels portfolio groups with valid native and ARIA semantics', () => {
@@ -199,7 +190,6 @@ describe('Portfolio', () => {
         .toBeInTheDocument()
     })
     expect(document.querySelector('[data-project-spiral-stage]')).toBeInTheDocument()
-    expect(document.querySelector('[data-project-flight-stage]')).not.toBeInTheDocument()
   })
 
   it('lets the project spiral own the page without explanatory intro copy', () => {

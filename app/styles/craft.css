@@ -1,6 +1,4 @@
 .craft-section {
-  --chapter-wipe-base: var(--page-surface);
-  --chapter-wipe-color: var(--page-surface);
   position: relative;
   height: calc(100svh - 59px);
   min-height: 0;

@@ -76,8 +76,6 @@ describe('continuous page color system', () => {
     const stylesheet = readFileSync(stylesheetPath, 'utf8')
 
     expect(declarationsFor(stylesheet, '.craft-section')).toMatchObject({
-      '--chapter-wipe-base': 'var(--page-surface)',
-      '--chapter-wipe-color': 'var(--page-surface)',
       'background-color': 'var(--page-surface)',
     })
     expect(declarationsFor(stylesheet, '.contact-board')).toMatchObject({

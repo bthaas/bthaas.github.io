@@ -309,14 +309,6 @@
   outline-offset: -0.45rem;
 }
 
-.portfolio-gateway__stats {
-  position: fixed !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: auto !important;
-  left: auto !important;
-}
-
 @media (max-width: 720px) {
   .portfolio-gateway {
     height: calc(100svh - 4.75rem - env(safe-area-inset-bottom));

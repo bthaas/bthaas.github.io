@@ -74,7 +74,7 @@ export function PageTransitionProvider({ children }: { readonly children: ReactN
   )
 }
 
-export interface PortalTransition {
+interface PortalTransition {
   readonly image: string
   readonly label: string
   readonly sourceRef: RefObject<HTMLElement | null>

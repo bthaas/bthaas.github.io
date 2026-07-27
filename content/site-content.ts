@@ -1,26 +1,9 @@
-export interface ContentAsset {
-  readonly id: string
-  readonly path: `/assets/${string}`
-  readonly alt: string
-  readonly kind: 'brand' | 'diagram' | 'screenshot'
-  readonly context: string
-}
-
-export interface AboutItem {
-  readonly id: string
-  readonly label: string
-  readonly caption: string
-  readonly detail: string
-  readonly kind: 'experience' | 'projects' | 'education'
-  readonly targetId: string | null
-}
-
-export interface ProjectMetric {
+interface ProjectMetric {
   readonly value: string
   readonly label: string
 }
 
-export interface ProjectCaseStudy {
+interface ProjectCaseStudy {
   readonly brief: string
   readonly approach: string
   readonly focus: string
@@ -33,15 +16,12 @@ export interface Project {
   readonly visualKey: ProjectVisualKey
   readonly name: string
   readonly description: string
-  readonly longDescription: string
   readonly technologies: readonly string[]
   readonly metrics: readonly ProjectMetric[]
   readonly caseStudy: ProjectCaseStudy
   readonly links: {
     readonly repository: string
-    readonly live: string | null
   }
-  readonly images: readonly string[]
 }
 
 export interface ExperienceEntry {
@@ -55,8 +35,6 @@ export interface ExperienceEntry {
   readonly highlights: readonly string[]
   readonly technologies: readonly string[]
   readonly logo: string | null
-  readonly workSamples: readonly string[]
-  readonly provenance: 'existing-site' | 'build-brief'
 }
 
 export interface EducationEntry {
@@ -74,97 +52,31 @@ export interface SiteContent {
   readonly identity: {
     readonly name: string
     readonly title: string
-    readonly descriptor: string
     readonly location: string
-    readonly availability: string
   }
   readonly contact: {
     readonly email: string
     readonly github: string
     readonly linkedin: string
-    readonly resume: string | null
   }
-  readonly about: readonly AboutItem[]
   readonly projects: readonly Project[]
   readonly experience: readonly ExperienceEntry[]
   readonly education: readonly EducationEntry[]
   readonly skills: Readonly<Record<string, readonly string[]>>
-  readonly assets: readonly ContentAsset[]
-  readonly editorial: {
-    readonly closingLine: string
-  }
 }
 
-/**
- * The portfolio's single source of truth.
- *
- * Existing-site copy takes precedence over fallback copy from the Icarus build
- * brief. Entries sourced only from that brief are marked with their provenance.
- * No resume PDF, live-demo URL, project screenshot, favicon, or OG image was
- * present in the repository at extraction time.
- */
+/** The portfolio's single source of truth. */
 export const siteContent = {
   identity: {
     name: 'Brett Haas',
     title: 'Software Engineer',
-    descriptor:
-      'Full-stack software engineer building reliable, intelligent products across web, mobile, and AI systems.',
     location: 'Bellevue, Washington',
-    availability: 'Open for opportunities',
   },
   contact: {
     email: 'bthaas15@gmail.com',
     github: 'https://github.com/bthaas',
     linkedin: 'https://linkedin.com/in/brett-haas',
-    resume: null,
   },
-  about: [
-    {
-      id: 'about-research',
-      label: 'AI Research',
-      caption: 'Steering model behavior at inference time without changing the weights.',
-      detail:
-        'At UVA, Brett researches inference-time activation steering for language models, building evaluation pipelines that reduce visual-language bias while preserving output quality.',
-      kind: 'experience',
-      targetId: 'uva-ml-research',
-    },
-    {
-      id: 'about-scale',
-      label: 'Scale AI',
-      caption: 'Pressure-testing frontier models, agents, and the systems around them.',
-      detail:
-        'On Scale AI’s SEAL team, Brett red-teamed frontier models, produced high-signal code evaluation data, and improved prompts and tool use for safer multi-step agents.',
-      kind: 'experience',
-      targetId: 'scale-ai',
-    },
-    {
-      id: 'about-refraction',
-      label: 'Refraction',
-      caption: 'Shipping a cross-platform AI nutrition product from architecture to telemetry.',
-      detail:
-        'At Refraction Innovation Hub, Brett shipped a React Native food-recognition product spanning multimodal AI, cloud authentication, data storage, and production performance work.',
-      kind: 'experience',
-      targetId: 'refraction-innovation-hub',
-    },
-    {
-      id: 'about-projects',
-      label: 'Projects',
-      caption: 'Products built where intelligent systems meet real human workflows.',
-      detail:
-        'The selected project set covers computer-vision sports analytics, music discovery, and research tooling for controlling and evaluating language-model behavior.',
-      kind: 'projects',
-      targetId: null,
-    },
-    {
-      id: 'about-education',
-      label: 'UVA · CS',
-      caption: 'Computer Science, systems, security, and machine learning research.',
-      detail:
-        'Brett earned a B.S. in Computer Science at the University of Virginia with a 3.7 GPA and a focus on software engineering, systems, cybersecurity, and machine learning.',
-      kind: 'education',
-      targetId: null,
-    },
-  ],
   projects: [
     {
       id: 'courtvision',
@@ -172,8 +84,6 @@ export const siteContent = {
       name: 'Court Vision',
       description:
         'Computer vision basketball analytics platform for shot tracking and player movement insights.',
-      longDescription:
-        'CourtVision analyzes basketball footage to extract event-level insights like shot attempts, player movement trends, and possession patterns. The project focuses on practical, coach-friendly metrics with a clean visualization layer for fast game review.',
       technologies: ['React Native', 'TensorFlow Lite', 'Flask', 'WebSockets', 'AWS EC2'],
       metrics: [
         {
@@ -195,9 +105,7 @@ export const siteContent = {
       },
       links: {
         repository: 'https://github.com/bthaas/CourtVision',
-        live: null,
       },
-      images: [],
     },
     {
       id: 'beatstream',
@@ -205,8 +113,6 @@ export const siteContent = {
       name: 'Beat Stream',
       description:
         'A real-time collaborative music production platform built for low-latency multi-user sessions.',
-      longDescription:
-        'BeatStream is a collaborative digital audio workstation where multiple users can produce music together in real time. WebSockets, operational transformation, and CRDT-based state management keep sessions responsive and synchronized.',
       technologies: ['TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'WebSockets'],
       metrics: [
         {
@@ -228,9 +134,7 @@ export const siteContent = {
       },
       links: {
         repository: 'https://github.com/bthaas/BeatStream',
-        live: null,
       },
-      images: [],
     },
     {
       id: 'vision-bias-steering',
@@ -238,8 +142,6 @@ export const siteContent = {
       name: 'Vision Bias Steering',
       description:
         'LLM steering experiments for shifting model outputs between spatial and descriptive language.',
-      longDescription:
-        'Vision Bias Steering is a research codebase for training, validating, and evaluating steering vectors that shift language-model outputs between spatial and descriptive captioning behavior. It includes local and multi-model sweep runners, evaluation utilities, and plotting workflows built around PyTorch, Transformers, and NNSight.',
       technologies: ['Python', 'PyTorch', 'NNSight', 'LLM Evaluation'],
       metrics: [
         {
@@ -265,9 +167,7 @@ export const siteContent = {
       },
       links: {
         repository: 'https://github.com/bthaas/vision-bias-steering',
-        live: null,
       },
-      images: [],
     },
   ],
   experience: [
@@ -287,8 +187,6 @@ export const siteContent = {
       ],
       technologies: ['PyTorch', 'NNSight', 'Activation Steering', 'Interpretability'],
       logo: '/assets/uva-symbol.png',
-      workSamples: [],
-      provenance: 'existing-site',
     },
     {
       id: 'scale-ai',
@@ -306,8 +204,6 @@ export const siteContent = {
       ],
       technologies: ['LLMs', 'RLHF', 'Model Safety', 'Evaluation'],
       logo: '/assets/scale.webp',
-      workSamples: [],
-      provenance: 'existing-site',
     },
     {
       id: 'refraction-innovation-hub',
@@ -325,13 +221,6 @@ export const siteContent = {
       ],
       technologies: ['TypeScript', 'React Native', 'OpenAI', 'AWS'],
       logo: '/assets/refraction.webp',
-      workSamples: [
-        '/assets/nutridiagram.webp',
-        '/assets/analytics1.png',
-        '/assets/analytics2.png',
-        '/assets/analytics3.png',
-      ],
-      provenance: 'existing-site',
     },
   ],
   education: [
@@ -400,66 +289,5 @@ export const siteContent = {
       'Mechanistic Interpretability',
       'Prompt Engineering',
     ],
-  },
-  assets: [
-    {
-      id: 'brett-monogram',
-      path: '/assets/logo.webp',
-      alt: 'Brett Haas BH monogram',
-      kind: 'brand',
-      context: 'Existing personal mark; optional supporting brand asset.',
-    },
-    {
-      id: 'uva-symbol',
-      path: '/assets/uva-symbol.png',
-      alt: 'University of Virginia symbol',
-      kind: 'brand',
-      context: 'UVA education and ML research entries.',
-    },
-    {
-      id: 'scale-logo',
-      path: '/assets/scale.webp',
-      alt: 'Scale AI logo',
-      kind: 'brand',
-      context: 'Scale AI experience entry.',
-    },
-    {
-      id: 'refraction-logo',
-      path: '/assets/refraction.webp',
-      alt: 'Refraction Innovation Hub logo',
-      kind: 'brand',
-      context: 'Refraction Innovation Hub experience entry.',
-    },
-    {
-      id: 'nutrition-architecture',
-      path: '/assets/nutridiagram.webp',
-      alt: 'Architecture diagram for a React Native nutrition app using OpenAI and SQLite',
-      kind: 'diagram',
-      context: 'Refraction food-recognition app work sample.',
-    },
-    {
-      id: 'nutrition-analytics-detail',
-      path: '/assets/analytics1.png',
-      alt: 'Mobile nutrition app showing macro distribution and detailed nutrition analytics',
-      kind: 'screenshot',
-      context: 'Refraction food-recognition app work sample.',
-    },
-    {
-      id: 'nutrition-progress',
-      path: '/assets/analytics2.png',
-      alt: 'Mobile nutrition app showing weekly progress and a weight trend',
-      kind: 'screenshot',
-      context: 'Refraction food-recognition app work sample.',
-    },
-    {
-      id: 'nutrition-daily-summary',
-      path: '/assets/analytics3.png',
-      alt: 'Mobile nutrition app showing a daily calorie, macronutrient, and water summary',
-      kind: 'screenshot',
-      context: 'Refraction food-recognition app work sample.',
-    },
-  ],
-  editorial: {
-    closingLine: 'Connect with me.',
   },
 } as const satisfies SiteContent

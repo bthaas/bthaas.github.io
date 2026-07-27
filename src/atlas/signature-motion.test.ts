@@ -2,17 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { AtlasEngine } from './engine'
 import { setupMagnetic } from './magnetic'
-import { setupPrintReveals, setupVelocityPlates } from './plates'
 import { setupScrambleWayfinding } from './wayfinding'
 import { setupCursor } from './cursor'
 
 function createSignatureHarness() {
   const triggers: Array<{ kill: ReturnType<typeof vi.fn>; vars: Record<string, unknown> }> = []
-  const timelines: Array<Record<string, unknown>> = []
   const quickSetters: Array<ReturnType<typeof vi.fn>> = []
   const quickTargets: Array<{ property: string; setter: ReturnType<typeof vi.fn>; target: unknown }> = []
   const tweens: Array<{ kill: ReturnType<typeof vi.fn>; vars: Record<string, unknown> }> = []
-  const delayed = { kill: vi.fn(), pause: vi.fn(), restart: vi.fn() }
   const create = vi.fn((vars: Record<string, unknown>) => {
     const trigger = { kill: vi.fn(), vars }
     triggers.push(trigger)
@@ -34,23 +31,6 @@ function createSignatureHarness() {
     tweens.push(tween)
     return tween
   })
-  const fromTo = vi.fn((_target: unknown, _from: unknown, vars: Record<string, unknown>) => {
-    const tween = { kill: vi.fn(), vars }
-    tweens.push(tween)
-    return tween
-  })
-  const timeline = vi.fn((vars: Record<string, unknown> = {}) => {
-    const instance: Record<string, unknown> = { vars }
-    instance.fromTo = vi.fn(() => instance)
-    instance.to = vi.fn(() => instance)
-    instance.kill = vi.fn()
-    instance.pause = vi.fn()
-    instance.resume = vi.fn()
-    instance.paused = vi.fn(() => false)
-    instance.timeScale = vi.fn(() => instance)
-    timelines.push(instance)
-    return instance
-  })
   const splitCreate = vi.fn((target: Element) => ({
     chars: Array.from(target.textContent ?? '').map(() => document.createElement('span')),
     revert: vi.fn(),
@@ -60,11 +40,9 @@ function createSignatureHarness() {
   const flipGetState = vi.fn(() => flipState)
   const flipFrom = vi.fn(() => flipAnimation)
   const set = vi.fn()
-  const delayedCall = vi.fn(() => delayed)
-
   const engine = {
     ScrollTrigger: { create, refresh: vi.fn() },
-    gsap: { delayedCall, fromTo, quickSetter, quickTo, set, timeline, to },
+    gsap: { quickSetter, quickTo, set, to },
     isCoarsePointer: false,
     plugins: {
       Flip: { from: flipFrom, getState: flipGetState },
@@ -74,17 +52,13 @@ function createSignatureHarness() {
 
   return {
     create,
-    delayed,
     engine,
     flipAnimation,
     flipFrom,
     flipGetState,
-    fromTo,
     quickSetters,
     quickTargets,
     splitCreate,
-    timeline,
-    timelines,
     to,
     triggers,
     tweens,
@@ -99,47 +73,6 @@ describe('Phase C signature motion', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
-  })
-
-  it('deforms marked plates from ScrollTrigger velocity and returns them to rest', () => {
-    document.body.innerHTML = `
-      <div data-atlas-velocity-plate></div>
-      <div data-atlas-velocity-plate></div>
-    `
-    const harness = createSignatureHarness()
-    const cleanup = setupVelocityPlates(document, harness.engine)
-
-    expect(harness.quickTargets.map(({ property }) => property)).toEqual([
-      '--atlas-plate-skew', '--atlas-plate-scale',
-      '--atlas-plate-skew', '--atlas-plate-scale',
-    ])
-    ;(harness.triggers[0].vars.onUpdate as (self: { getVelocity: () => number }) => void)({
-      getVelocity: () => 1_200,
-    })
-    expect(harness.quickTargets[0].setter).toHaveBeenCalledWith(0.6)
-    expect(harness.quickTargets[1].setter).toHaveBeenCalledWith(1.004)
-    expect(harness.delayed.restart).toHaveBeenCalledWith(true)
-    cleanup()
-    expect(harness.triggers[0].kill).toHaveBeenCalledOnce()
-  })
-
-  it('scrubs print plates through a halftone dot custom property', () => {
-    document.body.innerHTML = `
-      <picture data-atlas-print-plate></picture>
-      <picture data-atlas-print-plate></picture>
-    `
-    const harness = createSignatureHarness()
-    const cleanup = setupPrintReveals(document, window, harness.engine)
-
-    expect(harness.timelines).toHaveLength(2)
-    expect(harness.timelines[0].fromTo).toHaveBeenCalledWith(
-      document.querySelector('[data-atlas-print-plate]'),
-      { '--atlas-print-dot': '0px' },
-      expect.objectContaining({ '--atlas-print-dot': '10px', ease: 'none' }),
-      0,
-    )
-    cleanup()
-    expect(harness.timelines[0].kill).toHaveBeenCalledOnce()
   })
 
   it('decodes editorial labels without scrambling the persistent route index', () => {

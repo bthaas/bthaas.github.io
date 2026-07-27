@@ -5,6 +5,7 @@ import { PortfolioScreen } from '@/components/portfolio/PortfolioScreen'
 export const metadata: Metadata = {
   title: 'Projects | Brett Haas',
   description: 'Computer vision, collaborative systems, and language-model research projects.',
+  alternates: { canonical: '/projects' },
 }
 
 export default function ProjectsPage() {

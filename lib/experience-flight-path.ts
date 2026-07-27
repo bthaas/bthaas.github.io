@@ -19,12 +19,12 @@ interface ParsedMonth {
   readonly index: number
 }
 
-export interface ExperienceTimelineMarker {
+interface ExperienceTimelineMarker {
   readonly label: string
   readonly position: number
 }
 
-export interface ExperienceTimelineItem {
+interface ExperienceTimelineItem {
   readonly end: number
   readonly id: string
   readonly kind: 'education' | 'experience'

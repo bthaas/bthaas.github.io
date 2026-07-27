@@ -329,7 +329,6 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(page.locator('html')).toHaveClass(/atlas-js/)
   await expect(page.locator('#portfolio-gateway')).toHaveCount(1)
   await expect(page.locator('#experience, #projects, #craft, #contact')).toHaveCount(0)
-  await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
   const sectionBackgrounds = await page
     .locator('#portfolio-gateway')
     .evaluateAll((sections) => sections.map((section) => getComputedStyle(section).backgroundColor))
@@ -623,7 +622,6 @@ test('keeps reduced motion identical to the static render', async ({ browserName
   await expect(page.locator('html')).not.toHaveAttribute('data-atlas')
   await expect(page.locator('html')).not.toHaveAttribute('data-atlas-webgl-activated')
   await expect(page.locator([
-    '.chapter-wipe__layer',
     '[data-atlas-cursor]',
     '[data-atlas-preloader]',
     '[data-fluid-cursor]',
@@ -1222,7 +1220,6 @@ test('spins the project helix and keeps a complete static fallback', async ({
   const indexButton = page.getByRole('button', { name: 'Index view' })
   await expect(panels).toHaveCount(3)
   await stage.scrollIntoViewIfNeeded()
-  await expect(page.locator('[data-project-flight-stage], .project-flight-canvas')).toHaveCount(0)
 
   if (await spiral.getAttribute('data-project-spiral-enhanced') !== null) {
     await expect(spiral).toHaveAttribute('data-project-spiral-enhanced', '')
@@ -1283,7 +1280,6 @@ test('spins the project helix and keeps a complete static fallback', async ({
   await expect(visionBiasSteering)
     .toHaveAttribute('href', '/projects/vision-bias-steering')
 
-  await expect(page.locator('.chapter-wipe__layer')).toHaveCount(0)
   const chapterBackgrounds = await page.locator('#projects').evaluateAll(
     (chapters) => chapters.map((chapter) => getComputedStyle(chapter).backgroundColor),
   )

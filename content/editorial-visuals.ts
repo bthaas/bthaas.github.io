@@ -15,15 +15,6 @@ export interface AtlasVisual {
 }
 
 export const atlasVisuals = {
-  craft: {
-    src: '/icarus-atlas/craft-workshop-1600.avif',
-    fallback: '/icarus-atlas/craft-workshop-1600.webp',
-    smallSrc: '/icarus-atlas/craft-workshop-960.avif',
-    smallFallback: '/icarus-atlas/craft-workshop-960.webp',
-    width: 1600,
-    height: 1065,
-    smallWidth: 960,
-  },
   experience: {
     src: '/icarus-atlas/experience-trajectory-1600.avif',
     fallback: '/icarus-atlas/experience-trajectory-1600.webp',

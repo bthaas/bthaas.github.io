@@ -1,6 +1,6 @@
 import { mkdir } from 'node:fs/promises'
 
-import { chromium } from 'playwright'
+import { chromium } from '@playwright/test'
 
 const origin = process.env.ATLAS_CAPTURE_ORIGIN ?? 'http://127.0.0.1:4175'
 const root = new URL('..', import.meta.url).pathname
