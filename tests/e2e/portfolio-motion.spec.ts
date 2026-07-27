@@ -369,10 +369,8 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(
     page.locator('#portfolio-gateway').getByText('Engineer · Researcher · Builder', { exact: true }),
   ).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Open Experience', exact: true })).toHaveAttribute(
-    'href',
-    '/experience',
-  )
+  await expect(page.getByRole('link', { name: 'Open Experience screen' }))
+    .toHaveAttribute('href', '/experience')
   await gateway.focus()
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '1')
@@ -380,20 +378,16 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
     .toHaveAttribute('data-active-destination', 'true')
   await expect(homeRouteIndex.getByRole('link', { name: 'Experience' }))
     .not.toHaveAttribute('data-active-destination')
-  await expect(page.getByRole('link', { name: 'Open Projects', exact: true })).toHaveAttribute(
-    'href',
-    '/projects',
-  )
+  await expect(page.getByRole('link', { name: 'Open Projects screen' }))
+    .toHaveAttribute('href', '/projects')
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '2')
-  await expect(page.getByRole('link', { name: 'Open Skills', exact: true }))
+  await expect(page.getByRole('link', { name: 'Open Skills screen' }))
     .toHaveAttribute('href', '/skills')
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '3')
-  await expect(page.getByRole('link', { name: 'Open Contact', exact: true })).toHaveAttribute(
-    'href',
-    '/contact',
-  )
+  await expect(page.getByRole('link', { name: 'Open Contact screen' }))
+    .toHaveAttribute('href', '/contact')
   await gateway.press('ArrowRight')
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await gateway.press('ArrowLeft')
@@ -412,7 +406,7 @@ test('ships clean cross-browser routing, gateway choreography, and an accessible
   await expect(gateway).toHaveAttribute('data-active-index', '0')
   await expectNoHorizontalOverflow(page)
 
-  await page.getByRole('link', { name: 'Open Experience', exact: true }).click()
+  await page.getByRole('link', { name: 'Open Experience screen' }).click()
   await expect(page).toHaveURL(/\/experience\/?$/, { timeout: 15_000 })
   await expect(page.locator('#experience')).toHaveCount(1)
   await expect(page.locator('#portfolio-gateway, #projects, #craft, #contact')).toHaveCount(0)
