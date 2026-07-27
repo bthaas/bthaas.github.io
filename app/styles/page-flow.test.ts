@@ -20,7 +20,7 @@ function declarationsFor(stylesheet: string, selector: string): Record<string, s
 }
 
 describe('continuous page color system', () => {
-  it('uses the opening cream and one shared hairline across the light chapters', () => {
+  it('keeps the home gateway and skills cream without the centered hairline', () => {
     expect(existsSync(stylesheetPath)).toBe(true)
     const stylesheet = readFileSync(stylesheetPath, 'utf8')
     const root = declarationsFor(stylesheet, ':root')
@@ -31,11 +31,21 @@ describe('continuous page color system', () => {
       '--page-surface': 'var(--cream)',
     })
 
+    for (const selector of ['.portfolio-gateway', '.craft-section']) {
+      expect(declarationsFor(stylesheet, selector)).toMatchObject({
+        'background-color': 'var(--page-surface)',
+        'background-image': 'none',
+        color: 'var(--ink)',
+      })
+    }
+  })
+
+  it('uses one shared hairline across the later light chapters', () => {
+    const stylesheet = readFileSync(stylesheetPath, 'utf8')
+
     for (const selector of [
-      '.portfolio-gateway',
       '.experience-section',
       '.projects-section',
-      '.craft-section',
       '.contact-section',
     ]) {
       expect(declarationsFor(stylesheet, selector)).toMatchObject({
