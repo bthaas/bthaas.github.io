@@ -44,8 +44,9 @@
 }
 
 .atlas-home-link__arrow {
-  font-size: 1.15rem;
-  line-height: 1;
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
   transition: transform 300ms var(--ease-out);
 }
 

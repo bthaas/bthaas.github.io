@@ -42,6 +42,12 @@ describe('single-screen portfolio gateway layout', () => {
       'clamp(13rem, 29vh, 16rem)',
     )
     expect(declarationsFor(stylesheet, '.portfolio-gateway__fallback-ring').height).toBe('68%')
+    expect(declarationsFor(stylesheet, '.portfolio-gateway__side-arrow').top).toBe('34%')
+    expect(declarationsFor(stylesheet, '.portfolio-gateway__side-arrow svg')).toMatchObject({
+      display: 'block',
+      height: '1em',
+      width: '1em',
+    })
     expect(declarationsFor(stylesheet, '.portfolio-gateway__controls')).toEqual({})
   })
 
@@ -55,7 +61,7 @@ describe('single-screen portfolio gateway layout', () => {
     })
     expect(declarationsFor(stylesheet, '.portfolio-gateway__word', media).top).toBe('30%')
     expect(declarationsFor(stylesheet, '.portfolio-gateway__visual', media).top).toBe('31%')
-    expect(declarationsFor(stylesheet, '.portfolio-gateway__side-arrow', media).top).toBe('25%')
+    expect(declarationsFor(stylesheet, '.portfolio-gateway__side-arrow', media).top).toBe('31%')
     expect(declarationsFor(stylesheet, '.portfolio-gateway__controls', media)).toEqual({})
   })
 

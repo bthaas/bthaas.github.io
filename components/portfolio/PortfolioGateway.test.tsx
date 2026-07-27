@@ -42,14 +42,26 @@ describe('PortfolioGateway', () => {
       '/experience',
     )
     expect(screen.queryByRole('link', { name: 'Open Experience' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Previous category' })).toHaveClass(
+    const previousButton = screen.getByRole('button', { name: 'Previous category' })
+    const nextButton = screen.getByRole('button', { name: 'Next category' })
+    expect(previousButton).toHaveClass(
       'portfolio-gateway__side-arrow',
       'portfolio-gateway__side-arrow--previous',
     )
-    expect(screen.getByRole('button', { name: 'Next category' })).toHaveClass(
+    expect(nextButton).toHaveClass(
       'portfolio-gateway__side-arrow',
       'portfolio-gateway__side-arrow--next',
     )
+    expect(previousButton.querySelector('svg')).toHaveAttribute(
+      'data-arrow-direction',
+      'left',
+    )
+    expect(nextButton.querySelector('svg')).toHaveAttribute(
+      'data-arrow-direction',
+      'right',
+    )
+    expect(previousButton).not.toHaveTextContent('←')
+    expect(nextButton).not.toHaveTextContent('→')
     expect(container.querySelector('.portfolio-gateway__controls')).toBeNull()
     expect(screen.getByRole('region', { name: 'Portfolio category carousel' })).toHaveAttribute(
       'aria-roledescription',

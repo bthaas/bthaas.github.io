@@ -34,7 +34,8 @@ describe('PortfolioScreen', () => {
 
       expect(within(navigation).getAllByRole('link')).toEqual([home])
       expect(home).toHaveAttribute('href', '/')
-      expect(home).toHaveTextContent('←Home')
+      expect(home).toHaveTextContent('Home')
+      expect(home.querySelector('svg')).toHaveAttribute('data-arrow-direction', 'left')
       expect(within(navigation).queryByRole('link', { name: 'Experience' }))
         .not.toBeInTheDocument()
     },

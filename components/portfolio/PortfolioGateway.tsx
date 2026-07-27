@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
+import { ArrowIcon } from '@/components/ui/ArrowIcon'
 import {
   ATLAS_GATEWAY_SELECTION_EVENT,
   type AtlasGatewaySelectionDetail,
@@ -260,7 +261,7 @@ export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
             onClick={selectPrevious}
             onPointerDown={(event) => event.stopPropagation()}
           >
-            <span aria-hidden="true">←</span>
+            <ArrowIcon direction="left" />
           </button>
           <button
             className="portfolio-gateway__side-arrow portfolio-gateway__side-arrow--next"
@@ -270,7 +271,7 @@ export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
             onClick={selectNext}
             onPointerDown={(event) => event.stopPropagation()}
           >
-            <span aria-hidden="true">→</span>
+            <ArrowIcon direction="right" />
           </button>
           <div className="portfolio-gateway__ground-shadow" aria-hidden="true" />
           <div className="portfolio-gateway__fallback" aria-hidden="true">

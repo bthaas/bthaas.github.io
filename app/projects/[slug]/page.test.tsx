@@ -46,7 +46,9 @@ describe('project detail pages', () => {
     expect(within(navigation).getByRole('link', { name: 'Home' }))
       .toHaveAttribute('href', '/')
     expect(within(navigation).getByRole('link', { name: 'Home' }))
-      .toHaveTextContent('←Home')
+      .toHaveTextContent('Home')
+    expect(within(navigation).getByRole('link', { name: 'Home' }).querySelector('svg'))
+      .toHaveAttribute('data-arrow-direction', 'left')
     expect(screen.getByRole('link', { name: 'All projects' })).toHaveAttribute(
       'href',
       '/projects',

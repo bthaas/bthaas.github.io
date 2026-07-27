@@ -131,7 +131,7 @@
 .portfolio-gateway__side-arrow {
   position: absolute;
   z-index: 4;
-  top: 31%;
+  top: 34%;
   display: grid;
   width: clamp(2.25rem, 3vw, 2.75rem);
   height: clamp(2.25rem, 3vw, 2.75rem);
@@ -151,6 +151,12 @@
     border-color 180ms ease,
     color 180ms ease,
     transform 180ms ease;
+}
+
+.portfolio-gateway__side-arrow svg {
+  display: block;
+  width: 1em;
+  height: 1em;
 }
 
 .portfolio-gateway__side-arrow--previous {
@@ -346,7 +352,7 @@
   }
 
   .portfolio-gateway__side-arrow {
-    top: 25%;
+    top: 31%;
   }
 
   .portfolio-gateway__fallback-ring {

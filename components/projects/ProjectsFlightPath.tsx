@@ -8,6 +8,7 @@ import { Component, useCallback, useEffect, useRef, useState } from 'react'
 
 import { AtlasPicture } from '@/components/portfolio/AtlasPicture'
 import { projectVisualAlts } from '@/components/portfolio/ProjectCaseStudy'
+import { ArrowIcon } from '@/components/ui/ArrowIcon'
 import { atlasVisuals } from '@/content/editorial-visuals'
 import type { Project } from '@/content/site-content'
 import { detectWebGLProfile, shouldRenderWebGL } from '@/lib/client-capabilities'
@@ -308,7 +309,7 @@ export function ProjectsFlightPath({ projects }: ProjectsFlightPathProps) {
                   <span className="project-panel__description">{project.description}</span>
                 </span>
                 <span className="project-panel__action" aria-hidden="true">
-                  <span>↗</span>
+                  <ArrowIcon direction="up-right" />
                 </span>
               </a>
             </div>

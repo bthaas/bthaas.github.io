@@ -295,8 +295,11 @@ test('opens every carousel category as its own routed screen', async ({
     } else {
       await expect(primaryNavigation.getByRole('link')).toHaveCount(1)
     }
-    await expect(primaryNavigation.getByRole('link', { name: 'Home' }))
-      .toContainText('←')
+    await expect(
+      primaryNavigation
+        .getByRole('link', { name: 'Home' })
+        .locator('svg[data-arrow-direction="left"]'),
+    ).toHaveCount(1)
 
     if (route === '/projects') {
       await page.goBack()

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
+import { ArrowIcon } from '@/components/ui/ArrowIcon'
 import {
   ATLAS_GATEWAY_SELECTION_EVENT,
   type AtlasDestinationName,
@@ -56,7 +57,7 @@ export function AtlasNavigation({
       <nav className="site-nav" aria-label="Primary navigation">
         {showHomeControl && (
           <TransitionLink className="atlas-home-link" href="/">
-            <span className="atlas-home-link__arrow" aria-hidden="true">←</span>
+            <ArrowIcon className="atlas-home-link__arrow" direction="left" />
             <span className="atlas-home-link__label">Home</span>
           </TransitionLink>
         )}
