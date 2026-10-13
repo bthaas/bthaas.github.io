@@ -10,3 +10,8 @@ preview_urls = false
 routes = [
   { pattern = "www.bretthaas.com/*", zone_name = "bretthaas.com" },
 ]
+
+# Request logging stays off: the privacy policy promises that agent requests
+# collect no additional data. Errors remain visible through `wrangler tail`.
+[observability]
+enabled = false
