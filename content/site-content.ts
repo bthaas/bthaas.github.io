@@ -48,11 +48,18 @@ export interface EducationEntry {
   readonly logo: string
 }
 
+export interface PostalLocation {
+  readonly locality: string
+  readonly region: string
+  readonly country: string
+}
+
 export interface SiteContent {
   readonly identity: {
     readonly name: string
     readonly title: string
     readonly location: string
+    readonly postalLocation: PostalLocation
   }
   readonly contact: {
     readonly email: string
@@ -71,6 +78,11 @@ export const siteContent = {
     name: 'Brett Haas',
     title: 'Software Engineer',
     location: 'Bellevue, Washington',
+    postalLocation: {
+      locality: 'Bellevue',
+      region: 'WA',
+      country: 'US',
+    },
   },
   contact: {
     email: 'bthaas15@gmail.com',

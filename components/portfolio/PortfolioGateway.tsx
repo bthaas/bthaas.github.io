@@ -5,6 +5,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
 import { ArrowIcon } from '@/components/ui/ArrowIcon'
+import type { SiteOverview } from '@/content/site-overview'
 import {
   ATLAS_GATEWAY_SELECTION_EVENT,
   type AtlasGatewaySelectionDetail,
@@ -36,6 +37,8 @@ interface PortfolioGatewayProps {
     readonly name: string
     readonly title: string
   }
+  /** Text-only summary for assistive technology and non-visual readers of the gateway. */
+  readonly overview: SiteOverview
 }
 
 const GATEWAY_DRAG_CAPTURE_THRESHOLD_PX = 6
@@ -70,7 +73,7 @@ function GatewayCylinderSlices() {
   })
 }
 
-export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
+export function PortfolioGateway({ identity, overview }: PortfolioGatewayProps) {
   const rootRef = useRef<HTMLElement>(null)
   const portalSourceRef = useRef<HTMLSpanElement>(null)
   const dragRef = useRef<GatewayDragState>({
@@ -153,9 +156,20 @@ export function PortfolioGateway({ identity }: PortfolioGatewayProps) {
       <h1 className="portfolio-gateway__sr-only" id="portfolio-gateway-title">
         {identity.name}
       </h1>
+      <p className="portfolio-gateway__sr-only" data-testid="portfolio-gateway-summary">
+        {overview.summary} {overview.scope}
+      </p>
       <h2 className="portfolio-gateway__sr-only">
         Explore the portfolio
       </h2>
+      <dl className="portfolio-gateway__sr-only" data-testid="portfolio-gateway-sections">
+        {overview.sections.map((section) => (
+          <div key={section.path}>
+            <dt>{section.label}</dt>
+            <dd>{section.description}</dd>
+          </div>
+        ))}
+      </dl>
       <div
         className="portfolio-gateway__meta"
         role="group"

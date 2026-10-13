@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 
 import { PortfolioScreen } from '@/components/portfolio/PortfolioScreen'
+import { sitePages } from '@/content/site-pages'
+import { getPageAlternates } from '@/lib/page-metadata'
 
 export const metadata: Metadata = {
-  title: 'Skills | Brett Haas',
-  description: 'The engineering, machine-learning, and product skills behind Brett Haas’s work.',
-  alternates: { canonical: '/skills' },
+  title: sitePages.skills.title,
+  description: sitePages.skills.description,
+  alternates: getPageAlternates(sitePages.skills.path),
 }
 
 export default function SkillsPage() {

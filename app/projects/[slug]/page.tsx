@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { AtlasNavigation } from '@/components/portfolio/AtlasNavigation'
 import { ProjectCaseStudy } from '@/components/portfolio/ProjectCaseStudy'
 import { siteContent } from '@/content/site-content'
+import { getPageAlternates } from '@/lib/page-metadata'
 
 interface ProjectPageProps {
   readonly params: Promise<{ slug: string }>
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   return {
     title: `${project.name} — Brett Haas`,
     description: project.description,
-    alternates: { canonical: `/projects/${project.id}` },
+    alternates: getPageAlternates(`/projects/${project.id}`),
     openGraph: {
       title: `${project.name} — Brett Haas`,
       description: project.description,

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 
 import { PortfolioScreen } from '@/components/portfolio/PortfolioScreen'
+import { sitePages } from '@/content/site-pages'
+import { getPageAlternates } from '@/lib/page-metadata'
 
 export const metadata: Metadata = {
-  title: 'Experience | Brett Haas',
-  description: 'Brett Haas — research, model evaluation, and production software experience.',
-  alternates: { canonical: '/experience' },
+  title: sitePages.experience.title,
+  description: sitePages.experience.description,
+  alternates: getPageAlternates(sitePages.experience.path),
 }
 
 export default function ExperiencePage() {

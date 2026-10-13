@@ -76,5 +76,9 @@ describe('project detail pages', () => {
 
     expect(metadata.title).toBe('Beat Stream — Brett Haas')
     expect(metadata.description).toBe(siteContent.projects[1].description)
+    expect(metadata.alternates).toEqual({
+      canonical: '/projects/beatstream',
+      types: { 'text/markdown': '/projects/beatstream.md' },
+    })
   })
 })
