@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 
+import { editorialDocuments } from '@/content/editorial-documents'
 import { siteContent } from '@/content/site-content'
 import { SITE_URL } from '@/lib/site-config'
 
@@ -11,6 +12,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date('2026-07-25'),
     changeFrequency: 'monthly' as const,
     priority: 0.9,
+  }))
+  const documentPages = editorialDocuments.map(({ path }) => ({
+    url: `${SITE_URL}${path}`,
+    lastModified: new Date('2026-10-12'),
+    changeFrequency: 'yearly' as const,
+    priority: 0.5,
   }))
   const projectPages = siteContent.projects.map(({ id }) => ({
     url: `${SITE_URL}/projects/${id}`,
@@ -28,5 +35,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...sectionPages,
     ...projectPages,
+    ...documentPages,
   ]
 }

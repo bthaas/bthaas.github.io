@@ -4,6 +4,8 @@ import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
 import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
 import { siteContent } from '@/content/site-content'
+import { siteOverview } from '@/content/site-overview'
+import { contactCopy } from '@/content/site-pages'
 
 import { AtlasPicture } from './AtlasPicture'
 import {
@@ -81,7 +83,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
         data-portfolio-screen={screen}
       >
         {(!screen || screen === 'home') && (
-          <PortfolioGateway identity={identity} />
+          <PortfolioGateway identity={identity} overview={siteOverview} />
         )}
 
         {(!screen || screen === 'experience') && (
@@ -136,8 +138,7 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
                 <p className="eyebrow" data-contact-detail>04 / Next horizon</p>
                 <h2 id="contact-title" data-contact-title>Connect with me.</h2>
                 <p className="contact-intro" data-contact-detail>
-                  Always open to a conversation about interesting ideas, thoughtful products, and
-                  the systems that make them work.
+                  {contactCopy.intro}
                 </p>
                 <nav className="contact-links" aria-label="Contact links">
                   <span
@@ -185,10 +186,34 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
                     <ContactIcon name="linkedin" />
                   </a>
                 </nav>
+                <div className="visually-hidden" data-testid="contact-details">
+                  <h3>Contact details</h3>
+                  <dl>
+                    <dt>Email</dt>
+                    <dd>{contact.email}</dd>
+                    <dt>GitHub</dt>
+                    <dd>{contact.github.replace('https://', '')}</dd>
+                    <dt>LinkedIn</dt>
+                    <dd>{contact.linkedin.replace('https://', '')}</dd>
+                    <dt>Location</dt>
+                    <dd>{identity.location} (US Pacific Time)</dd>
+                    <dt>Topics</dt>
+                    <dd>Conversations about {contactCopy.topics}.</dd>
+                    <dt>More on this site</dt>
+                    <dd>{contactCopy.siteGuide}</dd>
+                  </dl>
+                  <p>{contactCopy.note}</p>
+                </div>
               </div>
 
               <footer className="site-footer" data-contact-detail>
-                <p>© 2026 Brett Haas</p>
+                <p className="site-footer__legal">
+                  © 2026 Brett Haas
+                  <span className="site-footer__links">
+                    <a href="/about">About</a>
+                    <a href="/privacy">Privacy</a>
+                  </span>
+                </p>
                 <p
                   data-atlas-local-time
                   role="timer"

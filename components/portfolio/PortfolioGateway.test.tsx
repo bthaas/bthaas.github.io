@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { siteContent } from '@/content/site-content'
+import { siteOverview } from '@/content/site-overview'
 import { ATLAS_GATEWAY_SELECTION_EVENT } from '@/lib/atlas-events'
 
 import { PortfolioGateway } from './PortfolioGateway'
@@ -14,13 +15,32 @@ vi.mock('./useGatewayEntrance', () => ({
   useGatewayEntrance: () => gatewayEntrance.state,
 }))
 
-const renderGateway = () => render(<PortfolioGateway identity={siteContent.identity} />)
+const renderGateway = () => render(<PortfolioGateway identity={siteContent.identity} overview={siteOverview} />)
 
 describe('PortfolioGateway', () => {
   beforeEach(() => {
     gatewayEntrance.state = 'settled'
     sessionStorage.clear()
     sessionStorage.setItem('atlas-gateway-entered', '1')
+  })
+
+  it('summarizes the portfolio for assistive technology without visible copy', () => {
+    renderGateway()
+    const summary = screen.getByTestId('portfolio-gateway-summary')
+    const sections = screen.getByTestId('portfolio-gateway-sections')
+
+    expect(summary).toHaveClass('portfolio-gateway__sr-only')
+    expect(summary).toHaveTextContent(siteOverview.summary)
+    expect(summary).toHaveTextContent(siteOverview.scope)
+    expect(sections).toHaveClass('portfolio-gateway__sr-only')
+    expect(Array.from(sections.querySelectorAll('dt')).map((term) => term.textContent)).toEqual([
+      'Experience',
+      'Projects',
+      'Skills',
+      'Contact',
+    ])
+    expect(sections.querySelectorAll('dd')).toHaveLength(4)
+    expect(sections.querySelectorAll('a')).toHaveLength(0)
   })
 
   it('starts on Experience with side arrows and no bottom control strip', () => {

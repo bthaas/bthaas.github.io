@@ -151,6 +151,18 @@
   font-size: 0.64rem;
 }
 
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.1rem;
+}
+
+.site-footer__links {
+  display: inline-flex;
+  gap: 1rem;
+}
+
 .site-footer > p:nth-child(2) {
   color: var(--muted);
 }

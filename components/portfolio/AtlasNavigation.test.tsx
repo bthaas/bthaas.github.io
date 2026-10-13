@@ -68,6 +68,16 @@ describe('AtlasNavigation', () => {
     expect(container.querySelector('.atlas-route-index')).not.toBeInTheDocument()
   })
 
+  it('shows only the back-to-home control on long-form documents', () => {
+    const { container } = render(<AtlasNavigation current="document" />)
+    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+
+    expect(within(navigation).getAllByRole('link')).toEqual([
+      within(navigation).getByRole('link', { name: 'Home' }),
+    ])
+    expect(container.querySelector('.site-header')).toHaveAttribute('data-index-visible', 'false')
+  })
+
   it.each([
     ['experience', 'Experience'],
     ['skills', 'Skills'],

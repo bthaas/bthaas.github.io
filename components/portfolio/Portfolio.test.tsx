@@ -258,6 +258,29 @@ describe('Portfolio', () => {
     expect(container.querySelector('[data-atlas-local-time]')).not.toHaveTextContent(/\d{2}:\d{2}/)
   })
 
+  it('spells out contact details for assistive technology and links the trust pages', () => {
+    const { container } = render(<Portfolio screen="contact" />)
+    const details = screen.getByTestId('contact-details')
+
+    expect(details).toHaveClass('visually-hidden')
+    expect(within(details).getByRole('heading', { level: 3, name: 'Contact details' }))
+      .toBeInTheDocument()
+    expect(details).toHaveTextContent(siteContent.contact.email)
+    expect(details).toHaveTextContent('github.com/bthaas')
+    expect(details).toHaveTextContent('linkedin.com/in/brett-haas')
+    expect(details).toHaveTextContent('Bellevue, Washington (US Pacific Time)')
+    expect(details).toHaveTextContent('There is no contact form')
+    expect(details).toHaveTextContent('the Privacy page explains how messages and visits are handled')
+    expect(within(details).queryAllByRole('link')).toHaveLength(0)
+    expect(container.querySelector('#contact')?.textContent?.length).toBeGreaterThan(500)
+
+    const footer = container.querySelector('.site-footer') as HTMLElement
+    expect(within(footer).getByRole('link', { name: 'About' })).toHaveAttribute('href', '/about')
+    expect(within(footer).getByRole('link', { name: 'Privacy' }))
+      .toHaveAttribute('href', '/privacy')
+    expect(footer.querySelector(':scope > a')).toHaveTextContent('Back to top')
+  })
+
   it('frames the horizon artwork as an inset plate on the contact canvas', () => {
     const { container } = render(<Portfolio />)
     const contact = container.querySelector('#contact')

@@ -11,6 +11,8 @@ import {
 } from '@/lib/atlas-events'
 
 export type AtlasRouteName = 'home' | 'experience' | 'projects' | 'skills' | 'contact'
+/** Long-form pages (About, Privacy) outside the four-route atlas. */
+export type AtlasNavigationContext = AtlasRouteName | 'document'
 
 const routes = [
   { href: '/experience', index: '01', label: 'Experience', name: 'experience' },
@@ -26,13 +28,13 @@ function isAtlasDestinationName(value: unknown): value is AtlasDestinationName {
 export function AtlasNavigation({
   current,
 }: {
-  readonly current: AtlasRouteName
+  readonly current: AtlasNavigationContext
 }) {
   const [selectedDestination, setSelectedDestination] = useState<AtlasDestinationName>(
     'experience',
   )
   const showHomeControl = current !== 'home'
-  const showRouteIndex = current !== 'projects'
+  const showRouteIndex = current !== 'projects' && current !== 'document'
 
   useEffect(() => {
     if (current !== 'home') return

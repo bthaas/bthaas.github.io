@@ -81,6 +81,36 @@ under reduced motion, and when client-side enhancements are unavailable.
 prepare the versioned static assets, and deploy `out/` through GitHub Pages.
 The custom domain is [www.bretthaas.com](https://www.bretthaas.com).
 
+### Agent-readable content
+
+`npm run prepare:deployment` also writes `/llms.txt` and a Markdown twin of
+every page (`/index.html.md`, `/about.md`, `/projects/<id>.md`, …) from
+`content/`, following [llmstxt.org](https://llmstxt.org/).
+
+GitHub Pages cannot vary responses by `Accept`, so a Cloudflare Worker in
+`edge/` sits in front of it on the proxied zone. It serves the Markdown twin
+for `Accept: text/markdown`, adds `Vary: Accept`, returns a Markdown 404 for
+missing pages, and answers `406` when nothing acceptable exists. The local
+preview server runs the same gateway, so `npm start` behaves like production.
+Deploy or update the Worker separately with Cloudflare credentials:
+
+```bash
+npx wrangler@4 deploy --config edge/wrangler.toml
+```
+
+The Worker falls back to the untouched origin response if negotiation fails.
+In the Cloudflare dashboard, set the route's request-limit failure mode to
+fail open, and add Worker-less routes for asset prefixes such as
+`www.bretthaas.com/static-v1/*`, `/icarus-atlas/*`, and `/models/*` so assets
+do not count against the Free plan's daily request limit.
+
+Verify after deploying:
+
+```bash
+curl -sS -i -H 'Accept: text/markdown' https://www.bretthaas.com/
+curl -sS -i -H 'Accept: text/markdown' https://www.bretthaas.com/missing-page
+```
+
 ## Source components
 
 The components in `components/bits/` are source-vendored and customized for this
