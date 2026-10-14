@@ -123,12 +123,11 @@
   gap: 0.7rem;
   border: 1px solid rgb(255 255 255 / 38%);
   border-radius: 999px;
-  background: rgb(7 8 6 / 74%);
+  background: rgb(7 8 6 / 80%);
   box-shadow: 0 1rem 3rem rgb(0 0 0 / 28%);
   color: var(--paper);
   font-size: 0.72rem;
   opacity: 0;
-  backdrop-filter: blur(14px);
   transform: translateY(1rem);
   transition:
     opacity 320ms ease,
@@ -248,12 +247,11 @@
   gap: 0.2rem;
   border: 1px solid rgb(17 19 15 / 38%);
   border-radius: 999px;
-  background: rgb(255 253 245 / 94%);
+  background: rgb(255 253 245 / 97%);
   box-shadow:
     0 0.9rem 2.5rem rgb(17 19 15 / 14%),
     0 0 0 1px rgb(255 255 255 / 44%) inset;
   margin-right: var(--project-nav-clearance);
-  backdrop-filter: blur(18px);
   pointer-events: auto;
 }
 
@@ -463,9 +461,8 @@
   max-width: 100%;
   border: 1px solid rgb(255 253 245 / 18%);
   border-radius: 999px;
-  background: rgb(7 8 6 / 72%);
+  background: rgb(7 8 6 / 79%);
   box-shadow: 0 0.8rem 2rem rgb(0 0 0 / 16%);
-  backdrop-filter: blur(12px);
 }
 
 .project-spiral[data-project-view="spiral"] .project-spiral__projects > li:nth-child(1) {

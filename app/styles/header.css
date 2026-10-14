@@ -33,10 +33,9 @@
   justify-content: center;
   border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--cream) 88%, transparent);
+  background: color-mix(in srgb, var(--cream) 94%, transparent);
   box-shadow: 0 0.35rem 1.25rem rgb(25 25 43 / 10%);
   gap: 0.45rem;
-  backdrop-filter: blur(10px);
   transition:
     background-color 220ms ease,
     border-color 220ms ease,
@@ -288,7 +287,6 @@
     background: transparent;
     box-shadow: none;
     gap: 0;
-    backdrop-filter: none;
   }
 
   .site-header[data-index-visible="true"]:not([data-current="home"]) .atlas-home-link {
@@ -300,7 +298,6 @@
     background: transparent;
     box-shadow: none;
     gap: 0;
-    backdrop-filter: none;
   }
 
   .site-header[data-index-visible="false"] .atlas-home-link {
@@ -311,10 +308,9 @@
     padding: 0 0.85rem;
     border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--cream) 88%, transparent);
+    background: color-mix(in srgb, var(--cream) 94%, transparent);
     box-shadow: 0 0.35rem 1.25rem rgb(25 25 43 / 10%);
     gap: 0.45rem;
-    backdrop-filter: blur(10px);
   }
 
   .site-header[data-index-visible="false"] .atlas-home-link:hover,

@@ -39,6 +39,12 @@ interface TokenOrigin {
   readonly y: number
 }
 
+interface ArenaSize {
+  readonly height: number
+  readonly viewportWidth: number
+  readonly width: number
+}
+
 interface DragState {
   angularVelocity: number
   index: number
@@ -90,6 +96,7 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
   const [physicsMode, setPhysicsMode] = useState<PhysicsMode>('stuck')
   const animationFrameRef = useRef<number | null>(null)
   const arenaRef = useRef<HTMLDivElement>(null)
+  const arenaSizeRef = useRef<ArenaSize | null>(null)
   const autoDropTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dragRef = useRef<DragState | null>(null)
   const itemRefs = useRef<Array<HTMLLIElement | null>>([])
@@ -119,6 +126,11 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
     const arenaRect = arena.getBoundingClientRect()
     const arenaWidth = arenaRect.width || arena.clientWidth || FALLBACK_ARENA_WIDTH
     const arenaHeight = arenaRect.height || arena.clientHeight || FALLBACK_ARENA_HEIGHT
+    arenaSizeRef.current = {
+      height: arenaRect.height,
+      viewportWidth: window.innerWidth,
+      width: arenaRect.width,
+    }
     const tokenSizes = tokenRefs.current.map((token) => {
       const tokenRect = token?.getBoundingClientRect()
 
@@ -236,6 +248,18 @@ export function SkillWorkbench({ logos }: { readonly logos: readonly SkillLogo[]
 
   useEffect(() => {
     const handleResize = () => {
+      // Rebuilding the world re-drops every token, so skip resizes (such as a
+      // mobile URL bar collapsing) that leave the arena and the vw-based token
+      // sizes unchanged.
+      const arenaRect = arenaRef.current?.getBoundingClientRect()
+      const previousSize = arenaSizeRef.current
+      if (
+        arenaRect
+        && previousSize
+        && window.innerWidth === previousSize.viewportWidth
+        && Math.abs(arenaRect.width - previousSize.width) < 1
+        && Math.abs(arenaRect.height - previousSize.height) < 1
+      ) return
       if (animationFrameRef.current !== null) {
         window.cancelAnimationFrame?.(animationFrameRef.current)
         animationFrameRef.current = null

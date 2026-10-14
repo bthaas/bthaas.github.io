@@ -3,7 +3,7 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { Stats } from '@react-three/drei/core/Stats.js'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
 import type { ProjectSpiralMotionState } from '@/components/projects/project-spiral-types'
@@ -12,9 +12,19 @@ import {
   getProjectSpiralLayout,
   PROJECT_SPIRAL_SLOT_ORDER,
 } from '@/lib/project-spiral'
-import { configureProjectSpiralTexture } from '@/lib/project-spiral-rendering'
+import {
+  configureProjectSpiralTexture,
+  isProjectSpiralInMotion,
+} from '@/lib/project-spiral-rendering'
+
+import { FrameRateLimiter } from './FrameRateLimiter'
+import { configureSceneRenderer } from './scene-renderer'
 
 const CARD_COUNT = 9
+// Desktop follows the display refresh while scroll or pointer input is easing the
+// spiral and drops to this rate when only the idle bob is moving.
+const IDLE_DESKTOP_FPS = 60
+const MOBILE_FPS = 30
 const MODEL_PATH = '/models/project-spiral.glb'
 const TEXTURE_SOURCES = [
   '/icarus-atlas/project-courtvision-1200.avif',
@@ -30,6 +40,10 @@ interface ProjectSpiralSceneProps {
   readonly showStats: boolean
 }
 
+interface ProjectSpiralCardsProps extends ProjectSpiralSceneProps {
+  readonly motionActiveRef: React.MutableRefObject<boolean>
+}
+
 interface CardGeometry {
   readonly geometry: THREE.BufferGeometry
   readonly width: number
@@ -38,9 +52,10 @@ interface CardGeometry {
 function ProjectSpiralCards({
   active,
   isMobile,
+  motionActiveRef,
   motionRef,
   onReady,
-}: ProjectSpiralSceneProps) {
+}: ProjectSpiralCardsProps) {
   const gltf = useGLTF(MODEL_PATH, '/draco/')
   const textures = useTexture([...TEXTURE_SOURCES])
   const groupRef = useRef<THREE.Group>(null)
@@ -48,7 +63,7 @@ function ProjectSpiralCards({
   const readyRef = useRef(false)
   const renderedPhase = useRef(0)
   const renderedVelocity = useRef(0)
-  const { gl, invalidate, viewport } = useThree()
+  const { gl, viewport } = useThree()
 
   const cards = useMemo<CardGeometry[]>(() => {
     const clonedScene = gltf.scene.clone(true)
@@ -86,21 +101,6 @@ function ProjectSpiralCards({
     textures.forEach((texture) => configureProjectSpiralTexture(texture, maximumAnisotropy))
     return () => materials.forEach((material) => material.dispose())
   }, [gl, materials, textures])
-
-  useEffect(() => {
-    if (!active || !isMobile) return
-    let animationFrame = 0
-    let lastRender = 0
-    const renderAtThirtyFps = (time: number) => {
-      if (time - lastRender >= 1000 / 30) {
-        lastRender = time
-        invalidate()
-      }
-      animationFrame = requestAnimationFrame(renderAtThirtyFps)
-    }
-    animationFrame = requestAnimationFrame(renderAtThirtyFps)
-    return () => cancelAnimationFrame(animationFrame)
-  }, [active, invalidate, isMobile])
 
   useFrame(({ clock }, delta) => {
     if (!active) return
@@ -154,20 +154,18 @@ function ProjectSpiralCards({
     }
 
     const group = groupRef.current
+    const targetRotationX = -motionRef.current.pointerY * 0.035
+    const targetRotationY = motionRef.current.pointerX * 0.05
     if (group) {
-      group.rotation.x = THREE.MathUtils.damp(
-        group.rotation.x,
-        -motionRef.current.pointerY * 0.035,
-        4,
-        delta,
-      )
-      group.rotation.y = THREE.MathUtils.damp(
-        group.rotation.y,
-        motionRef.current.pointerX * 0.05,
-        4,
-        delta,
-      )
+      group.rotation.x = THREE.MathUtils.damp(group.rotation.x, targetRotationX, 4, delta)
+      group.rotation.y = THREE.MathUtils.damp(group.rotation.y, targetRotationY, 4, delta)
     }
+    motionActiveRef.current = isProjectSpiralInMotion({
+      phaseGap: motionRef.current.phase - renderedPhase.current,
+      rotationGapX: group ? targetRotationX - group.rotation.x : 0,
+      rotationGapY: group ? targetRotationY - group.rotation.y : 0,
+      velocity: renderedVelocity.current,
+    })
     if (!readyRef.current) {
       readyRef.current = true
       onReady()
@@ -192,15 +190,24 @@ function ProjectSpiralCards({
 }
 
 export function ProjectSpiralScene(props: ProjectSpiralSceneProps) {
+  const motionActiveRef = useRef(false)
+  const followDisplayRefresh = useCallback(() => motionActiveRef.current, [])
   return (
     <Canvas
       camera={{ fov: 44, near: 0.1, far: 30, position: [0, 0, 9.5] }}
       className="project-spiral-canvas"
       dpr={props.isMobile ? 1 : [1, 1.5]}
-      frameloop={props.isMobile ? 'demand' : 'always'}
-      gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
+      frameloop="demand"
+      gl={{ alpha: true, antialias: false }}
+      onCreated={configureSceneRenderer}
     >
-      <ProjectSpiralCards {...props} />
+      {props.active && (
+        <FrameRateLimiter
+          fps={props.isMobile ? MOBILE_FPS : IDLE_DESKTOP_FPS}
+          fullRate={props.isMobile ? undefined : followDisplayRefresh}
+        />
+      )}
+      <ProjectSpiralCards {...props} motionActiveRef={motionActiveRef} />
       {props.showStats && <Stats className="project-spiral-stats" />}
     </Canvas>
   )

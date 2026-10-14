@@ -129,4 +129,24 @@ describe('FeatherFallLayer', () => {
     })
     expect(screen.queryByTestId('feather-fall-scene')).not.toBeInTheDocument()
   })
+
+  it('ignores height-only resizes such as a mobile URL bar collapsing during scroll', async () => {
+    document.documentElement.setAttribute(WEBGL_ACTIVATED_ATTRIBUTE, '')
+    render(<FeatherFallLayer />)
+    await screen.findByTestId('feather-fall-scene')
+    const checksAfterMount = vi.mocked(shouldRenderWebGL).mock.calls.length
+
+    act(() => {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 620, writable: true })
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(shouldRenderWebGL).toHaveBeenCalledTimes(checksAfterMount)
+
+    act(() => {
+      window.innerWidth = 700
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(shouldRenderWebGL).toHaveBeenCalledTimes(checksAfterMount + 1)
+    expect(screen.getByTestId('feather-fall-scene')).toHaveAttribute('data-mobile', 'true')
+  })
 })

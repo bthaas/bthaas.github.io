@@ -11,14 +11,10 @@ const mocks = vi.hoisted(() => {
   }> = []
 
   return {
-    drawSvgPlugin: { name: 'DrawSVGPlugin' },
-    flip: { name: 'Flip' },
     lenisInstances,
-    motionPathPlugin: { name: 'MotionPathPlugin' },
     registerPlugin: vi.fn(),
     scrambleTextPlugin: { name: 'ScrambleTextPlugin' },
     scrollTrigger: { update: vi.fn() },
-    splitText: { name: 'SplitText' },
     ticker: {
       add: vi.fn(),
       lagSmoothing: vi.fn(),
@@ -51,12 +47,8 @@ vi.mock('gsap', () => ({
     ticker: mocks.ticker,
   },
 }))
-vi.mock('gsap/DrawSVGPlugin', () => ({ DrawSVGPlugin: mocks.drawSvgPlugin }))
-vi.mock('gsap/Flip', () => ({ Flip: mocks.flip }))
-vi.mock('gsap/MotionPathPlugin', () => ({ MotionPathPlugin: mocks.motionPathPlugin }))
 vi.mock('gsap/ScrambleTextPlugin', () => ({ ScrambleTextPlugin: mocks.scrambleTextPlugin }))
 vi.mock('gsap/ScrollTrigger', () => ({ ScrollTrigger: mocks.scrollTrigger }))
-vi.mock('gsap/SplitText', () => ({ SplitText: mocks.splitText }))
 
 import { getAtlasEngine, initializeAtlasEngine } from './engine'
 
@@ -77,7 +69,7 @@ describe('Atlas motion engine', () => {
     expect(getAtlasEngine()).toBeNull()
   })
 
-  it('registers the approved plugins and drives Lenis from the GSAP ticker', () => {
+  it('registers only the plugins the runtime uses and drives Lenis from the GSAP ticker', () => {
     const matchMedia = vi.fn((query: string) => ({
       matches: query === '(pointer: coarse)' ? false : false,
     }))
@@ -88,14 +80,11 @@ describe('Atlas motion engine', () => {
 
     expect(engine).not.toBeNull()
     expect(getAtlasEngine()).toBe(engine)
-    expect(engine?.plugins.SplitText).toBe(mocks.splitText)
+    expect(engine?.plugins).toEqual({ ScrambleTextPlugin: mocks.scrambleTextPlugin })
+    expect(mocks.registerPlugin).toHaveBeenCalledOnce()
     expect(mocks.registerPlugin).toHaveBeenCalledWith(
       mocks.scrollTrigger,
-      mocks.splitText,
       mocks.scrambleTextPlugin,
-      mocks.drawSvgPlugin,
-      mocks.motionPathPlugin,
-      mocks.flip,
     )
     expect(lenis.options).toEqual({
       autoRaf: false,

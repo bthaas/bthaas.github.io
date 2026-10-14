@@ -1,10 +1,6 @@
 import { gsap } from 'gsap'
-import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin'
-import { Flip } from 'gsap/Flip'
-import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { SplitText } from 'gsap/SplitText'
 import Lenis from 'lenis'
 
 type MatchMedia = (query: string) => Pick<MediaQueryList, 'matches'>
@@ -16,11 +12,7 @@ export interface AtlasEngine {
   readonly isCoarsePointer: boolean
   readonly lenis: Lenis
   readonly plugins: {
-    readonly DrawSVGPlugin: typeof DrawSVGPlugin
-    readonly Flip: typeof Flip
-    readonly MotionPathPlugin: typeof MotionPathPlugin
     readonly ScrambleTextPlugin: typeof ScrambleTextPlugin
-    readonly SplitText: typeof SplitText
   }
 }
 
@@ -41,14 +33,7 @@ export function initializeAtlasEngine({
   if (activeEngine) return activeEngine
 
   const isCoarsePointer = matchMedia('(pointer: coarse)').matches
-  gsap.registerPlugin(
-    ScrollTrigger,
-    SplitText,
-    ScrambleTextPlugin,
-    DrawSVGPlugin,
-    MotionPathPlugin,
-    Flip,
-  )
+  gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin)
 
   const lenis = new Lenis({
     autoRaf: false,
@@ -70,11 +55,7 @@ export function initializeAtlasEngine({
     isCoarsePointer,
     lenis,
     plugins: {
-      DrawSVGPlugin,
-      Flip,
-      MotionPathPlugin,
       ScrambleTextPlugin,
-      SplitText,
     },
     destroy: () => {
       if (!isActive) return

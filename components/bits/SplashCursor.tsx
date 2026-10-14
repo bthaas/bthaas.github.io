@@ -894,6 +894,7 @@ export default function SplashCursor({
       const sampleDuration = timestamp - sampleStarted
       if (sampleDuration >= 1000) {
         canvas!.dataset.fluidFps = String(Math.round((frameCount * 1000) / sampleDuration))
+        canvas!.dataset.fluidSplats = String(splatCount)
         frameCount = 0
         sampleStarted = timestamp
       }
@@ -1182,7 +1183,6 @@ export default function SplashCursor({
       lastPointerMove = performance.now()
       startAnimation()
       splatCount += 1
-      canvas!.dataset.fluidSplats = String(splatCount)
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })

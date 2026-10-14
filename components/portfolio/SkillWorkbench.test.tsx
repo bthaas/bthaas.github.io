@@ -284,4 +284,61 @@ describe('SkillWorkbench', () => {
     const fallback = screen.getByTestId('skill-workbench-fallback')
     expect(within(fallback).getAllByRole('listitem')).toHaveLength(logos.length)
   })
+
+  it('keeps the dropped world running when a resize leaves the arena size unchanged', () => {
+    const requestFrame = vi.fn(() => 1)
+    vi.stubGlobal('requestAnimationFrame', requestFrame)
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+
+    render(<SkillWorkbench logos={logos} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
+    const framesAfterDrop = requestFrame.mock.calls.length
+
+    fireEvent(window, new Event('resize'))
+
+    expect(requestFrame).toHaveBeenCalledTimes(framesAfterDrop)
+    expect(cancelAnimationFrame).not.toHaveBeenCalled()
+  })
+
+  it('rebuilds the world when the arena actually changes size', () => {
+    const requestFrame = vi.fn(() => 1)
+    vi.stubGlobal('requestAnimationFrame', requestFrame)
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+    let arenaWidth = 1_200
+    const originalRect = HTMLElement.prototype.getBoundingClientRect
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      if (!this.classList.contains('skill-workbench__arena')) return originalRect.call(this)
+      return DOMRect.fromRect({ height: 520, width: arenaWidth, x: 0, y: 0 })
+    })
+
+    render(<SkillWorkbench logos={logos} />)
+    const workbench = screen.getByRole('region', { name: 'Interactive skill workbench' })
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
+    const framesAfterDrop = requestFrame.mock.calls.length
+
+    arenaWidth = 900
+    fireEvent(window, new Event('resize'))
+
+    expect(cancelAnimationFrame).toHaveBeenCalledWith(1)
+    expect(requestFrame).toHaveBeenCalledTimes(framesAfterDrop + 1)
+    expect(workbench).toHaveAttribute('data-physics', 'dropped')
+  })
+
+  it('rebuilds when the viewport width changes even if a capped arena keeps its size', () => {
+    const requestFrame = vi.fn(() => 1)
+    vi.stubGlobal('requestAnimationFrame', requestFrame)
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1_600)
+
+    render(<SkillWorkbench logos={logos} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Drop skills' }))
+    const framesAfterDrop = requestFrame.mock.calls.length
+
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1_440)
+    fireEvent(window, new Event('resize'))
+
+    expect(requestFrame).toHaveBeenCalledTimes(framesAfterDrop + 1)
+  })
 })

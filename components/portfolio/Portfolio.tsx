@@ -1,6 +1,5 @@
 import { atlasVisuals } from '@/content/editorial-visuals'
 import { ExperienceFlightPath } from '@/components/experience/ExperienceFlightPath'
-import { AtlasMotionEffects } from '@/components/motion/AtlasMotionEffects'
 import { TransitionLink } from '@/components/motion/PageTransitionProvider'
 import { ProjectsSpiral } from '@/components/projects/ProjectsSpiral'
 import { siteContent } from '@/content/site-content'
@@ -71,7 +70,6 @@ export function Portfolio({ screen }: PortfolioProps = {}) {
 
   return (
     <>
-      <AtlasMotionEffects />
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>

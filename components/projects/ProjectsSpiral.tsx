@@ -138,13 +138,22 @@ export function ProjectsSpiral({ projects }: ProjectsSpiralProps) {
       })
     }
 
+    // Mobile browsers fire height-only resizes while the URL bar collapses during
+    // scroll; only a width change can alter the tier or eligibility.
+    let lastWidth = window.innerWidth
+    const handleResize = () => {
+      if (window.innerWidth === lastWidth) return
+      lastWidth = window.innerWidth
+      update()
+    }
+
     update()
     reducedMotion.addEventListener('change', update)
-    window.addEventListener('resize', update, { passive: true })
+    window.addEventListener('resize', handleResize, { passive: true })
     return () => {
       cancelSchedule()
       reducedMotion.removeEventListener('change', update)
-      window.removeEventListener('resize', update)
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
 

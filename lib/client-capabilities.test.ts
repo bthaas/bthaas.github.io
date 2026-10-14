@@ -1,7 +1,13 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { detectWebGL, detectWebGLProfile, shouldRenderWebGL } from './client-capabilities'
+import {
+  detectWebGL,
+  detectWebGLProfile,
+  resetWebGLProfileCache,
+  shouldRenderWebGL,
+} from './client-capabilities'
 
+beforeEach(() => resetWebGLProfileCache())
 afterEach(() => vi.restoreAllMocks())
 
 describe('client WebGL capabilities', () => {
@@ -51,5 +57,38 @@ describe('client WebGL capabilities', () => {
 
     expect(detectWebGLProfile()).toEqual({ available: true, constrained: true })
     expect(loseContext).toHaveBeenCalledOnce()
+  })
+
+  it('reuses one probe per page instead of creating a WebGL context on every call', () => {
+    const loseContext = vi.fn()
+    const context = {
+      getExtension: vi.fn((name: string) => (name === 'WEBGL_lose_context' ? { loseContext } : null)),
+      getParameter: vi.fn(),
+    }
+    const createElement = vi.spyOn(document, 'createElement').mockReturnValue({
+      getContext: vi.fn(() => context),
+    } as unknown as HTMLCanvasElement)
+
+    const first = detectWebGLProfile()
+    const second = detectWebGLProfile()
+
+    expect(second).toBe(first)
+    expect(detectWebGL()).toBe(true)
+    expect(createElement).toHaveBeenCalledOnce()
+    expect(loseContext).toHaveBeenCalledOnce()
+  })
+
+  it('probes again after a failed probe so a transient context failure is not permanent', () => {
+    const createElement = vi.spyOn(document, 'createElement').mockImplementation(() => {
+      throw new Error('context limit reached')
+    })
+    expect(detectWebGLProfile()).toEqual({ available: false, constrained: false })
+
+    createElement.mockReturnValue({
+      getContext: vi.fn(() => ({ getExtension: vi.fn(() => null), getParameter: vi.fn() })),
+    } as unknown as HTMLCanvasElement)
+
+    expect(detectWebGLProfile()).toEqual({ available: true, constrained: false })
+    expect(createElement).toHaveBeenCalledTimes(2)
   })
 })

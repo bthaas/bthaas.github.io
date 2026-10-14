@@ -131,6 +131,41 @@ describe('atlas DOM capabilities', () => {
       .toEqual(['', '', '', '', '', ''])
   })
 
+  it('skips contact style writes while scroll progress is unchanged', () => {
+    document.body.innerHTML = `
+      <section id="contact" data-contact-finale>
+        <h2 data-contact-title>Keep building.</h2>
+        <p data-contact-detail>Start a conversation.</p>
+      </section>
+    `
+    const section = document.getElementById('contact')!
+    vi.spyOn(section, 'getBoundingClientRect').mockReturnValue({
+      bottom: 6200,
+      height: 1200,
+      left: 0,
+      right: 1200,
+      top: 5000,
+      width: 1200,
+      x: 0,
+      y: 5000,
+      toJSON: () => undefined,
+    })
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
+    vi.spyOn(window, 'scrollY', 'get').mockReturnValue(0)
+    const cleanup = setupContactFinale(document, window)
+    const setProperty = vi.spyOn(section.style, 'setProperty')
+
+    for (const scrollY of [0, 120, 240, 360]) {
+      window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY } }))
+    }
+    expect(setProperty).not.toHaveBeenCalled()
+
+    window.dispatchEvent(new CustomEvent('atlas:scroll', { detail: { scrollY: 5200 } }))
+    expect(setProperty).toHaveBeenCalled()
+    expect(section.style.getPropertyValue('--atlas-contact-plate-reveal')).toBe('1')
+    cleanup()
+  })
+
   it('renders Bellevue time without depending on the viewer timezone', () => {
     document.body.innerHTML = '<p data-atlas-local-time>Bellevue, WA</p>'
     const schedule = vi.fn(() => 17)
@@ -183,6 +218,34 @@ describe('atlas DOM capabilities', () => {
     const touchCleanup = setupCursor(document, () => false, engine)
     expect(document.querySelector('[data-atlas-cursor]')).not.toBeInTheDocument()
     touchCleanup()
+  })
+
+  it('only rewrites the cursor label when the pointer mode changes', async () => {
+    document.body.innerHTML = '<a id="external" href="https://example.com" target="_blank">External</a>'
+    const { engine } = createPointerEngine()
+    const cleanup = setupCursor(document, () => true, engine)
+    const cursor = document.querySelector<HTMLElement>('[data-atlas-cursor]')!
+    const link = document.getElementById('external')!
+    const records: MutationRecord[] = []
+    const observer = new MutationObserver((mutations) => records.push(...mutations))
+    observer.observe(cursor, {
+      attributeFilter: ['data-cursor-mode'],
+      characterData: true,
+      childList: true,
+      subtree: true,
+    })
+
+    for (let index = 0; index < 4; index += 1) {
+      link.dispatchEvent(new MouseEvent('pointermove', { bubbles: true, clientX: index, clientY: index }))
+    }
+    await Promise.resolve()
+    records.push(...observer.takeRecords())
+    observer.disconnect()
+
+    expect(cursor).toHaveAttribute('data-cursor-mode', 'external')
+    expect(records.filter((record) => record.type === 'attributes')).toHaveLength(1)
+    expect(records.filter((record) => record.type !== 'attributes')).toHaveLength(1)
+    cleanup()
   })
 
   it('writes alternating project pan transforms from the shared scroll event', () => {
@@ -488,6 +551,51 @@ describe('atlas DOM capabilities', () => {
     }))
     expect(subscriber).not.toHaveBeenCalled()
     expect(kill).toHaveBeenCalledOnce()
+  })
+
+  it('measures document height on refresh instead of on every scroll frame', () => {
+    let documentHeight = 3000
+    const readHeight = vi.fn(() => documentHeight)
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      get: readHeight,
+    })
+    Object.defineProperties(window, {
+      innerHeight: { configurable: true, value: 1000 },
+      scrollY: { configurable: true, value: 1000 },
+    })
+    let onRefresh: (() => void) | undefined
+    let onUpdate: (() => void) | undefined
+    const engine = {
+      ScrollTrigger: {
+        create: vi.fn((options: { onRefresh: () => void, onUpdate: () => void }) => {
+          onRefresh = options.onRefresh
+          onUpdate = options.onUpdate
+          return { kill: vi.fn() }
+        }),
+      },
+      lenis: { scroll: 1000, velocity: 0 },
+    }
+    const subscriber = vi.fn()
+    const bus = createScrollBus({ document, engine: engine as never, window })
+    bus.subscribe(subscriber)
+    const readsAfterSubscribe = readHeight.mock.calls.length
+
+    for (let step = 1; step <= 5; step += 1) {
+      engine.lenis.scroll = 1000 + step * 10
+      onUpdate?.()
+    }
+    expect(readHeight).toHaveBeenCalledTimes(readsAfterSubscribe)
+
+    documentHeight = 5000
+    engine.lenis.scroll = 2000
+    onRefresh?.()
+    expect(subscriber).toHaveBeenLastCalledWith({
+      documentProgress: 0.5,
+      scrollY: 2000,
+      velocity: 0,
+    })
+    bus.destroy()
   })
 
   it('does not split the same element twice', () => {

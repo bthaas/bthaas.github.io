@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Canvas } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei/core/Gltf.js'
 import { Stats } from '@react-three/drei/core/Stats.js'
-import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 import {
@@ -21,6 +21,10 @@ import {
   writeSunSpectacleFrame,
   type SunSpectacleFrame,
 } from '@/lib/atlas-motion/sun-spectacle'
+import { precompileShaders } from '@/lib/shader-precompile'
+
+import { FrameRateLimiter } from './FrameRateLimiter'
+import { configureSceneRenderer } from './scene-renderer'
 
 interface FeatherFallSceneProps {
   readonly isConstrained: boolean
@@ -46,20 +50,28 @@ interface SpectacleState {
   startedAt: number
 }
 
+interface FeatherRenderGate {
+  idle: boolean
+}
+
 interface FeatherInstancesProps {
   readonly frameRef: React.MutableRefObject<FeatherFrame>
   readonly geometry: THREE.BufferGeometry
   readonly gustRef: React.MutableRefObject<GustState>
   readonly layer: 0 | 1
-  readonly material: THREE.MeshPhysicalMaterial
+  readonly material: THREE.MeshStandardMaterial
   readonly records: readonly FeatherSeed[]
 }
 
 const modelPath = '/models/feather-variants.glb'
 const dracoPath = '/draco/'
+const DESKTOP_FPS = 60
+const CONSTRAINED_FPS = 30
 
-function createFeatherMaterial(layer: 0 | 1): THREE.MeshPhysicalMaterial {
-  const material = new THREE.MeshPhysicalMaterial({
+// MeshStandardMaterial shades these settings identically to MeshPhysicalMaterial
+// (its default IOR of 1.5 is the same 0.04 base reflectance) with a smaller shader.
+function createFeatherMaterial(layer: 0 | 1): THREE.MeshStandardMaterial {
+  const material = new THREE.MeshStandardMaterial({
     color: '#F5F2EC',
     depthWrite: false,
     metalness: 0.01,
@@ -183,11 +195,17 @@ function FeatherInstances({
   )
 }
 
-function FeatherField({ isConstrained, isMobile }: Pick<
-  FeatherFallSceneProps,
-  'isConstrained' | 'isMobile'
->) {
+interface FeatherFieldProps extends Pick<FeatherFallSceneProps, 'isConstrained' | 'isMobile'> {
+  readonly renderGate: React.MutableRefObject<FeatherRenderGate>
+}
+
+function FeatherField({ isConstrained, isMobile, renderGate }: FeatherFieldProps) {
   const { scene } = useGLTF(modelPath, dracoPath, true)
+  const camera = useThree((state) => state.camera)
+  const gl = useThree((state) => state.gl)
+  const rootScene = useThree((state) => state.scene)
+  const featherGroupRef = useRef<THREE.Group>(null)
+  const [shadersReady, setShadersReady] = useState(false)
   const model = useMemo(() => scene.clone(true), [scene])
   const count = isMobile || isConstrained ? 40 : 120
   const seeds = useMemo(() => createFeatherSeeds(count, 1217), [count])
@@ -233,10 +251,11 @@ function FeatherField({ isConstrained, isMobile }: Pick<
         scrollRef.current.documentProgress = detail.documentProgress
       }
       if (typeof detail?.velocity === 'number') scrollRef.current.velocity = detail.velocity
+      renderGate.current.idle = false
     }
     window.addEventListener('atlas:scroll', handleScroll)
     return () => window.removeEventListener('atlas:scroll', handleScroll)
-  }, [])
+  }, [renderGate])
 
   useEffect(() => {
     const storedStart = Number(document.documentElement.dataset.atlasSpectacleStart)
@@ -250,10 +269,27 @@ function FeatherField({ isConstrained, isMobile }: Pick<
       spectacleRef.current.startedAt = typeof startedAt === 'number'
         ? startedAt
         : performance.now()
+      renderGate.current.idle = false
     }
     window.addEventListener('atlas:sun-spectacle', handleSpectacle)
     return () => window.removeEventListener('atlas:sun-spectacle', handleSpectacle)
-  }, [])
+  }, [renderGate])
+
+  // Compile the feather programs off the main thread (KHR_parallel_shader_compile)
+  // before the first visible draw, so mounting does not stall the page.
+  useEffect(() => {
+    const featherGroup = featherGroupRef.current
+    if (!featherGroup) return
+    let cancelled = false
+    const precompile = precompileShaders(gl, featherGroup, camera, rootScene)
+    void precompile.ready.then(() => {
+      if (!cancelled) setShadersReady(true)
+    })
+    return () => {
+      cancelled = true
+      precompile.cancel()
+    }
+  }, [camera, gl, rootScene])
 
   useEffect(() => {
     if (isMobile) return
@@ -310,6 +346,10 @@ function FeatherField({ isConstrained, isMobile }: Pick<
     }
     nearMaterial.opacity = frameRef.current.opacity * 0.34
     farMaterial.opacity = frameRef.current.opacity * 0.14
+    // Once every feather has faded out this frame clears the canvas; later frames
+    // are skipped until scrolling or the spectacle can bring feathers back.
+    renderGate.current.idle = !spectacle.active
+      && getVisibleFeatherCount(count, frameRef.current.density) === 0
   }, -1)
 
   return (
@@ -317,29 +357,21 @@ function FeatherField({ isConstrained, isMobile }: Pick<
       <ambientLight intensity={1.25} color="#f5f2ec" />
       <directionalLight position={[5, 6, 4]} intensity={2.1} color="#ffdca0" />
       <directionalLight position={[-4, 1, 2]} intensity={0.72} color="#b7c8dc" />
-      {batches.map((batch) => (
-        <FeatherInstances
-          key={`${batch.layer}-${batch.records[0]?.variant ?? 'empty'}`}
-          frameRef={frameRef}
-          geometry={batch.geometry}
-          gustRef={gustRef}
-          layer={batch.layer}
-          material={batch.layer === 0 ? nearMaterial : farMaterial}
-          records={batch.records}
-        />
-      ))}
+      <group ref={featherGroupRef} visible={shadersReady}>
+        {batches.map((batch) => (
+          <FeatherInstances
+            key={`${batch.layer}-${batch.records[0]?.variant ?? 'empty'}`}
+            frameRef={frameRef}
+            geometry={batch.geometry}
+            gustRef={gustRef}
+            layer={batch.layer}
+            material={batch.layer === 0 ? nearMaterial : farMaterial}
+            records={batch.records}
+          />
+        ))}
+      </group>
     </>
   )
-}
-
-function MobileInvalidator() {
-  const invalidate = useThree((state) => state.invalidate)
-  useEffect(() => {
-    invalidate()
-    const timer = globalThis.setInterval(invalidate, 1000 / 30)
-    return () => globalThis.clearInterval(timer)
-  }, [invalidate])
-  return null
 }
 
 function FeatherTelemetry() {
@@ -368,19 +400,29 @@ function FeatherTelemetry() {
 
 export function FeatherFallScene({ isConstrained, isMobile, showStats }: FeatherFallSceneProps) {
   const capped = isMobile || isConstrained
+  const renderGate = useRef<FeatherRenderGate>({ idle: false })
+  const shouldRender = useCallback(() => !renderGate.current.idle, [])
   return (
     <Canvas
       camera={{ position: [0, 0, 8], zoom: 80 }}
       dpr={capped ? 1 : [1, 1.4]}
-      frameloop={capped ? 'demand' : 'always'}
-      gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
+      frameloop="demand"
+      gl={{ alpha: true, antialias: false }}
+      onCreated={configureSceneRenderer}
       orthographic
       className="feather-fall-canvas"
     >
-      {capped && <MobileInvalidator />}
+      <FrameRateLimiter
+        fps={capped ? CONSTRAINED_FPS : DESKTOP_FPS}
+        shouldRender={shouldRender}
+      />
       <FeatherTelemetry />
       <Suspense fallback={null}>
-        <FeatherField isConstrained={isConstrained} isMobile={isMobile} />
+        <FeatherField
+          isConstrained={isConstrained}
+          isMobile={isMobile}
+          renderGate={renderGate}
+        />
       </Suspense>
       {showStats && <Stats className="feather-fall-stats" />}
     </Canvas>

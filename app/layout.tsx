@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 
 import { PageTransitionProvider } from '@/components/motion/PageTransitionProvider'
+import { PersistentAtlasMotionEffects } from '@/components/motion/PersistentAtlasMotionEffects'
 import { WebGLActivationGate } from '@/components/motion/WebGLActivationGate'
 import { SITE_DESCRIPTION, SITE_URL } from '@/lib/site-config'
 
@@ -46,7 +47,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <PageTransitionProvider>{children}</PageTransitionProvider>
+        <PageTransitionProvider>
+          <PersistentAtlasMotionEffects />
+          {children}
+        </PageTransitionProvider>
         <WebGLActivationGate />
         <Script src="/atlas.js" strategy="lazyOnload" />
       </body>
