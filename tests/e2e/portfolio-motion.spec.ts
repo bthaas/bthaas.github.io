@@ -540,14 +540,37 @@ test('assembles the gateway once, locks interaction until landing, and hands off
   test.slow()
   test.skip(browserName !== 'chromium' || isMobile, 'One fine-pointer engine measures Phase 1.')
   const errors = observeApplicationErrors(page)
-  await page.addInitScript(() => sessionStorage.clear())
+  await page.addInitScript(() => {
+    sessionStorage.clear()
+    const probe = { entered: false, restingFrames: 0 }
+    Object.assign(window, { __gatewayBootProbe: probe })
+    const sample = () => {
+      const state = document.querySelector('#portfolio-gateway')
+        ?.getAttribute('data-gateway-entrance')
+      if (state === 'entering') probe.entered = true
+      const covered = document.documentElement.hasAttribute('data-atlas-boot')
+      const restingSlices = Array.from(document.querySelectorAll<HTMLElement>(
+        '[data-gateway-entrance-slice]',
+      )).filter((slice) => Number(getComputedStyle(slice).opacity) > 0.5)
+      if (!probe.entered && !covered && restingSlices.length > 0) probe.restingFrames += 1
+      if (!probe.entered) requestAnimationFrame(sample)
+    }
+    requestAnimationFrame(sample)
+  })
   await page.goto('/', { waitUntil: 'domcontentloaded' })
 
   await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
+  const bootLoader = page.locator('[data-boot-loader]')
+  await expect(page.locator('html')).toHaveAttribute('data-atlas-boot', 'loading')
+  await expect(bootLoader).toBeVisible()
+  await expect(bootLoader.locator('[data-boot-loader-value]')).toHaveText('100')
   const gateway = page.getByRole('region', { name: 'Portfolio category carousel' })
   const gatewaySection = page.locator('#portfolio-gateway')
   await gatewaySection.scrollIntoViewIfNeeded()
   await expect(gatewaySection).toHaveAttribute('data-gateway-entrance', 'entering')
+  expect(await page.evaluate(() => (
+    window as unknown as { __gatewayBootProbe: { restingFrames: number } }
+  ).__gatewayBootProbe.restingFrames)).toBe(0)
   await expect(gateway).toHaveAttribute('aria-disabled', 'true')
   await expect(gateway).toHaveAttribute('tabindex', '-1')
   await expect(page.getByRole('button', { name: 'Next category' })).toBeDisabled()
@@ -562,6 +585,8 @@ test('assembles the gateway once, locks interaction until landing, and hands off
   await expect(gateway).not.toHaveAttribute('aria-disabled')
   await expect(gateway).toHaveAttribute('tabindex', '0')
   await expect(page.getByRole('button', { name: 'Next category' })).toBeEnabled()
+  await expect(page.locator('html')).not.toHaveAttribute('data-atlas-boot')
+  await expect(bootLoader).toBeHidden()
 
   const entranceDuration = await page.evaluate(() => performance
     .getEntriesByName('atlas-gateway-entrance-duration')
@@ -581,6 +606,8 @@ test('assembles the gateway once, locks interaction until landing, and hands off
     'settled',
   )
   await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
+  await expect(page.locator('html')).not.toHaveAttribute('data-atlas-boot')
+  await expect(bootLoader).toBeHidden()
   expect(errors).toEqual([])
 })
 
@@ -605,6 +632,8 @@ test('skips the gateway assembly and unlocks input for reduced motion', async ({
   await expect(gateway).toHaveAttribute('tabindex', '0')
   await expect(page.getByRole('button', { name: 'Next category' })).toBeEnabled()
   await expect(page.locator('[data-atlas-preloader]')).toHaveCount(0)
+  await expect(page.locator('html')).not.toHaveAttribute('data-atlas-boot')
+  await expect(page.locator('[data-boot-loader]')).toBeHidden()
   expect(await gatewaySection.locator('[data-gateway-entrance-slice]').evaluateAll(
     (slices) => slices.filter((slice) => (slice as HTMLElement).style.transform).length,
   )).toBe(0)

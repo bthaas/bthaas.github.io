@@ -3,6 +3,7 @@ import Script from 'next/script'
 
 import { PageTransitionProvider } from '@/components/motion/PageTransitionProvider'
 import { WebGLActivationGate } from '@/components/motion/WebGLActivationGate'
+import { getBootLoaderScript } from '@/lib/boot-loader'
 import { SITE_DESCRIPTION, SITE_URL } from '@/lib/site-config'
 
 import './globals.css'
@@ -44,7 +45,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: getBootLoaderScript() }} />
+      </head>
       <body>
         <PageTransitionProvider>{children}</PageTransitionProvider>
         <WebGLActivationGate />
