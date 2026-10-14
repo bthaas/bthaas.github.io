@@ -260,4 +260,22 @@ describe('ProjectsSpiral', () => {
     await waitFor(() => expect(screen.queryByTestId('project-spiral-scene')).not.toBeInTheDocument())
     expect(stage).not.toHaveAttribute('data-project-spiral-ready')
   })
+
+  it('ignores height-only resizes such as a mobile URL bar collapsing during scroll', async () => {
+    render(<ProjectsSpiral projects={siteContent.projects} />)
+    await screen.findByTestId('project-spiral-scene')
+    const checksAfterMount = vi.mocked(shouldRenderWebGL).mock.calls.length
+
+    act(() => {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 620, writable: true })
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(shouldRenderWebGL).toHaveBeenCalledTimes(checksAfterMount)
+
+    act(() => {
+      window.innerWidth = 700
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(shouldRenderWebGL).toHaveBeenCalledTimes(checksAfterMount + 1)
+  })
 })

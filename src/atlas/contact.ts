@@ -62,6 +62,7 @@ export function setupContactFinale(
   let latestScrollY = runtimeWindow.scrollY
   let latestDocumentProgress = 0
   let measuredOnApproach = false
+  let renderedProgress = Number.NaN
   let firstMeasureFrame = 0
   let secondMeasureFrame = 0
 
@@ -80,6 +81,10 @@ export function setupContactFinale(
       measuredProgress,
       getContactDocumentProgress(latestDocumentProgress),
     )
+    // Every value below derives from progress alone; while it is unchanged (for
+    // example, anywhere above the section) the style writes would be no-ops.
+    if (progress === renderedProgress) return
+    renderedProgress = progress
     const glow = getContactGlowProgress(progress)
 
     section.style.setProperty('--atlas-contact-glow', String(glow))

@@ -47,8 +47,12 @@ export function setupCursor(
   const setDotY = engine.gsap.quickSetter(dot, 'y', 'px')
   const ringXTo = engine.gsap.quickTo(ring, 'x', { duration: 0.2, ease: 'power3.out' })
   const ringYTo = engine.gsap.quickTo(ring, 'y', { duration: 0.2, ease: 'power3.out' })
+  let currentMode: CursorMode = 'default'
   const updateMode = (target: EventTarget | null) => {
     const mode = getCursorMode(target)
+    // Pointer moves fire every frame; skip DOM writes that would only repeat the mode.
+    if (mode === currentMode) return
+    currentMode = mode
     cursor.dataset.cursorMode = mode
     label.textContent = labels[mode]
   }

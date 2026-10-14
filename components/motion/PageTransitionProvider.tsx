@@ -16,25 +16,15 @@ import type {
 } from 'react'
 
 import { ATLAS_ROUTE_CHANGE_EVENT } from '@/lib/atlas-events'
+import { normalizePathname, PORTFOLIO_DESTINATIONS } from '@/lib/atlas-routes'
 
 type PageTransitionKind = 'portal' | 'standard'
 type BeginNavigation = (href: string) => void
 
 const NavigationContext = createContext<BeginNavigation | null>(null)
-const PORTFOLIO_DESTINATIONS = [
-  '/experience',
-  '/projects',
-  '/skills',
-  '/contact',
-] as const
 
 function pathsMatch(left: string, right: string) {
-  const normalize = (value: string) => {
-    const pathname = value.split(/[?#]/, 1)[0]
-    return pathname === '/' ? pathname : pathname.replace(/\/+$/, '')
-  }
-
-  return normalize(left) === normalize(right)
+  return normalizePathname(left) === normalizePathname(right)
 }
 
 export function PageTransitionProvider({ children }: { readonly children: ReactNode }) {

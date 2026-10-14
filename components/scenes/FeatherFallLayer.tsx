@@ -91,13 +91,22 @@ export function FeatherFallLayer() {
       })
     }
 
+    // Mobile browsers fire height-only resizes while the URL bar collapses during
+    // scroll; only a width change can alter the tier or eligibility.
+    let lastWidth = window.innerWidth
+    const handleResize = () => {
+      if (window.innerWidth === lastWidth) return
+      lastWidth = window.innerWidth
+      update()
+    }
+
     update()
-    window.addEventListener('resize', update, { passive: true })
+    window.addEventListener('resize', handleResize, { passive: true })
     window.addEventListener(WEBGL_ACTIVATION_EVENT, update)
     reducedMotion.addEventListener('change', update)
     return () => {
       cancelSchedule()
-      window.removeEventListener('resize', update)
+      window.removeEventListener('resize', handleResize)
       window.removeEventListener(WEBGL_ACTIVATION_EVENT, update)
       reducedMotion.removeEventListener('change', update)
     }

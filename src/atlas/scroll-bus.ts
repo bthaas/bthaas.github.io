@@ -27,12 +27,18 @@ export function createScrollBus({
 }: ScrollBusOptions = {}): ScrollBus {
   const subscribers = new Set<ScrollSubscriber>()
   let lastPublished: ScrollSnapshot | null = null
+  // Reading scrollHeight on every scroll frame can force a synchronous layout, so
+  // it is measured once and refreshed whenever ScrollTrigger re-measures the page.
+  let scrollHeight = runtimeDocument.documentElement.scrollHeight
+  const measure = () => {
+    scrollHeight = runtimeDocument.documentElement.scrollHeight
+  }
 
   const readSnapshot = (scrollYOverride?: number): ScrollSnapshot => {
     const scrollY = scrollYOverride ?? engine?.lenis.scroll ?? runtimeWindow.scrollY
     return {
       documentProgress: getDocumentProgress({
-        scrollHeight: runtimeDocument.documentElement.scrollHeight,
+        scrollHeight,
         scrollY,
         viewportHeight: runtimeWindow.innerHeight,
       }),
@@ -52,12 +58,16 @@ export function createScrollBus({
     subscribers.forEach((subscriber) => subscriber(snapshot))
   }
   const handleNativeScroll = () => {
+    if (!engine) measure()
     publish(runtimeWindow.scrollY)
   }
 
   const trigger = engine?.ScrollTrigger.create({
     end: 'max',
-    onRefresh: () => publish(),
+    onRefresh: () => {
+      measure()
+      publish()
+    },
     onUpdate: () => publish(),
     start: 0,
     trigger: runtimeDocument.documentElement,
