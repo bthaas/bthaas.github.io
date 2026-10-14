@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
 import { useState, type RefObject } from 'react'
 
+import { afterBootLoader, announceBootReady } from '@/lib/boot-loader'
 import { GATEWAY_CYLINDER_SEGMENTS } from '@/lib/portfolio-gateway'
 import {
   GATEWAY_ENTRANCE_DURATION_SECONDS,
@@ -206,7 +207,10 @@ export function useGatewayEntrance(
 
   useGSAP(() => {
     const root = rootRef.current
-    if (!root) return
+    if (!root) {
+      announceBootReady()
+      return
+    }
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     if (!shouldRunGatewayEntrance({
@@ -214,12 +218,14 @@ export function useGatewayEntrance(
       seen: hasSeenGatewayEntrance(),
     })) {
       setState('settled')
+      announceBootReady()
       return
     }
 
     const targets = getEntranceTargets(root)
     if (!targets) {
       setState('settled')
+      announceBootReady()
       return
     }
 
@@ -229,6 +235,7 @@ export function useGatewayEntrance(
       getGatewaySliceEntrance(index, segment.angle, viewportHeight)
     ))
     prepareEntrance(targets, slices)
+    announceBootReady()
 
     let observer: IntersectionObserver | null = null
     let timeline: gsap.core.Timeline | null = null
@@ -259,17 +266,22 @@ export function useGatewayEntrance(
     }
     reducedMotion.addEventListener('change', handleMotionChange)
 
-    if (typeof IntersectionObserver === 'undefined') {
-      start()
-    } else {
+    const startWhenVisible = () => {
+      if (finished) return
+      if (typeof IntersectionObserver === 'undefined') {
+        start()
+        return
+      }
       observer = new IntersectionObserver(([entry]) => {
         if (entry?.isIntersecting) start()
       }, { threshold: 0.2 })
       observer.observe(root)
     }
+    const stopWaitingForBootLoader = afterBootLoader(startWhenVisible)
 
     return () => {
       finished = true
+      stopWaitingForBootLoader()
       observer?.disconnect()
       timeline?.kill()
       reducedMotion.removeEventListener('change', handleMotionChange)
