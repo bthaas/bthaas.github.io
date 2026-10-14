@@ -2,6 +2,12 @@ import { act, render, screen } from '@testing-library/react'
 import { useRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  BOOT_LOADER_ATTRIBUTE,
+  BOOT_LOADER_COMPLETE_EVENT,
+  BOOT_LOADER_READY_EVENT,
+} from '@/lib/boot-loader'
+
 import { useGatewayEntrance } from './useGatewayEntrance'
 
 const gsapMock = vi.hoisted(() => {
@@ -113,6 +119,7 @@ describe('useGatewayEntrance', () => {
   })
 
   afterEach(() => {
+    document.documentElement.removeAttribute(BOOT_LOADER_ATTRIBUTE)
     globalThis.IntersectionObserver = originalIntersectionObserver
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -202,6 +209,67 @@ describe('useGatewayEntrance', () => {
     expect(screen.getByTestId('entrance-state')).toHaveTextContent('settled')
     expect(sessionStorage.getItem('atlas-gateway-entered')).toBeNull()
     expect(gsapMock.timeline.kill).toHaveBeenCalled()
+  })
+
+  it('stages the slices under the boot loader and starts only once it reveals the page', () => {
+    globalThis.IntersectionObserver = undefined as unknown as typeof IntersectionObserver
+    document.documentElement.setAttribute(BOOT_LOADER_ATTRIBUTE, 'loading')
+    const ready = vi.fn(() => {
+      expect(gsapMock.set).toHaveBeenCalled()
+    })
+    window.addEventListener(BOOT_LOADER_READY_EVENT, ready)
+
+    render(<HookHarness />)
+
+    expect(ready).toHaveBeenCalledOnce()
+    expect(screen.getByTestId('entrance-state')).toHaveTextContent('pending')
+    expect(gsapMock.createTimeline).not.toHaveBeenCalled()
+
+    document.documentElement.setAttribute(BOOT_LOADER_ATTRIBUTE, 'exiting')
+    act(() => {
+      window.dispatchEvent(new Event(BOOT_LOADER_COMPLETE_EVENT))
+    })
+    expect(screen.getByTestId('entrance-state')).toHaveTextContent('entering')
+    expect(gsapMock.createTimeline).toHaveBeenCalledOnce()
+    window.removeEventListener(BOOT_LOADER_READY_EVENT, ready)
+  })
+
+  it('releases the boot loader when the entrance is skipped', () => {
+    const ready = vi.fn()
+    window.addEventListener(BOOT_LOADER_READY_EVENT, ready)
+
+    sessionStorage.setItem('atlas-gateway-entered', '1')
+    render(<HookHarness />).unmount()
+    sessionStorage.clear()
+    render(<HookHarness complete={false} />)
+
+    expect(ready).toHaveBeenCalledTimes(2)
+    window.removeEventListener(BOOT_LOADER_READY_EVENT, ready)
+  })
+
+  it('stops waiting for the boot loader after unmounting', () => {
+    globalThis.IntersectionObserver = undefined as unknown as typeof IntersectionObserver
+    document.documentElement.setAttribute(BOOT_LOADER_ATTRIBUTE, 'loading')
+
+    render(<HookHarness />).unmount()
+    window.dispatchEvent(new Event(BOOT_LOADER_COMPLETE_EVENT))
+
+    expect(gsapMock.createTimeline).not.toHaveBeenCalled()
+  })
+
+  it('does not start after motion becomes reduced while the boot loader is visible', () => {
+    globalThis.IntersectionObserver = undefined as unknown as typeof IntersectionObserver
+    document.documentElement.setAttribute(BOOT_LOADER_ATTRIBUTE, 'loading')
+    render(<HookHarness />)
+
+    mediaMatches = true
+    act(() => motionChange?.())
+    act(() => {
+      window.dispatchEvent(new Event(BOOT_LOADER_COMPLETE_EVENT))
+    })
+
+    expect(screen.getByTestId('entrance-state')).toHaveTextContent('settled')
+    expect(gsapMock.createTimeline).not.toHaveBeenCalled()
   })
 
   it('animates the side-arrow controls used by the current gateway', () => {

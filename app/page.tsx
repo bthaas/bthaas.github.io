@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { BootLoader } from '@/components/motion/BootLoader'
 import { Portfolio } from '@/components/portfolio/Portfolio'
 import { StructuredData } from '@/components/seo/StructuredData'
 import { getPageAlternates } from '@/lib/page-metadata'
@@ -14,6 +15,7 @@ export default function HomePage() {
     <>
       <StructuredData data={buildHomeJsonLd()} />
       <Portfolio screen="home" />
+      <BootLoader />
     </>
   )
 }

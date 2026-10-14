@@ -20,6 +20,16 @@ describe('homepage', () => {
     expect(container.querySelector('.hero-section')).not.toBeInTheDocument()
   })
 
+  it('ships a decorative loading bar outside the main landmark', () => {
+    const { container } = render(<HomePage />)
+    const loader = container.querySelector('[data-boot-loader]')
+
+    expect(loader).toHaveAttribute('aria-hidden', 'true')
+    expect(loader?.closest('main')).toBeNull()
+    expect(loader?.querySelector('[data-boot-loader-value]')).toHaveTextContent('000')
+    expect(loader?.querySelector('[data-boot-loader-fill]')).toBeInTheDocument()
+  })
+
   it('server-renders a meaningful text overview for readers without JavaScript', () => {
     const { container } = render(<HomePage />)
     const main = container.querySelector('main') as HTMLElement
